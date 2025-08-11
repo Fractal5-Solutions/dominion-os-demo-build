@@ -33,7 +33,7 @@ jobs:
         with:
           branch: autopolish/${{ github.run_id }}
           commit-message: "chore: autopolish"
-          title: "Autopolish: ${!! github.run_number }}"
+          title: "Autopolish: ${{ github.run_number }}"
           body: "Automated formatting & hygiene."
           labels: "autopilot,polish"
           signoff: true
