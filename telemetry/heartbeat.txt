@@ -5,5 +5,4 @@ Enter the new date: (yy-mm-dd) The system cannot accept the date entered.
 Enter the new date: (yy-mm-dd) The system cannot accept the date entered.
 Enter the new date: (yy-mm-dd) The system cannot accept the date entered.
 Enter the new date: (yy-mm-dd) The system cannot accept the date entered.
-Enter the new date: (yy-mm-dd) The system cannot accept the date entered.
 Enter the new date: (yy-mm-dd) 
