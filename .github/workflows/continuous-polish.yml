@@ -1,1 +1,45 @@
-﻿
+﻿name: continuous-polish
+on:
+  push:
+    branches: [ "main" ]
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  polish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+      - name: Run polish
+        run: bash tools/polish_all.sh
+      - name: Create PR if changes
+        id: cpr
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: autopolish/${{ github.run_id }}
+          commit-message: "chore: autopolish"
+          title: "Autopolish: ${!! github.run_number }}"
+          body: "Automated formatting & hygiene."
+          labels: "autopilot,polish"
+          signoff: true
+          delete-branch: true
+      - name: Auto-merge (optional)
+        if: ${{ steps.cpr.outputs.pull-request-number && vars.AUTO_MERGE == '1' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr merge --squash --auto ${{ steps.cpr.outputs.pull-request-number }}
