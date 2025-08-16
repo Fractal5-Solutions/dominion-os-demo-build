@@ -68,8 +68,9 @@ jobs:
         run: npm run build --if-present
 
       - name: Upload artifact (dist)
-        if: ${{ steps.detect.outputs.present == 'true' && hashFiles(format('{0}/dist/**', matrix.project.dir)) != '' }}
+        if: ${{ steps.detect.outputs.present == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.project.name }}-dist
           path: ${{ matrix.project.dir }}/dist
+          if-no-files-found: ignore
