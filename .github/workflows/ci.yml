@@ -29,10 +29,8 @@ jobs:
       fail-fast: false
       matrix:
         project:
-          - dir: .
-            name: root
-          - dir: app
-            name: app
+          - { dir: '.',  name: 'root' }
+          - { dir: 'app', name: 'app' }
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -42,9 +40,9 @@ jobs:
         id: detect
         run: |
           if [ -f "${{ matrix.project.dir }}/package.json" ]; then
-            echo "present=true" >> $GITHUB_OUTPUT
+            echo "present=true" >> "$GITHUB_OUTPUT"
           else
-            echo "present=false" >> $GITHUB_OUTPUT
+            echo "present=false" >> "$GITHUB_OUTPUT"
           fi
 
       - uses: actions/setup-node@v4
