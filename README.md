@@ -13,3 +13,5 @@ For the live demo experience, go to:
 ---
 
 © Fractal5 Solutions Inc. All rights reserved.
+
+Status badge placeholder
