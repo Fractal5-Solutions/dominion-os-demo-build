@@ -1,0 +1,11 @@
+name: NoActions
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  echo:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Runner started OK"
