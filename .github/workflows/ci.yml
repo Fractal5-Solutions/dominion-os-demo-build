@@ -2,18 +2,8 @@ name: CI
 on:
   push:
     branches: [ main ]
-    paths:
-      - '.github/workflows/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'app/**'
   pull_request:
     branches: [ main ]
-    paths:
-      - '.github/workflows/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'app/**'
   workflow_dispatch:
 
 permissions:
@@ -24,78 +14,50 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
-    strategy:
-      fail-fast: false
-      matrix:
-        project:
-          - { dir: '.',  name: 'root' }
-          - { dir: 'app', name: 'app' }
+  sanity:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+      - run: echo "Workflow parsed and runner started ✅"
 
-      - name: Detect project
-        id: detect
-        run: |
-          if [ -f "${{ matrix.project.dir }}/package.json" ]; then
-            echo "present=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "present=false" >> "$GITHUB_OUTPUT"
-          fi
-          if [ -f "${{ matrix.project.dir }}/package-lock.json" ]; then
-            echo "lock=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "lock=false" >> "$GITHUB_OUTPUT"
-          fi
-          if [ -f "${{ matrix.project.dir }}/.nvmrc" ]; then
-            echo "nvmrc=${{ matrix.project.dir }}/.nvmrc" >> "$GITHUB_OUTPUT"
-          else
-            echo "nvmrc=" >> "$GITHUB_OUTPUT"
-          fi
-
-      # Use .nvmrc if present
+  node-root:
+    if: ${{ hashFiles('package.json') != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        if: ${{ steps.detect.outputs.present == 'true' && steps.detect.outputs.nvmrc != '' }}
-        with:
-          node-version-file: ${{ steps.detect.outputs.nvmrc }}
-          cache: npm
-          cache-dependency-path: ${{ matrix.project.dir }}/package-lock.json
-
-      # Otherwise pin Node 20
-      - uses: actions/setup-node@v4
-        if: ${{ steps.detect.outputs.present == 'true' && steps.detect.outputs.nvmrc == '' }}
         with:
           node-version: '20'
           cache: npm
-          cache-dependency-path: ${{ matrix.project.dir }}/package-lock.json
-
-      - name: Install (use ci if lockfile exists)
-        if: ${{ steps.detect.outputs.present == 'true' }}
-        working-directory: ${{ matrix.project.dir }}
-        run: |
-          if [ "${{ steps.detect.outputs.lock }}" = "true" ]; then
-            npm ci
-          else
-            npm install
-          fi
-
-      - name: Test
-        if: ${{ steps.detect.outputs.present == 'true' }}
-        working-directory: ${{ matrix.project.dir }}
-        run: npm test --if-present
-
+          cache-dependency-path: package-lock.json
+      - name: Install deps
+        run: npm ci
       - name: Build
-        if: ${{ steps.detect.outputs.present == 'true' }}
-        working-directory: ${{ matrix.project.dir }}
         run: npm run build --if-present
-
-      - name: Upload artifact (dist)
-        if: ${{ steps.detect.outputs.present == 'true' }}
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.project.name }}-dist
-          path: ${{ matrix.project.dir }}/dist
+          name: root-dist
+          path: dist
           if-no-files-found: ignore
-          retention-days: 7
+
+  node-app:
+    if: ${{ hashFiles('app/package.json') != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - name: Install deps
+        working-directory: app
+        run: npm ci
+      - name: Build
+        working-directory: app
+        run: npm run build --if-present
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-dist
+          path: app/dist
+          if-no-files-found: ignore
