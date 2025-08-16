@@ -15,3 +15,4 @@ For the live demo experience, go to:
 © Fractal5 Solutions Inc. All rights reserved.
 
 Status badge placeholder
+`n![CI](https://github.com/Fractal5-Solutions/dominion-os-demo-build/actions/workflows/ci.yml/badge.svg)
