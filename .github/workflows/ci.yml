@@ -4,10 +4,11 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   node-root:
-    if: hashFiles('package.json') != ''
+    if: ${{ hashFiles('package.json') != '' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,10 +20,10 @@ jobs:
       - name: Install deps
         run: npm ci
       - name: Build
-        run: npm run build
+        run: npm run build --if-present
 
   node-app-subdir:
-    if: hashFiles('app/package.json') != ''
+    if: ${{ hashFiles('app/package.json') != '' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -36,4 +37,10 @@ jobs:
         run: npm ci
       - name: Build
         working-directory: app
-        run: npm run build
+        run: npm run build --if-present
+
+  noop:
+    if: ${{ hashFiles('package.json') == '' && hashFiles('app/package.json') == '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "No Node projects detected; skipping."
