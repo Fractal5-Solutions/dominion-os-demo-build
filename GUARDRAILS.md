@@ -36,3 +36,5 @@ This repo is **entombed**:
 - Every change passes through the gauntlet above.
 
 Dominion OS stands as a **crypt of compliance** — every artifact is truth-aligned, irreversible, and sovereign.
+
+
