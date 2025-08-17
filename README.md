@@ -1,3 +1,5 @@
+
+> **Compliance:** See [Guardrails](GUARDRAILS.md) for enforced repo & release protections.
 # Dominion OS Demo Build
 
 This repository contains the **compiled public demo build** of Dominion OS 1.0.  
@@ -16,3 +18,4 @@ For the live demo experience, go to:
 
 Status badge placeholder
 `n![CI](https://github.com/Fractal5-Solutions/dominion-os-demo-build/actions/workflows/ci.yml/badge.svg)
+
