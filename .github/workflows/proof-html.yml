@@ -1,0 +1,26 @@
+name: Proof HTML (terrain viewer)
+
+on:
+  pull_request:
+    branches: [ "main", "release/**" ]
+  workflow_dispatch:
+
+jobs:
+  lint-html:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure no external CDNs
+        run: |
+          set -euo pipefail
+          f="web/terrain-viewer/index.html"
+          if [ -f "$f" ]; then
+            if grep -E "https?://" "$f"; then
+              echo "External links not allowed" >&2
+              exit 1
+            fi
+          fi
+          echo "HTML check passed"
+
