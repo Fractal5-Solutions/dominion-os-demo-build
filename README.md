@@ -1,32 +1,30 @@
+Dominion OS Demo Build
 
-> **Compliance:** See [Guardrails](GUARDRAILS.md) for enforced repo & release protections.
-# Dominion OS Demo Build
+This repo demonstrates consuming the sibling `dominion-os-1.0` toy kernel to:
 
-This repository contains the **compiled public demo build** of Dominion OS 1.0.  
-It includes only **minified, non-editable assets** for display and testing purposes.  
-No source code or proprietary development files are included.
+- Build a JSON image
+- Run a demo and save outputs to `dist/`
 
-For full details about Dominion OS, visit:  
-➡ [Fractal5 Solutions – Dominion OS](https://www.fractal5solutions.com/dominion-os)
+Quickstart
 
-For the live demo experience, go to:  
-➡ [Dominion OS Public Demo](https://fractal5-solutions.github.io/dominion-os-1.0/)
+- Build: `python demo_build.py build`
+- Run demo: `python demo_build.py run`
+- Tests: `python -m unittest`
 
----
+Command Core (full experience)
 
-© Fractal5 Solutions Inc. All rights reserved.
+- Run interactive dashboard (small scale):
+  - `python demo_build.py command-core --duration 120 --scale small`
+- Headless, generate artifacts only:
+  - `python demo_build.py command-core --duration 100 --scale medium --no-ui`
+- Artifacts are written to `dist/command_core/` as `events.log`, `session.json`, and `summary.txt`.
 
-Status badge placeholder
-`n![CI](https://github.com/Fractal5-Solutions/dominion-os-demo-build/actions/workflows/ci.yml/badge.svg)
+Autopilot (NHITL)
 
-## Terrain Viewer (Local API)
+- Single automated run at large scale:
+  - `python demo_build.py autopilot --scale large --duration 300`
+- Multiple back-to-back runs with interval:
+  - `python demo_build.py autopilot --scale medium --duration 120 --runs 3 --interval-ms 500`
+- Output: flight summaries saved under `dist/command_core/flight_*.json`.
 
-- Start the Dominion API at `http://localhost:8080` (see `dominion-os-1.0/README.md`).
-- Open `http://localhost:8080/viewer/index.html?job_id={job_id}` to preview the ingested heightmap via WebGL2.
-- The API serves the viewer for same-origin asset fetches under `/v1/gis/...`.
-
-### Observability (contract)
-
-- When the API is started with `DOMINION_ENABLE_TELEMETRY=1`, it exposes Prometheus metrics at `GET /metrics`.
-- The viewer does not emit telemetry by default. To integrate browser traces, configure your deployment to serve an OTLP collector and inject a lightweight Web SDK snippet in `web/terrain-viewer/index.html`.
-- Egress from the API is denied by default (loopback only) and must not be required by viewer assets.
+Note: This demo imports `dominion_os` from the sibling path `../dominion-os-1.0` without installing it. This keeps it network-free.
