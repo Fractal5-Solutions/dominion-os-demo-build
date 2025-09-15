@@ -38,16 +38,21 @@ def run_demo() -> Path:
     return dst
 
 
-def build_image() -> Path:
+def build_demo_image() -> Path:
     _add_sibling_os_to_syspath()
-    from dominion_os.cli import build_image  # type: ignore
+    from dominion_os.cli import build_image as os_build_image  # type: ignore
 
-    path = build_image()
+    path = os_build_image()
     out_dir = Path("dist")
     out_dir.mkdir(parents=True, exist_ok=True)
     dst = out_dir / path.name
     dst.write_text(Path(path).read_text())
     return dst
+
+
+# Backwards-compat alias for tests and docs
+def build_image() -> Path:  # pragma: no cover - thin wrapper
+    return build_demo_image()
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -80,7 +85,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Demo report: {dst}")
         return 0
     if args.cmd == "build":
-        dst = build_image()
+        dst = build_demo_image()
         print(f"Image: {dst}")
         return 0
     if args.cmd == "command-core":
@@ -120,11 +125,11 @@ def main(argv: list[str] | None = None) -> int:
         _add_sibling_os_to_syspath()
         # 1) Build OS image from dominion-os-1.0
         try:
-            from dominion_os.cli import build_image  # type: ignore
+            from dominion_os.cli import build_image as os_build_image  # type: ignore
         except ModuleNotFoundError:
             print("Error: dominion_os not found. Set DOMINION_OS_PATH or place sibling repo.")
             return 1
-        os_image = build_image()
+        os_image = os_build_image()
         print(f"[flagship] Built OS image: {os_image}")
 
         # 2) Run Command Core
