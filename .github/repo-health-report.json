@@ -1,0 +1,35 @@
+{
+  "timestamp": "2025-10-01T06:02:42.841741",
+  "repository": "dominion-os-1.0",
+  "size_info": {
+    "count": "13",
+    "size": "6.90 KiB",
+    "in-pack": "434",
+    "packs": "1",
+    "size-pack": "97.30 KiB",
+    "prune-packable": "0",
+    "garbage": "0",
+    "size-garbage": "0 bytes"
+  },
+  "security": {
+    "vulnerabilities": {
+      "critical": 0,
+      "high": 0,
+      "moderate": 0,
+      "low": 0,
+      "total": 0
+    },
+    "vulnerable_files": [],
+    "recommendations": [
+      "Run 'pip install safety' and 'safety check'",
+      "Review Dependabot alerts in GitHub",
+      "Update dependencies regularly"
+    ]
+  },
+  "lfs_status": {
+    "lfs_installed": true,
+    "lfs_status": "healthy",
+    "output": "On branch feature/repository-optimization\n\nObjects to be committed:\n\n\nObjects not staged for commit:"
+  },
+  "recommendations": []
+}
