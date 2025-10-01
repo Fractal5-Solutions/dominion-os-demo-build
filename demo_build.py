@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import json
 import os
 from pathlib import Path
 import sys
@@ -62,22 +61,40 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("build")
 
     p_cc = sub.add_parser("command-core", help="Run Command Core orchestration demo")
-    p_cc.add_argument("--duration", type=int, default=120, help="Scheduler ticks to run")
+    p_cc.add_argument(
+        "--duration", type=int, default=120, help="Scheduler ticks to run"
+    )
     p_cc.add_argument("--scale", choices=["small", "medium", "large"], default="small")
-    p_cc.add_argument("--no-ui", action="store_true", help="Headless run; write artifacts only")
-    p_cc.add_argument("--refresh-ms", type=int, default=0, help="UI refresh delay in ms")
+    p_cc.add_argument(
+        "--no-ui", action="store_true", help="Headless run; write artifacts only"
+    )
+    p_cc.add_argument(
+        "--refresh-ms", type=int, default=0, help="UI refresh delay in ms"
+    )
 
     p_auto = sub.add_parser("autopilot", help="Fully automated NHITL orchestration run")
     p_auto.add_argument("--duration", type=int, default=180, help="Ticks per run")
-    p_auto.add_argument("--scale", choices=["small", "medium", "large"], default="large")
+    p_auto.add_argument(
+        "--scale", choices=["small", "medium", "large"], default="large"
+    )
     p_auto.add_argument("--runs", type=int, default=1, help="Number of sequential runs")
     p_auto.add_argument("--interval-ms", type=int, default=0, help="Pause between runs")
 
-    p_flag = sub.add_parser("flagship", help="Build OS + run Command Core + package artifacts")
-    p_flag.add_argument("--duration", type=int, default=300, help="Ticks to run Command Core")
-    p_flag.add_argument("--scale", choices=["small", "medium", "large"], default="large")
-    p_flag.add_argument("--no-ui", action="store_true", help="Run headless (recommended for CI)")
-    p_flag.add_argument("--refresh-ms", type=int, default=0, help="UI refresh delay in ms (interactive)")
+    p_flag = sub.add_parser(
+        "flagship", help="Build OS + run Command Core + package artifacts"
+    )
+    p_flag.add_argument(
+        "--duration", type=int, default=300, help="Ticks to run Command Core"
+    )
+    p_flag.add_argument(
+        "--scale", choices=["small", "medium", "large"], default="large"
+    )
+    p_flag.add_argument(
+        "--no-ui", action="store_true", help="Run headless (recommended for CI)"
+    )
+    p_flag.add_argument(
+        "--refresh-ms", type=int, default=0, help="UI refresh delay in ms (interactive)"
+    )
     args = parser.parse_args(argv)
 
     if args.cmd == "run":
@@ -91,6 +108,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd == "command-core":
         _add_sibling_os_to_syspath()
         from command_core import run_command_core
+
         out = run_command_core(
             duration_ticks=args.duration,
             scale=args.scale,
@@ -102,12 +120,18 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd == "autopilot":
         _add_sibling_os_to_syspath()
         from command_core import run_command_core
-        import time, json
+        import time
+        import json
         from datetime import datetime
+
         results = []
         for i in range(args.runs):
-            print(f"[autopilot] Run {i+1}/{args.runs}: scale={args.scale} duration={args.duration}")
-            res = run_command_core(duration_ticks=args.duration, scale=args.scale, ui=False)
+            print(
+                f"[autopilot] Run {i + 1}/{args.runs}: scale={args.scale} duration={args.duration}"
+            )
+            res = run_command_core(
+                duration_ticks=args.duration, scale=args.scale, ui=False
+            )
             results.append(res)
             if i < args.runs - 1 and args.interval_ms:
                 time.sleep(args.interval_ms / 1000)
@@ -127,13 +151,16 @@ def main(argv: list[str] | None = None) -> int:
         try:
             from dominion_os.cli import build_image as os_build_image  # type: ignore
         except ModuleNotFoundError:
-            print("Error: dominion_os not found. Set DOMINION_OS_PATH or place sibling repo.")
+            print(
+                "Error: dominion_os not found. Set DOMINION_OS_PATH or place sibling repo."
+            )
             return 1
         os_image = os_build_image()
         print(f"[flagship] Built OS image: {os_image}")
 
         # 2) Run Command Core
         from command_core import run_command_core
+
         session = run_command_core(
             duration_ticks=args.duration,
             scale=args.scale,
