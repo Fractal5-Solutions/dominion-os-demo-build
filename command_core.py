@@ -145,7 +145,10 @@ def _render_dashboard(
     max_side = max(len(left_box), len(right_box))
     left_box += [" "] * (max_side - len(left_box))
     right_box += [" "] * (max_side - len(right_box))
-    rows = [l + " " + r for l, r in zip(left_box, right_box)]
+    rows = [
+        left_line + " " + right_line
+        for left_line, right_line in zip(left_box, right_box)
+    ]
     rows += bottom
     header = [f"Dominion Command Core — Enterprise Orchestration (t={tick})"]
     return "\n" + "\n".join(header + rows)
