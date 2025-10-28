@@ -20,7 +20,11 @@ def check_canon() -> bool:
 
 def main() -> int:
     cat = check_catalog()
-    snap = {"catalog": cat, "canon": check_canon(), "ok": cat.get("exists") and cat.get("no_external")}
+    snap = {
+        "catalog": cat,
+        "canon": check_canon(),
+        "ok": cat.get("exists") and cat.get("no_external"),
+    }
     Path("demo_success_snapshot.json").write_text(json.dumps(snap, indent=2))
     print(json.dumps(snap))
     return 0 if snap["ok"] else 2
