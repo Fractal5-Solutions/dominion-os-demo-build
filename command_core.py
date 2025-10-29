@@ -38,10 +38,12 @@ class Service:
         while True:
             # Deterministic arrivals based on seed and tick
             seed = _seeded_rand(seed + tick)
-            arrivals = (seed % 4)  # 0..3 new tasks
+            arrivals = seed % 4  # 0..3 new tasks
             if arrivals:
                 self.backlog += arrivals
-                events.append(Event(tick, qual_name, "arrivals", f"+{arrivals} => {self.backlog}"))
+                events.append(
+                    Event(tick, qual_name, "arrivals", f"+{arrivals} => {self.backlog}")
+                )
 
             # Process up to 2 per step
             capacity = 2 if (tick % 3) else 3
@@ -49,7 +51,9 @@ class Service:
             if done:
                 self.backlog -= done
                 self.processed += done
-                events.append(Event(tick, qual_name, "processed", f"-{done} => {self.backlog}"))
+                events.append(
+                    Event(tick, qual_name, "processed", f"-{done} => {self.backlog}")
+                )
             else:
                 events.append(Event(tick, qual_name, "idle", "no work"))
 
@@ -78,7 +82,10 @@ def build_enterprise(scale: str = "small") -> Enterprise:
         divs, svcs = 3, 5
     divisions = []
     for d in range(divs):
-        services = [Service(name=f"svc-{d+1}-{i+1}", seed=(d + 1) * (i + 3)) for i in range(svcs)]
+        services = [
+            Service(name=f"svc-{d+1}-{i+1}", seed=(d + 1) * (i + 3))
+            for i in range(svcs)
+        ]
         divisions.append(Division(name=f"div-{d+1}", services=services))
     return Enterprise(name="Dominion Enterprises", divisions=divisions)
 
@@ -107,7 +114,9 @@ def _box(lines: List[str], w: int, title: str | None = None) -> List[str]:
     return out
 
 
-def _render_dashboard(tick: int, ent: Enterprise, events: List[Event], width: int = 100, height: int = 32) -> str:
+def _render_dashboard(
+    tick: int, ent: Enterprise, events: List[Event], width: int = 100, height: int = 32
+) -> str:
     # Left: enterprise tree; Right: recent events; Bottom: KPIs
     # Build tree
     left: List[str] = [f"Enterprise: {ent.name}"]
@@ -115,10 +124,10 @@ def _render_dashboard(tick: int, ent: Enterprise, events: List[Event], width: in
         left.append(f"- {div.name}")
         for svc in div.services[:12]:
             left.append(f"  · {svc.name}  Q:{svc.backlog}  ✔:{svc.processed}")
-    left_box = _box(left[:height - 10], width // 2, title="Command Core — Topology")
+    left_box = _box(left[: height - 10], width // 2, title="Command Core — Topology")
 
     # Events window
-    recent = events[-(height - 10):]
+    recent = events[-(height - 10) :]
     right_lines = [f"t={e.tick:04d} {e.entity} {e.action}: {e.message}" for e in recent]
     right_box = _box(right_lines, width - (width // 2), title="Event Stream")
 
@@ -142,8 +151,13 @@ def _render_dashboard(tick: int, ent: Enterprise, events: List[Event], width: in
     return "\n" + "\n".join(header + rows)
 
 
-def run_command_core(duration_ticks: int = 120, scale: str = "small", refresh_ms: int = 0, ui: bool = True,
-                     outdir: Path | None = None) -> Dict[str, int]:
+def run_command_core(
+    duration_ticks: int = 120,
+    scale: str = "small",
+    refresh_ms: int = 0,
+    ui: bool = True,
+    outdir: Path | None = None,
+) -> Dict[str, int]:
     """Run the Command Core demo.
 
     - duration_ticks: how many scheduler cycles to run
@@ -163,7 +177,11 @@ def run_command_core(duration_ticks: int = 120, scale: str = "small", refresh_ms
     for d in ent.divisions:
         for s in d.services:
             qual = f"{d.name}/{s.name}"
-            proc = Process(pid=hash(qual) & 0xFFFF, name=qual, target=lambda s=s, q=qual: s.generator(events, q))
+            proc = Process(
+                pid=hash(qual) & 0xFFFF,
+                name=qual,
+                target=lambda s=s, q=qual: s.generator(events, q),
+            )
             sched.add(proc)
 
     # Output directory
@@ -207,4 +225,3 @@ def run_command_core(duration_ticks: int = 120, scale: str = "small", refresh_ms
     ]
     summary_path.write_text("\n".join(summary_lines))
     return session
-
