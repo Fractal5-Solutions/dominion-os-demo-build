@@ -3,9 +3,9 @@ from __future__ import annotations
 import json
 import os
 import time
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Dict, Tuple, Iterable
+from typing import Dict, List
 
 
 def _seeded_rand(seed: int) -> int:
@@ -166,8 +166,8 @@ def run_command_core(
     - ui: when False, runs headless and only collects artifacts
     - outdir: where to write artifacts (events.log, session.json, summary.txt)
     """
-    from dominion_os.scheduler import Scheduler
     from dominion_os.process import Process
+    from dominion_os.scheduler import Scheduler
 
     ent = build_enterprise(scale)
     events: List[Event] = []
@@ -217,7 +217,7 @@ def run_command_core(
     session_path.write_text(json.dumps(session, indent=2))
 
     summary_lines = [
-        f"Dominion Command Core Session",
+        "Dominion Command Core Session",
         f"Ticks: {session['ticks']}",
         f"Scale: {session['scale']}  Divisions: {session['divisions']}  Services: {session['services']}",
         f"Processed: {session['processed']}  Backlog: {session['backlog']}",
