@@ -121,7 +121,7 @@ def main(argv: list[str] | None = None) -> int:
         _add_sibling_os_to_syspath()
         import json
         import time
-        from datetime import datetime
+        from datetime import UTC, datetime
 
         from command_core import run_command_core
 
@@ -139,7 +139,7 @@ def main(argv: list[str] | None = None) -> int:
         # Write flight summary
         out_dir = Path("dist") / "command_core"
         out_dir.mkdir(parents=True, exist_ok=True)
-        stamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+        stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
         flight = out_dir / f"flight_{stamp}.json"
         flight.write_text(json.dumps({"runs": results}, indent=2))
         print(f"[autopilot] Completed. Flight log: {flight}")
@@ -172,13 +172,13 @@ def main(argv: list[str] | None = None) -> int:
 
         # 3) Package artifacts
         import zipfile
-        from datetime import datetime
+        from datetime import UTC, datetime
 
         dist = Path("dist")
         cc_dir = dist / "command_core"
         pkg_dir = dist / "flagship"
         pkg_dir.mkdir(parents=True, exist_ok=True)
-        stamp = datetime.utcnow().strftime("%Y%m%dT%H%M%S")
+        stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S")
         pkg_path = pkg_dir / f"dominion_flagship_{args.scale}_{stamp}.zip"
         with zipfile.ZipFile(pkg_path, "w", compression=zipfile.ZIP_DEFLATED) as z:
             # Include OS image
