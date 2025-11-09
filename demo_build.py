@@ -8,11 +8,17 @@ from pathlib import Path
 
 def _add_sibling_os_to_syspath() -> None:
     here = Path(__file__).resolve().parent
-    # Prefer explicit env var, else sibling path
+    # Prefer explicit env var, else check parent or sibling path
     env_path = os.getenv("DOMINION_OS_PATH")
     if env_path:
         os_repo = Path(env_path)
     else:
+        # First check if dominion_os is in parent directory (submodule case)
+        parent_pkg = here.parent / "dominion_os"
+        if parent_pkg.exists():
+            sys.path.insert(0, str(here.parent))
+            return
+        # Fall back to sibling path
         os_repo = here.parent / "dominion-os-1.0"
     pkg_path = os_repo / "dominion_os"
     if pkg_path.exists():
