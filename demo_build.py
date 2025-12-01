@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import argparse
-import json
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
 
 
 def _add_sibling_os_to_syspath() -> None:
@@ -101,9 +100,11 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.cmd == "autopilot":
         _add_sibling_os_to_syspath()
-        from command_core import run_command_core
-        import time, json
+        import json
+        import time
         from datetime import datetime
+
+        from command_core import run_command_core
         results = []
         for i in range(args.runs):
             print(f"[autopilot] Run {i+1}/{args.runs}: scale={args.scale} duration={args.duration}")
@@ -143,8 +144,8 @@ def main(argv: list[str] | None = None) -> int:
         print("[flagship] Command Core session:", session)
 
         # 3) Package artifacts
-        from datetime import datetime
         import zipfile
+        from datetime import datetime
 
         dist = Path("dist")
         cc_dir = dist / "command_core"
