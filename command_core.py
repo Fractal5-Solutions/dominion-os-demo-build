@@ -5,7 +5,11 @@ import os
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Dict
+<<<<<<< HEAD
+from typing import Dict, List
+=======
+from typing import Dict, List
+>>>>>>> origin/feat/autopilot-flight-dedupe
 
 
 def _seeded_rand(seed: int) -> int:
@@ -83,10 +87,17 @@ def build_enterprise(scale: str = "small") -> Enterprise:
     divisions = []
     for d in range(divs):
         services = [
-            Service(name=f"svc-{d + 1}-{i + 1}", seed=(d + 1) * (i + 3))
+<<<<<<< HEAD
+            Service(name=f"svc-{d+1}-{i+1}", seed=(d + 1) * (i + 3))
             for i in range(svcs)
         ]
-        divisions.append(Division(name=f"div-{d + 1}", services=services))
+        divisions.append(Division(name=f"div-{d+1}", services=services))
+=======
+            Service(name=f"svc-{d+1}-{i+1}", seed=(d + 1) * (i + 3))
+            for i in range(svcs)
+        ]
+        divisions.append(Division(name=f"div-{d+1}", services=services))
+>>>>>>> origin/feat/autopilot-flight-dedupe
     return Enterprise(name="Dominion Enterprises", divisions=divisions)
 
 
@@ -136,7 +147,8 @@ def _render_dashboard(
     total_processed = sum(s.processed for d in ent.divisions for s in d.services)
     kpi = [
         f"Tick: {tick}",
-        f"Services: {sum(len(d.services) for d in ent.divisions)}  Divisions: {len(ent.divisions)}",
+        f"Services: {sum(len(d.services) for d in ent.divisions)}",
+        f"Divisions: {len(ent.divisions)}",
         f"Backlog: {total_backlog}  Processed: {total_processed}",
     ]
     bottom = _box(kpi, width, title="Operational KPIs")
@@ -145,10 +157,11 @@ def _render_dashboard(
     max_side = max(len(left_box), len(right_box))
     left_box += [" "] * (max_side - len(left_box))
     right_box += [" "] * (max_side - len(right_box))
-    rows = [
-        left_line + " " + right_line
-        for left_line, right_line in zip(left_box, right_box)
-    ]
+<<<<<<< HEAD
+    rows = [left + " " + right for left, right in zip(left_box, right_box)]
+=======
+    rows = [left + " " + right for left, right in zip(left_box, right_box)]
+>>>>>>> origin/feat/autopilot-flight-dedupe
     rows += bottom
     header = [f"Dominion Command Core — Enterprise Orchestration (t={tick})"]
     return "\n" + "\n".join(header + rows)
@@ -169,8 +182,8 @@ def run_command_core(
     - ui: when False, runs headless and only collects artifacts
     - outdir: where to write artifacts (events.log, session.json, summary.txt)
     """
-    from dominion_os.scheduler import Scheduler
     from dominion_os.process import Process
+    from dominion_os.scheduler import Scheduler
 
     ent = build_enterprise(scale)
     events: List[Event] = []
@@ -222,7 +235,8 @@ def run_command_core(
     summary_lines = [
         "Dominion Command Core Session",
         f"Ticks: {session['ticks']}",
-        f"Scale: {session['scale']}  Divisions: {session['divisions']}  Services: {session['services']}",
+        f"Scale: {session['scale']}",
+        f"Divisions: {session['divisions']}  Services: {session['services']}",
         f"Processed: {session['processed']}  Backlog: {session['backlog']}",
         f"Events: {len(events)}",
     ]

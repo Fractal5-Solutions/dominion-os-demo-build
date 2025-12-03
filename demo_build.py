@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import argparse
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
 
 
 def _add_sibling_os_to_syspath() -> None:
@@ -93,7 +93,17 @@ def main(argv: list[str] | None = None) -> int:
         "--no-ui", action="store_true", help="Run headless (recommended for CI)"
     )
     p_flag.add_argument(
-        "--refresh-ms", type=int, default=0, help="UI refresh delay in ms (interactive)"
+<<<<<<< HEAD
+        "--refresh-ms",
+        type=int,
+        default=0,
+        help="UI refresh delay in ms (interactive)",
+=======
+        "--refresh-ms",
+        type=int,
+        default=0,
+        help="UI refresh delay in ms (interactive)",
+>>>>>>> origin/feat/autopilot-flight-dedupe
     )
     args = parser.parse_args(argv)
 
@@ -119,6 +129,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.cmd == "autopilot":
         _add_sibling_os_to_syspath()
+<<<<<<< HEAD
         from command_core import run_command_core
         import time
         import json
@@ -128,6 +139,19 @@ def main(argv: list[str] | None = None) -> int:
         for i in range(args.runs):
             print(
                 f"[autopilot] Run {i + 1}/{args.runs}: scale={args.scale} duration={args.duration}"
+=======
+        import json
+        import time
+        from datetime import datetime
+
+        from command_core import run_command_core
+
+        results = []
+        for i in range(args.runs):
+            print(
+                f"[autopilot] Run {i+1}/{args.runs}: "
+                f"scale={args.scale} duration={args.duration}"
+>>>>>>> origin/feat/autopilot-flight-dedupe
             )
             res = run_command_core(
                 duration_ticks=args.duration, scale=args.scale, ui=False
@@ -139,7 +163,7 @@ def main(argv: list[str] | None = None) -> int:
         out_dir = Path("dist") / "command_core"
         out_dir.mkdir(parents=True, exist_ok=True)
         stamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-        flight = out_dir / f"flight_{stamp}.json"
+        flight = out_dir / f"flight_{stamp}_{args.scale}.json"
         flight.write_text(json.dumps({"runs": results}, indent=2))
         print(f"[autopilot] Completed. Flight log: {flight}")
         return 0
@@ -152,7 +176,13 @@ def main(argv: list[str] | None = None) -> int:
             from dominion_os.cli import build_image as os_build_image  # type: ignore
         except ModuleNotFoundError:
             print(
-                "Error: dominion_os not found. Set DOMINION_OS_PATH or place sibling repo."
+<<<<<<< HEAD
+                "Error: dominion_os not found. "
+                "Set DOMINION_OS_PATH or place sibling repo."
+=======
+                "Error: dominion_os not found. "
+                "Set DOMINION_OS_PATH or place sibling repo."
+>>>>>>> origin/feat/autopilot-flight-dedupe
             )
             return 1
         os_image = os_build_image()
@@ -170,8 +200,8 @@ def main(argv: list[str] | None = None) -> int:
         print("[flagship] Command Core session:", session)
 
         # 3) Package artifacts
-        from datetime import datetime
         import zipfile
+        from datetime import datetime
 
         dist = Path("dist")
         cc_dir = dist / "command_core"
