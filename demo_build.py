@@ -8,11 +8,17 @@ from pathlib import Path
 
 def _add_sibling_os_to_syspath() -> None:
     here = Path(__file__).resolve().parent
-    # Prefer explicit env var, else sibling path
+    # Prefer explicit env var, else check parent or sibling path
     env_path = os.getenv("DOMINION_OS_PATH")
     if env_path:
         os_repo = Path(env_path)
     else:
+        # First check if dominion_os is in parent directory (submodule case)
+        parent_pkg = here.parent / "dominion_os"
+        if parent_pkg.exists():
+            sys.path.insert(0, str(here.parent))
+            return
+        # Fall back to sibling path
         os_repo = here.parent / "dominion-os-1.0"
     pkg_path = os_repo / "dominion_os"
     if pkg_path.exists():
@@ -93,17 +99,7 @@ def main(argv: list[str] | None = None) -> int:
         "--no-ui", action="store_true", help="Run headless (recommended for CI)"
     )
     p_flag.add_argument(
-<<<<<<< HEAD
-        "--refresh-ms",
-        type=int,
-        default=0,
-        help="UI refresh delay in ms (interactive)",
-=======
-        "--refresh-ms",
-        type=int,
-        default=0,
-        help="UI refresh delay in ms (interactive)",
->>>>>>> origin/feat/autopilot-flight-dedupe
+        "--refresh-ms", type=int, default=0, help="UI refresh delay in ms (interactive)"
     )
     args = parser.parse_args(argv)
 
@@ -129,29 +125,16 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.cmd == "autopilot":
         _add_sibling_os_to_syspath()
-<<<<<<< HEAD
-        from command_core import run_command_core
-        import time
-        import json
-        from datetime import datetime
-
-        results = []
-        for i in range(args.runs):
-            print(
-                f"[autopilot] Run {i + 1}/{args.runs}: scale={args.scale} duration={args.duration}"
-=======
         import json
         import time
-        from datetime import datetime
+        from datetime import UTC, datetime
 
         from command_core import run_command_core
 
         results = []
         for i in range(args.runs):
             print(
-                f"[autopilot] Run {i+1}/{args.runs}: "
-                f"scale={args.scale} duration={args.duration}"
->>>>>>> origin/feat/autopilot-flight-dedupe
+                f"[autopilot] Run {i+1}/{args.runs}: scale={args.scale} duration={args.duration}"
             )
             res = run_command_core(
                 duration_ticks=args.duration, scale=args.scale, ui=False
@@ -162,8 +145,8 @@ def main(argv: list[str] | None = None) -> int:
         # Write flight summary
         out_dir = Path("dist") / "command_core"
         out_dir.mkdir(parents=True, exist_ok=True)
-        stamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-        flight = out_dir / f"flight_{stamp}_{args.scale}.json"
+        stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+        flight = out_dir / f"flight_{stamp}.json"
         flight.write_text(json.dumps({"runs": results}, indent=2))
         print(f"[autopilot] Completed. Flight log: {flight}")
         return 0
@@ -176,13 +159,7 @@ def main(argv: list[str] | None = None) -> int:
             from dominion_os.cli import build_image as os_build_image  # type: ignore
         except ModuleNotFoundError:
             print(
-<<<<<<< HEAD
-                "Error: dominion_os not found. "
-                "Set DOMINION_OS_PATH or place sibling repo."
-=======
-                "Error: dominion_os not found. "
-                "Set DOMINION_OS_PATH or place sibling repo."
->>>>>>> origin/feat/autopilot-flight-dedupe
+                "Error: dominion_os not found. Set DOMINION_OS_PATH or place sibling repo."
             )
             return 1
         os_image = os_build_image()
@@ -201,13 +178,13 @@ def main(argv: list[str] | None = None) -> int:
 
         # 3) Package artifacts
         import zipfile
-        from datetime import datetime
+        from datetime import UTC, datetime
 
         dist = Path("dist")
         cc_dir = dist / "command_core"
         pkg_dir = dist / "flagship"
         pkg_dir.mkdir(parents=True, exist_ok=True)
-        stamp = datetime.utcnow().strftime("%Y%m%dT%H%M%S")
+        stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S")
         pkg_path = pkg_dir / f"dominion_flagship_{args.scale}_{stamp}.zip"
         with zipfile.ZipFile(pkg_path, "w", compression=zipfile.ZIP_DEFLATED) as z:
             # Include OS image

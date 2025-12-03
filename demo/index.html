@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dominion OS Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .status { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        button { padding: 10px 20px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dominion OS GIS Asset Ingestion Demo</h1>
+        <p>Enter asset URLs to ingest into the GIS system:</p>
+        <textarea id="assetUrls" rows="5" cols="80" placeholder="Enter one URL per line"></textarea><br><br>
+        <button onclick="ingestAssets()">Ingest Assets</button>
+        <button onclick="getDemoInfo()">Get Demo Info</button>
+        <div id="status"></div>
+    </div>
+    <script>
+        const BASE_API = 'https://dominion-api-1234567890-uc.a.run.app';
+        async function ingestAssets() {
+            const urls = document.getElementById('assetUrls').value.split('\n').filter(url => url.trim());
+            if (urls.length === 0) {
+                showStatus('Please enter at least one URL', 'error');
+                return;
+            }
+            try {
+                const response = await fetch(BASE_API + '/v1/gis/ingest', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ asset_urls: urls })
+                });
+                const result = await response.json();
+                showStatus('Ingestion successful: ' + JSON.stringify(result), 'success');
+            } catch (error) {
+                showStatus('Error: ' + error.message, 'error');
+            }
+        }
+        async function getDemoInfo() {
+            try {
+                const response = await fetch(BASE_API + '/demo-info');
+                const data = await response.json();
+                showStatus('Demo Info: ' + JSON.stringify(data), 'success');
+            } catch (error) {
+                showStatus('Error: ' + error.message, 'error');
+            }
+        }
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = 'status ' + type;
+            statusDiv.textContent = message;
+        }
+    </script>
+</body>
+</html>
