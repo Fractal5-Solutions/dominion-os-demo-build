@@ -2,23 +2,18 @@ from __future__ import annotations
 
 import argparse
 import os
-import sys
+import json
 from pathlib import Path
+import sys
 
 
 def _add_sibling_os_to_syspath() -> None:
     here = Path(__file__).resolve().parent
-    # Prefer explicit env var, else check parent or sibling path
+    # Prefer explicit env var, else sibling path
     env_path = os.getenv("DOMINION_OS_PATH")
     if env_path:
         os_repo = Path(env_path)
     else:
-        # First check if dominion_os is in parent directory (submodule case)
-        parent_pkg = here.parent / "dominion_os"
-        if parent_pkg.exists():
-            sys.path.insert(0, str(here.parent))
-            return
-        # Fall back to sibling path
         os_repo = here.parent / "dominion-os-1.0"
     pkg_path = os_repo / "dominion_os"
     if pkg_path.exists():
@@ -125,16 +120,15 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.cmd == "autopilot":
         _add_sibling_os_to_syspath()
-        import json
-        import time
-        from datetime import UTC, datetime
-
         from command_core import run_command_core
+        import time
+        import json
+        from datetime import datetime
 
         results = []
         for i in range(args.runs):
             print(
-                f"[autopilot] Run {i+1}/{args.runs}: scale={args.scale} duration={args.duration}"
+                f"[autopilot] Run {i + 1}/{args.runs}: scale={args.scale} duration={args.duration}"
             )
             res = run_command_core(
                 duration_ticks=args.duration, scale=args.scale, ui=False
@@ -145,7 +139,7 @@ def main(argv: list[str] | None = None) -> int:
         # Write flight summary
         out_dir = Path("dist") / "command_core"
         out_dir.mkdir(parents=True, exist_ok=True)
-        stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+        stamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
         flight = out_dir / f"flight_{stamp}.json"
         flight.write_text(json.dumps({"runs": results}, indent=2))
         print(f"[autopilot] Completed. Flight log: {flight}")
@@ -177,14 +171,14 @@ def main(argv: list[str] | None = None) -> int:
         print("[flagship] Command Core session:", session)
 
         # 3) Package artifacts
+        from datetime import datetime
         import zipfile
-        from datetime import UTC, datetime
 
         dist = Path("dist")
         cc_dir = dist / "command_core"
         pkg_dir = dist / "flagship"
         pkg_dir.mkdir(parents=True, exist_ok=True)
-        stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S")
+        stamp = datetime.utcnow().strftime("%Y%m%dT%H%M%S")
         pkg_path = pkg_dir / f"dominion_flagship_{args.scale}_{stamp}.zip"
         with zipfile.ZipFile(pkg_path, "w", compression=zipfile.ZIP_DEFLATED) as z:
             # Include OS image
