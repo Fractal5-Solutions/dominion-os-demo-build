@@ -2,9 +2,13 @@ from __future__ import annotations
 
 import argparse
 import os
+<<<<<<< HEAD
 import json
 from pathlib import Path
+=======
+>>>>>>> origin/chore/lint-demo-build
 import sys
+from pathlib import Path
 
 
 def _add_sibling_os_to_syspath() -> None:
@@ -120,11 +124,19 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.cmd == "autopilot":
         _add_sibling_os_to_syspath()
+<<<<<<< HEAD
         from command_core import run_command_core
         import time
         import json
         from datetime import datetime
 
+=======
+        import json
+        import time
+        from datetime import datetime
+
+        from command_core import run_command_core
+>>>>>>> origin/chore/lint-demo-build
         results = []
         for i in range(args.runs):
             print(
@@ -171,8 +183,8 @@ def main(argv: list[str] | None = None) -> int:
         print("[flagship] Command Core session:", session)
 
         # 3) Package artifacts
-        from datetime import datetime
         import zipfile
+        from datetime import datetime
 
         dist = Path("dist")
         cc_dir = dist / "command_core"
