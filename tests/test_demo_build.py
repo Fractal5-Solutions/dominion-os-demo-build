@@ -1,6 +1,12 @@
+import importlib
 import os
+import sys
 import unittest
 from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 
 class TestDemoBuild(unittest.TestCase):
@@ -15,9 +21,9 @@ class TestDemoBuild(unittest.TestCase):
         os.chdir(self.cwd)
 
     def test_demo_build_run(self):
-        from demo_build import run_demo
-
         try:
+            module = importlib.import_module("demo_build")
+            run_demo = module.run_demo  # type: ignore[attr-defined]
             dst = run_demo()
             self.assertTrue(dst.exists())
             self.assertTrue((self.tmp / "dist" / "ticks.txt").exists())
@@ -27,9 +33,9 @@ class TestDemoBuild(unittest.TestCase):
             ) from err
 
     def test_demo_build_image(self):
-        from demo_build import build_image
-
         try:
+            module = importlib.import_module("demo_build")
+            build_image = module.build_image  # type: ignore[attr-defined]
             dst = build_image()
             self.assertTrue(dst.exists())
         except ModuleNotFoundError as err:

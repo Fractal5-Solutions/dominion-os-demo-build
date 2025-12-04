@@ -34,9 +34,9 @@ def run_demo() -> Path:
     src = Path("run-report.json")
     dst = out_dir / "run-report.json"
     if src.exists():
-        dst.write_text(src.read_text())
+        dst.write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
         src.unlink()
-    (out_dir / "ticks.txt").write_text(str(ticks))
+    (out_dir / "ticks.txt").write_text(str(ticks), encoding="utf-8")
     return dst
 
 
@@ -48,7 +48,7 @@ def build_demo_image() -> Path:
     out_dir = Path("dist")
     out_dir.mkdir(parents=True, exist_ok=True)
     dst = out_dir / path.name
-    dst.write_text(Path(path).read_text())
+    dst.write_text(Path(path).read_text(encoding="utf-8"), encoding="utf-8")
     return dst
 
 
@@ -63,40 +63,86 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("run")
     sub.add_parser("build")
 
-    p_cc = sub.add_parser("command-core", help="Run Command Core orchestration demo")
-    p_cc.add_argument(
-        "--duration", type=int, default=120, help="Scheduler ticks to run"
-    )
-    p_cc.add_argument("--scale", choices=["small", "medium", "large"], default="small")
-    p_cc.add_argument(
-        "--no-ui", action="store_true", help="Headless run; write artifacts only"
+    p_cc = sub.add_parser(
+        "command-core",
+        help="Run Command Core orchestration demo",
     )
     p_cc.add_argument(
-        "--refresh-ms", type=int, default=0, help="UI refresh delay in ms"
+        "--duration",
+        type=int,
+        default=120,
+        help="Scheduler ticks to run",
+    )
+    p_cc.add_argument(
+        "--scale",
+        choices=["small", "medium", "large"],
+        default="small",
+    )
+    p_cc.add_argument(
+        "--no-ui",
+        action="store_true",
+        help="Headless run; write artifacts only",
+    )
+    p_cc.add_argument(
+        "--refresh-ms",
+        type=int,
+        default=0,
+        help="UI refresh delay in ms",
     )
 
-    p_auto = sub.add_parser("autopilot", help="Fully automated NHITL orchestration run")
-    p_auto.add_argument("--duration", type=int, default=180, help="Ticks per run")
-    p_auto.add_argument(
-        "--scale", choices=["small", "medium", "large"], default="large"
+    p_auto = sub.add_parser(
+        "autopilot",
+        help="Fully automated NHITL orchestration run",
     )
-    p_auto.add_argument("--runs", type=int, default=1, help="Number of sequential runs")
-    p_auto.add_argument("--interval-ms", type=int, default=0, help="Pause between runs")
+    p_auto.add_argument(
+        "--duration",
+        type=int,
+        default=180,
+        help="Ticks per run",
+    )
+    p_auto.add_argument(
+        "--scale",
+        choices=["small", "medium", "large"],
+        default="large",
+    )
+    p_auto.add_argument(
+        "--runs",
+        type=int,
+        default=1,
+        help="Number of sequential runs",
+    )
+    p_auto.add_argument(
+        "--interval-ms",
+        type=int,
+        default=0,
+        help="Pause between runs",
+    )
 
     p_flag = sub.add_parser(
-        "flagship", help="Build OS + run Command Core + package artifacts"
+        "flagship",
+        help="Build OS + run Command Core + package artifacts",
     )
     p_flag.add_argument(
-        "--duration", type=int, default=300, help="Ticks to run Command Core"
+        "--duration",
+        type=int,
+        default=300,
+        help="Ticks to run Command Core",
     )
     p_flag.add_argument(
-        "--scale", choices=["small", "medium", "large"], default="large"
+        "--scale",
+        choices=["small", "medium", "large"],
+        default="large",
     )
     p_flag.add_argument(
-        "--no-ui", action="store_true", help="Run headless (recommended for CI)"
+        "--no-ui",
+        action="store_true",
+        help="Run headless (recommended for CI)",
     )
     p_flag.add_argument(
-        "--refresh-ms", type=int, default=0, help="UI refresh delay in ms (interactive)"
+        "--refresh-ms",
+        type=int,
+        default=0,
+        help="UI refresh delay in ms (interactive)",
     )
     args = parser.parse_args(argv)
 
@@ -124,11 +170,13 @@ def main(argv: list[str] | None = None) -> int:
         _add_sibling_os_to_syspath()
         from command_core import run_command_core
 
-        results = []
+        results: list[dict[str, int | str]] = []
         for i in range(args.runs):
-            print(
-                f"[autopilot] Run {i+1}/{args.runs}: scale={args.scale} duration={args.duration}"
+            run_label = (
+                f"[autopilot] Run {i + 1}/{args.runs}: "
+                f"scale={args.scale} duration={args.duration}"
             )
+            print(run_label)
             res = run_command_core(
                 duration_ticks=args.duration, scale=args.scale, ui=False
             )
@@ -140,7 +188,10 @@ def main(argv: list[str] | None = None) -> int:
         out_dir.mkdir(parents=True, exist_ok=True)
         stamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
         flight = out_dir / f"flight_{stamp}.json"
-        flight.write_text(json.dumps({"runs": results}, indent=2))
+        flight.write_text(
+            json.dumps({"runs": results}, indent=2),
+            encoding="utf-8",
+        )
         print(f"[autopilot] Completed. Flight log: {flight}")
         return 0
 
@@ -152,7 +203,8 @@ def main(argv: list[str] | None = None) -> int:
             from dominion_os.cli import build_image as os_build_image  # type: ignore
         except ModuleNotFoundError:
             print(
-                "Error: dominion_os not found. Set DOMINION_OS_PATH or place sibling repo."
+                "Error: dominion_os not found. "
+                "Set DOMINION_OS_PATH or place sibling repo."
             )
             return 1
         os_image = os_build_image()
@@ -178,7 +230,11 @@ def main(argv: list[str] | None = None) -> int:
         pkg_dir.mkdir(parents=True, exist_ok=True)
         stamp = datetime.utcnow().strftime("%Y%m%dT%H%M%S")
         pkg_path = pkg_dir / f"dominion_flagship_{args.scale}_{stamp}.zip"
-        with zipfile.ZipFile(pkg_path, "w", compression=zipfile.ZIP_DEFLATED) as z:
+        with zipfile.ZipFile(
+            pkg_path,
+            "w",
+            compression=zipfile.ZIP_DEFLATED,
+        ) as z:
             # Include OS image
             if Path(os_image).exists():
                 z.write(os_image, arcname=f"os/{Path(os_image).name}")

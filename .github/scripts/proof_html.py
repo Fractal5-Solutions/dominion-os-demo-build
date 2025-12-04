@@ -32,7 +32,7 @@ def main() -> int:
         "sha256": sha256_text(html),
         "links": hrefs,
     }
-    OUT.write_text(json.dumps(manifest, indent=2))
+    OUT.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     print("Wrote", OUT)
     return 0
 

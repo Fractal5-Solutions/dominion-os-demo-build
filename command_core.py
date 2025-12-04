@@ -4,6 +4,7 @@ import json
 import os
 import time
 from dataclasses import dataclass
+from functools import partial
 from pathlib import Path
 
 
@@ -40,9 +41,8 @@ class Service:
             arrivals = seed % 4  # 0..3 new tasks
             if arrivals:
                 self.backlog += arrivals
-                events.append(
-                    Event(tick, qual_name, "arrivals", f"+{arrivals} => {self.backlog}")
-                )
+                message = f"+{arrivals} => {self.backlog}"
+                events.append(Event(tick, qual_name, "arrivals", message))
 
             # Process up to 2 per step
             capacity = 2 if (tick % 3) else 3
@@ -50,9 +50,8 @@ class Service:
             if done:
                 self.backlog -= done
                 self.processed += done
-                events.append(
-                    Event(tick, qual_name, "processed", f"-{done} => {self.backlog}")
-                )
+                message = f"-{done} => {self.backlog}"
+                events.append(Event(tick, qual_name, "processed", message))
             else:
                 events.append(Event(tick, qual_name, "idle", "no work"))
 
@@ -91,10 +90,9 @@ def build_enterprise(scale: str = "small") -> Enterprise:
 
 # Minimal UI primitives (portable to Windows without curses)
 def _cls() -> None:
-    try:
-        # Windows
+    if os.name == "nt":
         os.system("cls")
-    except Exception:
+    else:
         print("\x1b[2J\x1b[H", end="")  # ANSI clear
 
 
@@ -114,7 +112,11 @@ def _box(lines: list[str], w: int, title: str | None = None) -> list[str]:
 
 
 def _render_dashboard(
-    tick: int, ent: Enterprise, events: list[Event], width: int = 100, height: int = 32
+    tick: int,
+    ent: Enterprise,
+    events: list[Event],
+    width: int = 100,
+    height: int = 32,
 ) -> str:
     # Left: enterprise tree; Right: recent events; Bottom: KPIs
     # Build tree
@@ -122,20 +124,31 @@ def _render_dashboard(
     for div in ent.divisions[:10]:
         left.append(f"- {div.name}")
         for svc in div.services[:12]:
-            left.append(f"  · {svc.name}  Q:{svc.backlog}  ✔:{svc.processed}")
-    left_box = _box(left[: height - 10], width // 2, title="Command Core — Topology")
+            summary = f"  · {svc.name}  Q:{svc.backlog}  ✔:{svc.processed}"
+            left.append(summary)
+    left_box = _box(
+        left[: height - 10],
+        width // 2,
+        title="Command Core — Topology",
+    )
 
     # Events window
     recent = events[-(height - 10) :]
     right_lines = [f"t={e.tick:04d} {e.entity} {e.action}: {e.message}" for e in recent]
-    right_box = _box(right_lines, width - (width // 2), title="Event Stream")
+    right_box = _box(
+        right_lines,
+        width - (width // 2),
+        title="Event Stream",
+    )
 
     # KPIs bottom
     total_backlog = sum(s.backlog for d in ent.divisions for s in d.services)
     total_processed = sum(s.processed for d in ent.divisions for s in d.services)
+    services_total = sum(len(d.services) for d in ent.divisions)
+    divisions_total = len(ent.divisions)
     kpi = [
         f"Tick: {tick}",
-        f"Services: {sum(len(d.services) for d in ent.divisions)}  Divisions: {len(ent.divisions)}",
+        f"Services: {services_total}  Divisions: {divisions_total}",
         f"Backlog: {total_backlog}  Processed: {total_processed}",
     ]
     bottom = _box(kpi, width, title="Operational KPIs")
@@ -145,7 +158,7 @@ def _render_dashboard(
     left_box += [" "] * (max_side - len(left_box))
     right_box += [" "] * (max_side - len(right_box))
     rows = [
-        left_line + " " + right_line
+        f"{left_line} {right_line}"
         for left_line, right_line in zip(left_box, right_box)
     ]
     rows += bottom
@@ -179,10 +192,11 @@ def run_command_core(
     for d in ent.divisions:
         for s in d.services:
             qual = f"{d.name}/{s.name}"
+            generator_target = partial(s.generator, events, qual)
             proc = Process(
                 pid=hash(qual) & 0xFFFF,
                 name=qual,
-                target=lambda s=s, q=qual: s.generator(events, q),
+                target=generator_target,
             )
             sched.add(proc)
 
@@ -208,22 +222,29 @@ def run_command_core(
         for e in events:
             f.write(f"{e.tick}\t{e.entity}\t{e.action}\t{e.message}\n")
 
-    session = {
+    services_count = sum(len(d.services) for d in ent.divisions)
+    processed_total = sum(s.processed for d in ent.divisions for s in d.services)
+    backlog_total = sum(s.backlog for d in ent.divisions for s in d.services)
+
+    session: dict[str, int | str] = {
         "scale": scale,
         "ticks": duration_ticks,
         "divisions": len(ent.divisions),
-        "services": sum(len(d.services) for d in ent.divisions),
-        "processed": sum(s.processed for d in ent.divisions for s in d.services),
-        "backlog": sum(s.backlog for d in ent.divisions for s in d.services),
+        "services": services_count,
+        "processed": processed_total,
+        "backlog": backlog_total,
     }
-    session_path.write_text(json.dumps(session, indent=2))
+    session_path.write_text(json.dumps(session, indent=2), encoding="utf-8")
 
     summary_lines = [
         "Dominion Command Core Session",
         f"Ticks: {session['ticks']}",
-        f"Scale: {session['scale']}  Divisions: {session['divisions']}  Services: {session['services']}",
-        f"Processed: {session['processed']}  Backlog: {session['backlog']}",
+        f"Scale: {session['scale']}",
+        f"Divisions: {session['divisions']}",
+        f"Services: {session['services']}",
+        f"Processed: {session['processed']}",
+        f"Backlog: {session['backlog']}",
         f"Events: {len(events)}",
     ]
-    summary_path.write_text("\n".join(summary_lines))
+    summary_path.write_text("\n".join(summary_lines), encoding="utf-8")
     return session
