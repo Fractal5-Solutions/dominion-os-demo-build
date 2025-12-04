@@ -24,11 +24,7 @@ class TestDemoBuild(unittest.TestCase):
         except ModuleNotFoundError:
             raise unittest.SkipTest(
                 "Sibling dominion-os-1.0 not available in this environment"
-<<<<<<< HEAD
             )
-=======
-            ) from None
->>>>>>> origin/chore/lint-demo-build
 
     def test_demo_build_image(self):
         from demo_build import build_image
@@ -39,8 +35,4 @@ class TestDemoBuild(unittest.TestCase):
         except ModuleNotFoundError:
             raise unittest.SkipTest(
                 "Sibling dominion-os-1.0 not available in this environment"
-<<<<<<< HEAD
             )
-=======
-            ) from None
->>>>>>> origin/chore/lint-demo-build

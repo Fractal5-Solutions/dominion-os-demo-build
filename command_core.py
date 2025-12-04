@@ -5,10 +5,6 @@ import os
 import time
 from dataclasses import dataclass
 from pathlib import Path
-<<<<<<< HEAD
-from typing import Dict, List
-=======
->>>>>>> origin/chore/lint-demo-build
 
 
 def _seeded_rand(seed: int) -> int:
@@ -118,15 +114,11 @@ def _box(lines: list[str], w: int, title: str | None = None) -> list[str]:
 
 
 def _render_dashboard(
-<<<<<<< HEAD
-    tick: int, ent: Enterprise, events: List[Event], width: int = 100, height: int = 32
-=======
     tick: int,
     ent: Enterprise,
     events: list[Event],
     width: int = 100,
     height: int = 32,
->>>>>>> origin/chore/lint-demo-build
 ) -> str:
     # Left: enterprise tree; Right: recent events; Bottom: KPIs
     # Build tree
@@ -156,7 +148,10 @@ def _render_dashboard(
     max_side = max(len(left_box), len(right_box))
     left_box += [" "] * (max_side - len(left_box))
     right_box += [" "] * (max_side - len(right_box))
-    rows = [left_line + " " + right_line for left_line, right_line in zip(left_box, right_box)]
+    rows = [
+        left_line + " " + right_line
+        for left_line, right_line in zip(left_box, right_box)
+    ]
     rows += bottom
     header = [f"Dominion Command Core — Enterprise Orchestration (t={tick})"]
     return "\n" + "\n".join(header + rows)
@@ -168,11 +163,7 @@ def run_command_core(
     refresh_ms: int = 0,
     ui: bool = True,
     outdir: Path | None = None,
-<<<<<<< HEAD
-) -> Dict[str, int]:
-=======
 ) -> dict[str, int]:
->>>>>>> origin/chore/lint-demo-build
     """Run the Command Core demo.
 
     - duration_ticks: how many scheduler cycles to run

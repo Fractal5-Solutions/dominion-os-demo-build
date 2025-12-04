@@ -1,5 +1,5 @@
 {
-  "version": "1.0.4407",
+  "version": "1.0.4406",
   "fs": {
     "/etc/dominion.conf": "version=1.0.0",
     "/boot/hello": "DominionOS bootable demo"
