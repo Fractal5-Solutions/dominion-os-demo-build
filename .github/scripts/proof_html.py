@@ -5,7 +5,6 @@ import json
 import re
 from pathlib import Path
 
-
 HTML_PATH = Path("web/sqsp/f5-applications.code.html")
 OUT = Path("catalog_manifest.json")
 
@@ -21,7 +20,9 @@ def main() -> int:
 
     # Extract links; ensure no external absolute http(s) URLs (No-CDN rule)
     hrefs = re.findall(r'href="([^"]+)"', html)
-    externals = [h for h in hrefs if h.startswith("http://") or h.startswith("https://")]
+    externals = [
+        h for h in hrefs if h.startswith("http://") or h.startswith("https://")
+    ]
     if externals:
         print("Found external links (disallowed):", externals)
         return 2
