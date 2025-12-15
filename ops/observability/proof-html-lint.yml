@@ -2,7 +2,7 @@ name: Proof HTML Lint (No External CDNs)
 
 on:
   pull_request:
-    branches: [ "main", "release/**" ]
+    branches: ["main", "release/**"]
   workflow_dispatch:
 
 jobs:
@@ -21,4 +21,3 @@ jobs:
             exit 1
           fi
           echo "OK: no external references"
-
