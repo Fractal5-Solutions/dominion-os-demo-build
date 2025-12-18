@@ -1,0 +1,28 @@
+{
+  "python.defaultInterpreterPath": "./.venv/bin/python",
+  "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": ["-q"],
+  "python.linting.enabled": true,
+  "python.linting.ruffEnabled": true,
+  "python.formatting.provider": "black",
+  "editor.formatOnSave": true,
+  "files.exclude": {
+    "**/.git/**": true,
+    "**/__pycache__/**": true,
+    "**/.pytest_cache/**": true,
+    "**/.venv/**": true,
+    "**/dist/**": true
+  },
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/__pycache__/**": true,
+    "**/.pytest_cache/**": true,
+    "**/.venv/**": true,
+    "**/dist/**": true
+  },
+  "markdownlint.config": {
+    "MD013": false,
+    "MD047": true,
+    "MD010": true
+  }
+}

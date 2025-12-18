@@ -1,0 +1,44 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Demo: Run tests",
+      "type": "shell",
+      "command": "bash",
+      "args": ["-lc", "pytest -q"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always" },
+      "problemMatcher": ["$pytest"]
+    },
+    {
+      "label": "Demo: Polish All",
+      "type": "shell",
+      "command": "bash",
+      "args": ["-lc", "chmod +x tools/polish_all.sh && tools/polish_all.sh"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Git Sync & Rebase (repo)",
+      "type": "shell",
+      "command": "bash",
+      "args": ["-lc", "git fetch --all --prune && git pull --rebase && git status -sb"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Git Push (Fast-Forward)",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "-lc",
+        "git fetch origin main && if git merge-base --is-ancestor origin/main HEAD; then git push; else echo 'Remote main has new commits; run Git Sync & Rebase first.' >&2; exit 1; fi"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "build",
+      "problemMatcher": []
+    }
+  ]
+}
