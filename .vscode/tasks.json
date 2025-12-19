@@ -23,7 +23,10 @@
       "label": "Git Sync & Rebase (repo)",
       "type": "shell",
       "command": "bash",
-      "args": ["-lc", "git fetch --all --prune && git pull --rebase && git status -sb"],
+      "args": [
+        "-lc",
+        "git fetch --all --prune && git pull --rebase && git status -sb"
+      ],
       "options": { "cwd": "${workspaceFolder}" },
       "group": "build",
       "problemMatcher": []
