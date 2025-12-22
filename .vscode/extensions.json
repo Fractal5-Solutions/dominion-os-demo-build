@@ -9,6 +9,9 @@
     "github.copilot-chat",
     "github.vscode-github-actions",
     "redhat.vscode-yaml",
-    "DavidAnson.vscode-markdownlint"
+    "DavidAnson.vscode-markdownlint",
+    "dbaeumer.vscode-eslint",
+    "streetsidesoftware.code-spell-checker",
+    "yzhang.markdown-all-in-one"
   ]
 }
