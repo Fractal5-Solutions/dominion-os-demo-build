@@ -2,10 +2,20 @@
   "python.defaultInterpreterPath": "./.venv/bin/python",
   "python.testing.pytestEnabled": true,
   "python.testing.pytestArgs": ["-q"],
-  "python.linting.enabled": true,
-  "python.linting.ruffEnabled": true,
-  "python.formatting.provider": "black",
+
+  // Editor
   "editor.formatOnSave": true,
+
+  // Ruff linting (replaces deprecated python.linting.*)
+  "ruff.lint.enable": true,
+  "ruff.lint.run": "onSave",
+
+  // Use Black as default formatter for Python
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+
+  // Exclusions
   "files.exclude": {
     "**/.git/**": true,
     "**/__pycache__/**": true,
@@ -20,6 +30,8 @@
     "**/.venv/**": true,
     "**/dist/**": true
   },
+
+  // Markdown lint tweaks
   "markdownlint.config": {
     "MD013": false,
     "MD047": true,
