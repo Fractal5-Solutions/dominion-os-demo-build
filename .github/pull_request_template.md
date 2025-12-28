@@ -1,21 +1,16 @@
-Title
+# Summary
 
-- Clear and scoped (e.g., docs(viewer): add local API usage note)
+Describe the change and why it matters.
 
-Summary
+## Changes
+- [ ] Key change 1
+- [ ] Key change 2
 
-- What changed in the demo build docs/assets.
+## Checks
+- [ ] governance-suite green
+- [ ] CodeQL green
+- [ ] All review threads resolved
 
-How to Verify
-
-- Steps to view or test the change locally.
-
-Checklist
-
-- [ ] Docs updated
-- [ ] Links tested locally
-- [ ] CI passes
-
-Linked Issues
-
-- Closes #
+## Post-merge
+- [ ] Run demo tests
+- [ ] Open CI summary and audit dashboards
