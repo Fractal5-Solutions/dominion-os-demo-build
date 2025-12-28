@@ -103,16 +103,14 @@
           }
 
           // Plane mesh (grid) displaced in vertex shader from heightmap
-          const vs = `#version 300 es\nprecision highp float;\nlayout(location=0) in vec2 aPos;\nlayout(location=1) in vec2 aUV;\nuniform sampler2D uTex;\nuniform float uScale;\nout vec3 vColor;\nvoid main(){\n  float h = texture(uTex, aUV).r;\n  vec3 pos = vec3(aPos, (h-0.5)*uScale);\n  // simple ortho projection
-  gl_Position = vec4(pos.xy, 0.0, 1.0);\n  vColor = vec3(h);
-}`;
+          const vs = `#version 300 es\nprecision highp float;\nlayout(location=0) in vec2 aPos;\nlayout(location=1) in vec2 aUV;\nuniform sampler2D uTex;\nuniform float uScale;\nout vec3 vColor;\nvoid main(){\n  float h = texture(uTex, aUV).r;\n  vec3 pos = vec3(aPos, (h-0.5)*uScale);\n  // simple ortho projection\n  gl_Position = vec4(pos.xy, 0.0, 1.0);\n  vColor = vec3(h);\n}`;
           const fs = `#version 300 es\nprecision highp float; in vec3 vColor; out vec4 frag; void main(){ frag=vec4(vColor,1.0);} `;
 
           function shader(type, src) {
             const s = gl.createShader(type);
             gl.shaderSource(s, src);
             gl.compileShader(s);
-            if (!gl.getShaderParameter(s, gl.COMPLETE_STATUS)) {
+            if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
               console.error(gl.getShaderInfoLog(s));
             }
             return s;
@@ -121,6 +119,9 @@
           gl.attachShader(prog, shader(gl.VERTEX_SHADER, vs));
           gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, fs));
           gl.linkProgram(prog);
+          if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+            console.error(gl.getProgramInfoLog(prog));
+          }
           gl.useProgram(prog);
 
           // Build grid
