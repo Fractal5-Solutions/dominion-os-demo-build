@@ -46,16 +46,18 @@
     <script>
       (async function () {
         const qs = new URLSearchParams(location.search);
-        const job = qs.get("job_id");
+        const jobRaw = qs.get("job_id");
         const status = document.getElementById("status");
-        if (!job) {
-          status.textContent = " — missing ?job_id";
+        // Validate job_id to avoid client-side request forgery and path injection
+        if (!jobRaw || !/^[A-Za-z0-9_-]{1,64}$/.test(jobRaw)) {
+          status.textContent = " — invalid ?job_id";
           return;
         }
+        const job = jobRaw;
         status.textContent = " — loading…";
 
         // Fetch assets map then scene.json
-        const assetsRes = await fetch(`/v1/gis/jobs/${job}/assets`).catch(
+        const assetsRes = await fetch(`/v1/gis/jobs/${encodeURIComponent(job)}/assets`).catch(
           () => null,
         );
         if (!assetsRes || !assetsRes.ok) {
@@ -67,8 +69,19 @@
           status.textContent = " — scene/heightmap missing";
           return;
         }
-        const scene = await (await fetch(`/v1/gis/jobs/${job}/assets`)).json();
-        const hmUrl = scene.heightmap || assets.heightmap;
+
+        // Resolve scene URL (absolute or relative to job assets)
+        const sceneUrlRaw = assets.scene;
+        const sceneUrl = /^https?:\/\//.test(sceneUrlRaw)
+          ? sceneUrlRaw
+          : `/v1/gis/jobs/${encodeURIComponent(job)}/${sceneUrlRaw.replace(/^\.\/?/, "")}`;
+        const scene = await (await fetch(sceneUrl)).json();
+
+        // Resolve heightmap URL similarly
+        const hmUrlRaw = scene.heightmap || assets.heightmap;
+        const hmUrl = /^https?:\/\//.test(hmUrlRaw)
+          ? hmUrlRaw
+          : `/v1/gis/jobs/${encodeURIComponent(job)}/${hmUrlRaw.replace(/^\.\/?/, "")}`;
 
         const img = new Image();
         img.crossOrigin = "anonymous";
@@ -79,7 +92,7 @@
         img.onerror = () => {
           status.textContent = " — failed to load heightmap";
         };
-        img.src = hmUrl.replace("./", "/v1/gis/jobs/" + job + "/");
+        img.src = hmUrl;
 
         function renderHeightmap(image) {
           const cvs = document.getElementById("gl");
@@ -99,7 +112,7 @@
             const s = gl.createShader(type);
             gl.shaderSource(s, src);
             gl.compileShader(s);
-            if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+            if (!gl.getShaderParameter(s, gl.COMPLETE_STATUS)) {
               console.error(gl.getShaderInfoLog(s));
             }
             return s;
