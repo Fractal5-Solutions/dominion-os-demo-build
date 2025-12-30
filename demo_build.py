@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import argparse
-import json
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
 
 
 def _add_sibling_os_to_syspath() -> None:
@@ -77,7 +76,9 @@ def main(argv: list[str] | None = None) -> int:
     p_flag.add_argument("--duration", type=int, default=300, help="Ticks to run Command Core")
     p_flag.add_argument("--scale", choices=["small", "medium", "large"], default="large")
     p_flag.add_argument("--no-ui", action="store_true", help="Run headless (recommended for CI)")
-    p_flag.add_argument("--refresh-ms", type=int, default=0, help="UI refresh delay in ms (interactive)")
+    p_flag.add_argument(
+        "--refresh-ms", type=int, default=0, help="UI refresh delay in ms (interactive)"
+    )
     args = parser.parse_args(argv)
 
     if args.cmd == "run":
@@ -91,6 +92,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd == "command-core":
         _add_sibling_os_to_syspath()
         from command_core import run_command_core
+
         out = run_command_core(
             duration_ticks=args.duration,
             scale=args.scale,
@@ -101,9 +103,12 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.cmd == "autopilot":
         _add_sibling_os_to_syspath()
-        from command_core import run_command_core
-        import time, json
+        import json
+        import time
         from datetime import datetime
+
+        from command_core import run_command_core
+
         results = []
         for i in range(args.runs):
             print(f"[autopilot] Run {i+1}/{args.runs}: scale={args.scale} duration={args.duration}")
@@ -134,6 +139,7 @@ def main(argv: list[str] | None = None) -> int:
 
         # 2) Run Command Core
         from command_core import run_command_core
+
         session = run_command_core(
             duration_ticks=args.duration,
             scale=args.scale,
@@ -143,8 +149,8 @@ def main(argv: list[str] | None = None) -> int:
         print("[flagship] Command Core session:", session)
 
         # 3) Package artifacts
-        from datetime import datetime
         import zipfile
+        from datetime import datetime
 
         dist = Path("dist")
         cc_dir = dist / "command_core"

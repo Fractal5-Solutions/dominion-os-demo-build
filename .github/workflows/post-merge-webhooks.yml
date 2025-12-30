@@ -9,4 +9,3 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "Stub governance hook on push to main."
-

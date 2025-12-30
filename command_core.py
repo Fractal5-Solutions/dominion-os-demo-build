@@ -3,9 +3,9 @@ from __future__ import annotations
 import json
 import os
 import time
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Dict, Tuple, Iterable
+from typing import Dict, List
 
 
 def _seeded_rand(seed: int) -> int:
@@ -38,7 +38,7 @@ class Service:
         while True:
             # Deterministic arrivals based on seed and tick
             seed = _seeded_rand(seed + tick)
-            arrivals = (seed % 4)  # 0..3 new tasks
+            arrivals = seed % 4  # 0..3 new tasks
             if arrivals:
                 self.backlog += arrivals
                 events.append(Event(tick, qual_name, "arrivals", f"+{arrivals} => {self.backlog}"))
@@ -107,7 +107,9 @@ def _box(lines: List[str], w: int, title: str | None = None) -> List[str]:
     return out
 
 
-def _render_dashboard(tick: int, ent: Enterprise, events: List[Event], width: int = 100, height: int = 32) -> str:
+def _render_dashboard(
+    tick: int, ent: Enterprise, events: List[Event], width: int = 100, height: int = 32
+) -> str:
     # Left: enterprise tree; Right: recent events; Bottom: KPIs
     # Build tree
     left: List[str] = [f"Enterprise: {ent.name}"]
@@ -115,10 +117,10 @@ def _render_dashboard(tick: int, ent: Enterprise, events: List[Event], width: in
         left.append(f"- {div.name}")
         for svc in div.services[:12]:
             left.append(f"  · {svc.name}  Q:{svc.backlog}  ✔:{svc.processed}")
-    left_box = _box(left[:height - 10], width // 2, title="Command Core — Topology")
+    left_box = _box(left[: height - 10], width // 2, title="Command Core — Topology")
 
     # Events window
-    recent = events[-(height - 10):]
+    recent = events[-(height - 10) :]
     right_lines = [f"t={e.tick:04d} {e.entity} {e.action}: {e.message}" for e in recent]
     right_box = _box(right_lines, width - (width // 2), title="Event Stream")
 
@@ -136,14 +138,19 @@ def _render_dashboard(tick: int, ent: Enterprise, events: List[Event], width: in
     max_side = max(len(left_box), len(right_box))
     left_box += [" "] * (max_side - len(left_box))
     right_box += [" "] * (max_side - len(right_box))
-    rows = [l + " " + r for l, r in zip(left_box, right_box)]
+    rows = [left_line + " " + right_line for left_line, right_line in zip(left_box, right_box)]
     rows += bottom
     header = [f"Dominion Command Core — Enterprise Orchestration (t={tick})"]
     return "\n" + "\n".join(header + rows)
 
 
-def run_command_core(duration_ticks: int = 120, scale: str = "small", refresh_ms: int = 0, ui: bool = True,
-                     outdir: Path | None = None) -> Dict[str, int]:
+def run_command_core(
+    duration_ticks: int = 120,
+    scale: str = "small",
+    refresh_ms: int = 0,
+    ui: bool = True,
+    outdir: Path | None = None,
+) -> Dict[str, int]:
     """Run the Command Core demo.
 
     - duration_ticks: how many scheduler cycles to run
@@ -152,8 +159,8 @@ def run_command_core(duration_ticks: int = 120, scale: str = "small", refresh_ms
     - ui: when False, runs headless and only collects artifacts
     - outdir: where to write artifacts (events.log, session.json, summary.txt)
     """
-    from dominion_os.scheduler import Scheduler
     from dominion_os.process import Process
+    from dominion_os.scheduler import Scheduler
 
     ent = build_enterprise(scale)
     events: List[Event] = []
@@ -163,7 +170,11 @@ def run_command_core(duration_ticks: int = 120, scale: str = "small", refresh_ms
     for d in ent.divisions:
         for s in d.services:
             qual = f"{d.name}/{s.name}"
-            proc = Process(pid=hash(qual) & 0xFFFF, name=qual, target=lambda s=s, q=qual: s.generator(events, q))
+            proc = Process(
+                pid=hash(qual) & 0xFFFF,
+                name=qual,
+                target=lambda s=s, q=qual: s.generator(events, q),
+            )
             sched.add(proc)
 
     # Output directory
@@ -199,7 +210,7 @@ def run_command_core(duration_ticks: int = 120, scale: str = "small", refresh_ms
     session_path.write_text(json.dumps(session, indent=2))
 
     summary_lines = [
-        f"Dominion Command Core Session",
+        "Dominion Command Core Session",
         f"Ticks: {session['ticks']}",
         f"Scale: {session['scale']}  Divisions: {session['divisions']}  Services: {session['services']}",
         f"Processed: {session['processed']}  Backlog: {session['backlog']}",
@@ -207,4 +218,3 @@ def run_command_core(duration_ticks: int = 120, scale: str = "small", refresh_ms
     ]
     summary_path.write_text("\n".join(summary_lines))
     return session
-
