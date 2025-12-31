@@ -4,6 +4,7 @@ Projects scanned: 3
 Projects with at least one healthy service: 2
 
 ## dominion-core-prod
+
 - us-central1 | api | fail (503)
 - us-central1 | chatgpt-gateway | fail (500)
 - us-central1 | demo | fail (503)
@@ -15,6 +16,7 @@ Projects with at least one healthy service: 2
 - us-central1 | pipeline | fail (503)
 
 ## dominion-os
+
 - us-central1 | ai-chief-of-staff | fail (404)
 - us-central1 | ai-enriched-harvesting | ok (200)
 - us-central1 | chatgpt-gateway | fail (403)
@@ -43,6 +45,7 @@ Projects with at least one healthy service: 2
 - europe-west1 | dominion-os-core | fail (302)
 
 ## f5-demo-sandbox
+
 - us-central1 | dominion-demo | ok (200)
 - us-central1 | dominion-harvesting | ok (200)
 - us-central1 | dominion-os-1-0 | ok (200)

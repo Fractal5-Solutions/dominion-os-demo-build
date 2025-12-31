@@ -14,17 +14,17 @@ Quickstart
 Command Core (full experience)
 
 - Run interactive dashboard (small scale):
-  - `python demo_build.py command-core --duration 120 --scale small`
+    - `python demo_build.py command-core --duration 120 --scale small`
 - Headless, generate artifacts only:
-  - `python demo_build.py command-core --duration 100 --scale medium --no-ui`
+    - `python demo_build.py command-core --duration 100 --scale medium --no-ui`
 - Artifacts are written to `dist/command_core/` as `events.log`, `session.json`, and `summary.txt`.
 
 Autopilot (NHITL)
 
 - Single automated run at large scale:
-  - `python demo_build.py autopilot --scale large --duration 300`
+    - `python demo_build.py autopilot --scale large --duration 300`
 - Multiple back-to-back runs with interval:
-  - `python demo_build.py autopilot --scale medium --duration 120 --runs 3 --interval-ms 500`
+    - `python demo_build.py autopilot --scale medium --duration 120 --runs 3 --interval-ms 500`
 - Output: flight summaries saved under `dist/command_core/flight_*.json`.
 
 Note: This demo imports `dominion_os` from the sibling path `../dominion-os-1.0` without installing it. This keeps it network-free.

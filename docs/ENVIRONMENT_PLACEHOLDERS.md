@@ -10,6 +10,7 @@ When running the demo build locally, you may want to set a few environment varia
 - GCLOUD_PROJECT=
 
 Notes:
+
 - The demo build imports sibling `dominion-os-1.0`; `PYTHONPATH` ensures local imports resolve.
 - `AI_GATEWAY_URL` should point to your locally running Gateway on port 8082.
 - Export `GH_TOKEN`/`GITHUB_TOKEN` in your shell for CI actions if needed.
