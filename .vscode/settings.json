@@ -4,11 +4,12 @@
     "extensions.autoCheckUpdates": true,
 
     "files.autoSave": "afterDelay",
-    "files.autoSaveDelay": 800,
+    "files.autoSaveDelay": 500,
     "files.trimTrailingWhitespace": true,
     "editor.formatOnSave": true,
     "editor.inlineSuggest.enabled": true,
-    "editor.quickSuggestions": { "other": true, "comments": false, "strings": true },
+    "editor.inlayHints.enabled": "on",
+    "editor.quickSuggestions": { "other": true, "comments": true, "strings": true },
     "editor.codeActionsOnSave": {
         "source.fixAll": "explicit",
         "source.organizeImports": "explicit"
