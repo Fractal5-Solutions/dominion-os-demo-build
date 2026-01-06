@@ -1,0 +1,48 @@
+name: Utilities — Open PR
+
+on:
+    workflow_dispatch:
+        inputs:
+            head:
+                description: Source branch name
+                required: true
+                default: chore/vscode-hygiene-20251231
+            base:
+                description: Target branch name
+                required: true
+                default: main
+            title:
+                description: PR title
+                required: false
+                default: "Automated PR"
+            body:
+                description: PR body
+                required: false
+                default: "Created via Utilities — Open PR workflow."
+
+jobs:
+    open-pr:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Open PR via GitHub API
+              shell: bash
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GH_REPO: ${{ github.repository }}
+                  GH_API: ${{ github.api_url || 'https://api.github.com' }}
+                  HEAD: ${{ inputs.head }}
+                  BASE: ${{ inputs.base }}
+                  TITLE: ${{ inputs.title }}
+                  BODY: ${{ inputs.body }}
+              run: |
+                  set -euo pipefail
+                  json=$(jq -nc \
+                    --arg t "$TITLE" \
+                    --arg b "$BODY" \
+                    --arg head "$HEAD" \
+                    --arg base "$BASE" '{title:$t, head:$head, base:$base, body:$b}')
+                  curl -s -X POST \
+                    -H "Authorization: Bearer ${GH_TOKEN}" \
+                    -H "Accept: application/vnd.github+json" \
+                    "${GH_API}/repos/${GH_REPO}/pulls" \
+                    -d "$json" | jq -r '.html_url // .message // "PR creation attempted"'
