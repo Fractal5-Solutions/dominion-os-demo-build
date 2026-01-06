@@ -3,3 +3,6 @@ __pycache__/
 .pytest_cache/
 .venv/
 dist/
+
+# Local backup artifacts (kept outside Git history)
+out/backups/
