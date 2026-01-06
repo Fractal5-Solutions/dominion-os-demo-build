@@ -1,0 +1,38 @@
+name: Security — Bandit
+
+on:
+    pull_request:
+    push:
+        branches: ["main", "chore/**", "ci/**"]
+    workflow_dispatch:
+
+jobs:
+    bandit:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Clone repository
+              shell: bash
+              run: |
+                  set -euo pipefail
+                  git clone --depth=1 "https://github.com/${GITHUB_REPOSITORY}.git" repo
+                  cd repo
+                  echo "Cloned $(git rev-parse --short HEAD)"
+
+            - name: Set up Python
+              shell: bash
+              working-directory: repo
+              run: |
+                  set -euo pipefail
+                  python3 -V
+                  python3 -m venv .venv
+                  source .venv/bin/activate
+                  python -m pip install --upgrade pip
+                  pip install bandit
+
+            - name: Run Bandit (fail on high severity)
+              shell: bash
+              working-directory: repo
+              run: |
+                  set -euo pipefail
+                  source .venv/bin/activate
+                  bandit -r . -ll -iii

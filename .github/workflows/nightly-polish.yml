@@ -1,0 +1,84 @@
+name: Nightly — Test & Polish
+
+on:
+    schedule:
+        - cron: "30 2 * * *" # daily at 02:30 UTC
+    workflow_dispatch:
+
+jobs:
+    test-and-polish:
+        runs-on: ubuntu-latest
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        steps:
+            - name: Clone repository
+              shell: bash
+              run: |
+                  set -euo pipefail
+                  git clone --depth=1 "https://github.com/${GITHUB_REPOSITORY}.git" repo
+                  cd repo
+                  echo "Cloned $(git rev-parse --short HEAD)"
+
+            - name: Install dependencies (jq)
+              shell: bash
+              run: |
+                  set -euo pipefail
+                  sudo apt-get update -y
+                  sudo apt-get install -y jq
+
+            - name: Set up Python and venv
+              shell: bash
+              working-directory: repo
+              run: |
+                  set -euo pipefail
+                  python3 -V
+                  python3 -m venv .venv
+                  source .venv/bin/activate
+                  python -m pip install --upgrade pip
+                  pip install -q pytest
+
+            - name: Run tests
+              shell: bash
+              working-directory: repo
+              run: |
+                  set -euo pipefail
+                  source .venv/bin/activate
+                  PYTHONPATH=. pytest -q
+
+            - name: Polish
+              shell: bash
+              working-directory: repo
+              run: |
+                  set -euo pipefail
+                  chmod +x tools/polish_all.sh || true
+                  tools/polish_all.sh || true
+
+            - name: Commit and push changes (if any)
+              shell: bash
+              working-directory: repo
+              env:
+                  GH_OWNER: ${{ github.repository_owner }}
+                  GH_REPO: ${{ github.event.repository.name }}
+              run: |
+                  set -euo pipefail
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                  if git diff --quiet && git diff --cached --quiet; then
+                    echo "No changes to commit."
+                    exit 0
+                  fi
+                  BRANCH="ci/polish-$(date -u +%Y%m%dT%H%M%SZ)"
+                  git checkout -b "$BRANCH"
+                  git add -A
+                  git commit -m "chore(polish): nightly auto-format and docs polish"
+                  # Use token for push
+                  git push -u "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$BRANCH"
+                  # Open PR via GitHub API
+                  api="${{ github.api_url || 'https://api.github.com' }}"
+                  base="${{ github.ref_name || 'main' }}"
+                  title="Nightly polish $(date -u +%Y-%m-%d)"
+                  body="Automated nightly polish run."
+                  curl -s -X POST -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/vnd.github+json" \
+                    "${api}/repos/${GITHUB_REPOSITORY}/pulls" \
+                    -d "$(jq -nc --arg t "$title" --arg b "$body" --arg head "$BRANCH" --arg base "$base" '{title:$t, head:$head, base:$base, body:$b}')" \
+                    | jq -r '.html_url // "PR creation attempted"'
