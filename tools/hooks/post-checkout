@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Refresh SESSION_EXIT_SUMMARY.md in dominion-os-1.0 after checkouts (branch/file changes)
+REPO_DIR="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+OS_REPO_DIR="$REPO_DIR/../dominion-os-1.0"
+REFRESH_SCRIPT="$OS_REPO_DIR/tools/refresh_session_summary.py"
+VENV_PY="$OS_REPO_DIR/.venv/bin/python"
+
+if [[ -f "$REFRESH_SCRIPT" ]]; then
+  if [[ -x "$VENV_PY" ]]; then
+    "$VENV_PY" "$REFRESH_SCRIPT" || true
+  else
+    python3 "$REFRESH_SCRIPT" || true
+  fi
+  echo "[hooks] SESSION_EXIT_SUMMARY.md refreshed (post-checkout)" >&2
+fi
+
+exit 0
