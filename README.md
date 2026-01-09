@@ -1,6 +1,11 @@
-Dominion OS Demo Build
+# Dominion OS Demo Build
 
-This repo demonstrates consuming the sibling `dominion-os-1.0` toy kernel to:
+![Demo](https://img.shields.io/badge/Demo-Ready-brightgreen)
+[![Dominion OS](https://img.shields.io/badge/Depends%20on-dominion--os--1.0-blue)](https://github.com/Fractal5-Solutions/dominion-os-1.0)
+![Cloud Run](https://img.shields.io/badge/Deployed-Google%20Cloud%20Run-4285F4?logo=googlecloud&logoColor=white)
+![License](https://img.shields.io/badge/license-Commercial-blue)
+
+This repo demonstrates consuming the sibling [`dominion-os-1.0`](https://github.com/Fractal5-Solutions/dominion-os-1.0) toy kernel to:
 
 - Build a JSON image
 - Run a demo and save outputs to `dist/`
