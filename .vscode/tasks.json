@@ -37,13 +37,12 @@
             "command": "bash",
             "args": [
                 "-lc",
-                "git fetch origin main && if git merge-base --is-ancestor origin/main HEAD; then git push; else echo 'Remote main has new commits; run Git Sync & Rebase first.' >&2; exit 1; fi"
+                "git fetch origin main && if git merge-base --is-ancestor origin/main HEAD; then git push; else echo \"Remote main has new commits; run Git Sync & Rebase first.\" >&2; exit 1; fi"
             ],
             "options": { "cwd": "${workspaceFolder}" },
             "group": "build",
             "problemMatcher": []
-        }
-        ,
+        },
         {
             "label": "Copilot: Demo Build — Test & Polish",
             "type": "shell",
@@ -55,6 +54,18 @@
             "options": { "cwd": "${workspaceFolder}" },
             "presentation": { "reveal": "always", "panel": "dedicated" },
             "problemMatcher": ["$pytest"]
+        },
+        {
+            "label": "Setup: Generate .env placeholders (demo-build)",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-lc",
+                "if [ -f .env ]; then echo \"[skip] .env already exists\"; else cp config/env.example .env && echo \"[created] .env from config/env.example\"; fi"
+            ],
+            "options": { "cwd": "${workspaceFolder}" },
+            "presentation": { "reveal": "always" },
+            "problemMatcher": []
         }
     ]
 }

@@ -25,8 +25,8 @@ No vertical is valid without all three parts.
 ## 🔑 Structure
 
 1. Dominion OS Configurations (modalities): Deploy It, Extend It, License It, Use It as a Service — required for all downstream offers.
-2. Verticals (BL2–BL7): each = SaaS + API + Agent (one canonical triad per vertical).
-3. Microproducts: entry SKUs that ladder into the triad (funnel → SaaS/API/Agent).
+1. Verticals (BL2–BL7): each = SaaS + API + Agent (one canonical triad per vertical).
+1. Microproducts: entry SKUs that ladder into the triad (funnel → SaaS/API/Agent).
 
 ## 💰 Pricing Doctrine
 

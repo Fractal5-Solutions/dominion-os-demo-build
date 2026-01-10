@@ -8,9 +8,9 @@
 ## Workflow
 
 1. Branch off `main` (or the appropriate chore branch).
-2. Run tests: `pytest -q`.
-3. Keep commits clean; avoid vendor files.
-4. Open a PR using the repo’s PR template.
+1. Run tests: `pytest -q`.
+1. Keep commits clean; avoid vendor files.
+1. Open a PR using the repo’s PR template.
 
 ## Style
 
