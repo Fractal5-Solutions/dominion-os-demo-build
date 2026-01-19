@@ -1,0 +1,15 @@
+.git
+.github
+.mypy_cache
+.ruff_cache
+.venv
+.vscode
+__pycache__
+dist
+out
+telemetry
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.zip
