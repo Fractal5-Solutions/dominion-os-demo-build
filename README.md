@@ -32,4 +32,11 @@ Autopilot (NHITL)
     - `python demo_build.py autopilot --scale medium --duration 120 --runs 3 --interval-ms 500`
 - Output: flight summaries saved under `dist/command_core/flight_*.json`.
 
-Note: This demo imports `dominion_os` from the sibling path `../dominion-os-1.0` without installing it. This keeps it network-free.
+Container (Cloud Run / local Docker)
+
+- Build: `docker build -t dominion-os-demo-build .`
+- Run: `docker run --rm -p 8080:8080 dominion-os-demo-build`
+- Health: `curl -fsS http://localhost:8080/healthz`
+
+Note: This repo vendors the minimal `dominion_os` toy kernel so the demo can run standalone. If you prefer
+to use a sibling checkout of `dominion-os-1.0`, set `DOMINION_OS_PATH` to that repo root.
