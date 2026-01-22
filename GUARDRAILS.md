@@ -8,14 +8,14 @@ This repository is **sealed**. Guardrails are enforced at both **branch** and **
 - **Linear history only** — no merge commits.
 - **Conversation resolution required** — all threads must be closed.
 - **Pull Request Reviews**:
-    - At least **1 approval** required.
-    - Approver must not be the last pusher.
+  - At least **1 approval** required.
+  - Approver must not be the last pusher.
 
 ## 🏷️ Tag Protection
 
 - All **release tags (`v*`)** are immutable:
-    - ❌ No deletion.
-    - ❌ No rewriting (no force-push).
+  - ❌ No deletion.
+  - ❌ No rewriting (no force-push).
 - Once a release tag is cut, it is permanent.
 
 ## ⚖️ Merge Strategy
@@ -28,9 +28,9 @@ This repository is **sealed**. Guardrails are enforced at both **branch** and **
 
 - The repo contains a **Guardrails workflow** (`.github/workflows/guardrails.yml`).
 - On every PR to `main` or `release/**`, the workflow asserts:
-    - Required checks exist.
-    - Linear history enforced.
-    - Conversation resolution enforced.
+  - Required checks exist.
+  - Linear history enforced.
+  - Conversation resolution enforced.
 - If protections drift, CI fails.
 
 ## 🪦 Immutable Guarantee

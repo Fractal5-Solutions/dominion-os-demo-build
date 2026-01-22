@@ -23,7 +23,7 @@ class Span:
             "name": self.name,
             "start": self.start,
             "end": self.end,
-            "duration_ms": None if self.end is None else (self.end - self.start) * 1000.0,
+            "duration_ms": (None if self.end is None else (self.end - self.start) * 1000.0),
             "attrs": self.attrs or {},
         }
 
