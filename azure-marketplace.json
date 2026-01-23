@@ -1,0 +1,33 @@
+{
+  "marketplace": "azure",
+  "product": {
+    "name": "dominion-os-demo-build",
+    "description": "Enterprise AI orchestration - dominion-os-demo-build",
+    "version": "1.0.0",
+    "category": "AI + Machine Learning",
+    "pricing": {
+      "model": "consumption",
+      "meters": [
+        "compute_hours",
+        "storage_gb",
+        "api_calls"
+      ]
+    }
+  },
+  "deployment": {
+    "image_urn": "fractal5:dominion-os:latest",
+    "vm_size": "Standard_D2s_v3",
+    "regions": [
+      "East US",
+      "West Europe",
+      "Southeast Asia"
+    ],
+    "arm_template": "azure-deployment.json"
+  },
+  "compliance": [
+    "ISO27001",
+    "CSA STAR",
+    "GDPR"
+  ],
+  "sovereign_ai": true
+}

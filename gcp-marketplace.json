@@ -1,0 +1,33 @@
+{
+  "marketplace": "gcp",
+  "product": {
+    "name": "dominion-os-demo-build",
+    "description": "Enterprise AI orchestration - dominion-os-demo-build",
+    "version": "1.0.0",
+    "category": "AI and Machine Learning",
+    "pricing": {
+      "model": "pay-as-you-go",
+      "tiers": [
+        "starter",
+        "professional",
+        "enterprise"
+      ]
+    }
+  },
+  "deployment": {
+    "container_image": "gcr.io/fractal5-solutions/dominion-os-demo-build:latest",
+    "machine_type": "n1-standard-2",
+    "regions": [
+      "us-central1",
+      "europe-west1",
+      "asia-southeast1"
+    ],
+    "deployment_manager_template": "gcp-deployment.yaml"
+  },
+  "compliance": [
+    "SOC2",
+    "ISO27001",
+    "GDPR"
+  ],
+  "sovereign_ai": true
+}

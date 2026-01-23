@@ -1,0 +1,33 @@
+{
+  "marketplace": "aws",
+  "product": {
+    "name": "dominion-os-demo-build",
+    "description": "Enterprise AI orchestration - dominion-os-demo-build",
+    "version": "1.0.0",
+    "category": "AI/ML",
+    "pricing": {
+      "model": "subscription",
+      "tiers": [
+        "basic",
+        "professional",
+        "enterprise"
+      ]
+    }
+  },
+  "deployment": {
+    "ami_id": "ami-12345678",
+    "instance_type": "t3.medium",
+    "regions": [
+      "us-east-1",
+      "eu-west-1",
+      "ap-southeast-1"
+    ],
+    "cloudformation_template": "aws-deployment.yaml"
+  },
+  "compliance": [
+    "SOC2",
+    "PCI-DSS",
+    "GDPR"
+  ],
+  "sovereign_ai": true
+}

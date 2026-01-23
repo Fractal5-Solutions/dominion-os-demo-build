@@ -10,6 +10,18 @@
 > **License**: Proprietary (Fractal5-Solutions)
 > **Marketplace**: Available on GCP, AWS, Azure
 
+# Dominion OS Demo Build - Commercial Edition
+
+> **Commercial Product** - Enterprise-ready AI orchestration platform
+> **License**: Proprietary (Fractal5-Solutions)
+> **Marketplace**: Available on GCP, AWS, Azure
+
+# Dominion OS Demo Build - Commercial Edition
+
+> **Commercial Product** - Enterprise-ready AI orchestration platform
+> **License**: Proprietary (Fractal5-Solutions)
+> **Marketplace**: Available on GCP, AWS, Azure
+
 # Dominion OS Demo Build
 
 ![Demo](https://img.shields.io/badge/Demo-Ready-brightgreen)
