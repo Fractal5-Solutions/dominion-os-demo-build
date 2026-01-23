@@ -1,0 +1,29 @@
+{
+  "product": "dominion-os-demo-build",
+  "version": "1.0.0",
+  "description": "Enterprise AI orchestration platform with sovereign protections",
+  "pricing": {
+    "model": "subscription",
+    "tiers": [
+      "starter",
+      "professional",
+      "enterprise"
+    ]
+  },
+  "features": [
+    "AI orchestration",
+    "Multi-cloud deployment",
+    "Sovereign AI operations",
+    "Automated optimization"
+  ],
+  "platforms": [
+    "GCP",
+    "AWS",
+    "Azure"
+  ],
+  "compliance": [
+    "SOC2",
+    "GDPR",
+    "AI Sovereignty"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "ai_providers": [
+    "grok"
+  ],
+  "blocked_providers": [
+    "google",
+    "openai",
+    "anthropic"
+  ],
+  "encryption": "enabled",
+  "data_sovereignty": "enforced",
+  "audit_logging": "enabled"
+}
