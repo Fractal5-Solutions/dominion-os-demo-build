@@ -1,0 +1,15 @@
+{
+  "last_updated": "2026-02-06",
+  "notes": [
+    "This is a minimal placeholder spec created to satisfy canonical spec discovery.",
+    "Expand this spec with API/data contracts, build/deploy contracts, and operational requirements."
+  ],
+  "repository": {
+    "dependencies": [
+      "dominion-os-1.0"
+    ],
+    "name": "dominion-os-demo-build",
+    "role": "Demo harness and build scripts for Dominion OS"
+  },
+  "schema_version": "1.0"
+}

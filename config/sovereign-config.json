@@ -1,0 +1,16 @@
+{
+  "ai_providers": [
+    "grok"
+  ],
+  "audit_logging": "enabled",
+  "blocked_providers": [
+    "google",
+    "openai",
+    "anthropic"
+  ],
+  "commercial_compliance": "enforced",
+  "data_sovereignty": "enforced",
+  "encryption": "military-grade",
+  "nhitl_oversight": "active",
+  "sovereign_mode": "required"
+}
