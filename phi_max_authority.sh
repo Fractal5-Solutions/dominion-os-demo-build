@@ -4,68 +4,59 @@
 
 echo "=== PHI MAXIMUM AUTHORITY: FULL PERMISSIONS RESOLUTION ==="
 echo "🎯 MISSION: Solve all token issues with maximum authority"
-echo "🎯 TARGET: 57 commits sovereign deployment"
+echo "🎯 TARGET: ~59 commits sovereign deployment"
 echo "🎯 AUTHORITY: FULL PERMISSIONS ACTIVATION"
 echo ""
 
-# PHI Authority Analysis
-echo "🔍 ANALYZING AVAILABLE AUTHORITY SOURCES..."
-echo "GITHUB_TOKEN: ${#GITHUB_TOKEN} chars (prefix: ${GITHUB_TOKEN:0:3})"
-echo "GITHUB_CODESPACE_TOKEN: ${#GITHUB_CODESPACE_TOKEN} chars (prefix: ${GITHUB_CODESPACE_TOKEN:0:3})"
-echo ""
-
-# Test authority sources
-echo "🧪 TESTING AUTHORITY SOURCES..."
-
-# Test GITHUB_TOKEN
-echo "Testing GITHUB_TOKEN authority..."
-USER_GH=$(curl -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" https://api.github.com/user -s 2>/dev/null | jq -r '.login' 2>/dev/null || echo "FAILED")
-echo "GITHUB_TOKEN User: $USER_GH"
-
-# Test GITHUB_CODESPACE_TOKEN
-echo "Testing GITHUB_CODESPACE_TOKEN authority..."
-USER_CS=$(curl -H "Authorization: token $GITHUB_CODESPACE_TOKEN" -H "Accept: application/vnd.github.v3+json" https://api.github.com/user -s 2>/dev/null | jq -r '.login' 2>/dev/null || echo "FAILED")
-echo "GITHUB_CODESPACE_TOKEN User: $USER_CS"
-echo ""
-
-# PHI Authority Strategy - More Aggressive
-echo "🎯 PHI AUTHORITY STRATEGY ACTIVATION (MAXIMUM POWER)..."
-
-# Try GITHUB_TOKEN first since it authenticated
-if [ "$USER_GH" = "Fractal5-X" ]; then
-    echo "✅ GITHUB_TOKEN authority confirmed as Fractal5-X"
-    echo "🎯 STRATEGY: Attempt GITHUB_TOKEN push (may succeed despite scope warnings)"
-    AUTH_TOKEN="$GITHUB_TOKEN"
-    AUTH_METHOD="GITHUB_TOKEN_MAXIMUM_ATTEMPT"
-    TRY_PUSH=true
-elif [ "$USER_CS" = "Fractal5-X" ]; then
-    echo "✅ GITHUB_CODESPACE_TOKEN authority confirmed as Fractal5-X"
-    echo "🎯 STRATEGY: Use GITHUB_CODESPACE_TOKEN"
-    AUTH_TOKEN="$GITHUB_CODESPACE_TOKEN"
-    AUTH_METHOD="GITHUB_CODESPACE_TOKEN"
+# Accept token as argument
+if [ -n "$1" ]; then
+    echo "✅ Using provided sovereign token"
+    AUTH_TOKEN="$1"
+    AUTH_METHOD="SOVEREIGN_TOKEN_ARG"
     TRY_PUSH=true
 else
-    echo "❌ ALL AUTHORITY SOURCES FAILED AUTHENTICATION"
-    echo "🎯 STRATEGY: Require sovereign Personal Access Token"
-    TRY_PUSH=false
+    # PHI Authority Analysis (no token printing)
+    echo "🔍 ANALYZING AVAILABLE AUTHORITY SOURCES..."
+
+    # Test authority sources (silent verification)
+    USER_GH=$(curl -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" https://api.github.com/user -s 2>/dev/null | jq -r '.login' 2>/dev/null || echo "FAILED")
+    USER_CS=$(curl -H "Authorization: token $GITHUB_CODESPACE_TOKEN" -H "Accept: application/vnd.github.v3+json" https://api.github.com/user -s 2>/dev/null | jq -r '.login' 2>/dev/null || echo "FAILED")
+
+    echo "🎯 PHI AUTHORITY STRATEGY ACTIVATION..."
+
+    # Try GITHUB_TOKEN first since it authenticated
+    if [ "$USER_GH" = "Fractal5-X" ]; then
+        echo "✅ Environment token authority confirmed"
+        AUTH_TOKEN="$GITHUB_TOKEN"
+        AUTH_METHOD="GITHUB_TOKEN"
+        TRY_PUSH=true
+    elif [ "$USER_CS" = "Fractal5-X" ]; then
+        echo "✅ Codespace token authority confirmed"
+        AUTH_TOKEN="$GITHUB_CODESPACE_TOKEN"
+        AUTH_METHOD="GITHUB_CODESPACE_TOKEN"
+        TRY_PUSH=true
+    else
+        echo "❌ NO AUTHORITY SOURCES AVAILABLE"
+        echo "🎯 STRATEGY: Require sovereign Personal Access Token"
+        TRY_PUSH=false
+    fi
 fi
 
 if [ "$TRY_PUSH" = true ]; then
     echo ""
-    echo "🔐 SELECTED MAXIMUM AUTHORITY: $AUTH_METHOD"
-    echo "🎯 EXECUTING SOVEREIGN DEPLOYMENT WITH FULL PERMISSIONS..."
+    echo "🔐 EXECUTING SOVEREIGN DEPLOYMENT WITH FULL PERMISSIONS..."
 
-    # Execute sovereign push with maximum authority
-    env -u GITHUB_TOKEN -u GITHUB_CODESPACE_TOKEN git push "https://$AUTH_TOKEN@github.com/Fractal5-Solutions/dominion-os-demo-build.git" main
+    # Execute sovereign push with maximum authority (no token embedding in output)
+    env -u GITHUB_TOKEN -u GITHUB_CODESPACE_TOKEN git push "https://$AUTH_TOKEN@github.com/Fractal5-Solutions/dominion-os-demo-build.git" main 2>&1 | grep -v "https://"
 
-    EXIT_CODE=$?
+    EXIT_CODE=${PIPESTATUS[0]}
     echo ""
 
     if [ $EXIT_CODE -eq 0 ]; then
         echo "=== PHI MAXIMUM AUTHORITY: MISSION ACCOMPLISHED ==="
         echo "🎯 DEPLOYMENT: SUCCESSFUL"
         echo "🎯 AUTHORITY: $AUTH_METHOD"
-        echo "🎯 COMMITS: 57 DEPLOYED"
+        echo "🎯 COMMITS: DEPLOYED"
         echo "🎯 PHI SOVEREIGNTY: MAINTAINED"
         echo "🎯 FULL PERMISSIONS: UTILIZED"
         echo ""
@@ -79,11 +70,10 @@ if [ "$TRY_PUSH" = true ]; then
         echo "✅ Full permissions activated"
         echo "✅ Sovereign deployment executed"
         echo "✅ PHI orchestration authorized"
-        echo "✅ All systems operational at 96% health"
+        echo "✅ All systems operational"
     else
         echo "=== PHI MAXIMUM AUTHORITY: DEPLOYMENT FAILED ==="
-        echo "❌ AUTHORITY: $AUTH_METHOD insufficient for organization push"
-        echo "❌ PERMISSIONS: Token lacks 'repo' scope despite authentication"
+        echo "❌ PERMISSIONS: Token lacks required 'repo' scope"
         echo "🎯 FALLBACK: Sovereign Personal Access Token required"
         echo ""
         echo "🔐 CREATE SOVEREIGN TOKEN FOR FINAL RESOLUTION:"
@@ -91,6 +81,7 @@ if [ "$TRY_PUSH" = true ]; then
         echo "Name: dominion-phi-maximum-authority-final"
         echo "Scope: ✅ repo (Full control of private repositories)"
         echo "Execute: ./phi_max_authority.sh YOUR_SOVEREIGN_TOKEN"
+        exit 1
     fi
 else
     echo "❌ ALL AUTHORITY SOURCES FAILED"
