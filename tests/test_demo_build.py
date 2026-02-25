@@ -16,6 +16,7 @@ class TestDemoBuild(unittest.TestCase):
 
     def test_demo_build_run(self):
         from demo_build import run_demo
+
         try:
             dst = run_demo()
             self.assertTrue(dst.exists())
@@ -25,6 +26,7 @@ class TestDemoBuild(unittest.TestCase):
 
     def test_demo_build_image(self):
         from demo_build import build_image
+
         try:
             dst = build_image()
             self.assertTrue(dst.exists())

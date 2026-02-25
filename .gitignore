@@ -3,3 +3,14 @@ __pycache__/
 .pytest_cache/
 .venv/
 dist/
+.DS_Store
+
+# Ignore local backup archives
+out/backups/
+image-digest.txt
+out/autopilot/
+
+# Local environment files
+.env
+
+.fake

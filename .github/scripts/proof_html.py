@@ -5,7 +5,6 @@ import json
 import re
 from pathlib import Path
 
-
 HTML_PATH = Path("web/sqsp/f5-applications.code.html")
 OUT = Path("catalog_manifest.json")
 

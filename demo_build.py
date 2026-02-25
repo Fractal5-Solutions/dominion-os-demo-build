@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import argparse
-import json
 import os
-from pathlib import Path
+import subprocess
 import sys
+from pathlib import Path
 
 
 def _add_sibling_os_to_syspath() -> None:
@@ -18,6 +18,53 @@ def _add_sibling_os_to_syspath() -> None:
     pkg_path = os_repo / "dominion_os"
     if pkg_path.exists():
         sys.path.insert(0, str(os_repo))
+
+
+def deploy_to_cloud() -> dict:
+    """Deploy demo to Google Cloud Run"""
+    _add_sibling_os_to_syspath()
+
+    print("🚀 Deploying Dominion OS Demo to Google Cloud Run...")
+
+    # Build the demo image first
+    image_path = build_demo_image()
+    print(f"📦 Built demo image: {image_path}")
+
+    # Use the bootstrap script from sibling repo
+    bootstrap_script = Path("../dominion-os-1.0/bootstrap_sovereign_gcp.sh")
+    if not bootstrap_script.exists():
+        raise FileNotFoundError(f"Bootstrap script not found: {bootstrap_script}")
+
+    # Deploy command-core service
+    deploy_cmd = [
+        "bash",
+        str(bootstrap_script),
+        "deploy_service",
+        "dominion-demo-command-core",
+        "gcr.io/fractal5-solutions/dominion-os-demo:latest",
+        "command-core",
+    ]
+
+    result = subprocess.run(
+        deploy_cmd, capture_output=True, text=True, cwd=Path("../dominion-os-1.0")
+    )
+    if result.returncode != 0:
+        print(f"❌ Deployment failed: {result.stderr}")
+        return {"status": "failed", "error": result.stderr}
+
+    # Extract service URL from output
+    service_url = None
+    for line in result.stdout.split("\n"):
+        if "https://" in line and "run.app" in line:
+            service_url = line.strip()
+            break
+
+    return {
+        "status": "success",
+        "service_url": service_url,
+        "image": str(image_path),
+        "deployment_log": result.stdout,
+    }
 
 
 def run_demo() -> Path:
@@ -60,6 +107,7 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="cmd")
     sub.add_parser("run")
     sub.add_parser("build")
+    sub.add_parser("deploy", help="Deploy demo to Google Cloud Run")
 
     p_cc = sub.add_parser("command-core", help="Run Command Core orchestration demo")
     p_cc.add_argument("--duration", type=int, default=120, help="Scheduler ticks to run")
@@ -77,7 +125,9 @@ def main(argv: list[str] | None = None) -> int:
     p_flag.add_argument("--duration", type=int, default=300, help="Ticks to run Command Core")
     p_flag.add_argument("--scale", choices=["small", "medium", "large"], default="large")
     p_flag.add_argument("--no-ui", action="store_true", help="Run headless (recommended for CI)")
-    p_flag.add_argument("--refresh-ms", type=int, default=0, help="UI refresh delay in ms (interactive)")
+    p_flag.add_argument(
+        "--refresh-ms", type=int, default=0, help="UI refresh delay in ms (interactive)"
+    )
     args = parser.parse_args(argv)
 
     if args.cmd == "run":
@@ -88,9 +138,22 @@ def main(argv: list[str] | None = None) -> int:
         dst = build_demo_image()
         print(f"Image: {dst}")
         return 0
+
+    if args.cmd == "deploy":
+        result = deploy_to_cloud()
+        if result["status"] == "success":
+            print("✅ Deployment successful!")
+            print(f"🌐 Service URL: {result['service_url']}")
+            print(f"📦 Image: {result['image']}")
+            return 0
+        else:
+            print(f"❌ Deployment failed: {result.get('error', 'Unknown error')}")
+            return 1
+
     if args.cmd == "command-core":
         _add_sibling_os_to_syspath()
         from command_core import run_command_core
+
         out = run_command_core(
             duration_ticks=args.duration,
             scale=args.scale,
@@ -101,9 +164,12 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.cmd == "autopilot":
         _add_sibling_os_to_syspath()
-        from command_core import run_command_core
-        import time, json
+        import json
+        import time
         from datetime import datetime
+
+        from command_core import run_command_core
+
         results = []
         for i in range(args.runs):
             print(f"[autopilot] Run {i+1}/{args.runs}: scale={args.scale} duration={args.duration}")
@@ -134,6 +200,7 @@ def main(argv: list[str] | None = None) -> int:
 
         # 2) Run Command Core
         from command_core import run_command_core
+
         session = run_command_core(
             duration_ticks=args.duration,
             scale=args.scale,
@@ -143,8 +210,8 @@ def main(argv: list[str] | None = None) -> int:
         print("[flagship] Command Core session:", session)
 
         # 3) Package artifacts
-        from datetime import datetime
         import zipfile
+        from datetime import datetime
 
         dist = Path("dist")
         cc_dir = dist / "command_core"

@@ -1,8 +1,8 @@
 {
-  "catalog": {
-    "exists": true,
-    "no_external": true
-  },
-  "canon": true,
-  "ok": true
+    "catalog": {
+        "exists": true,
+        "no_external": true
+    },
+    "canon": true,
+    "ok": true
 }
