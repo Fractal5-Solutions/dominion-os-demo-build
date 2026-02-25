@@ -12,3 +12,5 @@ out/autopilot/
 
 # Local environment files
 .env
+
+.fake
