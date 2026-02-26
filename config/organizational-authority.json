@@ -1,0 +1,133 @@
+{
+    "organizational_structure": {
+        "holding_entities": [
+            {
+                "name": "Fractal5 Solutions Inc",
+                "type": "C-Corporation",
+                "jurisdiction": "TBD",
+                "primary_business": "Sovereign AI Systems Development",
+                "ein": "TBD",
+                "status": "ACTIVE",
+                "sole_owner": {
+                    "name": "Matthew Burbidge",
+                    "email": "matthewburbidge@fractal5solutions.com",
+                    "ownership_percentage": 100,
+                    "title": "Founder & CEO"
+                },
+                "repositories": ["dominion-os-demo-build", "dominion-os-main", "fractal5-platform"],
+                "infrastructure": {
+                    "gcp_projects": ["dominion-os-1-0-main", "dominion-core-prod"],
+                    "services_count": 22,
+                    "deployment_authority": "matthewburbidge@fractal5solutions.com"
+                }
+            },
+            {
+                "name": "Blue Wave Action Group Inc",
+                "type": "C-Corporation",
+                "jurisdiction": "TBD",
+                "primary_business": "Political Technology & Campaign Infrastructure",
+                "ein": "TBD",
+                "status": "ACTIVE",
+                "sole_owner": {
+                    "name": "Matthew Burbidge",
+                    "email": "matthewburbidge@fractal5solutions.com",
+                    "ownership_percentage": 100,
+                    "title": "Founder & Principal"
+                },
+                "focus_areas": [
+                    "Campaign Technology",
+                    "Voter Engagement",
+                    "Digital Strategy",
+                    "AI-Powered Political Analysis"
+                ]
+            },
+            {
+                "name": "Plane4 Grian Inc",
+                "type": "C-Corporation",
+                "jurisdiction": "TBD",
+                "primary_business": "Advanced AI Research & Development",
+                "ein": "TBD",
+                "status": "ACTIVE",
+                "sole_owner": {
+                    "name": "Matthew Burbidge",
+                    "email": "matthewburbidge@fractal5solutions.com",
+                    "ownership_percentage": 100,
+                    "title": "Founder & Principal"
+                },
+                "focus_areas": [
+                    "Cybernetic Systems",
+                    "Autonomous Intelligence",
+                    "Sovereign Computing",
+                    "Next-Generation AI Architecture"
+                ]
+            }
+        ],
+        "unified_command": {
+            "structure": "SINGLE_AUTHORITY",
+            "decision_making": "CENTRALIZED",
+            "technical_authority": "matthewburbidge@fractal5solutions.com",
+            "financial_authority": "matthewburbidge@fractal5solutions.com",
+            "strategic_authority": "matthewburbidge@fractal5solutions.com"
+        }
+    },
+    "access_control_matrix": {
+        "owner_privileges": {
+            "matthewburbidge@fractal5solutions.com": {
+                "code_repositories": "FULL_CONTROL",
+                "cloud_infrastructure": "OWNER",
+                "financial_accounts": "SOLE_SIGNATORY",
+                "legal_authority": "PRINCIPAL",
+                "hiring_authority": "UNRESTRICTED",
+                "contract_authority": "UNLIMITED",
+                "ip_ownership": "COMPLETE"
+            }
+        },
+        "delegation_model": {
+            "current_employees": 0,
+            "pending_hires": 0,
+            "contractors": 0,
+            "ai_agents": [
+                {
+                    "name": "PHI Chief",
+                    "authority": "AUTONOMOUS_OPERATIONS",
+                    "reporting_to": "matthewburbidge@fractal5solutions.com",
+                    "override_capability": "OWNER_ONLY"
+                }
+            ]
+        }
+    },
+    "security_hardening": {
+        "authentication_requirements": {
+            "superuser_mfa": "REQUIRED",
+            "session_timeout": "24_HOURS",
+            "ip_whitelist": "OPTIONAL",
+            "hardware_key_support": "RECOMMENDED"
+        },
+        "audit_requirements": {
+            "all_superuser_actions": "LOGGED",
+            "infrastructure_changes": "LOGGED",
+            "code_merges": "LOGGED",
+            "financial_transactions": "LOGGED",
+            "security_policy_changes": "LOGGED_AND_ALERTED"
+        },
+        "backup_and_recovery": {
+            "code_backups": "GITHUB_AND_LOCAL",
+            "key_escrow": "REQUIRED",
+            "recovery_procedures": "DOCUMENTED",
+            "disaster_recovery_plan": "ACTIVE"
+        }
+    },
+    "compliance": {
+        "frameworks": ["SOVEREIGN_AI_SECURITY_STANDARD", "SOC2_TYPE2_TARGET", "ISO27001_TARGET"],
+        "data_residency": "US_ONLY",
+        "encryption_standard": "AES_256_GCM",
+        "key_management": "GOOGLE_KMS_AND_LOCAL_HSM"
+    },
+    "governance_metadata": {
+        "established_date": "2026-02-26",
+        "last_review": "2026-02-26",
+        "next_review": "2026-05-26",
+        "version": "1.0.0",
+        "authority": "matthewburbidge@fractal5solutions.com"
+    }
+}

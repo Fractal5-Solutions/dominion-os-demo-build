@@ -1,0 +1,76 @@
+{
+    "superuser": {
+        "identity": {
+            "name": "Matthew Burbidge",
+            "email": "matthewburbidge@fractal5solutions.com",
+            "github_username": "Fractal5-X",
+            "role": "Founder & Chief Architect",
+            "status": "SOLE_EMPLOYEE"
+        },
+        "authority_level": "MAXIMUM",
+        "permissions": {
+            "code_ownership": "COMPLETE",
+            "deployment_authority": "UNRESTRICTED",
+            "infrastructure_control": "FULL",
+            "security_governance": "ABSOLUTE",
+            "financial_authorization": "UNLIMITED",
+            "ai_orchestration": "SOVEREIGN"
+        },
+        "organizational_roles": {
+            "fractal5_solutions_inc": {
+                "title": "Founder & CEO",
+                "ownership": "100%",
+                "authority": "ABSOLUTE",
+                "ein": "TBD",
+                "incorporation_date": "TBD"
+            },
+            "blue_wave_action_group_inc": {
+                "title": "Principal",
+                "ownership": "100%",
+                "authority": "ABSOLUTE",
+                "ein": "TBD",
+                "incorporation_date": "TBD"
+            },
+            "plane4_grian_inc": {
+                "title": "Principal",
+                "ownership": "100%",
+                "authority": "ABSOLUTE",
+                "ein": "TBD",
+                "incorporation_date": "TBD"
+            }
+        },
+        "authentication_methods": [
+            "github_ssh_key",
+            "github_personal_access_token",
+            "gcp_service_account",
+            "email_verification"
+        ],
+        "security_clearance": {
+            "level": "SOVEREIGN",
+            "data_access": "UNRESTRICTED",
+            "encryption_keys": "MASTER",
+            "audit_override": "PERMITTED_WITH_LOGGING"
+        },
+        "delegation_authority": {
+            "can_create_admins": true,
+            "can_grant_superuser": false,
+            "can_modify_security_policies": true,
+            "can_access_all_systems": true,
+            "can_override_automation": true
+        }
+    },
+    "governance": {
+        "last_updated": "2026-02-26T00:00:00Z",
+        "version": "1.0.0",
+        "enforcement": "STRICT",
+        "audit_trail": "MANDATORY",
+        "compliance_framework": "SOVEREIGN_AI_SECURITY_STANDARD",
+        "review_frequency": "QUARTERLY"
+    },
+    "succession_plan": {
+        "status": "SOLE_AUTHORITY",
+        "backup_authentication": "MULTI_FACTOR_RECOVERY",
+        "emergency_access": "DOCUMENTED_RECOVERY_PROCEDURES",
+        "key_escrow": "SECURE_BACKUP_REQUIRED"
+    }
+}
