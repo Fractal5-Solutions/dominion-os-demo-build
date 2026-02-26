@@ -14,3 +14,8 @@ out/autopilot/
 .env
 
 .fake
+
+# Build outputs
+out/
+tools/*/obj/
+tools/*/bin/
