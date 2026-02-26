@@ -50,8 +50,8 @@ for SERVICE in "${!P1_SERVICES[@]}"; do
     --project=$PROJECT1 \
     --display-name="$DISPLAY_NAME" \
     --resource-type=uptime-url \
-    --host=$HOST \
-    --path="/" \
+    --resource-labels=host=$HOST \
+    --http-check-path="/" \
     --check-interval=60s \
     2>/dev/null && echo "    ✓ Created" || echo "    (already exists)"
 done
@@ -87,8 +87,8 @@ for SERVICE in "${!P2_SERVICES[@]}"; do
     --project=$PROJECT2 \
     --display-name="$DISPLAY_NAME" \
     --resource-type=uptime-url \
-    --host=$HOST \
-    --path="/" \
+    --resource-labels=host=$HOST \
+    --http-check-path="/" \
     --check-interval=60s \
     2>/dev/null && echo "    ✓ Created" || echo "    (already exists)"
 done
