@@ -12,7 +12,7 @@ All access has been granted. Matthew Burbidge (<matthewburbidge@fractal5solution
 
 - ✅ **Superuser:** Maximum authority across all systems
 - ✅ **Code Owner:** 100% ownership of all repositories
-- ✅ **Sole Employee:** Fractal5 Solutions Inc, Blue Wave Action Group Inc, Plane4 Grian Inc
+- ✅ **Sole Employee:** Fractal5 Solutions Inc, Blue Wave Action Group Inc, Plane4 Grain Inc
 - ✅ **Principal:** 100% ownership of all three corporations
 
 ---

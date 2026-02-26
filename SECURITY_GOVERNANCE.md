@@ -32,7 +32,7 @@ Matthew Burbidge holds **100% ownership and sole authority** over:
    - AI-powered campaign systems
    - Democratic technology advancement
 
-3. **Plane4 Grian Inc**
+3. **Plane4 Grain Inc**
    - Advanced AI Research & Development
    - Cybernetic systems and autonomous intelligence
    - Next-generation sovereign computing
@@ -428,7 +428,7 @@ Matthew Burbidge (Superuser)
 
 ## 🔐 FINAL DECLARATION
 
-**This document establishes Matthew Burbidge as the sole superuser, code owner, and principal authority for all Fractal5 Solutions, Blue Wave Action Group, and Plane4 Grian operations.**
+**This document establishes Matthew Burbidge as the sole superuser, code owner, and principal authority for all Fractal5 Solutions, Blue Wave Action Group, and Plane4 Grain operations.**
 
 **Authority Confirmed:** ✅ MAXIMUM
 **Enforcement Status:** ✅ ACTIVE
