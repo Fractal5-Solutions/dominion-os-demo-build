@@ -1,0 +1,4 @@
+# Dominion OS Demo Build - Requirements
+# Python dependencies for development and testing
+
+pytest>=7.0.0
