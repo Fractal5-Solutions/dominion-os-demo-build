@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-02-26T21:22:52+00:00",
+  "timestamp": "2026-02-26T21:24:13+00:00",
   "status": "operational",
   "infrastructure": {
     "total_services": 22,
-    "operational_services": 22,
-    "health_percentage": 100
+    "operational_services": 21,
+    "health_percentage": 95
   },
   "components": {
     "ai_gateways": 2,
@@ -17,7 +17,7 @@
       "total": 9
     },
     "dominion-core-prod": {
-      "operational": 13,
+      "operational": 12,
       "total": 13
     }
   }
