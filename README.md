@@ -1,7 +1,7 @@
 # Dominion OS Demo Build
 
 ![Demo](https://img.shields.io/badge/Demo-Ready-brightgreen)
-[![Dominion OS](https://img.shields.io/badge/Depends%20on-dominion--os--1.0-blue)](https://github.com/Fractal5-Solutions/dominion-os-1.0)
+[![Dominion OS](https://img.shields.io/badge/Depends%20on-Dominion%20Command%20Center-blue)](https://github.com/Fractal5-Solutions/dominion-command-center)
 ![Cloud Run](https://img.shields.io/badge/Deployed-Google%20Cloud%20Run-4285F4?logo=googlecloud&logoColor=white)
 ![License](https://img.shields.io/badge/license-Commercial-blue)
 
@@ -11,7 +11,7 @@
 
 Dominion OS operates as a three-tier system:
 
-- **Tier 1 (dominion-os-1.0):** Private control plane - Matthew's superuser "eye in the sky" with complete access to all dashboards, monitoring, and 22 production services across 2 GCP projects
+- **Tier 1 (Dominion Command Center):** Private control plane - Matthew's superuser "eye in the sky" with complete access to all dashboards, monitoring, and 22 production services across 2 GCP projects
 - **Tier 2 (dominion-os-1.0-gcloud):** Commercial sales repository - Perfect commercial sales of Dominion OS 1.0 & SaaS Suite on Google Cloud with enterprise-ready hardened source code, marketplace listing, and $1.2M+ ARR target
 - **Tier 3 (dominion-os-demo-build):** This public repository - Provides AskPhi interface, demo experience, and /demo page for public consumption to drive commercial sales interest
 
@@ -30,7 +30,7 @@ Quickstart
 
 - Build: `python demo_build.py build`
 - Run demo: `python demo_build.py run`
-- Tests: `python -m unittest`
+- Tests: `python -m unittest discover -s tests` (or `pytest -q`)
 
 Command Core (full experience)
 

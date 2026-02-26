@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
+import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -125,11 +127,11 @@ def build_enterprise(scale: str) -> Enterprise:
 
 # Minimal UI primitives (portable to Windows without curses)
 def _cls() -> None:
-    try:
-        # Windows
+    if os.name == "nt":
         os.system("cls")
-    except OSError:
-        print("\x1b[2J\x1b[H", end="")  # ANSI clear
+        return
+    sys.stdout.write("\x1b[2J\x1b[H")
+    sys.stdout.flush()
 
 
 def _box(lines: List[str], w: int, title: str | None = None) -> List[str]:
@@ -154,6 +156,12 @@ def _render_dashboard(
     width: int = 100,
     height: int = 32,
 ) -> str:
+    width = max(width, 60)
+    height = max(height, 20)
+    side_height = max(6, height - 10)
+    left_w = width // 2
+    right_w = width - left_w - 1
+
     # Left: enterprise tree; Right: recent events; Bottom: KPIs
     # Build tree
     left: List[str] = [f"Enterprise: {ent.name}"]
@@ -162,12 +170,12 @@ def _render_dashboard(
         for svc in div.services[:12]:
             left.append(f"  · {svc.name}  Q:{svc.backlog}  ✔:{svc.processed}")
     title_left = "Command Core — Topology"
-    left_box = _box(left[: height - 10], width // 2, title=title_left)
+    left_box = _box(left[:side_height], left_w, title=title_left)
 
     # Events window
-    recent = events[-(height - 10) :]
+    recent = events[-side_height:]
     right_lines = [f"t={e.tick:04d} {e.entity} {e.action}: {e.message}" for e in recent]
-    right_box = _box(right_lines, width - (width // 2), title="Event Stream")
+    right_box = _box(right_lines, right_w, title="Event Stream")
 
     # KPIs bottom
     total_backlog = sum(s.backlog for d in ent.divisions for s in d.services)
@@ -189,7 +197,8 @@ def _render_dashboard(
         for left_line, right_line in zip(left_box, right_box, strict=True)
     ]
     rows += bottom
-    header = [f"Dominion Command Core — Enterprise Orchestration (t={tick})"]
+    header_text = f"Dominion Command Core — Enterprise Orchestration (t={tick})"
+    header = [header_text[:width]]
     return "\n" + "\n".join(header + rows)
 
 
@@ -234,9 +243,12 @@ def run_command_core(
     for t in range(duration_ticks):
         sched.tick()
         if ui:
+            cols, rows = shutil.get_terminal_size(fallback=(120, 40))
+            width = max(60, cols - 1)
+            height = max(20, rows - 2)
             _cls()
-            frame = _render_dashboard(t, ent, events)
-            print(frame)
+            frame = _render_dashboard(t, ent, events, width=width, height=height)
+            print(frame, flush=True)
             if refresh_ms:
                 time.sleep(refresh_ms / 1000)
 
