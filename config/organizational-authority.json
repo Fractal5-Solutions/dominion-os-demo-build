@@ -1,0 +1,243 @@
+{
+    "organizational_structure": {
+        "holding_entities": [
+            {
+                "name": "Fractal5 Solutions Inc",
+                "type": "C-Corporation",
+                "jurisdiction": "TBD",
+                "primary_business": "Sovereign AI Systems Development",
+                "ein": "TBD",
+                "status": "ACTIVE",
+                "sole_owner": {
+                    "name": "Matthew Burbidge",
+                    "email": "matthewburbidge@fractal5solutions.com",
+                    "ownership_percentage": 100,
+                    "title": "Founder & CEO"
+                },
+                "repositories": ["dominion-os-demo-build", "dominion-os-main", "fractal5-platform"],
+                "infrastructure": {
+                    "gcp_projects": ["dominion-os-1-0-main", "dominion-core-prod"],
+                    "services_count": 22,
+                    "deployment_authority": "matthewburbidge@fractal5solutions.com"
+                }
+            },
+            {
+                "name": "Blue Wave Action Group Inc",
+                "type": "C-Corporation",
+                "jurisdiction": "TBD",
+                "primary_business": "Political Technology & Campaign Infrastructure",
+                "ein": "TBD",
+                "status": "ACTIVE",
+                "sole_owner": {
+                    "name": "Matthew Burbidge",
+                    "email": "matthewburbidge@fractal5solutions.com",
+                    "ownership_percentage": 100,
+                    "title": "Founder & Principal"
+                },
+                "focus_areas": [
+                    "Campaign Technology",
+                    "Voter Engagement",
+                    "Digital Strategy",
+                    "AI-Powered Political Analysis"
+                ]
+            },
+            {
+                "name": "Plane4 Grain Inc",
+                "type": "C-Corporation",
+                "jurisdiction": "TBD",
+                "primary_business": "Advanced AI Research & Development",
+                "ein": "TBD",
+                "status": "ACTIVE",
+                "sole_owner": {
+                    "name": "Matthew Burbidge",
+                    "email": "matthewburbidge@fractal5solutions.com",
+                    "ownership_percentage": 100,
+                    "title": "Founder & Principal"
+                },
+                "focus_areas": [
+                    "Cybernetic Systems",
+                    "Autonomous Intelligence",
+                    "Sovereign Computing",
+                    "Next-Generation AI Architecture"
+                ]
+            }
+        ],
+        "unified_command": {
+            "structure": "SINGLE_AUTHORITY",
+            "decision_making": "CENTRALIZED",
+            "technical_authority": "matthewburbidge@fractal5solutions.com",
+            "financial_authority": "matthewburbidge@fractal5solutions.com",
+            "strategic_authority": "matthewburbidge@fractal5solutions.com"
+        }
+    },
+    "access_control_matrix": {
+        "owner_privileges": {
+            "matthewburbidge@fractal5solutions.com": {
+                "code_repositories": "FULL_CONTROL",
+                "cloud_infrastructure": "OWNER",
+                "financial_accounts": "SOLE_SIGNATORY",
+                "legal_authority": "PRINCIPAL",
+                "hiring_authority": "UNRESTRICTED",
+                "contract_authority": "UNLIMITED",
+                "ip_ownership": "COMPLETE"
+            }
+        },
+        "delegation_model": {
+            "current_employees": 0,
+            "pending_hires": 0,
+            "contractors": 0,
+            "ai_agents": [
+                {
+                    "name": "PHI Chief",
+                    "authority": "AUTONOMOUS_OPERATIONS",
+                    "reporting_to": "matthewburbidge@fractal5solutions.com",
+                    "override_capability": "OWNER_ONLY"
+                }
+            ]
+        }
+    },
+    "security_hardening": {
+        "authentication_requirements": {
+            "superuser_mfa": "REQUIRED",
+            "session_timeout": "24_HOURS",
+            "ip_whitelist": "OPTIONAL",
+            "hardware_key_support": "RECOMMENDED"
+        },
+        "audit_requirements": {
+            "all_superuser_actions": "LOGGED",
+            "infrastructure_changes": "LOGGED",
+            "code_merges": "LOGGED",
+            "financial_transactions": "LOGGED",
+            "security_policy_changes": "LOGGED_AND_ALERTED"
+        },
+        "backup_and_recovery": {
+            "code_backups": "GITHUB_AND_LOCAL",
+            "key_escrow": "REQUIRED",
+            "recovery_procedures": "DOCUMENTED",
+            "disaster_recovery_plan": "ACTIVE"
+        }
+    },
+    "compliance": {
+        "frameworks": ["SOVEREIGN_AI_SECURITY_STANDARD", "SOC2_TYPE2_TARGET", "ISO27001_TARGET"],
+        "data_residency": "US_ONLY",
+        "encryption_standard": "AES_256_GCM",
+        "key_management": "GOOGLE_KMS_AND_LOCAL_HSM"
+    },
+    "governance_metadata": {
+        "established_date": "2026-02-26",
+        "last_review": "2026-02-26",
+        "next_review": "2026-05-26",
+        "version": "1.0.0",
+        "authority": "matthewburbidge@fractal5solutions.com"
+    },
+    "system_architecture": {
+        "tier_1_private_control_plane": {
+            "name": "dominion-os-1.0",
+            "type": "PRIVATE_INFRASTRUCTURE",
+            "purpose": "Superuser 'Eye in the Sky' - Complete business and software ecosystem oversight",
+            "repository": "../dominion-os-1.0",
+            "access": "MATTHEW_BURBIDGE_ONLY",
+            "gcp_projects": ["dominion-os-1-0-main", "dominion-core-prod"],
+            "total_services": 22,
+            "capabilities": [
+                "Complete infrastructure visibility",
+                "All monitoring dashboards (health, cost, SLO)",
+                "Unrestricted deployment authority",
+                "Full financial and billing access",
+                "Master encryption key access",
+                "PHI Chief autonomous operations control",
+                "All audit logs and security oversight"
+            ],
+            "dashboards": {
+                "monitoring": "https://console.cloud.google.com/monitoring/dashboards?project=dominion-os-1-0-main",
+                "uptime": "https://console.cloud.google.com/monitoring/uptime?project=dominion-os-1-0-main",
+                "alerting": "https://console.cloud.google.com/monitoring/alerting?project=dominion-os-1-0-main",
+                "billing": "https://console.cloud.google.com/billing",
+                "iam": "https://console.cloud.google.com/iam-admin"
+            }
+        },
+        "tier_2_commercial_sales": {
+            "name": "dominion-os-1.0-gcloud",
+            "type": "COMMERCIAL_PRODUCT",
+            "purpose": "Perfect commercial sales of Dominion OS 1.0 & SaaS Suite on Google Cloud",
+            "repository": "dominion-os-1.0-gcloud",
+            "access": "LICENSED_CUSTOMERS",
+            "owner": "Fractal5 Solutions Inc (Matthew Burbidge 100%)",
+            "license": "COMMERCIAL_PROPRIETARY",
+            "product_offering": {
+                "name": "Dominion OS 1.0 & F5 SaaS Suite",
+                "platform": "Google Cloud",
+                "target_market": "Enterprise customers seeking sovereign AI infrastructure",
+                "revenue_model": "SaaS subscription + professional services"
+            },
+            "pricing_tiers": {
+                "freemium": "Community tier with limited features",
+                "professional": "$99-499/month per organization",
+                "enterprise": "$1,000+/month with SLA and dedicated support",
+                "sovereign": "Custom pricing with white-glove PHI Chief integration"
+            },
+            "year_1_targets": {
+                "arr": "$1.2M+",
+                "customers": "25-100",
+                "gross_margin": "85%+",
+                "profitability": "Month 6 breakeven, Month 12+ growth"
+            },
+            "technical_features": [
+                "22 production-tested Cloud Run services",
+                "99.9%+ uptime SLA with multi-region support",
+                "Enterprise-grade security (GDPR, SOC2, HIPAA ready)",
+                "Auto-scaling to 10x peak capacity",
+                "Comprehensive monitoring dashboards"
+            ],
+            "business_features": [
+                "Multi-tenant architecture with complete isolation",
+                "Subscription management via Stripe integration",
+                "SSO support (SAML, OAuth)",
+                "Comprehensive audit logging",
+                "Customer success infrastructure"
+            ],
+            "sales_channels": [
+                "Google Cloud Marketplace (primary)",
+                "Direct enterprise sales",
+                "Partner ecosystem (VARs, SIs)",
+                "Developer self-service (freemium tier)"
+            ],
+            "support_tiers": {
+                "community": "GitHub issues and community forums",
+                "professional": "Email support (24-hour response)",
+                "enterprise": "Phone/Slack support (2-hour response) + dedicated account manager",
+                "sovereign": "White-glove support with PHI Chief autonomous operations"
+            }
+        },
+        "tier_3_public_demo": {
+            "name": "dominion-os-demo-build",
+            "type": "PUBLIC_DEMONSTRATION",
+            "purpose": "Public AskPhi interface, demo experience, and /demo page to drive commercial sales interest",
+            "repository": "https://github.com/Fractal5-Solutions/dominion-os-demo-build",
+            "access": "PUBLIC_READ_MATTHEW_WRITE",
+            "owner": "@Fractal5-X",
+            "capabilities": [
+                "Public AskPhi conversational interface",
+                "Interactive demo experience",
+                "Public landing page (/demo)",
+                "Limited-scope AI demonstrations",
+                "Public documentation and examples",
+                "Conversion funnel to commercial tier"
+            ],
+            "demo_services": [
+                "askphi-chatbot (https://askphi-chatbot-829831815576.us-central1.run.app)",
+                "dominion-demo (https://dominion-demo-447370233441.us-central1.run.app)",
+                "demo (https://demo-447370233441.us-central1.run.app)"
+            ],
+            "public_storage": "gs://dominion-os-1-0-main-dominion-demo/"
+        },
+        "separation_model": {
+            "data_flow": "dominion-os-1.0 → (commercial release) → dominion-os-1.0-gcloud → customer deployments; dominion-os-1.0 → (demo artifacts) → dominion-os-demo-build → public services",
+            "security_boundary": "Production secrets in tier 1, customer keys in tier 2, demo uses limited-scope credentials in tier 3",
+            "superuser_access": "Matthew has MAXIMUM authority on tier 1, COMPLETE IP ownership of tier 2, COMPLETE ownership of tier 3",
+            "public_access": "Tier 1 is private (Matthew only), tier 2 is licensed (paying customers), tier 3 is public (read-only)",
+            "monitoring_separation": "All dashboards in tier 1, tier 2 licensed to customers with isolated monitoring, tier 3 references but does not expose"
+        },
+        "architecture_reference": "DOMINION_ARCHITECTURE.md"
+    }
+}

@@ -14,7 +14,7 @@ def _add_sibling_os_to_syspath() -> None:
     if env_path:
         os_repo = Path(env_path)
     else:
-        os_repo = here.parent / "dominion-os-1.0"
+        os_repo = here.parent / "dominion-command-center"
     pkg_path = os_repo / "dominion_os"
     if pkg_path.exists():
         sys.path.insert(0, str(os_repo))
@@ -31,7 +31,7 @@ def deploy_to_cloud() -> dict:
     print(f"📦 Built demo image: {image_path}")
 
     # Use the bootstrap script from sibling repo
-    bootstrap_script = Path("../dominion-os-1.0/bootstrap_sovereign_gcp.sh")
+    bootstrap_script = Path("../dominion-command-center/bootstrap_sovereign_gcp.sh")
     if not bootstrap_script.exists():
         raise FileNotFoundError(f"Bootstrap script not found: {bootstrap_script}")
 
@@ -46,7 +46,7 @@ def deploy_to_cloud() -> dict:
     ]
 
     result = subprocess.run(
-        deploy_cmd, capture_output=True, text=True, cwd=Path("../dominion-os-1.0")
+        deploy_cmd, capture_output=True, text=True, cwd=Path("../dominion-command-center")
     )
     if result.returncode != 0:
         print(f"❌ Deployment failed: {result.stderr}")
@@ -189,7 +189,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd == "flagship":
         # Ensure sibling OS is importable
         _add_sibling_os_to_syspath()
-        # 1) Build OS image from dominion-os-1.0
+        # 1) Build OS image from dominion-command-center
         try:
             from dominion_os.cli import build_image as os_build_image  # type: ignore
         except ModuleNotFoundError:

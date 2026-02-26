@@ -4,16 +4,16 @@
 **Status**: Work In Progress
 **Fractal5 Solutions** | dominion-os-1-0-main
 
----
+______________________________________________________________________
 
 ## 🎯 Overview
 
 This guide documents the strategy for deploying missing container images to Google Cloud Run services. Two services currently require container images:
 
 1. **dominion-os-api** - API service (image not found)
-2. **dominion-security-framework** - Security framework service (image not found)
+1. **dominion-security-framework** - Security framework service (image not found)
 
----
+______________________________________________________________________
 
 ## 📊 Current Service Status
 
@@ -32,7 +32,7 @@ This guide documents the strategy for deploying missing container images to Goog
 - dominion-os-api
 - dominion-security-framework
 
----
+______________________________________________________________________
 
 ## 🔧 Deployment Strategies
 
@@ -86,7 +86,7 @@ COPY app/ ./app/
 CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
 ```
 
----
+______________________________________________________________________
 
 ## 📋 Prerequisites
 
@@ -114,7 +114,7 @@ gcloud auth configure-docker us-central1-docker.pkg.dev
 gcloud artifacts repositories list --location=us-central1
 ```
 
----
+______________________________________________________________________
 
 ## 🚀 Step-by-Step Deployment
 
@@ -160,7 +160,7 @@ gcloud run services update dominion-security-framework \
   --allow-unauthenticated
 ```
 
----
+______________________________________________________________________
 
 ## ✅ Verification
 
@@ -190,37 +190,37 @@ gcloud run services logs read dominion-os-api \
   --format="table(timestamp,severity,textPayload)"
 ```
 
----
+______________________________________________________________________
 
 ## 🔒 Security Considerations
 
 1. **Service Account**: Each service should have dedicated service account
-2. **IAM Policies**: Follow principle of least privilege
-3. **Secrets**: Use Secret Manager for sensitive data
-4. **Network**: Consider VPC connector for private resources
-5. **Authentication**: Configure IAM or Identity Platform
+1. **IAM Policies**: Follow principle of least privilege
+1. **Secrets**: Use Secret Manager for sensitive data
+1. **Network**: Consider VPC connector for private resources
+1. **Authentication**: Configure IAM or Identity Platform
 
----
+______________________________________________________________________
 
 ## 📝 Next Steps
 
 ### Immediate Actions
 
 1. Locate source repositories for missing services
-2. Verify Dockerfile existence and configuration
-3. Build and test images locally
-4. Deploy to staging environment first
-5. Promote to production after validation
+1. Verify Dockerfile existence and configuration
+1. Build and test images locally
+1. Deploy to staging environment first
+1. Promote to production after validation
 
 ### Future Improvements
 
 1. Automate builds with Cloud Build triggers
-2. Implement CI/CD pipeline
-3. Add health check endpoints
-4. Configure auto-scaling parameters
-5. Set up monitoring and alerting
+1. Implement CI/CD pipeline
+1. Add health check endpoints
+1. Configure auto-scaling parameters
+1. Set up monitoring and alerting
 
----
+______________________________________________________________________
 
 ## 🎯 Success Criteria
 
@@ -231,7 +231,7 @@ gcloud run services logs read dominion-os-api \
 - [ ] Services integrate with existing stack
 - [ ] Performance meets SLA requirements
 
----
+______________________________________________________________________
 
 ## 📞 Support
 
@@ -240,6 +240,6 @@ gcloud run services logs read dominion-os-api \
 **Region**: us-central1
 **Documentation**: DEPLOYMENT_GUIDE.md
 
----
+______________________________________________________________________
 
 **Status**: Ready for implementation when source repositories are available.

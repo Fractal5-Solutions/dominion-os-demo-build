@@ -38,10 +38,11 @@ printf "protocol=https\nhost=github.com\n" | git credential reject
 ```
 
 1. **Create new token** at <https://github.com/settings/tokens/new>
-    - Required scopes: `repo` (full control of private repositories)
-    - Note: "Dominion OS Demo Build - Push Access"
 
-2. **Push (will prompt for token):**
+   - Required scopes: `repo` (full control of private repositories)
+   - Note: "Dominion OS Demo Build - Push Access"
+
+1. **Push (will prompt for token):**
 
 ```bash
 git push origin main
@@ -65,7 +66,7 @@ cat ~/.ssh/id_ed25519.pub
 
 1. **Add key to GitHub:** <https://github.com/settings/keys>
 
-2. **Update remotes:**
+1. **Update remotes:**
 
 ```bash
 git remote set-url origin git@github.com:Fractal5-Solutions/dominion-os-demo-build.git
@@ -119,9 +120,9 @@ git format-patch origin/main..HEAD -o /tmp/patches/
 Once pushed, these will be live:
 
 1. GitHub Actions workflows activated
-2. Autopilot nightly runs enabled
-3. GCP deployment automation active
-4. Full governance suite operational
+1. Autopilot nightly runs enabled
+1. GCP deployment automation active
+1. Full governance suite operational
 
 ## 💡 Quick Check
 
@@ -143,7 +144,7 @@ git remote -v
 - Current branch: **main**
 - Everything is ready and tested locally
 
----
+______________________________________________________________________
 
 **Ready to push when authentication is updated!**
 
