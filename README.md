@@ -5,6 +5,21 @@
 ![Cloud Run](https://img.shields.io/badge/Deployed-Google%20Cloud%20Run-4285F4?logo=googlecloud&logoColor=white)
 ![License](https://img.shields.io/badge/license-Commercial-blue)
 
+## 🏗️ Architecture Overview
+
+**This is Tier 2: Public Demo & Showcase Interface**
+
+Dominion OS operates as a two-tier system:
+
+- **Tier 1 (dominion-os-1.0):** Private control plane - Matthew's superuser "eye in the sky" with complete access to all dashboards, monitoring, and 22 production services across 2 GCP projects
+- **Tier 2 (dominion-os-demo-build):** This public repository - Provides AskPhi interface, demo experience, and /demo page for public consumption
+
+For complete architecture details, see [DOMINION_ARCHITECTURE.md](DOMINION_ARCHITECTURE.md).
+
+---
+
+## Overview
+
 This repo demonstrates consuming the sibling [`dominion-os-1.0`](https://github.com/Fractal5-Solutions/dominion-os-1.0) toy kernel to:
 
 - Build a JSON image

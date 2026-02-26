@@ -129,5 +129,61 @@
         "next_review": "2026-05-26",
         "version": "1.0.0",
         "authority": "matthewburbidge@fractal5solutions.com"
+    },
+    "system_architecture": {
+        "tier_1_private_control_plane": {
+            "name": "dominion-os-1.0",
+            "type": "PRIVATE_INFRASTRUCTURE",
+            "purpose": "Superuser 'Eye in the Sky' - Complete business and software ecosystem oversight",
+            "repository": "../dominion-os-1.0",
+            "access": "MATTHEW_BURBIDGE_ONLY",
+            "gcp_projects": ["dominion-os-1-0-main", "dominion-core-prod"],
+            "total_services": 22,
+            "capabilities": [
+                "Complete infrastructure visibility",
+                "All monitoring dashboards (health, cost, SLO)",
+                "Unrestricted deployment authority",
+                "Full financial and billing access",
+                "Master encryption key access",
+                "PHI Chief autonomous operations control",
+                "All audit logs and security oversight"
+            ],
+            "dashboards": {
+                "monitoring": "https://console.cloud.google.com/monitoring/dashboards?project=dominion-os-1-0-main",
+                "uptime": "https://console.cloud.google.com/monitoring/uptime?project=dominion-os-1-0-main",
+                "alerting": "https://console.cloud.google.com/monitoring/alerting?project=dominion-os-1-0-main",
+                "billing": "https://console.cloud.google.com/billing",
+                "iam": "https://console.cloud.google.com/iam-admin"
+            }
+        },
+        "tier_2_public_demo": {
+            "name": "dominion-os-demo-build",
+            "type": "PUBLIC_DEMONSTRATION",
+            "purpose": "Public AskPhi interface, demo experience, and /demo page",
+            "repository": "https://github.com/Fractal5-Solutions/dominion-os-demo-build",
+            "access": "PUBLIC_READ_MATTHEW_WRITE",
+            "owner": "@Fractal5-X",
+            "capabilities": [
+                "Public AskPhi conversational interface",
+                "Interactive demo experience",
+                "Public landing page (/demo)",
+                "Limited-scope AI demonstrations",
+                "Public documentation and examples"
+            ],
+            "demo_services": [
+                "askphi-chatbot (https://askphi-chatbot-829831815576.us-central1.run.app)",
+                "dominion-demo (https://dominion-demo-447370233441.us-central1.run.app)",
+                "demo (https://demo-447370233441.us-central1.run.app)"
+            ],
+            "public_storage": "gs://dominion-os-1-0-main-dominion-demo/"
+        },
+        "separation_model": {
+            "data_flow": "dominion-os-1.0 → builds artifacts → dominion-os-demo-build → public services",
+            "security_boundary": "Production secrets remain in tier 1, demo uses limited-scope credentials",
+            "superuser_access": "Matthew has MAXIMUM authority on tier 1, COMPLETE ownership of tier 2",
+            "public_access": "Tier 1 is private (Matthew only), tier 2 is public (read-only)",
+            "monitoring_separation": "All dashboards in tier 1, demo-build references but does not expose"
+        },
+        "architecture_reference": "DOMINION_ARCHITECTURE.md"
     }
 }
