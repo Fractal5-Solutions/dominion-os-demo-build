@@ -5,13 +5,13 @@
 **Duration:** ~15 minutes
 **Status:** ✅ Complete
 
----
+______________________________________________________________________
 
 ## Overview
 
 Comprehensive Cloud Monitoring infrastructure deployed across both Dominion OS projects to enable proactive incident detection, performance visibility, and automated alerting.
 
----
+______________________________________________________________________
 
 ## Monitoring Resources Created
 
@@ -20,19 +20,22 @@ Comprehensive Cloud Monitoring infrastructure deployed across both Dominion OS p
 **Project: dominion-os-1-0-main**
 
 1. **Dominion AI Gateway Uptime**
-    - Host: `dominion-ai-gateway-66ymegzkya-uc.a.run.app`
-    - Check Interval: 60 seconds
-    - Path: `/`
 
-2. **Dominion F5 Gateway Uptime**
-    - Host: `dominion-f5-gateway-66ymegzkya-uc.a.run.app`
-    - Check Interval: 60 seconds
-    - Path: `/`
+   - Host: `dominion-ai-gateway-66ymegzkya-uc.a.run.app`
+   - Check Interval: 60 seconds
+   - Path: `/`
 
-3. **Dominion PHI UI Uptime**
-    - Host: `dominion-phi-ui-66ymegzkya-uc.a.run.app`
-    - Check Interval: 60 seconds
-    - Path: `/`
+1. **Dominion F5 Gateway Uptime**
+
+   - Host: `dominion-f5-gateway-66ymegzkya-uc.a.run.app`
+   - Check Interval: 60 seconds
+   - Path: `/`
+
+1. **Dominion PHI UI Uptime**
+
+   - Host: `dominion-phi-ui-66ymegzkya-uc.a.run.app`
+   - Check Interval: 60 seconds
+   - Path: `/`
 
 **Project: dominion-core-prod** 4. **Dominion AI Gateway Uptime (Core)**
 
@@ -41,9 +44,9 @@ Comprehensive Cloud Monitoring infrastructure deployed across both Dominion OS p
 - Path: `/`
 
 5. **Dominion Gateway Uptime (Core)**
-    - Host: `dominion-gateway-reduwyf2ra-uc.a.run.app`
-    - Check Interval: 60 seconds
-    - Path: `/`
+   - Host: `dominion-gateway-reduwyf2ra-uc.a.run.app`
+   - Check Interval: 60 seconds
+   - Path: `/`
 
 ### Monitoring Dashboards (2 Total)
 
@@ -52,24 +55,28 @@ Comprehensive Cloud Monitoring infrastructure deployed across both Dominion OS p
 **Tiles:**
 
 1. **Cloud Run Request Count** (6x4)
-    - Metric: `run.googleapis.com/request_count`
-    - Aggregation: ALIGN_RATE (60s)
-    - Visualization: XY Chart
 
-2. **Cloud Run Request Latencies** (6x4)
-    - Metric: `run.googleapis.com/request_latencies`
-    - Aggregation: ALIGN_DELTA, REDUCE_MEAN (60s)
-    - Visualization: XY Chart
+   - Metric: `run.googleapis.com/request_count`
+   - Aggregation: ALIGN_RATE (60s)
+   - Visualization: XY Chart
 
-3. **Cloud Run Instance Count** (6x4)
-    - Metric: `run.googleapis.com/container/instance_count`
-    - Aggregation: ALIGN_MEAN (60s)
-    - Visualization: XY Chart
+1. **Cloud Run Request Latencies** (6x4)
 
-4. **Uptime Check Success Rate** (6x4)
-    - Metric: `monitoring.googleapis.com/uptime_check/check_passed`
-    - Aggregation: ALIGN_FRACTION_TRUE (60s)
-    - Visualization: XY Chart
+   - Metric: `run.googleapis.com/request_latencies`
+   - Aggregation: ALIGN_DELTA, REDUCE_MEAN (60s)
+   - Visualization: XY Chart
+
+1. **Cloud Run Instance Count** (6x4)
+
+   - Metric: `run.googleapis.com/container/instance_count`
+   - Aggregation: ALIGN_MEAN (60s)
+   - Visualization: XY Chart
+
+1. **Uptime Check Success Rate** (6x4)
+
+   - Metric: `monitoring.googleapis.com/uptime_check/check_passed`
+   - Aggregation: ALIGN_FRACTION_TRUE (60s)
+   - Visualization: XY Chart
 
 **Deployed to:**
 
@@ -95,7 +102,7 @@ Comprehensive Cloud Monitoring infrastructure deployed across both Dominion OS p
 
 - dominion-os-1-0-main project
 
----
+______________________________________________________________________
 
 ## Access Monitoring Resources
 
@@ -129,7 +136,7 @@ gcloud alpha monitoring policies list --project=dominion-os-1-0-main
 gcloud alpha monitoring policies list --project=dominion-core-prod
 ```
 
----
+______________________________________________________________________
 
 ## Monitoring Capabilities
 
@@ -153,32 +160,32 @@ gcloud alpha monitoring policies list --project=dominion-core-prod
 ✅ **Resource optimization** - Identify over-provisioned services
 ✅ **Incident correlation** - Link performance anomalies to deployments
 
----
+______________________________________________________________________
 
 ## Next Steps (Recommended)
 
 ### Immediate (This Week)
 
 1. **Configure notification channels** - Email/Slack for alert delivery
-2. **Test alerting** - Simulate downtime to verify alert delivery
-3. **Review dashboard layouts** - Customize tiles for specific use cases
-4. **Add SLO tracking** - Define and monitor service-level objectives
+1. **Test alerting** - Simulate downtime to verify alert delivery
+1. **Review dashboard layouts** - Customize tiles for specific use cases
+1. **Add SLO tracking** - Define and monitor service-level objectives
 
 ### Short-term (Next 2 Weeks)
 
 1. **Expand uptime checks** - Add remaining 17 services
-2. **Create error-rate alerts** - Detect elevated error percentages
-3. **Cost monitoring** - Track Cloud Run billing by service
-4. **Latency SLIs** - Set performance targets for APIs
+1. **Create error-rate alerts** - Detect elevated error percentages
+1. **Cost monitoring** - Track Cloud Run billing by service
+1. **Latency SLIs** - Set performance targets for APIs
 
 ### Medium-term (Next Month)
 
 1. **Custom metrics** - Application-specific monitoring (business KPIs)
-2. **Log-based metrics** - Extract patterns from Cloud Logging
-3. **Synthetic monitoring** - Multi-step user journey validation
-4. **Capacity planning** - Predictive scaling based on trends
+1. **Log-based metrics** - Extract patterns from Cloud Logging
+1. **Synthetic monitoring** - Multi-step user journey validation
+1. **Capacity planning** - Predictive scaling based on trends
 
----
+______________________________________________________________________
 
 ## Monitoring Best Practices
 
@@ -203,7 +210,7 @@ gcloud alpha monitoring policies list --project=dominion-core-prod
 - 💡 Create executive dashboard: High-level KPIs for stakeholder reporting
 - 💡 Build troubleshooting dashboard: Error rates, log patterns, trace analysis
 
----
+______________________________________________________________________
 
 ## Cost Impact
 
@@ -214,7 +221,7 @@ gcloud alpha monitoring policies list --project=dominion-core-prod
 
 **Total Estimated Cost:** ~$2-5/month (negligible impact on $200-300/month infrastructure spend)
 
----
+______________________________________________________________________
 
 ## Execution Summary
 
@@ -228,10 +235,10 @@ gcloud alpha monitoring policies list --project=dominion-core-prod
 ### Operations Performed
 
 1. ✅ Verified Cloud Monitoring API enabled (both projects)
-2. ✅ Created 5 uptime checks for critical services
-3. ✅ Deployed monitoring dashboards (both projects)
-4. ✅ Configured gateway downtime alerting policy
-5. ✅ Validated monitoring resource creation
+1. ✅ Created 5 uptime checks for critical services
+1. ✅ Deployed monitoring dashboards (both projects)
+1. ✅ Configured gateway downtime alerting policy
+1. ✅ Validated monitoring resource creation
 
 ### Changes Made
 
@@ -239,7 +246,7 @@ gcloud alpha monitoring policies list --project=dominion-core-prod
 - **New Documentation:** 1 file ([docs/MONITORING_SETUP.md](docs/MONITORING_SETUP.md))
 - **GCP Resources:** 5 uptime checks, 2 dashboards, 1 alert policy
 
----
+______________________________________________________________________
 
 ## Validation
 
@@ -262,32 +269,32 @@ gcloud alpha monitoring policies list \
   --filter="displayName:Gateway"
 ```
 
----
+______________________________________________________________________
 
 ## Troubleshooting
 
 ### Uptime Checks Failing
 
 1. Verify service URL is public and accessible
-2. Check Cloud Run service has `--allow-unauthenticated` flag
-3. Review uptime check logs in Cloud Console
-4. Adjust check interval if needed (balance responsiveness vs. quotas)
+1. Check Cloud Run service has `--allow-unauthenticated` flag
+1. Review uptime check logs in Cloud Console
+1. Adjust check interval if needed (balance responsiveness vs. quotas)
 
 ### Alerts Not Triggering
 
 1. Confirm notification channels are configured
-2. Verify alert condition thresholds are appropriate
-3. Check alert policy is enabled (not muted)
-4. Review alert incident history in Cloud Console
+1. Verify alert condition thresholds are appropriate
+1. Check alert policy is enabled (not muted)
+1. Review alert incident history in Cloud Console
 
 ### Dashboard Not Showing Data
 
 1. Wait 1-2 minutes for metric propagation
-2. Verify services have received traffic (metrics require requests)
-3. Check time range selector (default: 1 hour)
-4. Confirm metric filters match deployed service names
+1. Verify services have received traffic (metrics require requests)
+1. Check time range selector (default: 1 hour)
+1. Confirm metric filters match deployed service names
 
----
+______________________________________________________________________
 
 ## Related Documentation
 
@@ -296,13 +303,13 @@ gcloud alpha monitoring policies list \
 - [telemetry/system_status.json](../telemetry/system_status.json) - Current infrastructure health
 - [scripts/start_all_systems.sh](../scripts/start_all_systems.sh) - System validation
 
----
+______________________________________________________________________
 
 **Monitoring Infrastructure Status:** ✅ Operational
 **Next Monitoring Task:** Configure notification channels
 **Recommendation:** Review dashboards after 24 hours of data collection
 
----
+______________________________________________________________________
 
 _Cloud Monitoring setup by PHI Chief_
 _Dominion OS Infrastructure Management_

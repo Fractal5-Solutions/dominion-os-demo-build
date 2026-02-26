@@ -15,16 +15,18 @@ class TestCommandCore(unittest.TestCase):
 
             self.assertIsNotNone(command_core)
         except ModuleNotFoundError:
-            raise unittest.SkipTest("Sibling dominion-os-1.0 not available")
+            msg = "Sibling dominion-os-1.0 not available"
+            raise unittest.SkipTest(msg) from None
 
     def test_command_core_dashboard(self):
         """Test dashboard generation function exists."""
         try:
-            from command_core import render_dashboard
+            from command_core import _render_dashboard
 
-            self.assertTrue(callable(render_dashboard))
-        except (ModuleNotFoundError, ImportError):
-            raise unittest.SkipTest("Sibling dominion-os-1.0 not available")
+            self.assertTrue(callable(_render_dashboard))
+        except ModuleNotFoundError:
+            msg = "Sibling dominion-os-1.0 not available"
+            raise unittest.SkipTest(msg) from None
 
 
 class TestConfigurations(unittest.TestCase):
@@ -36,7 +38,7 @@ class TestConfigurations(unittest.TestCase):
         if not config_path.exists():
             raise unittest.SkipTest("Config file not found")
 
-        with open(config_path) as f:
+        with open(config_path, encoding="utf-8") as f:
             config = json.load(f)
 
         self.assertIsInstance(config, dict)
@@ -48,7 +50,7 @@ class TestConfigurations(unittest.TestCase):
         if not config_path.exists():
             raise unittest.SkipTest("Config file not found")
 
-        with open(config_path) as f:
+        with open(config_path, encoding="utf-8") as f:
             config = json.load(f)
 
         self.assertIsInstance(config, dict)
@@ -59,7 +61,7 @@ class TestConfigurations(unittest.TestCase):
         if not config_path.exists():
             raise unittest.SkipTest("Config file not found")
 
-        with open(config_path) as f:
+        with open(config_path, encoding="utf-8") as f:
             config = json.load(f)
 
         self.assertIsInstance(config, dict)
@@ -87,7 +89,7 @@ class TestFlightLogs(unittest.TestCase):
             raise unittest.SkipTest("No flight logs found")
 
         latest_log = flight_logs[-1]
-        with open(latest_log) as f:
+        with open(latest_log, encoding="utf-8") as f:
             flight = json.load(f)
 
         self.assertIsInstance(flight, dict)

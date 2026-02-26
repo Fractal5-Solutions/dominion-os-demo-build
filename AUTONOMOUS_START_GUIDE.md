@@ -7,7 +7,7 @@
 **Mode:** Fully Autonomous
 **Current Infrastructure:** 22/22 services operational (100%)
 
----
+______________________________________________________________________
 
 ## 🚀 Start Autonomous Operations
 
@@ -41,7 +41,7 @@ bash scripts/autonomous_overnight.sh
 bash scripts/autonomous_overnight.sh
 ```
 
----
+______________________________________________________________________
 
 ## 📊 Monitor Progress
 
@@ -76,7 +76,7 @@ gcloud run services list --project=dominion-os-1-0-main --format="value(status.c
 gcloud run services list --project=dominion-core-prod --format="value(status.conditions[0].status)" | grep -c True
 ```
 
----
+______________________________________________________________________
 
 ## 🛑 Stop Operations (If Needed)
 
@@ -106,7 +106,7 @@ kill $(cat telemetry/autonomous.pid)
 kill -9 $(cat telemetry/autonomous.pid)
 ```
 
----
+______________________________________________________________________
 
 ## 📋 What Will Happen
 
@@ -145,7 +145,7 @@ kill -9 $(cat telemetry/autonomous.pid)
 - Performance tracking
 - Log aggregation
 
----
+______________________________________________________________________
 
 ## 📁 Files That Will Be Created
 
@@ -168,19 +168,19 @@ kill -9 $(cat telemetry/autonomous.pid)
 - `docs/INFRASTRUCTURE_OVERVIEW.md` - Generated architecture docs
 - `OVERNIGHT_OPERATIONS_REPORT.md` - Final comprehensive report
 
----
+______________________________________________________________________
 
 ## ✅ Success Criteria
 
 After 8 hours, you should see:
 
 1. **Infrastructure Health:** 22/22 services still operational (100%)
-2. **Zero Incidents:** No service failures or degradations
-3. **Complete Logs:** Full audit trail of all operations
-4. **Documentation:** Enhanced infrastructure documentation
-5. **Final Report:** Comprehensive OVERNIGHT_OPERATIONS_REPORT.md
+1. **Zero Incidents:** No service failures or degradations
+1. **Complete Logs:** Full audit trail of all operations
+1. **Documentation:** Enhanced infrastructure documentation
+1. **Final Report:** Comprehensive OVERNIGHT_OPERATIONS_REPORT.md
 
----
+______________________________________________________________________
 
 ## 🔒 Safety Features
 
@@ -204,7 +204,7 @@ After 8 hours, you should see:
 - Process kill available anytime
 - No orphaned processes
 
----
+______________________________________________________________________
 
 ## 📞 Troubleshooting
 
@@ -239,9 +239,9 @@ ls -l scripts/autonomous_overnight.sh
 The script will:
 
 1. Detect the failure automatically
-2. Log to `telemetry/incidents.log`
-3. Continue monitoring
-4. Include in final report
+1. Log to `telemetry/incidents.log`
+1. Continue monitoring
+1. Include in final report
 
 To manually check:
 
@@ -253,7 +253,7 @@ cat telemetry/incidents.log
 gcloud run services describe <service-name> --project=<project> --region=us-central1
 ```
 
----
+______________________________________________________________________
 
 ## 🎯 Expected Timeline
 
@@ -270,7 +270,7 @@ Hour 8  [▓▓▓▓▓▓▓▓▓▓] Continuous Monitoring + Report
 
 **Total:** ~32 health checks, 4 major task phases, continuous monitoring
 
----
+______________________________________________________________________
 
 ## 🎬 Recommended Start Command
 
@@ -289,7 +289,7 @@ sleep 2
 tail -10 telemetry/overnight_operations.log
 ```
 
----
+______________________________________________________________________
 
 ## 📊 Example Output
 
@@ -310,18 +310,18 @@ When running, you'll see logs like:
 ...
 ```
 
----
+______________________________________________________________________
 
 ## 🎁 What You'll Get in the Morning
 
 1. **Complete Report:** OVERNIGHT_OPERATIONS_REPORT.md with full execution summary
-2. **Health Timeline:** Full 8-hour health monitoring log
-3. **Infrastructure Docs:** Generated documentation for all services
-4. **Configuration Analysis:** Optimization recommendations
-5. **100% Health:** All services still operational
-6. **Peace of Mind:** Full audit trail of all operations
+1. **Health Timeline:** Full 8-hour health monitoring log
+1. **Infrastructure Docs:** Generated documentation for all services
+1. **Configuration Analysis:** Optimization recommendations
+1. **100% Health:** All services still operational
+1. **Peace of Mind:** Full audit trail of all operations
 
----
+______________________________________________________________________
 
 ## 🚀 Ready to Execute?
 
@@ -336,7 +336,7 @@ nohup bash scripts/autonomous_overnight.sh > telemetry/overnight_terminal.log 2>
 bash scripts/autonomous_overnight.sh
 ```
 
----
+______________________________________________________________________
 
 _PHI Chief Autonomous Operations System_
 _Dominion OS Infrastructure Management_
