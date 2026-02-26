@@ -7,12 +7,13 @@
 
 ## 🏗️ Architecture Overview
 
-**This is Tier 2: Public Demo & Showcase Interface**
+**This is Tier 3: Public Demo & Showcase Interface**
 
-Dominion OS operates as a two-tier system:
+Dominion OS operates as a three-tier system:
 
 - **Tier 1 (dominion-os-1.0):** Private control plane - Matthew's superuser "eye in the sky" with complete access to all dashboards, monitoring, and 22 production services across 2 GCP projects
-- **Tier 2 (dominion-os-demo-build):** This public repository - Provides AskPhi interface, demo experience, and /demo page for public consumption
+- **Tier 2 (dominion-os-1.0-gcloud):** Commercial sales repository - Perfect commercial sales of Dominion OS 1.0 & SaaS Suite on Google Cloud with enterprise-ready hardened source code, marketplace listing, and $1.2M+ ARR target
+- **Tier 3 (dominion-os-demo-build):** This public repository - Provides AskPhi interface, demo experience, and /demo page for public consumption to drive commercial sales interest
 
 For complete architecture details, see [DOMINION_ARCHITECTURE.md](DOMINION_ARCHITECTURE.md).
 
