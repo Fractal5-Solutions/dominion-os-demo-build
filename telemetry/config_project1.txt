@@ -1,0 +1,10 @@
+NAME                           MEMORY  CPU
+askphi-chatbot                 512Mi   1
+dominion-ai-gateway            4Gi     1
+dominion-f5-gateway            512Mi   1000m
+dominion-monitoring-dashboard  2Gi     2
+dominion-os-1-0                512Mi   1000m
+dominion-os-api                512Mi   1000m
+dominion-phi-ui                1Gi     1
+dominion-revenue-automation    1Gi     1
+dominion-security-framework    1Gi     1

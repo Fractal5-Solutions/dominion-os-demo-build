@@ -1,11 +1,36 @@
 # CODEOWNERS for dominion-os-demo-build
-* @Fractal5-Solutions/codeowners
+# Superuser & Code Owner: Matthew Burbidge (matthewburbidge@fractal5solutions.com)
+# Sole Employee - Fractal5 Solutions Inc, Blue Wave Action Group Inc, Plane4 Grain Inc
 
-docs/ @Fractal5-Solutions/codeowners
-tools/ @Fractal5-Solutions/codeowners
-tests/ @Fractal5-Solutions/codeowners
-web/ @Fractal5-Solutions/codeowners
-scripts/ @Fractal5-Solutions/codeowners
+# Global ownership - all code owned by Matthew Burbidge
+* @Fractal5-X
 
-# Replace with real team/user handlesweb/terrain-viewer/**  @Fractal5-Solutions/maintainers
-.github/workflows/proof-html.yml  @Fractal5-Solutions/secops @Fractal5-Solutions/maintainers
+# Critical infrastructure - requires Fractal5-X review
+/.github/ @Fractal5-X
+/config/ @Fractal5-X
+/scripts/ @Fractal5-X
+/ops/ @Fractal5-X
+
+# Security and governance - Fractal5-X only
+/config/superuser-authority.json @Fractal5-X
+/config/organizational-authority.json @Fractal5-X
+/config/sovereign-config.json @Fractal5-X
+/.github/workflows/ @Fractal5-X
+
+# Documentation - Fractal5-X ownership
+/docs/ @Fractal5-X
+/*.md @Fractal5-X
+
+# Testing - Fractal5-X ownership
+/tests/ @Fractal5-X
+pytest.ini @Fractal5-X
+
+# Deployment & infrastructure
+/deploy*.sh @Fractal5-X
+/phi_*.sh @Fractal5-X
+/sovereign_execute.sh @Fractal5-X
+/repair_execute.sh @Fractal5-X
+
+# Core application code
+/command_core.py @Fractal5-X
+/demo_build.py @Fractal5-X

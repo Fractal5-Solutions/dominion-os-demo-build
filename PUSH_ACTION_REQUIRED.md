@@ -4,7 +4,7 @@
 **Blocking Issue:** Authentication credentials lack write permissions
 **User Action Required:** Register SSH key OR create new Personal Access Token
 
----
+______________________________________________________________________
 
 ## Current State
 
@@ -21,7 +21,7 @@
 - SSH key not registered with GitHub account
 - Git credential store contains invalid credentials
 
----
+______________________________________________________________________
 
 ## SOLUTION 1: Register SSH Key (Recommended)
 
@@ -35,54 +35,56 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINIC/tO/V4kVFdPw8THRSOAl9XEZXxFKSfXwWLcPN5B2
 
 1. **Copy the SSH key above**
 
-2. **Add to GitHub:**
-    - Visit: <https://github.com/settings/keys>
-    - Click "New SSH key"
-    - Title: `dominion-os-dev-container`
-    - Key: Paste the SSH public key above
-    - Click "Add SSH key"
+1. **Add to GitHub:**
 
-3. **Switch git remote to SSH:**
+   - Visit: <https://github.com/settings/keys>
+   - Click "New SSH key"
+   - Title: `dominion-os-dev-container`
+   - Key: Paste the SSH public key above
+   - Click "Add SSH key"
 
-    ```bash
-    git remote set-url origin git@github.com:Fractal5-Solutions/dominion-os-demo-build.git
-    ```
+1. **Switch git remote to SSH:**
 
-4. **Push commits:**
+   ```bash
+   git remote set-url origin git@github.com:Fractal5-Solutions/dominion-os-demo-build.git
+   ```
 
-    ```bash
-    git push origin main
-    ```
+1. **Push commits:**
 
----
+   ```bash
+   git push origin main
+   ```
+
+______________________________________________________________________
 
 ## SOLUTION 2: Create Personal Access Token
 
 ### Steps
 
 1. **Create new token:**
-    - Visit: <https://github.com/settings/tokens/new>
-    - Token name: `dominion-os-dev-container-write`
-    - Expiration: Choose duration
-    - Scopes: Select **`repo`** (full control of private repositories)
-    - Click "Generate token"
-    - **COPY THE TOKEN** (shown only once)
 
-2. **Push with new token:**
+   - Visit: <https://github.com/settings/tokens/new>
+   - Token name: `dominion-os-dev-container-write`
+   - Expiration: Choose duration
+   - Scopes: Select **`repo`** (full control of private repositories)
+   - Click "Generate token"
+   - **COPY THE TOKEN** (shown only once)
 
-    ```bash
-    # Unset old token and push with new one
-    env -u GITHUB_TOKEN git push https://YOUR_NEW_TOKEN@github.com/Fractal5-Solutions/dominion-os-demo-build.git main
-    ```
+1. **Push with new token:**
 
-    Or set permanently:
+   ```bash
+   # Unset old token and push with new one
+   env -u GITHUB_TOKEN git push https://YOUR_NEW_TOKEN@github.com/Fractal5-Solutions/dominion-os-demo-build.git main
+   ```
 
-    ```bash
-    export GITHUB_TOKEN=your_new_token
-    git push origin main
-    ```
+   Or set permanently:
 
----
+   ```bash
+   export GITHUB_TOKEN=your_new_token
+   git push origin main
+   ```
+
+______________________________________________________________________
 
 ## SOLUTION 3: Use GitHub CLI Re-authentication
 
@@ -101,7 +103,7 @@ gh auth login
 git push origin main
 ```
 
----
+______________________________________________________________________
 
 ## Quick Status Check
 
@@ -119,7 +121,7 @@ git log --oneline origin/main..HEAD | wc -l
 # Should show: 43
 ```
 
----
+______________________________________________________________________
 
 ## After Authentication Setup
 
@@ -150,7 +152,7 @@ Once authentication is configured, the push will include:
 - Flight logs (2 files, 1,100 runs)
 - Configuration validations
 
----
+______________________________________________________________________
 
 ## Commands to Run After Auth Setup
 
@@ -165,7 +167,7 @@ git push origin main
 git log --oneline -3 && git status -sb
 ```
 
----
+______________________________________________________________________
 
 **Ready to proceed once authentication is configured.**
 **Choose Solution 1 (SSH - recommended) or Solution 2 (PAT) above.**

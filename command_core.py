@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
+import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Generator, List
+from typing import Any, Dict, Generator, List
 
 
 def _seeded_rand(seed: int) -> int:
@@ -41,7 +43,8 @@ class Service:
             arrivals = seed % 4  # 0..3 new tasks
             if arrivals:
                 self.backlog += arrivals
-                events.append(Event(tick, qual_name, "arrivals", f"+{arrivals} => {self.backlog}"))
+                msg = f"+{arrivals} => {self.backlog}"
+                events.append(Event(tick, qual_name, "arrivals", msg))
 
             # Process up to 2 per step
             capacity = 2 if (tick % 3) else 3
@@ -49,7 +52,8 @@ class Service:
             if done:
                 self.backlog -= done
                 self.processed += done
-                events.append(Event(tick, qual_name, "processed", f"-{done} => {self.backlog}"))
+                msg = f"-{done} => {self.backlog}"
+                events.append(Event(tick, qual_name, "processed", msg))
             else:
                 events.append(Event(tick, qual_name, "idle", "no work"))
 
@@ -72,7 +76,8 @@ class Enterprise:
         self.name = name
         self.divisions = []
         for i in range(scale):
-            services = [Service(f"svc{j}") for j in range(12)]  # 12 services per division
+            # 12 services per division
+            services = [Service(f"svc{j}") for j in range(12)]
             self.divisions.append(Division(f"div{i}", services))
 
 
@@ -83,12 +88,12 @@ class Process:
         self.pid = pid
         self.name = name
         self.target = target
-        self.generator = None
+        self.generator: Generator | None = None
 
     def run(self):
         """Run one step of the process."""
         if self.generator is None:
-            self.generator = self.target()
+            self.generator = self.target
         try:
             next(self.generator)
         except StopIteration:
@@ -122,11 +127,11 @@ def build_enterprise(scale: str) -> Enterprise:
 
 # Minimal UI primitives (portable to Windows without curses)
 def _cls() -> None:
-    try:
-        # Windows
+    if os.name == "nt":
         os.system("cls")
-    except Exception:
-        print("\x1b[2J\x1b[H", end="")  # ANSI clear
+        return
+    sys.stdout.write("\x1b[2J\x1b[H")
+    sys.stdout.flush()
 
 
 def _box(lines: List[str], w: int, title: str | None = None) -> List[str]:
@@ -145,8 +150,18 @@ def _box(lines: List[str], w: int, title: str | None = None) -> List[str]:
 
 
 def _render_dashboard(
-    tick: int, ent: Enterprise, events: List[Event], width: int = 100, height: int = 32
+    tick: int,
+    ent: Enterprise,
+    events: List[Event],
+    width: int = 100,
+    height: int = 32,
 ) -> str:
+    width = max(width, 60)
+    height = max(height, 20)
+    side_height = max(6, height - 10)
+    left_w = width // 2
+    right_w = width - left_w - 1
+
     # Left: enterprise tree; Right: recent events; Bottom: KPIs
     # Build tree
     left: List[str] = [f"Enterprise: {ent.name}"]
@@ -154,19 +169,21 @@ def _render_dashboard(
         left.append(f"- {div.name}")
         for svc in div.services[:12]:
             left.append(f"  · {svc.name}  Q:{svc.backlog}  ✔:{svc.processed}")
-    left_box = _box(left[: height - 10], width // 2, title="Command Core — Topology")
+    title_left = "Command Core — Topology"
+    left_box = _box(left[:side_height], left_w, title=title_left)
 
     # Events window
-    recent = events[-(height - 10) :]
+    recent = events[-side_height:]
     right_lines = [f"t={e.tick:04d} {e.entity} {e.action}: {e.message}" for e in recent]
-    right_box = _box(right_lines, width - (width // 2), title="Event Stream")
+    right_box = _box(right_lines, right_w, title="Event Stream")
 
     # KPIs bottom
     total_backlog = sum(s.backlog for d in ent.divisions for s in d.services)
     total_processed = sum(s.processed for d in ent.divisions for s in d.services)
+    num_services = sum(len(d.services) for d in ent.divisions)
     kpi = [
         f"Tick: {tick}",
-        f"Services: {sum(len(d.services) for d in ent.divisions)}  Divisions: {len(ent.divisions)}",
+        f"Services: {num_services}  Divisions: {len(ent.divisions)}",
         f"Backlog: {total_backlog}  Processed: {total_processed}",
     ]
     bottom = _box(kpi, width, title="Operational KPIs")
@@ -180,7 +197,8 @@ def _render_dashboard(
         for left_line, right_line in zip(left_box, right_box, strict=True)
     ]
     rows += bottom
-    header = [f"Dominion Command Core — Enterprise Orchestration (t={tick})"]
+    header_text = f"Dominion Command Core — Enterprise Orchestration (t={tick})"
+    header = [header_text[:width]]
     return "\n" + "\n".join(header + rows)
 
 
@@ -190,7 +208,7 @@ def run_command_core(
     refresh_ms: int = 0,
     ui: bool = True,
     outdir: Path | None = None,
-) -> Dict[str, int]:
+) -> Dict[str, Any]:
     """Run the Command Core demo.
 
     - duration_ticks: how many scheduler cycles to run
@@ -210,7 +228,7 @@ def run_command_core(
             proc = Process(
                 pid=hash(qual) & 0xFFFF,
                 name=qual,
-                target=lambda s=s, q=qual: s.generator(events, q),
+                target=s.generator(events, qual),
             )
             sched.add(proc)
 
@@ -225,9 +243,12 @@ def run_command_core(
     for t in range(duration_ticks):
         sched.tick()
         if ui:
+            cols, rows = shutil.get_terminal_size(fallback=(120, 40))
+            width = max(60, cols - 1)
+            height = max(20, rows - 2)
             _cls()
-            frame = _render_dashboard(t, ent, events)
-            print(frame)
+            frame = _render_dashboard(t, ent, events, width=width, height=height)
+            print(frame, flush=True)
             if refresh_ms:
                 time.sleep(refresh_ms / 1000)
 
@@ -249,7 +270,8 @@ def run_command_core(
     summary_lines = [
         "Dominion Command Core Session",
         f"Ticks: {session['ticks']}",
-        f"Scale: {session['scale']}  Divisions: {session['divisions']}  Services: {session['services']}",
+        f"Scale: {session['scale']}  Divisions: {session['divisions']}  "
+        f"Services: {session['services']}",
         f"Processed: {session['processed']}  Backlog: {session['backlog']}",
         f"Events: {len(events)}",
     ]
@@ -280,7 +302,11 @@ class CommandCore:
         self.services = [
             {"name": f"service_{i}", "status": "active"} for i in range(session["services"])
         ]
-        return {"services_orchestrated": len(self.services), "session": session}
+        result = {
+            "services_orchestrated": len(self.services),
+            "session": session,
+        }
+        return result
 
     def process_all_tasks(self) -> int:
         """Process all pending tasks."""

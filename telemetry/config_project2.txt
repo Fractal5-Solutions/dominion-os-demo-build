@@ -1,0 +1,14 @@
+NAME                     MEMORY  CPU
+api                      1Gi     1
+chatgpt-gateway          512Mi   1000m
+demo                     1Gi     1
+dominion-ai-gateway      2Gi     1
+dominion-api             512Mi   1000m
+dominion-chief-of-staff  512Mi   1000m
+dominion-demo            512Mi   1000m
+dominion-gateway         512Mi   1000m
+dominion-os              1Gi     2
+dominion-os-1-0-101      2Gi     1
+dominion-os-demo         512Mi   1000m
+dominion-phi-ui          512Mi   1000m
+pipeline                 1Gi     1

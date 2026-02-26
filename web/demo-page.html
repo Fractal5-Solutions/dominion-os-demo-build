@@ -19,6 +19,28 @@
             overflow-x: hidden;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .skip-link {
+            position: absolute;
+            left: 12px;
+            top: 12px;
+            padding: 10px 14px;
+            background: #0f172a;
+            color: #fff;
+            border-radius: 10px;
+            text-decoration: none;
+            transform: translateY(-200%);
+            transition: transform 0.2s;
+            z-index: 1000;
+        }
+
+        .skip-link:focus {
+            transform: translateY(0);
+        }
+
         /* Hero Section */
         .hero {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -103,6 +125,17 @@
             transition: all 0.3s;
             text-decoration: none;
             display: inline-block;
+            font-family: inherit;
+            appearance: none;
+        }
+
+        .btn:focus-visible {
+            outline: 3px solid #1a202c;
+            outline-offset: 3px;
+        }
+
+        .hero .btn:focus-visible {
+            outline-color: #fff;
         }
 
         .btn-primary {
@@ -310,11 +343,41 @@
                 flex-direction: column;
             }
         }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+            .status-indicator {
+                animation: none;
+            }
+            .btn,
+            .feature-card,
+            .demo-card {
+                transition: none;
+            }
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 20px;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.95);
+            color: #fff;
+            padding: 12px 16px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+            z-index: 1000;
+            max-width: min(600px, 92vw);
+        }
     </style>
 </head>
 <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
     <!-- Hero Section -->
-    <section class="hero">
+    <header class="hero">
         <div class="hero-content">
             <div class="status-badge">
                 <span class="status-indicator"></span>
@@ -327,8 +390,9 @@
                 <a href="#askphi" class="btn btn-secondary">Talk to AskPhi AI</a>
             </div>
         </div>
-    </section>
+    </header>
 
+    <main id="main">
     <!-- Features Section -->
     <section class="features">
         <div class="container">
@@ -382,7 +446,7 @@
             <p class="section-subtitle">Interact with our autonomous orchestration platform</p>
 
             <div class="demo-grid">
-                <div class="demo-card">
+                <div class="demo-card" id="askphi">
                     <h3>💬 AskPhi Chatbot</h3>
                     <p>Chat with our Oniverse-grade AI assistant connected to Phi Chief systems.</p>
                     <div class="metrics">
@@ -395,7 +459,7 @@
                             <div class="metric-label">Accuracy</div>
                         </div>
                     </div>
-                    <a href="https://askphi-chatbot-829831815576.us-central1.run.app" class="btn btn-primary" style="width: 100%; text-align: center; margin-top: 20px;" target="_blank">Launch AskPhi</a>
+                    <a href="https://askphi-chatbot-829831815576.us-central1.run.app" class="btn btn-primary" style="width: 100%; text-align: center; margin-top: 20px;" target="_blank" rel="noopener noreferrer">Launch AskPhi</a>
                 </div>
 
                 <div class="demo-card">
@@ -411,7 +475,7 @@
                             <div class="metric-label">Health Status</div>
                         </div>
                     </div>
-                    <a href="javascript:void(0)" onclick="alert('Run: python3 orchestration_dashboard.py')" class="btn btn-secondary" style="width: 100%; text-align: center; margin-top: 20px;">View Dashboard</a>
+                    <button type="button" class="btn btn-secondary" style="width: 100%; text-align: center; margin-top: 20px;" data-copy="python orchestration_dashboard.py">Copy Dashboard Command</button>
                 </div>
 
                 <div class="demo-card">
@@ -427,7 +491,7 @@
                             <div class="metric-label">Services</div>
                         </div>
                     </div>
-                    <a href="javascript:void(0)" onclick="alert('Run: python3 demo_build.py command-core')" class="btn btn-secondary" style="width: 100%; text-align: center; margin-top: 20px;">Run Demo</a>
+                    <button type="button" class="btn btn-secondary" style="width: 100%; text-align: center; margin-top: 20px;" data-copy="python demo_build.py command-core">Copy Demo Command</button>
                 </div>
             </div>
         </div>
@@ -490,6 +554,7 @@
             </div>
         </div>
     </section>
+    </main>
 
     <!-- Footer -->
     <footer>
@@ -503,15 +568,52 @@
         </div>
     </footer>
 
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
     <script>
+        const toast = document.getElementById('toast');
+
+        function showToast(message) {
+            if (!toast) return;
+            toast.textContent = message;
+            toast.hidden = false;
+            clearTimeout(showToast._t);
+            showToast._t = setTimeout(() => { toast.hidden = true; }, 2500);
+        }
+
+        async function copyToClipboard(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                showToast(`Copied: ${text}`);
+            } catch (e) {
+                // Fallback: best-effort prompt
+                window.prompt('Copy command:', text);
+            }
+        }
+
+        document.addEventListener('click', (event) => {
+            const el = event.target.closest('[data-copy]');
+            if (!el) return;
+            const cmd = el.getAttribute('data-copy');
+            if (!cmd) return;
+            copyToClipboard(cmd);
+        });
+
         // Auto-refresh system status (optional)
         async function refreshStatus() {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 5000);
             try {
-                const response = await fetch('https://askphi-chatbot-829831815576.us-central1.run.app/api/status');
-                const data = await response.json();
-                console.log('System Status:', data);
+                const response = await fetch(
+                    'https://askphi-chatbot-829831815576.us-central1.run.app/api/status',
+                    { signal: controller.signal, cache: 'no-store' },
+                );
+                if (!response.ok) return;
+                await response.json();
             } catch (error) {
                 console.log('Status check unavailable (normal if not running locally)');
+            } finally {
+                clearTimeout(timeout);
             }
         }
 

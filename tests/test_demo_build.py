@@ -1,10 +1,15 @@
 import os
+import sys
 import unittest
 from pathlib import Path
 
 
 class TestDemoBuild(unittest.TestCase):
     def setUp(self):
+        self._orig_sys_path = list(sys.path)
+        repo_root = Path(__file__).resolve().parents[1]
+        sys.path.insert(0, str(repo_root))
+
         self.cwd = Path.cwd()
         self.tmp = Path(os.getenv("TMP", str(self.cwd))) / "dominion_demo_test"
         if not self.tmp.exists():
@@ -13,6 +18,7 @@ class TestDemoBuild(unittest.TestCase):
 
     def tearDown(self):
         os.chdir(self.cwd)
+        sys.path[:] = self._orig_sys_path
 
     def test_demo_build_run(self):
         from demo_build import run_demo

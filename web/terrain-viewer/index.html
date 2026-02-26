@@ -65,8 +65,25 @@
                     status.textContent = " — scene/heightmap missing";
                     return;
                 }
-                const scene = await (await fetch(`/v1/gis/jobs/${job}/assets`)).json();
-                const hmUrl = scene.heightmap || assets.heightmap;
+                const resolveAsset = (p) => {
+                    if (!p) return null;
+                    if (p.startsWith("http://") || p.startsWith("https://")) return p;
+                    if (p.startsWith("/")) return p;
+                    return `/v1/gis/jobs/${job}/` + p.replace(/^\\.\\//, "");
+                };
+
+                const sceneUrl = resolveAsset(assets.scene);
+                const sceneRes = await fetch(sceneUrl).catch(() => null);
+                if (!sceneRes || !sceneRes.ok) {
+                    status.textContent = " — scene not found";
+                    return;
+                }
+                const scene = await sceneRes.json();
+                const hmUrl = resolveAsset(scene.heightmap || assets.heightmap);
+                if (!hmUrl) {
+                    status.textContent = " — heightmap missing";
+                    return;
+                }
 
                 const img = new Image();
                 img.crossOrigin = "anonymous";
@@ -77,7 +94,7 @@
                 img.onerror = () => {
                     status.textContent = " — failed to load heightmap";
                 };
-                img.src = hmUrl.replace("./", "/v1/gis/jobs/" + job + "/");
+                img.src = hmUrl;
 
                 function renderHeightmap(image) {
                     const cvs = document.getElementById("gl");
@@ -86,6 +103,14 @@
                         status.textContent = " — WebGL2 not supported";
                         return;
                     }
+                    const dpr = Math.max(1, window.devicePixelRatio || 1);
+                    const displayWidth = Math.floor(cvs.clientWidth * dpr);
+                    const displayHeight = Math.floor(cvs.clientHeight * dpr);
+                    if (cvs.width !== displayWidth || cvs.height !== displayHeight) {
+                        cvs.width = displayWidth;
+                        cvs.height = displayHeight;
+                    }
+                    gl.enable(gl.DEPTH_TEST);
 
                     // Plane mesh (grid) displaced in vertex shader from heightmap
                     const vs = `#version 300 es\nprecision highp float;\nlayout(location=0) in vec2 aPos;\nlayout(location=1) in vec2 aUV;\nuniform sampler2D uTex;\nuniform float uScale;\nout vec3 vColor;\nvoid main(){\n  float h = texture(uTex, aUV).r;\n  vec3 pos = vec3(aPos, (h-0.5)*uScale);\n  // simple ortho projection
@@ -166,11 +191,11 @@
                     gl.texImage2D(
                         gl.TEXTURE_2D,
                         0,
-                        gl.LUMINANCE,
+                        gl.R8,
                         image.width,
                         image.height,
                         0,
-                        gl.LUMINANCE,
+                        gl.RED,
                         gl.UNSIGNED_BYTE,
                         red,
                     );
