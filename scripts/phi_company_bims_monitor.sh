@@ -46,9 +46,6 @@ echo ""
 echo "═══════════════════════════════════════════════════════════════"
 echo ""
 
-# Initialize ledger system
-ledger_init
-
 # Function to get file hash
 get_file_hash() {
     local file=$1
