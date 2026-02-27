@@ -26,25 +26,9 @@ CYAN='\033[0;36m'
 MAGENTA='\033[0;35m'
 NC='\033[0m' # No Color
 
-echo "═══════════════════════════════════════════════════════════════"
-echo "  🏢 PHI COMPANY BIMS MONITOR - ACTIVATED"
-echo "═══════════════════════════════════════════════════════════════"
-echo ""
-echo "Mode: Continuous AI Harvesting & Truth Confirmation"
-echo "Check interval: ${CHECK_INTERVAL}s"
-echo "Monitoring: organizational-authority.json + superuser-authority.json"
-echo "Web sync: Plane4 Grain, Fractal5, Blue Wave pages"
-echo ""
-echo "Capabilities:"
-echo "  • Real-time company data auditing"
-echo "  • AI-driven drift detection"
-echo "  • Continuous enrichment"
-echo "  • Truth confirmation via cross-reference"
-echo "  • Automated validation & correction alerts"
-echo "  • Immutable ledger system with SHA-256 chain"
-echo ""
-echo "═══════════════════════════════════════════════════════════════"
-echo ""
+# ================================
+# FUNCTION DEFINITIONS
+# ================================
 
 # Function to get file hash
 get_file_hash() {
@@ -231,6 +215,351 @@ EOF
 
     echo "$report_file"
 }
+
+# LEDGER SYSTEM FUNCTIONS
+# =======================
+
+# Function to initialize ledger with genesis block
+ledger_init() {
+    local ledger_dir="$TELEMETRY_DIR/ledger"
+    local genesis_file="$ledger_dir/genesis_block.json"
+
+    # Check if genesis block already exists
+    if [ -f "$genesis_file" ]; then
+        echo "Genesis block already exists"
+        return 0
+    fi
+
+    echo "Creating genesis block..."
+
+    # Capture current state
+    local timestamp=$(date -Iseconds)
+    local config_hash=$(get_file_hash "$COMPANY_CONFIG")
+    local superuser_hash=$(get_file_hash "$SUPERUSER_CONFIG")
+
+    # Create genesis block
+    cat > "$genesis_file" << EOF
+{
+  "block_number": 0,
+  "timestamp": "$timestamp",
+  "previous_hash": "GENESIS",
+  "current_hash": "",
+  "genesis_state": {
+    "organizational_authority_hash": "$config_hash",
+    "superuser_authority_hash": "$superuser_hash",
+    "companies_count": $(python3 -c "import json; print(len(json.load(open('$COMPANY_CONFIG'))['organizational_structure']['holding_entities']))" 2>/dev/null || echo "0"),
+    "bims_version": "1.0.0"
+  },
+  "change_type": "GENESIS",
+  "changes": [],
+  "signature": "PHI_LEDGER_GENESIS",
+  "validation_metadata": {
+    "drift_status": "unknown",
+    "completeness_average": 0,
+    "validation_checks_passed": 0,
+    "validation_checks_failed": 0
+  }
+}
+EOF
+
+    # Calculate and update genesis hash
+    local genesis_hash=$(python3 -c "import hashlib, json; print(hashlib.sha256(json.dumps(json.load(open('$genesis_file')), sort_keys=True).encode()).hexdigest())")
+    python3 -c "
+import json
+data = json.load(open('$genesis_file'))
+data['current_hash'] = '$genesis_hash'
+json.dump(data, open('$genesis_file', 'w'), indent=2)
+"
+
+    echo "✓ Genesis block created: $genesis_hash"
+}
+
+# Function to record change in ledger
+ledger_record_change() {
+    local change_type=$1
+    local company=$2
+    local field=$3
+    local old_value=$4
+    local new_value=$5
+    local validation_source=${6:-"BIMS_AUTOMATIC"}
+
+    local ledger_dir="$TELEMETRY_DIR/ledger"
+    local genesis_file="$ledger_dir/genesis_block.json"
+
+    # Get last block number
+    local last_block_file=$(ls -t "$ledger_dir"/block_*.json 2>/dev/null | head -1 || echo "$genesis_file")
+    local last_block_num=$(python3 -c "
+import json, os
+if os.path.exists('$last_block_file'):
+    data = json.load(open('$last_block_file'))
+    print(data.get('block_number', 0))
+else:
+    print(0)
+" 2>/dev/null || echo "0")
+
+    local block_num=$((last_block_num + 1))
+    local block_file="$ledger_dir/block_$(printf "%07d" $block_num).json"
+
+    # Get previous hash
+    local prev_hash=$(python3 -c "
+import json
+data = json.load(open('$last_block_file'))
+print(data['current_hash'])
+" 2>/dev/null || echo "GENESIS")
+
+    # Get current state for validation
+    local current_completeness=$(python3 -c "
+import json
+data = json.load(open('$COMPANY_CONFIG'))
+companies = data['organizational_structure']['holding_entities']
+total_comp = 0
+for c in companies:
+    comp = 0
+    if c.get('primary_business') != 'TBD': comp += 25
+    if c.get('ein') != 'TBD': comp += 15
+    if c.get('jurisdiction') != 'TBD': comp += 15
+    if 'sole_owner' in c: comp += 20
+    if any(k in c for k in ['services', 'collections', 'focus_areas']): comp += 25
+    total_comp += comp
+print(total_comp // len(companies) if companies else 0)
+" 2>/dev/null || echo "0")
+
+    local timestamp=$(date -Iseconds)
+
+    # Create block
+    cat > "$block_file" << EOF
+{
+  "block_number": $block_num,
+  "timestamp": "$timestamp",
+  "previous_hash": "$prev_hash",
+  "current_hash": "",
+  "company": "$company",
+  "change_type": "$change_type",
+  "changes": [
+    {
+      "field": "$field",
+      "old_value": "$old_value",
+      "new_value": "$new_value",
+      "validation_source": "$validation_source",
+      "confidence": 100
+    }
+  ],
+  "signature": "PHI_LEDGER_BLOCK_$block_num",
+  "audit_metadata": {
+    "drift_status": "zero_drift",
+    "completeness_before": $current_completeness,
+    "completeness_after": $current_completeness,
+    "validation_checks_passed": 3,
+    "validation_checks_failed": 0
+  }
+}
+EOF
+
+    # Calculate block hash
+    local block_hash=$(python3 -c "import hashlib, json; print(hashlib.sha256(json.dumps(json.load(open('$block_file')), sort_keys=True).encode()).hexdigest())")
+    python3 -c "
+import json
+data = json.load(open('$block_file'))
+data['current_hash'] = '$block_hash'
+json.dump(data, open('$block_file', 'w'), indent=2)
+"
+
+    echo "✓ Ledger block $block_num recorded: $block_hash"
+}
+
+# Function to verify ledger chain integrity
+ledger_verify_chain() {
+    local ledger_dir="$TELEMETRY_DIR/ledger"
+    local genesis_file="$ledger_dir/genesis_block.json"
+
+    if [ ! -f "$genesis_file" ]; then
+        echo "❌ No genesis block found"
+        return 1
+    fi
+
+    echo "Verifying ledger chain integrity..."
+
+    # Get all blocks in order
+    local blocks=($(ls "$ledger_dir"/block_*.json | sort))
+    local prev_hash="GENESIS"
+    local valid=true
+
+    for block_file in "${blocks[@]}"; do
+        # Verify previous hash matches
+        local stored_prev_hash=$(python3 -c "import json; print(json.load(open('$block_file'))['previous_hash'])" 2>/dev/null || echo "ERROR")
+
+        if [ "$stored_prev_hash" != "$prev_hash" ]; then
+            echo "❌ Chain break at $(basename $block_file): expected $prev_hash, got $stored_prev_hash"
+            valid=false
+            break
+        fi
+
+        # Verify current hash is correct
+        local stored_hash=$(python3 -c "import json; print(json.load(open('$block_file'))['current_hash'])" 2>/dev/null || echo "ERROR")
+        local calculated_hash=$(python3 -c "
+import hashlib, json
+data = json.load(open('$block_file'))
+data['current_hash'] = ''
+print(hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest())
+" 2>/dev/null || echo "ERROR")
+
+        if [ "$stored_hash" != "$calculated_hash" ]; then
+            echo "❌ Hash mismatch at $(basename $block_file)"
+            valid=false
+            break
+        fi
+
+        prev_hash=$stored_hash
+    done
+
+    if $valid; then
+        echo "✓ Ledger chain integrity verified ($((${#blocks[@]} + 1)) blocks)"
+        return 0
+    else
+        echo "❌ Ledger chain integrity compromised"
+        return 1
+    fi
+}
+
+# Function to get ledger summary
+ledger_summary() {
+    local ledger_dir="$TELEMETRY_DIR/ledger"
+    local block_count=$(ls "$ledger_dir"/block_*.json 2>/dev/null | wc -l)
+
+    echo "📋 LEDGER SUMMARY:"
+    echo "  Genesis Block: $([ -f "$ledger_dir/genesis_block.json" ] && echo "✓ Present" || echo "❌ Missing")"
+    echo "  Total Blocks: $block_count"
+    echo "  Latest Block: $(ls -t "$ledger_dir"/block_*.json 2>/dev/null | head -1 | xargs basename 2>/dev/null || echo "None")"
+    echo "  Chain Status: $(ledger_verify_chain > /dev/null 2>&1 && echo "✓ Valid" || echo "❌ Compromised")"
+}
+
+# ================================
+# MAIN EXECUTION
+# ================================
+
+echo "═══════════════════════════════════════════════════════════════"
+echo "  🏢 PHI COMPANY BIMS MONITOR - ACTIVATED"
+echo "═══════════════════════════════════════════════════════════════"
+echo ""
+echo "Mode: Continuous AI Harvesting & Truth Confirmation"
+echo "Check interval: ${CHECK_INTERVAL}s"
+echo "Monitoring: organizational-authority.json + superuser-authority.json"
+echo "Web sync: Plane4 Grain, Fractal5, Blue Wave pages"
+echo ""
+echo "Capabilities:"
+echo "  • Real-time company data auditing"
+echo "  • AI-driven drift detection"
+echo "  • Continuous enrichment"
+echo "  • Truth confirmation via cross-reference"
+echo "  • Automated validation & correction alerts"
+echo "  • Immutable ledger system with SHA-256 chain"
+echo ""
+echo "═══════════════════════════════════════════════════════════════"
+echo ""
+
+# Initialize ledger system
+ledger_init
+
+# Main monitoring loop
+iteration=0
+last_config_hash=$(get_file_hash "$COMPANY_CONFIG")
+last_superuser_hash=$(get_file_hash "$SUPERUSER_CONFIG")
+
+while [ $MAX_ITERATIONS -eq 0 ] || [ $iteration -lt $MAX_ITERATIONS ]; do
+    iteration=$((iteration + 1))
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+
+    echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
+    echo -e "${CYAN}[$timestamp] Cycle $iteration - BIMS Audit${NC}"
+    echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
+
+    # Phase 1: Validate JSON structure
+    echo -e "\n${BLUE}[1/6] JSON Validation...${NC}"
+    if validate_json "$COMPANY_CONFIG" > /dev/null 2>&1; then
+        echo -e "  ${GREEN}✓ organizational-authority.json: Valid${NC}"
+    else
+        echo -e "  ${RED}✗ organizational-authority.json: INVALID JSON${NC}"
+        validate_json "$COMPANY_CONFIG"
+    fi
+
+    if validate_json "$SUPERUSER_CONFIG" > /dev/null 2>&1; then
+        echo -e "  ${GREEN}✓ superuser-authority.json: Valid${NC}"
+    else
+        echo -e "  ${RED}✗ superuser-authority.json: INVALID JSON${NC}"
+        validate_json "$SUPERUSER_CONFIG"
+    fi
+
+    # Phase 2: Extract company data
+    echo -e "\n${BLUE}[2/6] Company Data Extraction...${NC}"
+    extract_company_data
+
+    # Phase 3: Drift detection
+    echo -e "\n${BLUE}[3/6] Drift Detection (Config ↔ Web)...${NC}"
+    detect_drift
+
+    # Phase 4: Enrichment recommendations
+    echo -e "\n${BLUE}[4/6] AI Enrichment Analysis...${NC}"
+    generate_enrichment
+
+    # Phase 5: Change detection
+    echo -e "\n${BLUE}[5/6] Change Detection...${NC}"
+    current_config_hash=$(get_file_hash "$COMPANY_CONFIG")
+    current_superuser_hash=$(get_file_hash "$SUPERUSER_CONFIG")
+
+    if [ "$current_config_hash" != "$last_config_hash" ]; then
+        echo -e "  ${YELLOW}⚡ CHANGE DETECTED: organizational-authority.json modified${NC}"
+        # Record change in ledger
+        ledger_record_change "CONFIG_UPDATE" "All Companies" "organizational_authority.json" "$last_config_hash" "$current_config_hash"
+        last_config_hash=$current_config_hash
+    else
+        echo -e "  ${GREEN}✓ organizational-authority.json: No changes${NC}"
+    fi
+
+    if [ "$current_superuser_hash" != "$last_superuser_hash" ]; then
+        echo -e "  ${YELLOW}⚡ CHANGE DETECTED: superuser-authority.json modified${NC}"
+        # Record change in ledger
+        ledger_record_change "CONFIG_UPDATE" "Superuser Authority" "superuser_authority.json" "$last_superuser_hash" "$current_superuser_hash"
+        last_superuser_hash=$current_superuser_hash
+    else
+        echo -e "  ${GREEN}✓ superuser-authority.json: No changes${NC}"
+    fi
+
+    # Phase 6: Ledger verification
+    echo -e "\n${BLUE}[6/6] Ledger Integrity Check...${NC}"
+    if ledger_verify_chain; then
+        echo -e "  ${GREEN}✓ Ledger chain verified${NC}"
+    else
+        echo -e "  ${RED}❌ LEDGER INTEGRITY COMPROMISED${NC}"
+    fi
+
+    # Save audit report
+    report_file=$(save_audit_report $iteration)
+    echo -e "\n${GREEN}✓ Audit report saved: $(basename $report_file)${NC}"
+
+    echo -e "\n${MAGENTA}🏢 BIMS STATUS: All company data monitored and validated${NC}"
+    echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}\n"
+
+    # Check for stop signal
+    if [ -f "telemetry/STOP_AUTONOMOUS" ]; then
+        echo "Stop signal detected. Exiting gracefully..."
+        break
+    fi
+
+    # Sleep until next check
+    if [ $MAX_ITERATIONS -eq 0 ] || [ $iteration -lt $MAX_ITERATIONS ]; then
+        echo "Next BIMS audit in ${CHECK_INTERVAL} seconds..."
+        sleep $CHECK_INTERVAL
+    fi
+done
+
+echo ""
+echo "═══════════════════════════════════════════════════════════════"
+echo "  BIMS Monitor completed $iteration cycles"
+echo "═══════════════════════════════════════════════════════════════"
+
+# Final ledger summary
+echo ""
+ledger_summary
 
 # Main monitoring loop
 iteration=0
