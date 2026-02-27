@@ -241,9 +241,37 @@
             }
         }
 
-        function exportCSV() { alert('CSV export coming soon!'); }
-        function exportExcel() { alert('Excel export coming soon!'); }
-        function exportQuickBooks() { alert('QuickBooks export coming soon!'); }
+        function exportCSV() {
+            const startDate = document.getElementById('exportStartDate').value;
+            const endDate = document.getElementById('exportEndDate').value;
+            const company = document.getElementById('exportCompany').value;
+
+            const params = new URLSearchParams({
+                start_date: startDate,
+                end_date: endDate,
+                company: company
+            });
+
+            window.location.href = `/api/export/csv?${params}`;
+        }
+
+        function exportExcel() {
+            alert('Excel export coming soon! (Requires openpyxl library)');
+        }
+
+        function exportQuickBooks() {
+            const startDate = document.getElementById('exportStartDate').value;
+            const endDate = document.getElementById('exportEndDate').value;
+            const company = document.getElementById('exportCompany').value;
+
+            const params = new URLSearchParams({
+                start_date: startDate,
+                end_date: endDate,
+                company: company
+            });
+
+            window.location.href = `/api/export/quickbooks?${params}`;
+        }
     </script>
 </body>
 </html>

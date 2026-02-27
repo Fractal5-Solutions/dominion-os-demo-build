@@ -267,7 +267,17 @@
         }
 
         function exportToCSV() {
-            alert('CSV export feature coming soon!');
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const company = document.getElementById('companyFilter').value;
+
+            const params = new URLSearchParams({
+                start_date: startDate,
+                end_date: endDate,
+                company: company
+            });
+
+            window.location.href = `/api/export/csv?${params}`;
         }
 
         // Load on page load

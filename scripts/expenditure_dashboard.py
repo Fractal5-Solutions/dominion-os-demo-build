@@ -24,6 +24,7 @@ try:
         ExtractionConfidence,
         SQLALCHEMY_AVAILABLE,
     )
+    from expenditure_exports import export_to_csv, export_to_quickbooks
 
     MODELS_AVAILABLE = True
 except ImportError:
@@ -560,15 +561,75 @@ def api_report_monthly_trend():
 @app.route("/api/export/csv")
 def api_export_csv():
     """Export expenditures to CSV"""
-    # TODO: Implement CSV export
-    return jsonify({"error": "Not implemented"}), 501
+    if not db:
+        return jsonify({"error": "Database not available"}), 503
+
+    try:
+        # Get query parameters
+        start_date_str = request.args.get("start_date")
+        end_date_str = request.args.get("end_date")
+        company = request.args.get("company")
+
+        # Default to current year
+        if not end_date_str:
+            end_date = datetime.now()
+        else:
+            end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
+
+        if not start_date_str:
+            start_date = datetime(end_date.year, 1, 1)
+        else:
+            start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
+
+        # Get expenditures
+        expenditures = db.get_expenditures_by_date_range(start_date, end_date, company)
+
+        # Export to CSV
+        csv_data, headers = export_to_csv(expenditures)
+
+        # Return as downloadable file
+        from flask import Response
+        return Response(csv_data, headers=headers)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/api/export/quickbooks")
 def api_export_quickbooks():
     """Export expenditures to QuickBooks IIF format"""
-    # TODO: Implement QuickBooks export
-    return jsonify({"error": "Not implemented"}), 501
+    if not db:
+        return jsonify({"error": "Database not available"}), 503
+
+    try:
+        # Get query parameters
+        start_date_str = request.args.get("start_date")
+        end_date_str = request.args.get("end_date")
+        company = request.args.get("company")
+
+        # Default to current year
+        if not end_date_str:
+            end_date = datetime.now()
+        else:
+            end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
+
+        if not start_date_str:
+            start_date = datetime(end_date.year, 1, 1)
+        else:
+            start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
+
+        # Get expenditures
+        expenditures = db.get_expenditures_by_date_range(start_date, end_date, company)
+
+        # Export to QuickBooks IIF
+        iif_data, headers = export_to_quickbooks(expenditures)
+
+        # Return as downloadable file
+        from flask import Response
+        return Response(iif_data, headers=headers)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 # ============================================================================
