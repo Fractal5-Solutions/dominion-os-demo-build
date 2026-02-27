@@ -45,7 +45,7 @@
                 "name": "Plane4 Grain Inc",
                 "type": "C-Corporation",
                 "jurisdiction": "TBD",
-                "primary_business": "Advanced AI Research & Development",
+                "primary_business": "Contemporary Furniture & Woodworking Craftsmanship",
                 "ein": "TBD",
                 "status": "ACTIVE",
                 "sole_owner": {
@@ -55,11 +55,23 @@
                     "title": "Founder & Principal"
                 },
                 "focus_areas": [
-                    "Cybernetic Systems",
-                    "Autonomous Intelligence",
-                    "Sovereign Computing",
-                    "Next-Generation AI Architecture"
-                ]
+                    "Modern furniture with rustic materials",
+                    "Contemporary design with traditional joinery",
+                    "Character-grade and reclaimed wood craftsmanship",
+                    "Canada-inspired natural aesthetics"
+                ],
+                "collections": [
+                    "Furniture (tables, benches, shelving, functional centerpieces)",
+                    "Home & Décor (accents, display pieces, story-rich details)",
+                    "Custom Commissions (bespoke pieces for specific spaces)"
+                ],
+                "services": [
+                    "Custom furniture commissions",
+                    "On-site woodworking and built-ins",
+                    "Contemporary rustic furniture design",
+                    "Reclaimed and character-grade wood projects"
+                ],
+                "design_philosophy": "Fusing contemporary design with rustic materials to craft pieces that narrate unique stories. Clean lines, honest texture, human hands."
             }
         ],
         "unified_command": {
