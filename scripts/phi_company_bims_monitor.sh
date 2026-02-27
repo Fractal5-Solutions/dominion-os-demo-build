@@ -15,6 +15,7 @@ MAX_ITERATIONS=0     # 0 = infinite
 
 # Create telemetry directory
 mkdir -p "$TELEMETRY_DIR"
+mkdir -p "$TELEMETRY_DIR/ledger"
 
 # Color codes
 RED='\033[0;31m'
@@ -40,9 +41,13 @@ echo "  • AI-driven drift detection"
 echo "  • Continuous enrichment"
 echo "  • Truth confirmation via cross-reference"
 echo "  • Automated validation & correction alerts"
+echo "  • Immutable ledger system with SHA-256 chain"
 echo ""
 echo "═══════════════════════════════════════════════════════════════"
 echo ""
+
+# Initialize ledger system
+ledger_init
 
 # Function to get file hash
 get_file_hash() {
@@ -244,7 +249,7 @@ while [ $MAX_ITERATIONS -eq 0 ] || [ $iteration -lt $MAX_ITERATIONS ]; do
     echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
 
     # Phase 1: Validate JSON structure
-    echo -e "\n${BLUE}[1/5] JSON Validation...${NC}"
+    echo -e "\n${BLUE}[1/6] JSON Validation...${NC}"
     if validate_json "$COMPANY_CONFIG" > /dev/null 2>&1; then
         echo -e "  ${GREEN}✓ organizational-authority.json: Valid${NC}"
     else
@@ -260,24 +265,26 @@ while [ $MAX_ITERATIONS -eq 0 ] || [ $iteration -lt $MAX_ITERATIONS ]; do
     fi
 
     # Phase 2: Extract company data
-    echo -e "\n${BLUE}[2/5] Company Data Extraction...${NC}"
+    echo -e "\n${BLUE}[2/6] Company Data Extraction...${NC}"
     extract_company_data
 
     # Phase 3: Drift detection
-    echo -e "\n${BLUE}[3/5] Drift Detection (Config ↔ Web)...${NC}"
+    echo -e "\n${BLUE}[3/6] Drift Detection (Config ↔ Web)...${NC}"
     detect_drift
 
     # Phase 4: Enrichment recommendations
-    echo -e "\n${BLUE}[4/5] AI Enrichment Analysis...${NC}"
+    echo -e "\n${BLUE}[4/6] AI Enrichment Analysis...${NC}"
     generate_enrichment
 
     # Phase 5: Change detection
-    echo -e "\n${BLUE}[5/5] Change Detection...${NC}"
+    echo -e "\n${BLUE}[5/6] Change Detection...${NC}"
     current_config_hash=$(get_file_hash "$COMPANY_CONFIG")
     current_superuser_hash=$(get_file_hash "$SUPERUSER_CONFIG")
 
     if [ "$current_config_hash" != "$last_config_hash" ]; then
         echo -e "  ${YELLOW}⚡ CHANGE DETECTED: organizational-authority.json modified${NC}"
+        # Record change in ledger
+        ledger_record_change "CONFIG_UPDATE" "All Companies" "organizational_authority.json" "$last_config_hash" "$current_config_hash"
         last_config_hash=$current_config_hash
     else
         echo -e "  ${GREEN}✓ organizational-authority.json: No changes${NC}"
@@ -285,9 +292,19 @@ while [ $MAX_ITERATIONS -eq 0 ] || [ $iteration -lt $MAX_ITERATIONS ]; do
 
     if [ "$current_superuser_hash" != "$last_superuser_hash" ]; then
         echo -e "  ${YELLOW}⚡ CHANGE DETECTED: superuser-authority.json modified${NC}"
+        # Record change in ledger
+        ledger_record_change "CONFIG_UPDATE" "Superuser Authority" "superuser_authority.json" "$last_superuser_hash" "$current_superuser_hash"
         last_superuser_hash=$current_superuser_hash
     else
         echo -e "  ${GREEN}✓ superuser-authority.json: No changes${NC}"
+    fi
+
+    # Phase 6: Ledger verification
+    echo -e "\n${BLUE}[6/6] Ledger Integrity Check...${NC}"
+    if ledger_verify_chain; then
+        echo -e "  ${GREEN}✓ Ledger chain verified${NC}"
+    else
+        echo -e "  ${RED}❌ LEDGER INTEGRITY COMPROMISED${NC}"
     fi
 
     # Save audit report
@@ -314,3 +331,7 @@ echo ""
 echo "═══════════════════════════════════════════════════════════════"
 echo "  BIMS Monitor completed $iteration cycles"
 echo "═══════════════════════════════════════════════════════════════"
+
+# Final ledger summary
+echo ""
+ledger_summary
