@@ -4,10 +4,29 @@
             {
                 "name": "Fractal5 Solutions Inc",
                 "type": "C-Corporation",
-                "jurisdiction": "TBD",
+                "jurisdiction": "PENDING_VERIFICATION",
                 "primary_business": "Sovereign AI Systems Development",
-                "ein": "TBD",
+                "ein": "PENDING_VERIFICATION",
                 "status": "ACTIVE",
+                "website": "https://www.fractal5solutions.com",
+                "location": {
+                    "city": "Victoria",
+                    "province": "BC",
+                    "country": "Canada"
+                },
+                "contact": {
+                    "email": "support@fractal5solutions.com",
+                    "business_hours": {
+                        "monday_friday": "8am - 5pm PST",
+                        "saturday": "8am - 12pm PST",
+                        "sunday": "Closed"
+                    }
+                },
+                "social_media": {
+                    "facebook": "https://www.facebook.com/profile.php?id=61572428791801",
+                    "twitter": "https://x.com/Fractal5X",
+                    "linkedin": "https://www.linkedin.com/company/fractal5-solutions/"
+                },
                 "sole_owner": {
                     "name": "Matthew Burbidge",
                     "email": "matthewburbidge@fractal5solutions.com",
@@ -24,10 +43,11 @@
             {
                 "name": "Blue Wave Action Group Inc",
                 "type": "C-Corporation",
-                "jurisdiction": "TBD",
+                "jurisdiction": "PENDING_VERIFICATION",
                 "primary_business": "Political Technology & Campaign Infrastructure",
-                "ein": "TBD",
+                "ein": "PENDING_VERIFICATION",
                 "status": "ACTIVE",
+                "website": "https://www.bluewaveactiongroup.ca",
                 "sole_owner": {
                     "name": "Matthew Burbidge",
                     "email": "matthewburbidge@fractal5solutions.com",
@@ -44,9 +64,9 @@
             {
                 "name": "Plane4 Grain Inc",
                 "type": "C-Corporation",
-                "jurisdiction": "TBD",
+                "jurisdiction": "PENDING_VERIFICATION",
                 "primary_business": "Contemporary Furniture & Woodworking Craftsmanship",
-                "ein": "TBD",
+                "ein": "PENDING_VERIFICATION",
                 "status": "ACTIVE",
                 "sole_owner": {
                     "name": "Matthew Burbidge",

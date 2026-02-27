@@ -70,6 +70,9 @@ try:
         import os
         has_page = "YES" if os.path.exists(web_file) else "NO"
 
+        # Check for website URL
+        website = company.get('website', 'Not configured')
+
         # Calculate completeness score
         completeness = 0
         if 'primary_business' in company and company['primary_business'] != 'TBD':
@@ -86,7 +89,8 @@ try:
         print(f"COMPANY: {name}")
         print(f"  BUSINESS: {business}")
         print(f"  STATUS: {status}")
-        print(f"  WEB_PAGE: {has_page}")
+        print(f"  LOCAL_WEB_PAGE: {has_page}")
+        print(f"  WEBSITE_URL: {website}")
         print(f"  COMPLETENESS: {completeness}%")
         print(f"  FIELDS: {len(company.keys())}")
 
@@ -102,6 +106,7 @@ detect_drift() {
 import json
 import os
 import re
+import subprocess
 
 config_data = json.load(open('/workspaces/dominion-os-demo-build/config/organizational-authority.json'))
 companies = config_data.get('organizational_structure', {}).get('holding_entities', [])
@@ -113,30 +118,73 @@ for company in companies:
     name = company.get('name', 'Unknown')
     config_business = company.get('primary_business', '').lower()
 
-    # Check if web page exists
+    # Check local web page first
     slug = name.lower().replace(' ', '-').replace('inc', '').strip().rstrip('-')
     web_file = f"/workspaces/dominion-os-demo-build/web/{slug}.html"
 
-    if os.path.exists(web_file):
+    has_local_page = os.path.exists(web_file)
+
+    # Check external website if configured
+    website_url = company.get('website')
+    has_external_site = False
+    external_content = ""
+
+    if website_url:
+        try:
+            # Use curl to fetch website content
+            result = subprocess.run([
+                'curl', '-s', '--max-time', '10', '--user-agent',
+                'PHI-BIMS-Monitor/1.0 (Company Data Validation)', website_url
+            ], capture_output=True, text=True, timeout=15)
+
+            if result.returncode == 0 and result.stdout:
+                has_external_site = True
+                external_content = result.stdout.lower()
+                print(f"✓ {name}: External site accessible ({website_url})")
+            else:
+                print(f"⚠ {name}: External site unreachable ({website_url}) - HTTP {result.returncode}")
+
+    # Drift detection logic
+    if has_local_page:
         with open(web_file, 'r') as f:
-            web_content = f.read().lower()
+            local_content = f.read().lower()
 
         # Basic drift detection: check if primary business keywords appear in page
         if config_business and config_business != 'tbd':
             # Extract key terms from config business description
             business_terms = set(re.findall(r'\b\w{4,}\b', config_business))
 
-            # Check if at least 50% of business terms appear in web page
-            matches = sum(1 for term in business_terms if term in web_content)
+            # Check if at least 50% of business terms appear in local page
+            matches = sum(1 for term in business_terms if term in local_content)
             match_rate = (matches / len(business_terms) * 100) if business_terms else 0
 
             if match_rate < 50:
                 drift_detected = True
-                drift_issues.append(f"{name}: Config/Web mismatch ({match_rate:.0f}% keyword match)")
+                drift_issues.append(f"{name}: Config/Local page mismatch ({match_rate:.0f}% keyword match)")
             else:
-                print(f"✓ {name}: Aligned (config ↔ web)")
-    else:
-        print(f"⚠ {name}: No web page found")
+                print(f"✓ {name}: Local page aligned (config ↔ local)")
+
+    # Check external site drift if available
+    if has_external_site and config_business and config_business != 'tbd':
+        business_terms = set(re.findall(r'\b\w{4,}\b', config_business))
+        matches = sum(1 for term in business_terms if term in external_content)
+        match_rate = (matches / len(business_terms) * 100) if business_terms else 0
+
+        if match_rate < 50:
+            drift_detected = True
+            drift_issues.append(f"{name}: Config/External site mismatch ({match_rate:.0f}% keyword match)")
+        else:
+            print(f"✓ {name}: External site aligned (config ↔ external)")
+
+    # Status reporting
+    if not has_local_page and not has_external_site:
+        print(f"⚠ {name}: No web presence found")
+    elif has_local_page and has_external_site:
+        print(f"✓ {name}: Dual presence (local + external)")
+    elif has_local_page:
+        print(f"✓ {name}: Local page only")
+    elif has_external_site:
+        print(f"✓ {name}: External site only")
 
 if drift_detected:
     print("\n⚠ DRIFT DETECTED:")
