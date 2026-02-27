@@ -1,22 +1,22 @@
 {
-  "cycle": 5,
-  "timestamp": "2026-02-27 20:54:57 UTC",
+  "cycle": 4,
+  "timestamp": "2026-02-27 20:39:36 UTC",
   "services": [
     {
       "name": "askphi-chatbot",
       "project": "dominion-os-1-0-main",
       "url": "https://askphi-chatbot-66ymegzkya-uc.a.run.app",
-      "response_time_ms": 91,
+      "response_time_ms": 1122,
       "http_code": "200",
-      "status": "excellent",
-      "rating": "EXCELLENT"
+      "status": "slow",
+      "rating": "SLOW"
     }
 ,
     {
       "name": "dominion-ai-gateway",
       "project": "dominion-os-1-0-main",
       "url": "https://dominion-ai-gateway-66ymegzkya-uc.a.run.app",
-      "response_time_ms": 109,
+      "response_time_ms": 103,
       "http_code": "404",
       "status": "good",
       "rating": "GOOD"
@@ -26,17 +26,17 @@
       "name": "dominion-f5-gateway",
       "project": "dominion-os-1-0-main",
       "url": "https://dominion-f5-gateway-66ymegzkya-uc.a.run.app",
-      "response_time_ms": 95,
+      "response_time_ms": 1525,
       "http_code": "200",
-      "status": "excellent",
-      "rating": "EXCELLENT"
+      "status": "slow",
+      "rating": "SLOW"
     }
 ,
     {
       "name": "dominion-monitoring-dashboard",
       "project": "dominion-os-1-0-main",
       "url": "https://dominion-monitoring-dashboard-66ymegzkya-uc.a.run.app",
-      "response_time_ms": 102,
+      "response_time_ms": 111,
       "http_code": "200",
       "status": "good",
       "rating": "GOOD"
@@ -46,17 +46,17 @@
       "name": "dominion-os-1-0",
       "project": "dominion-os-1-0-main",
       "url": "https://dominion-os-1-0-66ymegzkya-uc.a.run.app",
-      "response_time_ms": 106,
+      "response_time_ms": 4795,
       "http_code": "404",
-      "status": "good",
-      "rating": "GOOD"
+      "status": "timeout",
+      "rating": "TIMEOUT"
     }
 ,
     {
       "name": "dominion-os-api",
       "project": "dominion-os-1-0-main",
       "url": "https://dominion-os-api-66ymegzkya-uc.a.run.app",
-      "response_time_ms": 148,
+      "response_time_ms": 112,
       "http_code": "404",
       "status": "good",
       "rating": "GOOD"
@@ -66,7 +66,7 @@
       "name": "dominion-phi-ui",
       "project": "dominion-os-1-0-main",
       "url": "https://dominion-phi-ui-66ymegzkya-uc.a.run.app",
-      "response_time_ms": 132,
+      "response_time_ms": 113,
       "http_code": "200",
       "status": "good",
       "rating": "GOOD"
@@ -76,7 +76,7 @@
       "name": "dominion-revenue-automation",
       "project": "dominion-os-1-0-main",
       "url": "https://dominion-revenue-automation-66ymegzkya-uc.a.run.app",
-      "response_time_ms": 118,
+      "response_time_ms": 108,
       "http_code": "404",
       "status": "good",
       "rating": "GOOD"
@@ -86,7 +86,7 @@
       "name": "dominion-security-framework",
       "project": "dominion-os-1-0-main",
       "url": "https://dominion-security-framework-66ymegzkya-uc.a.run.app",
-      "response_time_ms": 131,
+      "response_time_ms": 111,
       "http_code": "307",
       "status": "good",
       "rating": "GOOD"
@@ -96,37 +96,37 @@
       "name": "api",
       "project": "dominion-core-prod",
       "url": "https://api-reduwyf2ra-uc.a.run.app",
-      "response_time_ms": 94,
+      "response_time_ms": 1598,
       "http_code": "404",
-      "status": "excellent",
-      "rating": "EXCELLENT"
+      "status": "slow",
+      "rating": "SLOW"
     }
 ,
     {
       "name": "chatgpt-gateway",
       "project": "dominion-core-prod",
       "url": "https://chatgpt-gateway-reduwyf2ra-uc.a.run.app",
-      "response_time_ms": 96,
+      "response_time_ms": 2221,
       "http_code": "404",
-      "status": "excellent",
-      "rating": "EXCELLENT"
+      "status": "slow",
+      "rating": "SLOW"
     }
 ,
     {
       "name": "demo",
       "project": "dominion-core-prod",
       "url": "https://demo-reduwyf2ra-uc.a.run.app",
-      "response_time_ms": 142,
+      "response_time_ms": 757,
       "http_code": "200",
-      "status": "good",
-      "rating": "GOOD"
+      "status": "acceptable",
+      "rating": "ACCEPTABLE"
     }
 ,
     {
       "name": "dominion-ai-gateway",
       "project": "dominion-core-prod",
       "url": "https://dominion-ai-gateway-reduwyf2ra-uc.a.run.app",
-      "response_time_ms": 132,
+      "response_time_ms": 114,
       "http_code": "404",
       "status": "good",
       "rating": "GOOD"
@@ -136,7 +136,7 @@
       "name": "dominion-api",
       "project": "dominion-core-prod",
       "url": "https://dominion-api-reduwyf2ra-uc.a.run.app",
-      "response_time_ms": 108,
+      "response_time_ms": 102,
       "http_code": "200",
       "status": "good",
       "rating": "GOOD"
@@ -146,17 +146,17 @@
       "name": "dominion-chief-of-staff",
       "project": "dominion-core-prod",
       "url": "https://dominion-chief-of-staff-reduwyf2ra-uc.a.run.app",
-      "response_time_ms": 143,
+      "response_time_ms": 490,
       "http_code": "200",
-      "status": "good",
-      "rating": "GOOD"
+      "status": "acceptable",
+      "rating": "ACCEPTABLE"
     }
 ,
     {
       "name": "dominion-demo",
       "project": "dominion-core-prod",
       "url": "https://dominion-demo-reduwyf2ra-uc.a.run.app",
-      "response_time_ms": 99,
+      "response_time_ms": 90,
       "http_code": "200",
       "status": "excellent",
       "rating": "EXCELLENT"
@@ -166,17 +166,17 @@
       "name": "dominion-gateway",
       "project": "dominion-core-prod",
       "url": "https://dominion-gateway-reduwyf2ra-uc.a.run.app",
-      "response_time_ms": 109,
+      "response_time_ms": 86,
       "http_code": "200",
-      "status": "good",
-      "rating": "GOOD"
+      "status": "excellent",
+      "rating": "EXCELLENT"
     }
 ,
     {
       "name": "dominion-os",
       "project": "dominion-core-prod",
       "url": "https://dominion-os-reduwyf2ra-uc.a.run.app",
-      "response_time_ms": 105,
+      "response_time_ms": 138,
       "http_code": "500",
       "status": "good",
       "rating": "GOOD"
@@ -186,7 +186,7 @@
       "name": "dominion-os-1-0-101",
       "project": "dominion-core-prod",
       "url": "https://dominion-os-1-0-101-reduwyf2ra-uc.a.run.app",
-      "response_time_ms": 97,
+      "response_time_ms": 95,
       "http_code": "404",
       "status": "excellent",
       "rating": "EXCELLENT"
@@ -196,40 +196,40 @@
       "name": "dominion-os-demo",
       "project": "dominion-core-prod",
       "url": "https://dominion-os-demo-reduwyf2ra-uc.a.run.app",
-      "response_time_ms": 105,
+      "response_time_ms": 690,
       "http_code": "200",
-      "status": "good",
-      "rating": "GOOD"
+      "status": "acceptable",
+      "rating": "ACCEPTABLE"
     }
 ,
     {
       "name": "dominion-phi-ui",
       "project": "dominion-core-prod",
       "url": "https://dominion-phi-ui-reduwyf2ra-uc.a.run.app",
-      "response_time_ms": 121,
+      "response_time_ms": 99,
       "http_code": "200",
-      "status": "good",
-      "rating": "GOOD"
+      "status": "excellent",
+      "rating": "EXCELLENT"
     }
 ,
     {
       "name": "pipeline",
       "project": "dominion-core-prod",
       "url": "https://pipeline-reduwyf2ra-uc.a.run.app",
-      "response_time_ms": 101,
+      "response_time_ms": 2717,
       "http_code": "404",
-      "status": "good",
-      "rating": "GOOD"
+      "status": "slow",
+      "rating": "SLOW"
     }
 
   ],
   "summary": {
     "total_services": 22,
-    "tested_services": 22,
-    "excellent": 6,
-    "good": 16,
-    "acceptable": 0,
-    "slow": 0,
-    "failed": 0
+    "tested_services": 21,
+    "excellent": 4,
+    "good": 9,
+    "acceptable": 3,
+    "slow": 5,
+    "failed": 1
   }
 }
