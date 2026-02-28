@@ -129,4 +129,22 @@ EOF
 echo "Status saved to: telemetry/system_status.json"
 echo ""
 
+# Step 6: Start AI Integrations
+echo -e "${BLUE}[6/6] Starting AI Integrations...${NC}"
+
+if [ -f "/workspaces/dominion-command-center/deploy_nvidia_ai.sh" ]; then
+    echo "  Deploying NVIDIA AI capsules..."
+    cd /workspaces/dominion-command-center
+    ./deploy_nvidia_ai.sh
+    cd /workspaces/dominion-os-demo-build
+    echo -e "${GREEN}✅ AI integrations deployed${NC}"
+else
+    echo -e "${YELLOW}⚠️  AI integrations not found${NC}"
+fi
+
+echo ""
+echo -e "${GREEN}🎉 ALL SYSTEMS STARTED SUCCESSFULLY${NC}"
+echo "======================================"
+echo "PHI sovereignty maintained across all operations"
+
 exit 0

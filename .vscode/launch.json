@@ -94,6 +94,21 @@
             "env": {
                 "PYTHONPATH": "${workspaceFolder}"
             }
+        },
+        {
+            "name": "Cloud Code: Debug on Cloud Run",
+            "type": "cloudcode.cloudrun",
+            "request": "launch",
+            "skaffoldConfig": "${workspaceFolder}/skaffold.yaml",
+            "profile": "dev"
+        },
+        {
+            "name": "Cloud Code: Debug Locally",
+            "type": "cloudcode.kubernetes",
+            "request": "launch",
+            "skaffoldConfig": "${workspaceFolder}/skaffold.yaml",
+            "profile": "dev",
+            "portForward": true
         }
     ]
 }

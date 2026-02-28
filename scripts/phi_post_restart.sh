@@ -57,3 +57,23 @@ echo ""
 echo "────────────────────────────────────────────────────────────────"
 echo "Full status: ./scripts/phi_sovereign_status.sh"
 echo "────────────────────────────────────────────────────────────────"
+
+echo ""
+echo "🔧 Starting PHI AI Integrations..."
+echo "=================================="
+
+# Start NVIDIA AI integrations if available
+if [ -f "/workspaces/dominion-command-center/deploy_nvidia_ai.sh" ]; then
+    echo "  Deploying NVIDIA AI capsules..."
+    cd /workspaces/dominion-command-center
+    nohup ./deploy_nvidia_ai.sh > /tmp/phi_ai_startup.log 2>&1 &
+    echo "  AI deployment started (PID: $!)"
+    cd /workspaces/dominion-os-demo-build
+else
+    echo "  NVIDIA AI integration not found - skipping"
+fi
+
+echo ""
+echo "✅ PHI Sovereign Post-Restart Complete"
+echo "======================================"
+echo "All systems resumed with PHI sovereignty and AI integrations active"

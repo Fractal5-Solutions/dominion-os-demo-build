@@ -66,6 +66,149 @@
             "options": { "cwd": "${workspaceFolder}" },
             "presentation": { "reveal": "always" },
             "problemMatcher": []
+        },
+        {
+            "label": "Cloud Code: Deploy to Cloud Run (Dev)",
+            "type": "shell",
+            "command": "skaffold",
+            "args": ["run", "--profile=dev", "--default-repo=gcr.io/dominion-core-prod"],
+            "options": { "cwd": "${workspaceFolder}" },
+            "group": "build",
+            "presentation": { "reveal": "always", "panel": "dedicated" },
+            "problemMatcher": []
+        },
+        {
+            "label": "Cloud Code: Deploy to Cloud Run (Prod)",
+            "type": "shell",
+            "command": "skaffold",
+            "args": ["run", "--profile=prod", "--default-repo=gcr.io/dominion-core-prod"],
+            "options": { "cwd": "${workspaceFolder}" },
+            "group": "build",
+            "presentation": { "reveal": "always", "panel": "dedicated" },
+            "problemMatcher": []
+        },
+        {
+            "label": "GCP: Validate Auth & Project",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-lc",
+                "echo 'Checking GCP Authentication...' && gcloud auth list --filter=status:ACTIVE --format='value(account)' && echo 'Current Project:' && gcloud config get-value project && echo 'Available services:' && gcloud run services list --limit=5"
+            ],
+            "options": { "cwd": "${workspaceFolder}" },
+            "presentation": { "reveal": "always" },
+            "problemMatcher": []
+        },
+        {
+            "label": "GCP: Full Stack Deploy",
+            "type": "shell",
+            "command": "bash",
+            "args": ["-lc", "chmod +x deploy_to_gcp.sh && ./deploy_to_gcp.sh"],
+            "options": { "cwd": "${workspaceFolder}" },
+            "group": "build",
+            "presentation": { "reveal": "always", "panel": "dedicated" },
+            "problemMatcher": []
+        },
+        {
+            "label": "Docker: Build Image Locally",
+            "type": "shell",
+            "command": "docker",
+            "args": [
+                "build",
+                "--tag", "dominion-demo:latest",
+                "--tag", "dominion-demo:dev",
+                "--cache-from", "dominion-demo:latest",
+                "--build-arg", "BUILDKIT_INLINE_CACHE=1",
+                "."
+            ],
+            "options": { "cwd": "${workspaceFolder}" },
+            "group": "build",
+            "presentation": { "reveal": "always", "panel": "shared" },
+            "problemMatcher": []
+        },
+        {
+            "label": "Docker: Run Local Container",
+            "type": "shell",
+            "command": "docker",
+            "args": [
+                "run",
+                "--rm",
+                "-p", "8080:8080",
+                "-e", "PORT=8080",
+                "-e", "PROJECT_ID=dominion-core-prod",
+                "--name", "dominion-demo-local",
+                "dominion-demo:latest"
+            ],
+            "options": { "cwd": "${workspaceFolder}" },
+            "presentation": { "reveal": "always", "panel": "dedicated" },
+            "problemMatcher": [],
+            "dependsOn": ["Docker: Build Image Locally"]
+        },
+        {
+            "label": "Cloud Build: Submit Build",
+            "type": "shell",
+            "command": "gcloud",
+            "args": [
+                "builds", "submit",
+                "--config", "cloudbuild.yaml",
+                "--substitutions", "BRANCH_NAME=${input:branchName},_SERVICE_NAME=dominion-demo-service",
+                "."
+            ],
+            "options": { "cwd": "${workspaceFolder}" },
+            "group": "build",
+            "presentation": { "reveal": "always", "panel": "dedicated" },
+            "problemMatcher": []
+        },
+        {
+            "label": "Skaffold: Dev Mode (Hot Reload)",
+            "type": "shell",
+            "command": "skaffold",
+            "args": ["dev", "--profile=dev", "--port-forward"],
+            "options": { "cwd": "${workspaceFolder}" },
+            "isBackground": true,
+            "presentation": { "reveal": "always", "panel": "dedicated" },
+            "problemMatcher": []
+        },
+        {
+            "label": "Cloud Run: View Logs",
+            "type": "shell",
+            "command": "gcloud",
+            "args": [
+                "run", "logs", "read",
+                "dominion-demo-service",
+                "--region", "us-central1",
+                "--limit", "50",
+                "--format", "json"
+            ],
+            "options": { "cwd": "${workspaceFolder}" },
+            "presentation": { "reveal": "always", "panel": "shared" },
+            "problemMatcher": []
+        },
+        {
+            "label": "GCP: Setup Complete Environment",
+            "type": "shell",
+            "command": "bash",
+            "args": ["-c", "chmod +x scripts/setup_cloudcode_integration.sh && ./scripts/setup_cloudcode_integration.sh"],
+            "options": { "cwd": "${workspaceFolder}" },
+            "presentation": { "reveal": "always", "panel": "dedicated" },
+            "problemMatcher": []
+        },
+        {
+            "label": "GCP: Validate Deployment Readiness",
+            "type": "shell",
+            "command": "bash",
+            "args": ["-c", "chmod +x scripts/validate_deployment_readiness.sh && ./scripts/validate_deployment_readiness.sh"],
+            "options": { "cwd": "${workspaceFolder}" },
+            "presentation": { "reveal": "always", "panel": "dedicated" },
+            "problemMatcher": []
+        }
+    ],
+    "inputs": [
+        {
+            "id": "branchName",
+            "type": "promptString",
+            "description": "Enter branch name",
+            "default": "main"
         }
     ]
 }

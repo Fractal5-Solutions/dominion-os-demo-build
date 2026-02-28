@@ -140,7 +140,7 @@ while true; do
     echo ""
 
     # Phase 5: Automated Recommendations
-    echo -e "${CYAN}[5/6] Generating Improvement Recommendations...${NC}"
+    echo -e "${CYAN}[5/7] Generating Improvement Recommendations...${NC}"
 
     recommendations=()
 
@@ -166,8 +166,39 @@ while true; do
     fi
     echo ""
 
-    # Phase 6: Continuous Improvement Actions
-    echo -e "${CYAN}[6/6] Executing Autonomous Improvements...${NC}"
+    # Phase 6: AI Integration Health Check
+    echo -e "${CYAN}[6/7] AI Integration Health Check...${NC}"
+
+    ai_healthy=true
+    ai_containers=$(docker ps --filter "name=nvidia-ai" --format "{{.Names}}" 2>/dev/null | wc -l || echo "0")
+
+    if [ "$ai_containers" -gt 0 ]; then
+        echo -e "  ${GREEN}✓ $ai_containers AI containers running${NC}"
+
+        # Check GPU utilization if available
+        if nvidia-smi &>/dev/null; then
+            gpu_util=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits | awk '{sum+=$1} END {print sum/NR}')
+            echo -e "  ${GREEN}✓ GPU utilization: ${gpu_util}%${NC}"
+        fi
+    else
+        echo -e "  ${YELLOW}⚠ AI containers not running - attempting restart${NC}"
+        ai_healthy=false
+        # Attempt restart
+        if [ -f "/workspaces/dominion-command-center/deploy_nvidia_ai.sh" ]; then
+            cd /workspaces/dominion-command-center
+            ./deploy_nvidia_ai.sh &
+            cd /workspaces/dominion-os-demo-build
+            echo -e "  ${GREEN}✓ AI restart initiated${NC}"
+        fi
+    fi
+
+    if [ "$ai_healthy" = true ]; then
+        echo -e "  ${GREEN}✓ AI integrations healthy${NC}"
+    fi
+    echo ""
+
+    # Phase 7: Continuous Improvement Actions
+    echo -e "${CYAN}[7/7] Executing Autonomous Improvements...${NC}"
 
     improvements_made=0
 
@@ -199,7 +230,7 @@ while true; do
 
     echo -e "${GREEN}╔═══════════════════════════════════════════════════════════════╗${NC}"
     echo -e "${GREEN}║  CYCLE #${iteration} COMPLETE                                        ║${NC}"
-    echo -e "${GREEN}║  Duration: ${cycle_duration}s | Health: ${health_pct}% | SLO: ${slo_compliant}/${slo_total}                   ║${NC}"
+    echo -e "${GREEN}║  Duration: ${cycle_duration}s | Health: ${health_pct}% | SLO: ${slo_compliant}/${slo_total} | AI: ${ai_containers} containers ║${NC}"
     echo -e "${GREEN}╚═══════════════════════════════════════════════════════════════╝${NC}"
     echo ""
 
