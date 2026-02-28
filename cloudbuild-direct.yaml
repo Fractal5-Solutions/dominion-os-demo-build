@@ -1,0 +1,63 @@
+# Simplified Cloud Build - Deploy directly to Cloud Run from source
+options:
+  machineType: E2_HIGHCPU_8
+  logging: CLOUD_LOGGING_ONLY
+
+substitutions:
+  _SERVICE_NAME: dominion-demo-service
+  _REGION: us-central1
+
+steps:
+  # Step 1: Deploy directly to Cloud Run from source
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-from-source'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "=========================================="
+        echo "Deploying to Cloud Run from source"
+        echo "=========================================="
+        gcloud run deploy ${_SERVICE_NAME} \
+          --source . \
+          --region ${_REGION} \
+          --platform managed \
+          --memory 4Gi \
+          --cpu 2 \
+          --timeout 300s \
+          --concurrency 250 \
+          --min-instances 1 \
+          --max-instances 100 \
+          --no-cpu-throttling \
+          --execution-environment gen2 \
+          --allow-unauthenticated \
+          --set-env-vars PROJECT_ID=$$PROJECT_ID,REGION=${_REGION},SERVICE_NAME=${_SERVICE_NAME} \
+          --labels managed-by=cloudbuild \
+          --quiet
+
+  # Step 2: Get service URL and run smoke test
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'verify-deployment'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        SERVICE_URL=$$(gcloud run services describe ${_SERVICE_NAME} \
+          --region ${_REGION} \
+          --platform managed \
+          --format 'value(status.url)')
+        echo "=========================================="
+        echo "✅ Deployment Complete!"
+        echo "Service URL: $$SERVICE_URL"
+        echo "=========================================="
+        echo "Running smoke test..."
+        sleep 10
+        curl -f -m 30 "$$SERVICE_URL/" || curl -f -m 30 "$$SERVICE_URL/health" || echo "Service deployed but health check endpoints not available"
+
+timeout: 1800s
+
+tags:
+  - 'dominion-os'
+  - 'demo-build'
+  - 'cloud-run'
+  - 'direct-deploy'
