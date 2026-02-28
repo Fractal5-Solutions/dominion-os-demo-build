@@ -1,0 +1,225 @@
+name: PHI Autonomous Sync
+
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Force push even if no commits ahead'
+        required: false
+        default: 'false'
+  schedule:
+    # Run every 6 hours to sync any pending commits
+    - cron: "0 */6 * * *"
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: phi-sync-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "PHI-Autonomous"
+          git config user.email "phi@fractal5.dev"
+
+      - name: Check for pending commits
+        id: check
+        run: |
+          # Get the default branch name
+          DEFAULT_BRANCH=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
+          CURRENT_BRANCH=$(git branch --show-current)
+
+          echo "default_branch=$DEFAULT_BRANCH" >> $GITHUB_OUTPUT
+          echo "current_branch=$CURRENT_BRANCH" >> $GITHUB_OUTPUT
+
+          # Check if we're ahead of remote
+          git fetch origin "$CURRENT_BRANCH" || true
+
+          if git rev-parse "origin/$CURRENT_BRANCH" >/dev/null 2>&1; then
+            COMMITS_AHEAD=$(git rev-list --count "origin/$CURRENT_BRANCH..$CURRENT_BRANCH" || echo "0")
+          else
+            # Branch doesn't exist on remote yet
+            COMMITS_AHEAD=$(git rev-list --count HEAD || echo "0")
+          fi
+
+          echo "commits_ahead=$COMMITS_AHEAD" >> $GITHUB_OUTPUT
+
+          echo "📊 Status Check:"
+          echo "  Current branch: $CURRENT_BRANCH"
+          echo "  Default branch: $DEFAULT_BRANCH"
+          echo "  Commits ahead: $COMMITS_AHEAD"
+
+          if [ "$COMMITS_AHEAD" -eq 0 ] && [ "${{ inputs.force }}" != "true" ]; then
+            echo "sync_needed=false" >> $GITHUB_OUTPUT
+            echo "✅ No commits to sync"
+          else
+            echo "sync_needed=true" >> $GITHUB_OUTPUT
+            echo "🔄 Sync needed"
+          fi
+
+      - name: Authenticate with GCloud (if secrets available)
+        if: steps.check.outputs.sync_needed == 'true'
+        continue-on-error: true
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+        run: |
+          if [ -n "$GCP_SA_KEY" ]; then
+            echo "🔐 GCloud service account key found, authenticating..."
+            echo "$GCP_SA_KEY" | base64 -d > /tmp/gcp-key.json
+            gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
+            rm /tmp/gcp-key.json
+            echo "✅ GCloud authentication successful"
+            echo "gcloud_authenticated=true" >> $GITHUB_ENV
+          else
+            echo "⚠️  No GCP_SA_KEY secret - skipping GCloud auth"
+            echo "gcloud_authenticated=false" >> $GITHUB_ENV
+          fi
+
+      - name: Retrieve PAT from GCloud Secrets (if available)
+        if: steps.check.outputs.sync_needed == 'true' && env.gcloud_authenticated == 'true'
+        continue-on-error: true
+        run: |
+          PROJECT_ID="dominion-core-prod"
+          SECRET_NAME="github-pat"
+
+          if gcloud secrets describe "$SECRET_NAME" --project="$PROJECT_ID" &>/dev/null; then
+            echo "🔓 Retrieving PAT from GCloud Secrets..."
+            PAT_TOKEN=$(gcloud secrets versions access latest \
+              --secret="$SECRET_NAME" \
+              --project="$PROJECT_ID" 2>/dev/null || echo "")
+
+            if [ -n "$PAT_TOKEN" ]; then
+              echo "✅ PAT retrieved from GCloud Secrets (${PAT_TOKEN:0:15}***)"
+              echo "GITHUB_TOKEN=$PAT_TOKEN" >> $GITHUB_ENV
+              echo "using_gcloud_pat=true" >> $GITHUB_ENV
+            else
+              echo "⚠️  Failed to retrieve PAT from GCloud"
+              echo "using_gcloud_pat=false" >> $GITHUB_ENV
+            fi
+          else
+            echo "ℹ️  No github-pat secret in GCloud - will use GitHub Actions token"
+            echo "using_gcloud_pat=false" >> $GITHUB_ENV
+          fi
+
+      - name: Push commits
+        if: steps.check.outputs.sync_needed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN || github.token }}
+        run: |
+          CURRENT_BRANCH="${{ steps.check.outputs.current_branch }}"
+          COMMITS_AHEAD="${{ steps.check.outputs.commits_ahead }}"
+
+          echo "🚀 Pushing $COMMITS_AHEAD commits to origin/$CURRENT_BRANCH..."
+          echo ""
+
+          # Show what we're pushing
+          echo "📝 Commits to be pushed:"
+          git log --oneline "origin/$CURRENT_BRANCH..HEAD" 2>/dev/null || git log --oneline HEAD | head -10
+          echo ""
+
+          # Configure auth for push
+          if [ "${{ env.using_gcloud_pat }}" = "true" ]; then
+            echo "Using PAT from GCloud Secrets"
+            git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git"
+          else
+            echo "Using GitHub Actions token"
+            git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git"
+          fi
+
+          # Push
+          if git push origin "$CURRENT_BRANCH"; then
+            echo "✅ Push successful!"
+            echo "push_status=success" >> $GITHUB_ENV
+            echo "commits_pushed=$COMMITS_AHEAD" >> $GITHUB_ENV
+          else
+            echo "❌ Push failed"
+            echo "push_status=failed" >> $GITHUB_ENV
+            exit 1
+          fi
+
+      - name: Update status issue (on success)
+        if: steps.check.outputs.sync_needed == 'true' && env.push_status == 'success'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const commits = '${{ env.commits_pushed }}';
+            const branch = '${{ steps.check.outputs.current_branch }}';
+            const usingGCloudPat = '${{ env.using_gcloud_pat }}' === 'true';
+
+            // Try to find the autonomous status issue (#33)
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'autonomous'
+            });
+
+            const statusIssue = issues.data.find(issue =>
+              issue.title.includes('PHI Autonomous Report') ||
+              issue.title.includes('Commits Awaiting Push')
+            );
+
+            if (statusIssue) {
+              const comment = `## ✅ Autonomous Sync Complete
+
+            **Timestamp:** ${new Date().toISOString()}
+            **Workflow:** PHI Autonomous Sync
+            **Commits pushed:** ${commits}
+            **Branch:** \`${branch}\`
+            **Credential source:** ${usingGCloudPat ? 'GCloud Secrets Manager' : 'GitHub Actions token'}
+
+            ---
+
+            All pending commits have been successfully pushed to the remote repository.
+
+            This issue can now be closed.`;
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: statusIssue.number,
+                body: comment
+              });
+
+              // Close the issue
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: statusIssue.number,
+                state: 'closed'
+              });
+            }
+
+      - name: Report status
+        if: always()
+        run: |
+          echo ""
+          echo "═══════════════════════════════════════════════════════"
+          echo "  PHI AUTONOMOUS SYNC - FINAL STATUS"
+          echo "═══════════════════════════════════════════════════════"
+          echo ""
+          echo "Sync needed: ${{ steps.check.outputs.sync_needed }}"
+          echo "Commits ahead: ${{ steps.check.outputs.commits_ahead }}"
+          echo "Push status: ${{ env.push_status || 'skipped' }}"
+          echo "Using GCloud PAT: ${{ env.using_gcloud_pat || 'N/A' }}"
+          echo ""
+
+          if [ "${{ env.push_status }}" = "success" ]; then
+            echo "✅ PHI Autonomous Sync completed successfully"
+          elif [ "${{ steps.check.outputs.sync_needed }}" = "false" ]; then
+            echo "✅ No sync needed - repository is up to date"
+          else
+            echo "❌ Sync failed - manual intervention may be required"
+          fi
