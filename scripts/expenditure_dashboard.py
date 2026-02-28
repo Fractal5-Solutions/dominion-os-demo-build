@@ -884,7 +884,16 @@ def main():
     print("Press Ctrl+C to stop")
     print("=" * 70)
 
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    # Use environment variable to control debug mode (default: False in production)
+    debug_mode = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
+
+    if not debug_mode:
+        print()
+        print("⚠️  Production mode: Debug disabled")
+        print("   For production, use: gunicorn --bind 0.0.0.0:5000 --workers 4 expenditure_dashboard:app")
+        print()
+
+    app.run(host="0.0.0.0", port=5000, debug=debug_mode)
 
 
 if __name__ == "__main__":

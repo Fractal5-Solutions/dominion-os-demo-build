@@ -4,32 +4,47 @@ PHI Expenditure AI Optimizer
 Purpose: AI-enhanced pipeline optimization for autonomous ingestion
 Features: Confidence tuning, category prediction, vendor normalization, outlier detection
 Generated: 2026-02-27 by PHI Chief Sovereign Mode
+Type-safe with comprehensive error handling
 """
 
 import sys
 import re
 import json
+import logging
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Any
 from datetime import datetime
 from difflib import SequenceMatcher
+
+# Setup logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 
 class AIOptimizer:
     """AI-powered optimization for expenditure ingestion pipeline"""
 
-    def __init__(self, config_path: Optional[str] = None):
+    def __init__(self, config_path: Optional[str] = None) -> None:
         """Initialize AI optimizer with configuration"""
         self.config_path = config_path or Path(__file__).parent / "ai_optimization_config.json"
-        self.config = self.load_config()
-        self.vendor_patterns = self.build_vendor_patterns()
-        self.category_rules = self.build_category_rules()
+        self.config: Dict[str, Any] = self.load_config()
+        self.vendor_patterns: Dict[str, List[str]] = self.build_vendor_patterns()
+        self.category_rules: List[Dict[str, Any]] = self.build_category_rules()
+        logger.info("AI Optimizer initialized successfully")
 
-    def load_config(self) -> Dict:
+    def load_config(self) -> Dict[str, Any]:
         """Load AI optimization configuration"""
-        if Path(self.config_path).exists():
-            with open(self.config_path, 'r') as f:
-                return json.load(f)
+        try:
+            if Path(self.config_path).exists():
+                with open(self.config_path, 'r', encoding='utf-8') as f:
+                    config = json.load(f)
+                    logger.info(f"Loaded configuration from {self.config_path}")
+                    return config
+        except (json.JSONDecodeError, IOError) as e:
+            logger.warning(f"Failed to load config: {e}. Using defaults.")
 
         # Default configuration
         return {

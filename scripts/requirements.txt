@@ -20,8 +20,8 @@ cryptography>=41.0.0
 # Excel Export (Optional)
 # openpyxl>=3.1.2
 
-# Production WSGI Server (Optional for deployment)
-# gunicorn>=21.2.0
+# Production WSGI Server
+gunicorn>=21.2.0
 
 # Testing (Optional)
 # pytest>=7.4.0

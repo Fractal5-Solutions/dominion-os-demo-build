@@ -2,12 +2,16 @@
 # PHI Chief - Start All Systems
 # Comprehensive system activation and validation
 
-set -e
+set -euo pipefail
 
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+RED='\033[0;31m'
 NC='\033[0m'
+
+# Trap errors
+trap 'echo -e "${RED}ERROR: Script failed at line $LINENO${NC}"; exit 1' ERR
 
 echo "========================================="
 echo "PHI CHIEF - START ALL SYSTEMS"
@@ -18,11 +22,10 @@ echo ""
 
 # Step 1: Verify GCP Authentication
 echo -e "${BLUE}[1/6] Verifying GCP Authentication...${NC}"
-if gcloud auth list --filter=status:ACTIVE --format="value(account)" > /dev/null 2>&1; then
-    ACCOUNT=$(gcloud auth list --filter=status:ACTIVE --format="value(account)")
+if ACCOUNT=$(gcloud auth list --filter=status:ACTIVE --format="value(account)" 2>/dev/null) && [ -n "$ACCOUNT" ]; then
     echo -e "${GREEN}✅ Authenticated as: $ACCOUNT${NC}"
 else
-    echo -e "${YELLOW}⚠️  GCP authentication expired${NC}"
+    echo -e "${RED}❌ GCP authentication required${NC}"
     echo "Please run: gcloud auth login"
     exit 1
 fi
@@ -44,13 +47,14 @@ total2=$(gcloud run services list --format="value(metadata.name)" 2>/dev/null | 
 total=$((total1 + total2))
 ready=$((ready1 + ready2))
 
-if [ $total -eq 0 ]; then
-    echo -e "${YELLOW}⚠️  No services found - authentication may be required${NC}"
+if [ "$total" -eq 0 ]; then
+    echo -e "${RED}❌ No services found - Please check authentication${NC}"
     exit 1
-elif [ $ready -eq $total ]; then
+elif [ "$ready" -eq "$total" ]; then
     echo -e "${GREEN}✅ Infrastructure: $ready/$total services operational (100%)${NC}"
 else
-    echo -e "${YELLOW}⚠️  Infrastructure: $ready/$total services operational ($(( ready * 100 / total ))%)${NC}"
+    health_pct=$((ready * 100 / total))
+    echo -e "${YELLOW}⚠️  Infrastructure: $ready/$total services operational (${health_pct}%)${NC}"
 fi
 echo ""
 
@@ -82,7 +86,7 @@ echo ""
 echo "Infrastructure:"
 echo "  • Total Services: $total"
 echo "  • Operational: $ready"
-echo "  • Health: $(( ready * 100 / total ))%"
+echo "  • Health: $((ready * 100 / total))%"
 echo ""
 echo "Components:"
 echo "  • AI Gateways: $gateway_count"

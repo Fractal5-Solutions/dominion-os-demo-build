@@ -4,9 +4,9 @@
 # Authority: Level 9/9 Sovereign Power
 # Interval: Every 15 minutes
 
-set -e
+set -euo pipefail
 
-TELEMETRY_DIR="/workspaces/dominion-os-demo-build/telemetry"
+TELEMETRY_DIR="${TELEMETRY_DIR:-/workspaces/dominion-os-demo-build/telemetry}"
 PERFORMANCE_DIR="$TELEMETRY_DIR/performance"
 LOG_FILE="$TELEMETRY_DIR/performance.log"
 STOP_FILE="$TELEMETRY_DIR/STOP_AUTONOMOUS"
@@ -16,6 +16,9 @@ mkdir -p "$PERFORMANCE_DIR"
 log() {
     echo "[$(date -u +"%Y-%m-%d %H:%M:%S UTC")] $1" | tee -a "$LOG_FILE"
 }
+
+# Trap errors
+trap 'log "ERROR: Script failed at line $LINENO"' ERR
 
 # Banner
 cat << 'EOF' | tee -a "$LOG_FILE"
