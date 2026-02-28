@@ -69,48 +69,17 @@ jobs:
             echo "🔄 Sync needed"
           fi
 
-      - name: Authenticate with GCloud (if secrets available)
+      - name: Check for organization PAT secret
         if: steps.check.outputs.sync_needed == 'true'
         continue-on-error: true
-        env:
-          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
         run: |
-          if [ -n "$GCP_SA_KEY" ]; then
-            echo "🔐 GCloud service account key found, authenticating..."
-            echo "$GCP_SA_KEY" | base64 -d > /tmp/gcp-key.json
-            gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
-            rm /tmp/gcp-key.json
-            echo "✅ GCloud authentication successful"
-            echo "gcloud_authenticated=true" >> $GITHUB_ENV
+          if [ -n "${{ secrets.GITHUB_PAT }}" ]; then
+            echo "🔐 Organization PAT secret found"
+            echo "GITHUB_TOKEN=${{ secrets.GITHUB_PAT }}" >> $GITHUB_ENV
+            echo "using_org_pat=true" >> $GITHUB_ENV
           else
-            echo "⚠️  No GCP_SA_KEY secret - skipping GCloud auth"
-            echo "gcloud_authenticated=false" >> $GITHUB_ENV
-          fi
-
-      - name: Retrieve PAT from GCloud Secrets (if available)
-        if: steps.check.outputs.sync_needed == 'true' && env.gcloud_authenticated == 'true'
-        continue-on-error: true
-        run: |
-          PROJECT_ID="dominion-core-prod"
-          SECRET_NAME="github-pat"
-
-          if gcloud secrets describe "$SECRET_NAME" --project="$PROJECT_ID" &>/dev/null; then
-            echo "🔓 Retrieving PAT from GCloud Secrets..."
-            PAT_TOKEN=$(gcloud secrets versions access latest \
-              --secret="$SECRET_NAME" \
-              --project="$PROJECT_ID" 2>/dev/null || echo "")
-
-            if [ -n "$PAT_TOKEN" ]; then
-              echo "✅ PAT retrieved from GCloud Secrets (${PAT_TOKEN:0:15}***)"
-              echo "GITHUB_TOKEN=$PAT_TOKEN" >> $GITHUB_ENV
-              echo "using_gcloud_pat=true" >> $GITHUB_ENV
-            else
-              echo "⚠️  Failed to retrieve PAT from GCloud"
-              echo "using_gcloud_pat=false" >> $GITHUB_ENV
-            fi
-          else
-            echo "ℹ️  No github-pat secret in GCloud - will use GitHub Actions token"
-            echo "using_gcloud_pat=false" >> $GITHUB_ENV
+            echo "ℹ️  No organization PAT secret - will use GitHub Actions token"
+            echo "using_org_pat=false" >> $GITHUB_ENV
           fi
 
       - name: Push commits
@@ -130,8 +99,8 @@ jobs:
           echo ""
 
           # Configure auth for push
-          if [ "${{ env.using_gcloud_pat }}" = "true" ]; then
-            echo "Using PAT from GCloud Secrets"
+          if [ "${{ env.using_org_pat }}" = "true" ]; then
+            echo "Using organization PAT secret"
             git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git"
           else
             echo "Using GitHub Actions token"
@@ -156,7 +125,7 @@ jobs:
           script: |
             const commits = '${{ env.commits_pushed }}';
             const branch = '${{ steps.check.outputs.current_branch }}';
-            const usingGCloudPat = '${{ env.using_gcloud_pat }}' === 'true';
+            const usingOrgPat = '${{ env.using_org_pat }}' === 'true';
 
             // Try to find the autonomous status issue (#33)
             const issues = await github.rest.issues.listForRepo({
@@ -178,7 +147,7 @@ jobs:
             **Workflow:** PHI Autonomous Sync
             **Commits pushed:** ${commits}
             **Branch:** \`${branch}\`
-            **Credential source:** ${usingGCloudPat ? 'GCloud Secrets Manager' : 'GitHub Actions token'}
+            **Credential source:** ${usingOrgPat ? 'GitHub Organization PAT' : 'GitHub Actions token'}
 
             ---
 
@@ -213,7 +182,7 @@ jobs:
           echo "Sync needed: ${{ steps.check.outputs.sync_needed }}"
           echo "Commits ahead: ${{ steps.check.outputs.commits_ahead }}"
           echo "Push status: ${{ env.push_status || 'skipped' }}"
-          echo "Using GCloud PAT: ${{ env.using_gcloud_pat || 'N/A' }}"
+          echo "Using organization PAT: ${{ env.using_org_pat || 'N/A' }}"
           echo ""
 
           if [ "${{ env.push_status }}" = "success" ]; then
