@@ -33,6 +33,18 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.ref }}
 
+      - name: Check Organization PAT
+        run: |
+          if [ -n "${{ secrets.GITHUB_PAT }}" ]; then
+            echo "using_org_pat=true" >> $GITHUB_ENV
+            echo "GITHUB_TOKEN=${{ secrets.GITHUB_PAT }}" >> $GITHUB_ENV
+            echo "🔐 Using organization PAT secret"
+          else
+            echo "using_org_pat=false" >> $GITHUB_ENV
+            echo "GITHUB_TOKEN=${{ github.token }}" >> $GITHUB_ENV
+            echo "🔑 Using GitHub Actions token (fallback)"
+          fi
+
       - name: Configure Git
         run: |
           git config user.name "PHI-Autonomous"
@@ -99,6 +111,19 @@ jobs:
           fi
 
           echo "✅ Enterprise compliance check passed"
+
+      - name: Check for organization PAT secret
+        if: steps.check.outputs.sync_needed == 'true'
+        continue-on-error: true
+        run: |
+          if [ -n "${{ secrets.GITHUB_PAT }}" ]; then
+            echo "🔐 Organization PAT secret found"
+            echo "GITHUB_TOKEN=${{ secrets.GITHUB_PAT }}" >> $GITHUB_ENV
+            echo "using_org_pat=true" >> $GITHUB_ENV
+          else
+            echo "ℹ️  No organization PAT secret - will use GitHub Actions token"
+            echo "using_org_pat=false" >> $GITHUB_ENV
+          fi
 
       - name: Audit Log Entry
         if: steps.check.outputs.sync_needed == 'true'
