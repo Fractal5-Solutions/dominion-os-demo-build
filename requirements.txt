@@ -12,6 +12,7 @@ numpy>=1.21.0
 
 # Web framework (if needed)
 flask>=2.2.0
+gunicorn>=21.2.0
 
 # Database (if needed)
 sqlalchemy>=1.4.0
@@ -30,4 +31,4 @@ PyGitHub>=1.55
 
 # Enterprise features
 azure-identity>=1.10.0
-google-cloud-secretmanager>=2.12.0
+google-cloud-secret-manager>=2.12.0

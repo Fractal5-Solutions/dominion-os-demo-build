@@ -186,8 +186,8 @@ if SQLALCHEMY_AVAILABLE:
         updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
         ledger_hash = Column(String(64), nullable=False)  # SHA-256 hash
 
-        # Metadata (JSONB for flexible attributes)
-        metadata = Column(JSONB, nullable=True)
+        # Extra metadata (JSONB for flexible attributes) - renamed from 'metadata' to avoid SQLAlchemy reserved name
+        extra_metadata = Column(JSONB, nullable=True)
 
         # Relationships
         audit_logs = relationship("ExpenditureAuditLog", back_populates="expenditure")
@@ -285,9 +285,9 @@ if SQLALCHEMY_AVAILABLE:
         # Default category
         default_category = Column(SQLEnum(ExpenditureCategory), nullable=True)
 
-        # Metadata
+        # Extra metadata - renamed from 'metadata' to avoid SQLAlchemy reserved name
         notes = Column(Text, nullable=True)
-        metadata = Column(JSONB, nullable=True)
+        extra_metadata = Column(JSONB, nullable=True)
 
         # Audit
         created_at = Column(DateTime, default=datetime.utcnow)

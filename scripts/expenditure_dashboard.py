@@ -8,23 +8,24 @@ Tech Stack: Flask + Bootstrap + Chart.js
 Status: IMPLEMENTATION READY
 """
 
-from flask import Flask, render_template, request, jsonify, send_file
-from datetime import datetime, timedelta
-from typing import List, Dict, Any, Optional
 import json
 import os
+from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+from flask import Flask, jsonify, render_template, request, send_file
 
 # Import expenditure models
 try:
-    from expenditure_models import (
-        ExpenditureDatabase,
-        ExpenditureCategory,
-        PaymentStatus,
-        ExtractionConfidence,
-        SQLALCHEMY_AVAILABLE,
-    )
     from expenditure_exports import export_to_csv, export_to_quickbooks
+    from expenditure_models import (
+        SQLALCHEMY_AVAILABLE,
+        ExpenditureCategory,
+        ExpenditureDatabase,
+        ExtractionConfidence,
+        PaymentStatus,
+    )
 
     MODELS_AVAILABLE = True
 except ImportError:
@@ -35,6 +36,7 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET_KEY", "phi-dominion-os-2026")
 
 # Database connection (configure in environment)
+# NOTE: Default includes password for local dev only - DEMO_MODE bypasses database entirely
 DB_CONNECTION = os.environ.get(
     "EXPENDITURE_DB",
     "postgresql://phi_admin:secure_password@localhost:5432/expenditures",
@@ -42,11 +44,101 @@ DB_CONNECTION = os.environ.get(
 
 # Initialize database if available
 db = None
-if MODELS_AVAILABLE:
+DEMO_MODE = os.environ.get("DEMO_MODE", "true").lower() == "true"
+
+if MODELS_AVAILABLE and not DEMO_MODE:
     try:
         db = ExpenditureDatabase(DB_CONNECTION)
+        print("✅ Database connected")
     except Exception as e:
         print(f"⚠️  Database connection failed: {e}")
+        print("💡 Running in DEMO_MODE - API endpoints will return sample data")
+        DEMO_MODE = True
+else:
+    print("💡 Running in DEMO_MODE - API endpoints will return sample data")
+    DEMO_MODE = True
+
+
+# ============================================================================
+# DEMO DATA GENERATOR
+# ============================================================================
+
+
+def generate_demo_summary():
+    """Generate sample summary data for demo mode"""
+    now = datetime.now()
+    return {
+        "current_month": {
+            "total": 45678.90,
+            "count": 142,
+            "month": now.strftime("%B %Y"),
+        },
+        "ytd": {"total": 523456.78, "count": 1847},
+        "top_vendors": [
+            {"vendor": "AWS", "amount": 89234.50},
+            {"vendor": "Microsoft Azure", "amount": 67890.25},
+            {"vendor": "Google Cloud", "amount": 45678.30},
+            {"vendor": "GitHub", "amount": 23456.00},
+            {"vendor": "Atlassian", "amount": 12345.67},
+        ],
+        "by_category": [
+            {"category": "Cloud Services", "amount": 202803.05},
+            {"category": "Software Licenses", "amount": 145678.90},
+            {"category": "Professional Services", "amount": 89234.56},
+            {"category": "Hardware", "amount": 45678.12},
+            {"category": "Office Supplies", "amount": 23456.78},
+            {"category": "Marketing", "amount": 16605.37},
+        ],
+        "by_company": [
+            {"company": "Fractal5Solutions", "amount": 345678.90},
+            {"company": "TechStartupCo", "amount": 123456.78},
+            {"company": "InnovateNow", "amount": 54321.10},
+        ],
+        "verification": {"verified": 1234, "pending": 613, "percent_verified": 66.8},
+    }
+
+
+def generate_demo_expenditures(limit=100):
+    """Generate sample expenditure data for demo mode"""
+    vendors = [
+        "AWS",
+        "Microsoft",
+        "Google Cloud",
+        "GitHub",
+        "Atlassian",
+        "Stripe",
+        "Twilio",
+        "SendGrid",
+    ]
+    categories = [
+        "Cloud Services",
+        "Software Licenses",
+        "Professional Services",
+        "Hardware",
+        "Office Supplies",
+    ]
+    companies = ["Fractal5Solutions", "TechStartupCo", "InnovateNow"]
+
+    expenditures = []
+    for i in range(min(limit, 100)):
+        days_ago = i * 2
+        expenditures.append(
+            {
+                "id": f"EXP-{1000+i:04d}",
+                "company": companies[i % len(companies)],
+                "date": (datetime.now() - timedelta(days=days_ago)).strftime("%Y-%m-%d"),
+                "amount": round(100 + (i * 123.45) % 5000, 2),
+                "currency": "USD",
+                "category": categories[i % len(categories)],
+                "vendor": vendors[i % len(vendors)],
+                "description": f"Sample transaction {i+1} for demo purposes",
+                "invoice_number": f"INV-{2000+i:04d}",
+                "status": "paid" if i % 3 == 0 else "pending",
+                "verified": i % 4 == 0,
+                "confidence": "high" if i % 2 == 0 else "medium",
+            }
+        )
+    return expenditures
 
 
 # ============================================================================
@@ -60,6 +152,22 @@ def index():
     return render_template("dashboard.html")
 
 
+@app.route("/health")
+def health():
+    """Health check endpoint for container orchestration"""
+    return (
+        jsonify(
+            {
+                "status": "healthy",
+                "demo_mode": DEMO_MODE,
+                "database_available": db is not None,
+                "models_available": MODELS_AVAILABLE,
+            }
+        ),
+        200,
+    )
+
+
 @app.route("/api/summary")
 def api_summary():
     """
@@ -68,6 +176,9 @@ def api_summary():
     Returns:
         JSON with current month spend, YTD, top vendors, category breakdown
     """
+    if DEMO_MODE:
+        return jsonify(generate_demo_summary())
+
     if not db:
         return jsonify({"error": "Database not available"}), 503
 
@@ -76,14 +187,10 @@ def api_summary():
         now = datetime.now()
         month_start = datetime(now.year, now.month, 1)
         month_end = (
-            datetime(now.year, now.month + 1, 1)
-            if now.month < 12
-            else datetime(now.year + 1, 1, 1)
+            datetime(now.year, now.month + 1, 1) if now.month < 12 else datetime(now.year + 1, 1, 1)
         )
 
-        current_month_expenses = db.get_expenditures_by_date_range(
-            month_start, month_end
-        )
+        current_month_expenses = db.get_expenditures_by_date_range(month_start, month_end)
 
         # YTD
         year_start = datetime(now.year, 1, 1)
@@ -98,9 +205,7 @@ def api_summary():
         for exp in ytd_expenses:
             vendor_totals[exp.vendor] = vendor_totals.get(exp.vendor, 0) + exp.amount
 
-        top_vendors = sorted(vendor_totals.items(), key=lambda x: x[1], reverse=True)[
-            :10
-        ]
+        top_vendors = sorted(vendor_totals.items(), key=lambda x: x[1], reverse=True)[:10]
 
         # Category breakdown (YTD)
         category_totals = {}
@@ -111,9 +216,7 @@ def api_summary():
         # By company (YTD)
         company_totals = {}
         for exp in ytd_expenses:
-            company_totals[exp.company] = (
-                company_totals.get(exp.company, 0) + exp.amount
-            )
+            company_totals[exp.company] = company_totals.get(exp.company, 0) + exp.amount
 
         # Verification status
         verified_count = sum(1 for exp in ytd_expenses if exp.human_verified)
@@ -127,26 +230,19 @@ def api_summary():
                     "month": now.strftime("%B %Y"),
                 },
                 "ytd": {"total": round(ytd_total, 2), "count": len(ytd_expenses)},
-                "top_vendors": [
-                    {"vendor": v, "amount": round(a, 2)} for v, a in top_vendors
-                ],
+                "top_vendors": [{"vendor": v, "amount": round(a, 2)} for v, a in top_vendors],
                 "by_category": [
                     {"category": c, "amount": round(a, 2)}
-                    for c, a in sorted(
-                        category_totals.items(), key=lambda x: x[1], reverse=True
-                    )
+                    for c, a in sorted(category_totals.items(), key=lambda x: x[1], reverse=True)
                 ],
                 "by_company": [
-                    {"company": c, "amount": round(a, 2)}
-                    for c, a in company_totals.items()
+                    {"company": c, "amount": round(a, 2)} for c, a in company_totals.items()
                 ],
                 "verification": {
                     "verified": verified_count,
                     "pending": pending_count,
                     "percent_verified": round(
-                        (verified_count / len(ytd_expenses) * 100)
-                        if ytd_expenses
-                        else 0,
+                        (verified_count / len(ytd_expenses) * 100) if ytd_expenses else 0,
                         1,
                     ),
                 },
@@ -181,6 +277,11 @@ def api_expenditures():
         verified: true/false/all
         limit: Number of results
     """
+    if DEMO_MODE:
+        limit = int(request.args.get("limit", 100))
+        expenditures = generate_demo_expenditures(limit)
+        return jsonify({"expenditures": expenditures, "count": len(expenditures)})
+
     if not db:
         return jsonify({"error": "Database not available"}), 503
 
@@ -210,9 +311,7 @@ def api_expenditures():
         # Apply filters
         if category_str:
             expenditures = [
-                exp
-                for exp in expenditures
-                if exp.category.value == category_str if exp.category else False
+                exp for exp in expenditures if exp.category and exp.category.value == category_str
             ]
 
         if verified_filter == "true":
@@ -233,15 +332,15 @@ def api_expenditures():
                 "currency": exp.currency,
                 "category": exp.category.value if exp.category else None,
                 "vendor": exp.vendor,
-                "description": exp.description[:100] + "..."
-                if len(exp.description) > 100
-                else exp.description,
+                "description": (
+                    exp.description[:100] + "..." if len(exp.description) > 100 else exp.description
+                ),
                 "invoice_number": exp.invoice_number,
                 "status": exp.payment_status.value if exp.payment_status else None,
                 "verified": exp.human_verified,
-                "confidence": exp.extraction_confidence.value
-                if exp.extraction_confidence
-                else None,
+                "confidence": (
+                    exp.extraction_confidence.value if exp.extraction_confidence else None
+                ),
             }
             for exp in expenditures
         ]
@@ -255,6 +354,12 @@ def api_expenditures():
 @app.route("/api/expenditures/<expenditure_id>")
 def api_expenditure_detail(expenditure_id: str):
     """Get detailed information for a specific expenditure"""
+    if DEMO_MODE:
+        demo_exp = generate_demo_expenditures(1)[0]
+        demo_exp["id"] = expenditure_id
+        demo_exp["extra_metadata"] = {"source": "demo", "note": "Sample data for demonstration"}
+        return jsonify(demo_exp)
+
     if not db:
         return jsonify({"error": "Database not available"}), 503
 
@@ -262,11 +367,7 @@ def api_expenditure_detail(expenditure_id: str):
         session = db.Session()
         from expenditure_models import Expenditure
 
-        expenditure = (
-            session.query(Expenditure)
-            .filter_by(expenditure_id=expenditure_id)
-            .first()
-        )
+        expenditure = session.query(Expenditure).filter_by(expenditure_id=expenditure_id).first()
 
         if not expenditure:
             return jsonify({"error": "Expenditure not found"}), 404
@@ -285,25 +386,27 @@ def api_expenditure_detail(expenditure_id: str):
             "notes": expenditure.notes,
             "invoice_number": expenditure.invoice_number,
             "payment_method": expenditure.payment_method,
-            "payment_status": expenditure.payment_status.value
-            if expenditure.payment_status
-            else None,
+            "payment_status": (
+                expenditure.payment_status.value if expenditure.payment_status else None
+            ),
             "tax_amount": expenditure.tax_amount,
             "tax_type": expenditure.tax_type,
             "tax_deductible": expenditure.tax_deductible,
             "receipt_url": expenditure.receipt_url,
-            "data_source": expenditure.data_source.value
-            if expenditure.data_source
-            else None,
+            "data_source": expenditure.data_source.value if expenditure.data_source else None,
             "source_email_id": expenditure.source_email_id,
-            "confidence": expenditure.extraction_confidence.value
-            if expenditure.extraction_confidence
-            else None,
+            "confidence": (
+                expenditure.extraction_confidence.value
+                if expenditure.extraction_confidence
+                else None
+            ),
             "verified": expenditure.human_verified,
             "verified_by": expenditure.verified_by,
-            "verified_at": expenditure.verified_at.strftime("%Y-%m-%d %H:%M:%S")
-            if expenditure.verified_at
-            else None,
+            "verified_at": (
+                expenditure.verified_at.strftime("%Y-%m-%d %H:%M:%S")
+                if expenditure.verified_at
+                else None
+            ),
             "created_by": expenditure.created_by,
             "created_at": expenditure.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             "ledger_hash": expenditure.ledger_hash,
@@ -331,6 +434,10 @@ def verify_page():
 @app.route("/api/pending_verification")
 def api_pending_verification():
     """Get expenditures pending human verification"""
+    if DEMO_MODE:
+        pending = [exp for exp in generate_demo_expenditures(50) if not exp["verified"]]
+        return jsonify({"pending": pending, "count": len(pending)})
+
     if not db:
         return jsonify({"error": "Database not available"}), 503
 
@@ -382,6 +489,15 @@ def api_verify(expenditure_id: str):
             "updates": {optional field updates}
         }
     """
+    if DEMO_MODE:
+        return jsonify(
+            {
+                "success": True,
+                "message": "Demo mode: verification simulated",
+                "expenditure_id": expenditure_id,
+            }
+        )
+
     if not db:
         return jsonify({"error": "Database not available"}), 503
 
@@ -396,9 +512,7 @@ def api_verify(expenditure_id: str):
             from expenditure_models import Expenditure
 
             expenditure = (
-                session.query(Expenditure)
-                .filter_by(expenditure_id=expenditure_id)
-                .first()
+                session.query(Expenditure).filter_by(expenditure_id=expenditure_id).first()
             )
 
             if expenditure:
@@ -439,6 +553,10 @@ def api_report_category():
         end_date: YYYY-MM-DD
         company: Optional company filter
     """
+    if DEMO_MODE:
+        demo_summary = generate_demo_summary()
+        return jsonify({"categories": demo_summary["by_category"]})
+
     if not db:
         return jsonify({"error": "Database not available"}), 503
 
@@ -518,6 +636,19 @@ def api_report_monthly_trend():
     Query params:
         company: Optional company filter
     """
+    if DEMO_MODE:
+        months = []
+        for i in range(12):
+            date = datetime.now() - timedelta(days=30 * i)
+            months.append(
+                {
+                    "month": date.strftime("%Y-%m"),
+                    "total": round(30000 + (i * 2000) % 20000, 2),
+                    "count": 120 + (i * 10),
+                }
+            )
+        return jsonify({"months": list(reversed(months))})
+
     if not db:
         return jsonify({"error": "Database not available"}), 503
 
@@ -561,6 +692,9 @@ def api_report_monthly_trend():
 @app.route("/api/export/csv")
 def api_export_csv():
     """Export expenditures to CSV"""
+    if DEMO_MODE:
+        return jsonify({"error": "Export not available in demo mode"}), 503
+
     if not db:
         return jsonify({"error": "Database not available"}), 503
 
@@ -589,6 +723,7 @@ def api_export_csv():
 
         # Return as downloadable file
         from flask import Response
+
         return Response(csv_data, headers=headers)
 
     except Exception as e:
@@ -598,6 +733,9 @@ def api_export_csv():
 @app.route("/api/export/quickbooks")
 def api_export_quickbooks():
     """Export expenditures to QuickBooks IIF format"""
+    if DEMO_MODE:
+        return jsonify({"error": "Export not available in demo mode"}), 503
+
     if not db:
         return jsonify({"error": "Database not available"}), 503
 
@@ -626,6 +764,7 @@ def api_export_quickbooks():
 
         # Return as downloadable file
         from flask import Response
+
         return Response(iif_data, headers=headers)
 
     except Exception as e:
@@ -646,6 +785,24 @@ def recurring_page():
 @app.route("/api/recurring")
 def api_recurring():
     """Get recurring expenditures"""
+    if DEMO_MODE:
+        recurring = [
+            {"vendor": "AWS", "amount": 5000.00, "frequency": "monthly", "next_date": "2026-03-15"},
+            {
+                "vendor": "GitHub",
+                "amount": 420.00,
+                "frequency": "monthly",
+                "next_date": "2026-03-01",
+            },
+            {
+                "vendor": "Atlassian",
+                "amount": 150.00,
+                "frequency": "monthly",
+                "next_date": "2026-03-10",
+            },
+        ]
+        return jsonify({"recurring": recurring, "count": len(recurring)})
+
     if not db:
         return jsonify({"error": "Database not available"}), 503
 
