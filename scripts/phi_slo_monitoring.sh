@@ -12,18 +12,34 @@ echo "Execution: Weekly automated review"
 echo "Timestamp: $(date)"
 echo ""
 
+# ============================================================================
+# GCP Project Configuration - PROJECT ID vs DISPLAY NAME
+# ============================================================================
+# Scripts must use Project IDs (permanent identifiers), not display names (UI labels)
+#
+# Development/Staging: dominion-os-1-0-main → Display: "Dominion Core Dev"
+# Production: dominion-core-prod → Display: "dominion-core-prod"
+#
+# Display names visible in GCP Console improve clarity for Matthew.
+# Project IDs in code ensure infrastructure stability (immutable after creation).
+# ============================================================================
+
 # Critical services with 99.9% SLO targets
+# P1: Development/Staging Environment (dominion-os-1-0-main / "Dominion Core Dev")
+# These are tested/validated services promoted from development
 CRITICAL_SERVICES_P1=(
-    "dominion-ai-gateway"
-    "dominion-os-api"
-    "dominion-os-1-0"
-    "dominion-f5-gateway"
+    "dominion-ai-gateway"    # AI Gateway - DEV
+    "dominion-os-api"        # Core API - DEV
+    "dominion-os-1-0"        # Runtime - DEV
+    "dominion-f5-gateway"    # F5 Gateway - DEV
 )
 
+# P2: Production Environment (dominion-core-prod)
+# Customer-facing services with strict 99.9% availability requirements
 CRITICAL_SERVICES_P2=(
-    "dominion-api"
-    "dominion-os"
-    "api"
+    "dominion-api"           # Core API - PROD
+    "dominion-os"            # Runtime - PROD (3x instances)
+    "api"                    # Generic API - PROD
 )
 
 # Function to check SLO compliance

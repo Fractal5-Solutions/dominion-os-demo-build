@@ -31,12 +31,16 @@ echo ""
 # Step 2: Verify Infrastructure Health
 echo -e "${BLUE}[2/6] Scanning Infrastructure Health...${NC}"
 
-echo "Checking dominion-os-1-0-main..."
+# Development & Staging Environment (9 services)
+# Purpose: Testing, validation, operational tooling | SLO: 95%+ (best effort)
+echo "Checking dominion-os-1-0-main (DEV/STAGING)..."
 gcloud config set project dominion-os-1-0-main --quiet 2>&1 | grep -v environment || true
 ready1=$(gcloud run services list --format="value(status.conditions[0].status)" 2>/dev/null | grep -c "True" || echo "0")
 total1=$(gcloud run services list --format="value(metadata.name)" 2>/dev/null | wc -l || echo "0")
 
-echo "Checking dominion-core-prod..."
+# Production Environment (13 services)
+# Purpose: Customer-facing services, revenue generation | SLO: 99.9% availability
+echo "Checking dominion-core-prod (PRODUCTION)..."
 gcloud config set project dominion-core-prod --quiet 2>&1 | grep -v environment || true
 ready2=$(gcloud run services list --format="value(status.conditions[0].status)" 2>/dev/null | grep -c "True" || echo "0")
 total2=$(gcloud run services list --format="value(metadata.name)" 2>/dev/null | wc -l || echo "0")

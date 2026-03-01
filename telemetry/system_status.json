@@ -1,15 +1,15 @@
 {
-  "timestamp": "2026-02-26T11:35:45+00:00",
+  "timestamp": "2026-03-01T13:22:08Z",
   "status": "operational",
   "infrastructure": {
-    "total_services": 22,
-    "operational_services": 22,
+    "total_services": 24,
+    "operational_services": 24,
     "health_percentage": 100
   },
   "components": {
     "ai_gateways": 2,
     "phi_uis": 1,
-    "core_apis": 2
+    "core_apis": 3
   },
   "projects": {
     "dominion-os-1-0-main": {
@@ -17,8 +17,14 @@
       "total": 9
     },
     "dominion-core-prod": {
-      "operational": 13,
-      "total": 13
+      "operational": 15,
+      "total": 15
     }
+  },
+  "git": {
+    "local_sha": "cb48d8162",
+    "remote_sha": "dfc447f73",
+    "commits_ahead": 4,
+    "can_push": false
   }
 }
