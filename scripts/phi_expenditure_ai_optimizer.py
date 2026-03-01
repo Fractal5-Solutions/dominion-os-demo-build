@@ -7,19 +7,18 @@ Generated: 2026-02-27 by PHI Chief Sovereign Mode
 Type-safe with comprehensive error handling
 """
 
-import sys
-import re
 import json
 import logging
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
+import re
+import sys
 from datetime import datetime
 from difflib import SequenceMatcher
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -39,7 +38,7 @@ class AIOptimizer:
         """Load AI optimization configuration"""
         try:
             if Path(self.config_path).exists():
-                with open(self.config_path, 'r', encoding='utf-8') as f:
+                with open(self.config_path, "r", encoding="utf-8") as f:
                     config = json.load(f)
                     logger.info(f"Loaded configuration from {self.config_path}")
                     return config
@@ -53,29 +52,29 @@ class AIOptimizer:
                 "confidence_tuning": {
                     "enabled": True,
                     "thresholds": {"high": 0.9, "medium": 0.7, "low": 0.5},
-                    "auto_verify_high": True
+                    "auto_verify_high": True,
                 },
                 "category_prediction": {
                     "enabled": True,
                     "model": "pattern_matching_v1",
-                    "confidence_threshold": 0.85
+                    "confidence_threshold": 0.85,
                 },
                 "vendor_normalization": {
                     "enabled": True,
                     "fuzzy_matching": True,
-                    "auto_create_vendors": False
+                    "auto_create_vendors": False,
                 },
                 "amount_validation": {
                     "enabled": True,
                     "outlier_detection": True,
-                    "statistical_method": "iqr"
+                    "statistical_method": "iqr",
                 },
                 "tax_calculation": {
                     "enabled": True,
                     "auto_detect_region": True,
-                    "default_rate": 0.13
-                }
-            }
+                    "default_rate": 0.13,
+                },
+            },
         }
 
     def build_vendor_patterns(self) -> Dict[str, List[str]]:
@@ -110,54 +109,94 @@ class AIOptimizer:
         return [
             {
                 "category": "Cloud Services",
-                "keywords": ["cloud", "aws", "azure", "gcp", "hosting", "server", "compute", "storage", "cdn"],
-                "vendors": ["google cloud", "amazon web services", "microsoft azure", "digitalocean", "cloudflare"]
+                "keywords": [
+                    "cloud",
+                    "aws",
+                    "azure",
+                    "gcp",
+                    "hosting",
+                    "server",
+                    "compute",
+                    "storage",
+                    "cdn",
+                ],
+                "vendors": [
+                    "google cloud",
+                    "amazon web services",
+                    "microsoft azure",
+                    "digitalocean",
+                    "cloudflare",
+                ],
             },
             {
                 "category": "Software Subscriptions",
-                "keywords": ["subscription", "license", "saas", "software", "app", "tool", "service"],
-                "vendors": ["github", "atlassian", "adobe", "jetbrains", "slack", "zoom", "docusign"]
+                "keywords": [
+                    "subscription",
+                    "license",
+                    "saas",
+                    "software",
+                    "app",
+                    "tool",
+                    "service",
+                ],
+                "vendors": [
+                    "github",
+                    "atlassian",
+                    "adobe",
+                    "jetbrains",
+                    "slack",
+                    "zoom",
+                    "docusign",
+                ],
             },
             {
                 "category": "Marketing & Advertising",
                 "keywords": ["ads", "advertising", "marketing", "campaign", "ppc", "social media"],
-                "vendors": ["google ads", "facebook", "linkedin", "twitter", "instagram"]
+                "vendors": ["google ads", "facebook", "linkedin", "twitter", "instagram"],
             },
             {
                 "category": "Professional Services",
-                "keywords": ["consulting", "legal", "accounting", "cpa", "lawyer", "attorney", "professional"],
-                "vendors": ["legal", "accounting", "consulting"]
+                "keywords": [
+                    "consulting",
+                    "legal",
+                    "accounting",
+                    "cpa",
+                    "lawyer",
+                    "attorney",
+                    "professional",
+                ],
+                "vendors": ["legal", "accounting", "consulting"],
             },
             {
                 "category": "Office & Facilities",
                 "keywords": ["office", "supplies", "furniture", "workspace", "coworking", "rent"],
-                "vendors": ["wework", "regus", "staples", "office depot"]
+                "vendors": ["wework", "regus", "staples", "office depot"],
             },
             {
                 "category": "Telecommunications",
                 "keywords": ["phone", "mobile", "internet", "telecom", "wireless", "broadband"],
-                "vendors": ["rogers", "bell", "telus", "at&t", "verizon"]
+                "vendors": ["rogers", "bell", "telus", "at&t", "verizon"],
             },
             {
                 "category": "Insurance",
                 "keywords": ["insurance", "coverage", "policy", "premium"],
-                "vendors": ["manulife", "sun life", "great west", "industrial alliance"]
+                "vendors": ["manulife", "sun life", "great west", "industrial alliance"],
             },
             {
                 "category": "Domain & Hosting",
                 "keywords": ["domain", "dns", "ssl", "certificate", "hosting", "registrar"],
-                "vendors": ["godaddy", "namecheap", "google domains", "cloudflare"]
+                "vendors": ["godaddy", "namecheap", "google domains", "cloudflare"],
             },
             {
                 "category": "Payment Processing",
                 "keywords": ["payment", "processing", "gateway", "merchant", "pos", "transaction"],
-                "vendors": ["stripe", "square", "paypal", "shopify payments"]
+                "vendors": ["stripe", "square", "paypal", "shopify payments"],
             },
             {
                 "category": "Development Tools",
                 "keywords": ["development", "dev", "api", "code", "repository", "version control"],
-                "vendors": ["github", "gitlab", "bitbucket", "jetbrains"]
-            }
+                "vendors": ["github", "gitlab", "bitbucket", "jetbrains"],
+            },
         ]
 
     def normalize_vendor(self, vendor_name: str) -> Tuple[str, float]:
@@ -232,7 +271,10 @@ class AIOptimizer:
                     best_score = confidence
                     best_category = rule["category"]
 
-        if best_category and best_score >= self.config["features"]["category_prediction"]["confidence_threshold"]:
+        if (
+            best_category
+            and best_score >= self.config["features"]["category_prediction"]["confidence_threshold"]
+        ):
             return best_category, best_score
 
         return "Uncategorized", 0.5
@@ -251,7 +293,7 @@ class AIOptimizer:
             "amount": 0.25,
             "date": 0.20,
             "description": 0.15,
-            "invoice": 0.15
+            "invoice": 0.15,
         }
 
         # Vendor confidence
@@ -278,9 +320,9 @@ class AIOptimizer:
             try:
                 date_str = data["date"]
                 # Check if date is in reasonable format
-                if re.match(r'\d{4}-\d{2}-\d{2}', date_str):
+                if re.match(r"\d{4}-\d{2}-\d{2}", date_str):
                     score += weights["date"]
-                elif re.match(r'\d{2}/\d{2}/\d{4}', date_str):
+                elif re.match(r"\d{2}/\d{2}/\d{4}", date_str):
                     score += weights["date"] * 0.8
             except (ValueError, TypeError):
                 pass
@@ -308,7 +350,9 @@ class AIOptimizer:
         else:
             return "LOW", score
 
-    def validate_amount(self, amount: float, category: str, historical_data: Optional[List[float]] = None) -> Tuple[bool, str]:
+    def validate_amount(
+        self, amount: float, category: str, historical_data: Optional[List[float]] = None
+    ) -> Tuple[bool, str]:
         """
         Validate amount for outlier detection
         Returns: (is_valid, reason)
@@ -383,19 +427,21 @@ class AIOptimizer:
         metadata = {
             "ai_optimized": True,
             "optimization_timestamp": datetime.utcnow().isoformat() + "Z",
-            "optimizations_applied": []
+            "optimizations_applied": [],
         }
 
         # Vendor normalization
         if optimized.get("vendor"):
             normalized_vendor, vendor_confidence = self.normalize_vendor(optimized["vendor"])
             if normalized_vendor != optimized["vendor"]:
-                metadata["optimizations_applied"].append({
-                    "type": "vendor_normalization",
-                    "original": optimized["vendor"],
-                    "normalized": normalized_vendor,
-                    "confidence": vendor_confidence
-                })
+                metadata["optimizations_applied"].append(
+                    {
+                        "type": "vendor_normalization",
+                        "original": optimized["vendor"],
+                        "normalized": normalized_vendor,
+                        "confidence": vendor_confidence,
+                    }
+                )
             optimized["vendor"] = normalized_vendor
             optimized["vendor_confidence"] = vendor_confidence
 
@@ -406,11 +452,13 @@ class AIOptimizer:
 
         if not optimized.get("category") or optimized["category"] == "Uncategorized":
             optimized["category"] = predicted_category
-            metadata["optimizations_applied"].append({
-                "type": "category_prediction",
-                "predicted": predicted_category,
-                "confidence": category_confidence
-            })
+            metadata["optimizations_applied"].append(
+                {
+                    "type": "category_prediction",
+                    "predicted": predicted_category,
+                    "confidence": category_confidence,
+                }
+            )
 
         optimized["category_confidence"] = category_confidence
 
@@ -419,23 +467,25 @@ class AIOptimizer:
         optimized["confidence"] = confidence_level
         optimized["confidence_score"] = confidence_score
 
-        metadata["optimizations_applied"].append({
-            "type": "confidence_calculation",
-            "level": confidence_level,
-            "score": confidence_score
-        })
+        metadata["optimizations_applied"].append(
+            {"type": "confidence_calculation", "level": confidence_level, "score": confidence_score}
+        )
 
         # Auto-verify if high confidence
-        if (confidence_level == "HIGH" and
-            self.config["features"]["confidence_tuning"]["auto_verify_high"]):
+        if (
+            confidence_level == "HIGH"
+            and self.config["features"]["confidence_tuning"]["auto_verify_high"]
+        ):
             optimized["verified"] = True
             optimized["verified_by"] = "AI_AUTO_VERIFY"
             optimized["verified_at"] = datetime.utcnow().isoformat() + "Z"
-            metadata["optimizations_applied"].append({
-                "type": "auto_verification",
-                "reason": "high_confidence",
-                "score": confidence_score
-            })
+            metadata["optimizations_applied"].append(
+                {
+                    "type": "auto_verification",
+                    "reason": "high_confidence",
+                    "score": confidence_score,
+                }
+            )
 
         # Amount validation
         if optimized.get("amount"):
@@ -445,11 +495,9 @@ class AIOptimizer:
 
                 if not is_valid:
                     optimized["amount_validation_warning"] = reason
-                    metadata["optimizations_applied"].append({
-                        "type": "amount_validation",
-                        "valid": False,
-                        "reason": reason
-                    })
+                    metadata["optimizations_applied"].append(
+                        {"type": "amount_validation", "valid": False, "reason": reason}
+                    )
             except (ValueError, TypeError):
                 pass
 
@@ -464,12 +512,14 @@ class AIOptimizer:
                     optimized["tax_amount"] = tax_amount
                     optimized["tax_type"] = tax_type
                     optimized["tax_calculated_by"] = "AI"
-                    metadata["optimizations_applied"].append({
-                        "type": "tax_calculation",
-                        "amount": tax_amount,
-                        "type": tax_type,
-                        "region": region
-                    })
+                    metadata["optimizations_applied"].append(
+                        {
+                            "type": "tax_calculation",
+                            "amount": tax_amount,
+                            "type": tax_type,
+                            "region": region,
+                        }
+                    )
             except (ValueError, TypeError):
                 pass
 
@@ -489,11 +539,7 @@ class AIOptimizer:
             "vendor_normalized": 0,
             "category_predicted": 0,
             "tax_calculated": 0,
-            "confidence_distribution": {
-                "HIGH": 0,
-                "MEDIUM": 0,
-                "LOW": 0
-            }
+            "confidence_distribution": {"HIGH": 0, "MEDIUM": 0, "LOW": 0},
         }
 
         for item in optimized_data_list:
@@ -543,7 +589,7 @@ def main():
             "amount": 1250.00,
             "date": "2026-02-15",
             "description": "Cloud compute and storage services",
-            "invoice_number": "GCP-123456"
+            "invoice_number": "GCP-123456",
         }
 
         print("🧪 Testing AI Optimizer...")
@@ -555,7 +601,7 @@ def main():
 
     elif args.input and args.output:
         # Process file
-        with open(args.input, 'r') as f:
+        with open(args.input, "r") as f:
             raw_data_list = json.load(f)
 
         print(f"🔄 Optimizing {len(raw_data_list)} items...")
@@ -563,7 +609,7 @@ def main():
         optimized_list = optimizer.batch_optimize(raw_data_list)
         stats = optimizer.get_optimization_stats(optimized_list)
 
-        with open(args.output, 'w') as f:
+        with open(args.output, "w") as f:
             json.dump(optimized_list, f, indent=2)
 
         print(f"\n✅ Optimization complete!")
