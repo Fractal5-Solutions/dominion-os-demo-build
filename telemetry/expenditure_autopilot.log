@@ -1,0 +1,3 @@
+[2026-02-28T00:06:53Z] [INFO] Starting PHI Expenditure Autopilot in docker mode
+[2026-02-28T00:06:53Z] [INFO] Python environment: Python 3.12.12
+[2026-02-28T00:06:53Z] [ERROR] Database connection failed - initialization may be required

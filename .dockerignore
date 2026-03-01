@@ -1,0 +1,122 @@
+# Dominion OS Demo - Docker Build Optimization
+# Exclude unnecessary files to speed up builds and reduce image size
+
+# Git and version control
+.git/
+.github/
+.gitignore
+.gitattributes
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist-info/
+.eggs/
+*.egg
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+.python-version
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Documentation and markdown (not needed in runtime)
+*.md
+docs/
+*.rst
+LICENSE
+AUTHORS
+CHANGELOG
+
+# Tests and development tools
+tests/
+test_*.py
+*_test.py
+pytest.ini
+.pytest_cache/
+.pre-commit-config.yaml
+.editorconfig
+
+# Build artifacts and temporary files
+build/
+dist/
+out/
+*.tar.gz
+*.zip
+*.bak
+*.tmp
+*.log
+*.pid
+
+# Deployment and CI/CD (not needed in container)
+.github/
+.gitlab-ci.yml
+.circleci/
+azure-pipelines.yml
+Jenkinsfile
+*.sh
+deploy*.yaml
+skaffold.yaml
+service.yaml
+
+# Configuration examples (keep actual configs)
+*.example
+*.sample
+config/env.example
+
+# Archives and telemetry backups
+archive/
+telemetry/*.txt
+telemetry/*.json
+*.patch
+*.diff
+
+# Node modules (if any)
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Cloud and container files
+.dockerignore
+Dockerfile
+docker-compose*.yml
+kubernetes/
+k8s/
+
+# Monitoring and reports
+*_REPORT.md
+*_STATUS.md
+*_GUIDE.md
+DEPLOYMENT_*.md
+PHI_*.md
+
+# Specification and planning files
+spec/
+specs/
+repairs/
+demos/
+catalog_manifest.json
+demo_success_snapshot.json

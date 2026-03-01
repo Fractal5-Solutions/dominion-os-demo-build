@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - PHI Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body style="background-color: #f8f9fa;">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/"><i class="fas fa-chart-line"></i> PHI Expenditure Tracker</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/expenditures">Expenditures</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/verify">Verify</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/recurring">Recurring</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/reports">Reports</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <h2><i class="fas fa-file-alt"></i> Reports & Exports</h2>
+
+        <!-- Report Types -->
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-chart-pie fa-3x text-primary mb-3"></i>
+                        <h5>Category Report</h5>
+                        <p class="text-muted">Spending breakdown by category</p>
+                        <button class="btn btn-primary" onclick="generateCategoryReport()">Generate</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-calendar-alt fa-3x text-success mb-3"></i>
+                        <h5>Monthly Trend</h5>
+                        <p class="text-muted">12-month spending analysis</p>
+                        <button class="btn btn-success" onclick="generateMonthlyReport()">Generate</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-file-invoice-dollar fa-3x text-warning mb-3"></i>
+                        <h5>Tax Report</h5>
+                        <p class="text-muted">CRA-compliant summary</p>
+                        <button class="btn btn-warning">Coming Soon</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Options -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5><i class="fas fa-download"></i> Export Data</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Start Date</label>
+                                <input type="date" class="form-control" id="exportStartDate">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">End Date</label>
+                                <input type="date" class="form-control" id="exportEndDate">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Company</label>
+                                <select class="form-select" id="exportCompany">
+                                    <option value="">All Companies</option>
+                                    <option>Fractal5 Solutions Inc</option>
+                                    <option>Blue Wave Action Group Inc</option>
+                                    <option>Plane4 Grain Inc</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Export Format</label>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-primary" onclick="exportCSV()">
+                                <i class="fas fa-file-csv"></i> CSV
+                            </button>
+                            <button class="btn btn-outline-success" onclick="exportExcel()">
+                                <i class="fas fa-file-excel"></i> Excel
+                            </button>
+                            <button class="btn btn-outline-info" onclick="exportQuickBooks()">
+                                <i class="fas fa-file-invoice"></i> QuickBooks IIF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Display Area -->
+        <div id="reportDisplay" class="mt-4"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+    <script>
+        // Set default dates
+        const today = new Date();
+        const yearStart = new Date(today.getFullYear(), 0, 1);
+        document.getElementById('exportEndDate').valueAsDate = today;
+        document.getElementById('exportStartDate').valueAsDate = yearStart;
+
+        async function generateCategoryReport() {
+            const display = document.getElementById('reportDisplay');
+            display.innerHTML = '<div class="text-center py-5"><i class="fas fa-spinner fa-spin fa-2x"></i></div>';
+
+            try {
+                const response = await fetch('/api/report/category');
+                const data = await response.json();
+
+                display.innerHTML = `
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-chart-pie"></i> Category Report: ${data.period.start} to ${data.period.end}</h5>
+                        </div>
+                        <div class="card-body">
+                            <h6>Total Spending: $${data.total.toLocaleString()}</h6>
+                            <table class="table table-striped mt-3">
+                                <thead>
+                                    <tr>
+                                        <th>Category</th>
+                                        <th class="text-end">Total</th>
+                                        <th class="text-end">Count</th>
+                                        <th class="text-end">Average</th>
+                                        <th class="text-end">% of Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.categories.map(cat => `
+                                        <tr>
+                                            <td>${cat.category}</td>
+                                            <td class="text-end">$${cat.total.toLocaleString()}</td>
+                                            <td class="text-end">${cat.count}</td>
+                                            <td class="text-end">$${cat.average.toLocaleString()}</td>
+                                            <td class="text-end">${((cat.total / data.total) * 100).toFixed(1)}%</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+
+            } catch (error) {
+                display.innerHTML = '<div class="alert alert-danger">Error generating report</div>';
+            }
+        }
+
+        async function generateMonthlyReport() {
+            const display = document.getElementById('reportDisplay');
+            display.innerHTML = '<div class="text-center py-5"><i class="fas fa-spinner fa-spin fa-2x"></i></div>';
+
+            try {
+                const response = await fetch('/api/report/monthly_trend');
+                const data = await response.json();
+
+                const chartCanvas = document.createElement('canvas');
+                chartCanvas.id = 'monthlyChart';
+
+                display.innerHTML = `
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-chart-line"></i> Monthly Spending Trend (Last 12 Months)</h5>
+                        </div>
+                        <div class="card-body">
+                            <div style="height: 400px; position: relative;">
+                                <canvas id="monthlyChart"></canvas>
+                            </div>
+                            <table class="table table-sm mt-4">
+                                <thead>
+                                    <tr>
+                                        <th>Month</th>
+                                        <th class="text-end">Total</th>
+                                        <th class="text-end">Transactions</th>
+                                        <th class="text-end">Average</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.months.map(m => `
+                                        <tr>
+                                            <td>${m.month}</td>
+                                            <td class="text-end">$${m.total.toLocaleString()}</td>
+                                            <td class="text-end">${m.count}</td>
+                                            <td class="text-end">$${m.average.toLocaleString()}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+
+                new Chart(document.getElementById('monthlyChart'), {
+                    type: 'line',
+                    data: {
+                        labels: data.months.map(m => m.month),
+                        datasets: [{
+                            label: 'Monthly Spending',
+                            data: data.months.map(m => m.total),
+                            borderColor: '#0066cc',
+                            backgroundColor: 'rgba(0, 102, 204, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: value => '$' + value.toLocaleString()
+                                }
+                            }
+                        }
+                    }
+                });
+
+            } catch (error) {
+                display.innerHTML = '<div class="alert alert-danger">Error generating report</div>';
+            }
+        }
+
+        function exportCSV() {
+            const startDate = document.getElementById('exportStartDate').value;
+            const endDate = document.getElementById('exportEndDate').value;
+            const company = document.getElementById('exportCompany').value;
+
+            const params = new URLSearchParams({
+                start_date: startDate,
+                end_date: endDate,
+                company: company
+            });
+
+            window.location.href = `/api/export/csv?${params}`;
+        }
+
+        function exportExcel() {
+            alert('Excel export coming soon! (Requires openpyxl library)');
+        }
+
+        function exportQuickBooks() {
+            const startDate = document.getElementById('exportStartDate').value;
+            const endDate = document.getElementById('exportEndDate').value;
+            const company = document.getElementById('exportCompany').value;
+
+            const params = new URLSearchParams({
+                start_date: startDate,
+                end_date: endDate,
+                company: company
+            });
+
+            window.location.href = `/api/export/quickbooks?${params}`;
+        }
+    </script>
+</body>
+</html>

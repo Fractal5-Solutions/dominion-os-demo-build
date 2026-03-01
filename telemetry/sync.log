@@ -1,0 +1,293 @@
+═══════════════════════════════════════════════════════
+  🎯 PHI MULTI-REPO AUTONOMOUS SYNC - ACTIVATED
+═══════════════════════════════════════════════════════
+
+Monitoring 2 repositories
+Check interval: 60s
+Mode: Continuous (NHITL)
+
+Repositories:
+  • dominion-os-demo-build
+  • dominion-command-center
+
+═══════════════════════════════════════════════════════
+
+[2026-02-27 19:33:36] 🔍 Iteration 1 - Scanning repositories...
+  Token: Classic PAT | Push capability: YES
+    📦 dominion-os-demo-build: 18 commits pending
+    🚀 Pushing dominion-os-demo-build...
+remote: error: GH006: Protected branch update failed for refs/heads/main.
+remote:
+remote: - This branch must not contain merge commits.
+remote:   Found 1 violation:
+remote:
+remote:   ef8e8c4114c76ea8585e7b958f9cc602d2aface8
+remote:
+remote: - Changes must be made through a pull request.
+remote:
+remote: - Required status check "governance-suite" is expected.
+To https://github.com/Fractal5-Solutions/dominion-os-demo-build.git
+ ! [remote rejected]     main -> main (protected branch hook declined)
+error: failed to push some refs to 'https://github.com/Fractal5-Solutions/dominion-os-demo-build.git'
+    ⚠️  dominion-os-demo-build push failed
+  📊 Total: 18 commits across 1 repos
+
+[2026-02-27 19:34:45] 🔍 Iteration 2 - Scanning repositories...
+  Token: Classic PAT | Push capability: YES
+    📦 dominion-os-demo-build: 18 commits pending
+    🚀 Pushing dominion-os-demo-build...
+remote: error: GH006: Protected branch update failed for refs/heads/main.
+remote:
+remote: - This branch must not contain merge commits.
+remote:   Found 1 violation:
+remote:
+remote:   ef8e8c4114c76ea8585e7b958f9cc602d2aface8
+remote:
+remote: - Changes must be made through a pull request.
+remote:
+remote: - Required status check "governance-suite" is expected.
+To https://github.com/Fractal5-Solutions/dominion-os-demo-build.git
+ ! [remote rejected]     main -> main (protected branch hook declined)
+error: failed to push some refs to 'https://github.com/Fractal5-Solutions/dominion-os-demo-build.git'
+    ⚠️  dominion-os-demo-build push failed
+  📊 Total: 18 commits across 1 repos
+
+[2026-02-27 19:35:47] 🔍 Iteration 3 - Scanning repositories...
+  Token: Classic PAT | Push capability: YES
+    📦 dominion-os-demo-build: 18 commits pending
+    🚀 Pushing dominion-os-demo-build...
+remote: error: GH006: Protected branch update failed for refs/heads/main.
+remote:
+remote: - This branch must not contain merge commits.
+remote:   Found 1 violation:
+remote:
+remote:   ef8e8c4114c76ea8585e7b958f9cc602d2aface8
+remote:
+remote: - Changes must be made through a pull request.
+remote:
+remote: - Required status check "governance-suite" is expected.
+To https://github.com/Fractal5-Solutions/dominion-os-demo-build.git
+ ! [remote rejected]     main -> main (protected branch hook declined)
+error: failed to push some refs to 'https://github.com/Fractal5-Solutions/dominion-os-demo-build.git'
+    ⚠️  dominion-os-demo-build push failed
+  📊 Total: 18 commits across 1 repos
+
+[2026-02-27 19:36:50] 🔍 Iteration 4 - Scanning repositories...
+  Token: Classic PAT | Push capability: YES
+    📦 dominion-os-demo-build: 18 commits pending
+    🚀 Pushing dominion-os-demo-build...
+remote: error: GH006: Protected branch update failed for refs/heads/main.
+remote:
+remote: - This branch must not contain merge commits.
+remote:   Found 1 violation:
+remote:
+remote:   ef8e8c4114c76ea8585e7b958f9cc602d2aface8
+remote:
+remote: - Changes must be made through a pull request.
+remote:
+remote: - Required status check "governance-suite" is expected.
+To https://github.com/Fractal5-Solutions/dominion-os-demo-build.git
+ ! [remote rejected]     main -> main (protected branch hook declined)
+error: failed to push some refs to 'https://github.com/Fractal5-Solutions/dominion-os-demo-build.git'
+    ⚠️  dominion-os-demo-build push failed
+  📊 Total: 18 commits across 1 repos
+
+[2026-02-27 19:37:52] 🔍 Iteration 5 - Scanning repositories...
+  Token: Classic PAT | Push capability: YES
+    📦 dominion-os-demo-build: 18 commits pending
+    🚀 Pushing dominion-os-demo-build...
+remote: error: GH006: Protected branch update failed for refs/heads/main.
+remote:
+remote: - This branch must not contain merge commits.
+remote:   Found 1 violation:
+remote:
+remote:   ef8e8c4114c76ea8585e7b958f9cc602d2aface8
+remote:
+remote: - Changes must be made through a pull request.
+remote:
+remote: - Required status check "governance-suite" is expected.
+To https://github.com/Fractal5-Solutions/dominion-os-demo-build.git
+ ! [remote rejected]     main -> main (protected branch hook declined)
+error: failed to push some refs to 'https://github.com/Fractal5-Solutions/dominion-os-demo-build.git'
+    ⚠️  dominion-os-demo-build push failed
+  📊 Total: 18 commits across 1 repos
+
+[2026-02-27 19:38:55] 🔍 Iteration 6 - Scanning repositories...
+  Token: Classic PAT | Push capability: YES
+    📦 dominion-os-demo-build: 18 commits pending
+    🚀 Pushing dominion-os-demo-build...
+remote: error: GH006: Protected branch update failed for refs/heads/main.
+remote:
+remote: - This branch must not contain merge commits.
+remote:   Found 1 violation:
+remote:
+remote:   ef8e8c4114c76ea8585e7b958f9cc602d2aface8
+remote:
+remote: - Changes must be made through a pull request.
+remote:
+remote: - Required status check "governance-suite" is expected.
+To https://github.com/Fractal5-Solutions/dominion-os-demo-build.git
+ ! [remote rejected]     main -> main (protected branch hook declined)
+error: failed to push some refs to 'https://github.com/Fractal5-Solutions/dominion-os-demo-build.git'
+    ⚠️  dominion-os-demo-build push failed
+  📊 Total: 18 commits across 1 repos
+
+[2026-02-27 19:39:57] 🔍 Iteration 7 - Scanning repositories...
+  Token: Classic PAT | Push capability: YES
+    📦 dominion-os-demo-build: 18 commits pending
+    🚀 Pushing dominion-os-demo-build...
+remote: error: GH006: Protected branch update failed for refs/heads/main.
+remote:
+remote: - This branch must not contain merge commits.
+remote:   Found 1 violation:
+remote:
+remote:   ef8e8c4114c76ea8585e7b958f9cc602d2aface8
+remote:
+remote: - Changes must be made through a pull request.
+remote:
+remote: - Required status check "governance-suite" is expected.
+To https://github.com/Fractal5-Solutions/dominion-os-demo-build.git
+ ! [remote rejected]     main -> main (protected branch hook declined)
+error: failed to push some refs to 'https://github.com/Fractal5-Solutions/dominion-os-demo-build.git'
+    ⚠️  dominion-os-demo-build push failed
+  📊 Total: 18 commits across 1 repos
+
+[2026-02-27 19:40:59] 🔍 Iteration 8 - Scanning repositories...
+  Token: Classic PAT | Push capability: YES
+    📦 dominion-os-demo-build: 18 commits pending
+    🚀 Pushing dominion-os-demo-build...
+remote: error: GH006: Protected branch update failed for refs/heads/main.
+remote:
+remote: - This branch must not contain merge commits.
+remote:   Found 1 violation:
+remote:
+remote:   ef8e8c4114c76ea8585e7b958f9cc602d2aface8
+remote:
+remote: - Changes must be made through a pull request.
+remote:
+remote: - Required status check "governance-suite" is expected.
+To https://github.com/Fractal5-Solutions/dominion-os-demo-build.git
+ ! [remote rejected]     main -> main (protected branch hook declined)
+error: failed to push some refs to 'https://github.com/Fractal5-Solutions/dominion-os-demo-build.git'
+    ⚠️  dominion-os-demo-build push failed
+  📊 Total: 18 commits across 1 repos
+
+[2026-02-27 19:42:02] 🔍 Iteration 9 - Scanning repositories...
+  Token: Classic PAT | Push capability: YES
+    📦 dominion-os-demo-build: 18 commits pending
+    🚀 Pushing dominion-os-demo-build...
+remote: error: GH006: Protected branch update failed for refs/heads/main.
+remote:
+remote: - This branch must not contain merge commits.
+remote:   Found 1 violation:
+remote:
+remote:   ef8e8c4114c76ea8585e7b958f9cc602d2aface8
+remote:
+remote: - Changes must be made through a pull request.
+remote:
+remote: - Required status check "governance-suite" is expected.
+To https://github.com/Fractal5-Solutions/dominion-os-demo-build.git
+ ! [remote rejected]     main -> main (protected branch hook declined)
+error: failed to push some refs to 'https://github.com/Fractal5-Solutions/dominion-os-demo-build.git'
+    ⚠️  dominion-os-demo-build push failed
+  📊 Total: 18 commits across 1 repos
+
+[2026-02-27 19:43:04] 🔍 Iteration 10 - Scanning repositories...
+  Token: Classic PAT | Push capability: YES
+    📦 dominion-os-demo-build: 18 commits pending
+    🚀 Pushing dominion-os-demo-build...
+remote: error: GH006: Protected branch update failed for refs/heads/main.
+remote:
+remote: - This branch must not contain merge commits.
+remote:   Found 1 violation:
+remote:
+remote:   ef8e8c4114c76ea8585e7b958f9cc602d2aface8
+remote:
+remote: - Changes must be made through a pull request.
+remote:
+remote: - Required status check "governance-suite" is expected.
+To https://github.com/Fractal5-Solutions/dominion-os-demo-build.git
+ ! [remote rejected]     main -> main (protected branch hook declined)
+error: failed to push some refs to 'https://github.com/Fractal5-Solutions/dominion-os-demo-build.git'
+    ⚠️  dominion-os-demo-build push failed
+  📊 Total: 18 commits across 1 repos
+
+[2026-02-27 19:44:07] 🔍 Iteration 11 - Scanning repositories...
+  Token: Classic PAT | Push capability: YES
+    📦 dominion-os-demo-build: 18 commits pending
+    🚀 Pushing dominion-os-demo-build...
+remote: error: GH006: Protected branch update failed for refs/heads/main.
+remote:
+remote: - This branch must not contain merge commits.
+remote:   Found 1 violation:
+remote:
+remote:   ef8e8c4114c76ea8585e7b958f9cc602d2aface8
+remote:
+remote: - Changes must be made through a pull request.
+remote:
+remote: - Required status check "governance-suite" is expected.
+To https://github.com/Fractal5-Solutions/dominion-os-demo-build.git
+ ! [remote rejected]     main -> main (protected branch hook declined)
+error: failed to push some refs to 'https://github.com/Fractal5-Solutions/dominion-os-demo-build.git'
+    ⚠️  dominion-os-demo-build push failed
+  📊 Total: 18 commits across 1 repos
+
+[2026-02-27 19:45:09] 🔍 Iteration 12 - Scanning repositories...
+  Token: Classic PAT | Push capability: YES
+    📦 dominion-os-demo-build: 18 commits pending
+    🚀 Pushing dominion-os-demo-build...
+remote: error: GH006: Protected branch update failed for refs/heads/main.
+remote:
+remote: - This branch must not contain merge commits.
+remote:   Found 1 violation:
+remote:
+remote:   ef8e8c4114c76ea8585e7b958f9cc602d2aface8
+remote:
+remote: - Changes must be made through a pull request.
+remote:
+remote: - Required status check "governance-suite" is expected.
+To https://github.com/Fractal5-Solutions/dominion-os-demo-build.git
+ ! [remote rejected]     main -> main (protected branch hook declined)
+error: failed to push some refs to 'https://github.com/Fractal5-Solutions/dominion-os-demo-build.git'
+    ⚠️  dominion-os-demo-build push failed
+  📊 Total: 18 commits across 1 repos
+
+[2026-02-27 19:46:12] 🔍 Iteration 13 - Scanning repositories...
+  Token: Classic PAT | Push capability: YES
+    📦 dominion-os-demo-build: 18 commits pending
+    🚀 Pushing dominion-os-demo-build...
+remote: error: GH006: Protected branch update failed for refs/heads/main.
+remote:
+remote: - This branch must not contain merge commits.
+remote:   Found 1 violation:
+remote:
+remote:   ef8e8c4114c76ea8585e7b958f9cc602d2aface8
+remote:
+remote: - Changes must be made through a pull request.
+remote:
+remote: - Required status check "governance-suite" is expected.
+To https://github.com/Fractal5-Solutions/dominion-os-demo-build.git
+ ! [remote rejected]     main -> main (protected branch hook declined)
+error: failed to push some refs to 'https://github.com/Fractal5-Solutions/dominion-os-demo-build.git'
+    ⚠️  dominion-os-demo-build push failed
+  📊 Total: 18 commits across 1 repos
+
+[2026-02-27 19:47:14] 🔍 Iteration 14 - Scanning repositories...
+  Token: Classic PAT | Push capability: YES
+    📦 dominion-os-demo-build: 18 commits pending
+    🚀 Pushing dominion-os-demo-build...
+remote: error: GH006: Protected branch update failed for refs/heads/main.
+remote:
+remote: - This branch must not contain merge commits.
+remote:   Found 1 violation:
+remote:
+remote:   ef8e8c4114c76ea8585e7b958f9cc602d2aface8
+remote:
+remote: - Changes must be made through a pull request.
+remote:
+remote: - Required status check "governance-suite" is expected.
+To https://github.com/Fractal5-Solutions/dominion-os-demo-build.git
+ ! [remote rejected]     main -> main (protected branch hook declined)
+error: failed to push some refs to 'https://github.com/Fractal5-Solutions/dominion-os-demo-build.git'
+    ⚠️  dominion-os-demo-build push failed
+  📊 Total: 18 commits across 1 repos

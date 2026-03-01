@@ -1,0 +1,28 @@
+name: "PHI Enterprise CodeQL Configuration"
+
+disable-default-queries: false
+
+queries:
+  - uses: security-and-quality
+  - uses: security-experimental
+
+paths-ignore:
+  - "**/test/**"
+  - "**/tests/**"
+  - "**/*.test.py"
+  - "**/node_modules/**"
+  - "**/venv/**"
+  - "**/.venv/**"
+
+paths:
+  - "**/*.py"
+  - "**/*.yml"
+  - "**/*.yaml"
+  - "**/*.sh"
+  - "**/*.md"
+
+query-filters:
+  - exclude:
+      problem.severity:
+        - warning
+        - recommendation

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recurring Expenses - PHI Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body style="background-color: #f8f9fa;">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/"><i class="fas fa-chart-line"></i> PHI Expenditure Tracker</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/expenditures">Expenditures</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/verify">Verify</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/recurring">Recurring</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/reports">Reports</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-sync-alt"></i> Recurring Expenses & Subscriptions</h2>
+            <div>
+                <span class="badge bg-primary fs-6" id="monthlyTotal">$0.00/month</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-list"></i> Active Subscriptions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="recurringList">
+                            <div class="text-center py-5">
+                                <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+                                <p class="mt-3 text-muted">Loading recurring expenses...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        async function loadRecurring() {
+            try {
+                const response = await fetch('/api/recurring');
+                const data = await response.json();
+
+                document.getElementById('monthlyTotal').textContent = `$${data.monthly_total.toLocaleString()}/month`;
+
+                const listDiv = document.getElementById('recurringList');
+
+                if (data.recurring.length === 0) {
+                    listDiv.innerHTML = `
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-inbox fa-3x"></i>
+                            <p class="mt-3">No recurring expenses found</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                listDiv.innerHTML = `
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Vendor</th>
+                                    <th>Description</th>
+                                    <th>Company</th>
+                                    <th class="text-end">Amount</th>
+                                    <th>Frequency</th>
+                                    <th>Next Due</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.recurring.map(rec => {
+                                    const dueDate = new Date(rec.next_expected);
+                                    const daysUntilDue = Math.floor((dueDate - new Date()) / (1000 * 60 * 60 * 24));
+                                    const isUpcoming = daysUntilDue <= 7 && daysUntilDue >= 0;
+
+                                    return `
+                                        <tr class="${isUpcoming ? 'table-warning' : ''}">
+                                            <td><strong>${rec.vendor}</strong></td>
+                                            <td>${rec.description}</td>
+                                            <td><small>${rec.company.split(' ')[0]}</small></td>
+                                            <td class="text-end fw-bold">${rec.currency} $${rec.amount.toLocaleString()}</td>
+                                            <td><span class="badge bg-info">${rec.frequency}</span></td>
+                                            <td>
+                                                ${rec.next_expected}
+                                                ${isUpcoming ? '<span class="badge bg-warning ms-2">Due Soon</span>' : ''}
+                                            </td>
+                                            <td>
+                                                ${rec.active
+                                                    ? '<span class="badge bg-success">Active</span>'
+                                                    : '<span class="badge bg-secondary">Inactive</span>'}
+                                                ${rec.auto_renew
+                                                    ? '<span class="badge bg-primary ms-1">Auto-Renew</span>'
+                                                    : ''}
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Error loading recurring expenses:', error);
+                document.getElementById('recurringList').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i> Error loading recurring expenses
+                    </div>
+                `;
+            }
+        }
+
+        loadRecurring();
+    </script>
+</body>
+</html>

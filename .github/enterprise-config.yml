@@ -1,0 +1,47 @@
+# PHI Enterprise Environment Configurations
+
+# Production Sync Environment
+# Used by phi-autonomous-sync.yml workflow
+# Requires manual approval for production deployments
+
+production-sync:
+  name: phi-production-sync
+  url: https://github.com/Fractal5-Solutions/dominion-os-demo-build
+  required_reviewers:
+    - Fractal5-X
+  required_checks:
+    - "security / Enterprise Security Scan"
+  secrets:
+    - GITHUB_PAT  # Organization secret
+  variables:
+    PHI_ENVIRONMENT: production
+    PHI_MODE: autonomous-sync
+    ENTERPRISE_FEATURES: enabled
+
+# Security Scan Environment
+# Used by security.yml workflow
+# Automated security scanning environment
+
+security-scan:
+  name: phi-security-scan
+  url: https://github.com/Fractal5-Solutions/dominion-os-demo-build
+  secrets:
+    - GITHUB_TOKEN
+  variables:
+    PHI_ENVIRONMENT: security
+    PHI_MODE: scanning
+    SECURITY_LEVEL: enterprise
+    AUDIT_LOGGING: enabled
+
+# Development Environment
+# For development and testing workflows
+
+development:
+  name: phi-development
+  url: https://github.com/Fractal5-Solutions/dominion-os-demo-build
+  secrets:
+    - GITHUB_TOKEN
+  variables:
+    PHI_ENVIRONMENT: development
+    PHI_MODE: testing
+    ENTERPRISE_FEATURES: disabled

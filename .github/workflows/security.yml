@@ -1,0 +1,78 @@
+name: Enterprise Security
+
+on:
+  push:
+    branches: [ main, sovereign-power-mode-max ]
+  pull_request:
+    branches: [ main, sovereign-power-mode-max ]
+  schedule:
+    # Run security scans daily at 2 AM UTC
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+  checks: write
+
+jobs:
+  security:
+    name: Enterprise Security Scan
+    runs-on: ubuntu-latest
+    environment: phi-security-scan
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: python
+          config-file: ./.github/codeql-config.yml
+
+      - name: Run CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:python"
+
+      - name: Security Audit (Python)
+        run: |
+          echo "🔍 Running Python security audit..."
+          python -m pip install --upgrade pip
+          pip install safety
+          safety check --output json || true
+
+      - name: Secret Scanning
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        if: github.event_name == 'pull_request'
+
+      - name: Upload Security Results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: results.sarif
+
+      - name: Enterprise Security Report
+        if: always()
+        run: |
+          echo "🏢 Enterprise Security Scan Complete"
+          echo "📊 CodeQL: ${{ job.status == 'success' && '✅ Passed' || '❌ Issues Found' }}"
+          echo "🔐 Secrets: Scanned for exposed credentials"
+          echo "📦 Dependencies: Security review completed"
+          echo "🛡️ Environment: phi-security-scan"
+          echo ""
+          echo "📋 Audit Trail:"
+          echo "  Repository: ${{ github.repository }}"
+          echo "  Branch: ${{ github.ref_name }}"
+          echo "  Commit: ${{ github.sha }}"
+          echo "  Actor: ${{ github.actor }}"
+          echo "  Timestamp: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"

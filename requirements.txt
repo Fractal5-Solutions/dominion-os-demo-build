@@ -1,0 +1,34 @@
+# PHI Dominion OS Demo Build Requirements
+# Enterprise autonomous optimization system
+
+# Core Python dependencies
+python-dateutil>=2.8.0
+PyYAML>=6.0
+requests>=2.28.0
+
+# Data processing
+pandas>=1.5.0
+numpy>=1.21.0
+
+# Web framework (if needed)
+flask>=2.2.0
+gunicorn>=21.2.0
+
+# Database (if needed)
+sqlalchemy>=1.4.0
+
+# Testing and quality
+pytest>=7.0.0
+black>=22.0.0
+flake8>=4.0.0
+mypy>=0.950
+
+# Security scanning
+safety>=2.3.0
+
+# GitHub integration
+PyGitHub>=1.55
+
+# Enterprise features
+azure-identity>=1.10.0
+google-cloud-secret-manager>=2.12.0

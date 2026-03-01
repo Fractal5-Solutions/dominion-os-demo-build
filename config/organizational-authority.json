@@ -4,10 +4,29 @@
             {
                 "name": "Fractal5 Solutions Inc",
                 "type": "C-Corporation",
-                "jurisdiction": "TBD",
+                "jurisdiction": "PENDING_VERIFICATION",
                 "primary_business": "Sovereign AI Systems Development",
-                "ein": "TBD",
+                "ein": "PENDING_VERIFICATION",
                 "status": "ACTIVE",
+                "website": "https://www.fractal5solutions.com",
+                "location": {
+                    "city": "Victoria",
+                    "province": "BC",
+                    "country": "Canada"
+                },
+                "contact": {
+                    "email": "support@fractal5solutions.com",
+                    "business_hours": {
+                        "monday_friday": "8am - 5pm PST",
+                        "saturday": "8am - 12pm PST",
+                        "sunday": "Closed"
+                    }
+                },
+                "social_media": {
+                    "facebook": "https://www.facebook.com/profile.php?id=61572428791801",
+                    "twitter": "https://x.com/Fractal5X",
+                    "linkedin": "https://www.linkedin.com/company/fractal5-solutions/"
+                },
                 "sole_owner": {
                     "name": "Matthew Burbidge",
                     "email": "matthewburbidge@fractal5solutions.com",
@@ -24,10 +43,11 @@
             {
                 "name": "Blue Wave Action Group Inc",
                 "type": "C-Corporation",
-                "jurisdiction": "TBD",
+                "jurisdiction": "PENDING_VERIFICATION",
                 "primary_business": "Political Technology & Campaign Infrastructure",
-                "ein": "TBD",
+                "ein": "PENDING_VERIFICATION",
                 "status": "ACTIVE",
+                "website": "https://www.bluewaveactiongroup.ca",
                 "sole_owner": {
                     "name": "Matthew Burbidge",
                     "email": "matthewburbidge@fractal5solutions.com",
@@ -44,9 +64,9 @@
             {
                 "name": "Plane4 Grain Inc",
                 "type": "C-Corporation",
-                "jurisdiction": "TBD",
-                "primary_business": "Advanced AI Research & Development",
-                "ein": "TBD",
+                "jurisdiction": "PENDING_VERIFICATION",
+                "primary_business": "Contemporary Furniture & Woodworking Craftsmanship",
+                "ein": "PENDING_VERIFICATION",
                 "status": "ACTIVE",
                 "sole_owner": {
                     "name": "Matthew Burbidge",
@@ -55,11 +75,23 @@
                     "title": "Founder & Principal"
                 },
                 "focus_areas": [
-                    "Cybernetic Systems",
-                    "Autonomous Intelligence",
-                    "Sovereign Computing",
-                    "Next-Generation AI Architecture"
-                ]
+                    "Modern furniture with rustic materials",
+                    "Contemporary design with traditional joinery",
+                    "Character-grade and reclaimed wood craftsmanship",
+                    "Canada-inspired natural aesthetics"
+                ],
+                "collections": [
+                    "Furniture (tables, benches, shelving, functional centerpieces)",
+                    "Home & Décor (accents, display pieces, story-rich details)",
+                    "Custom Commissions (bespoke pieces for specific spaces)"
+                ],
+                "services": [
+                    "Custom furniture commissions",
+                    "On-site woodworking and built-ins",
+                    "Contemporary rustic furniture design",
+                    "Reclaimed and character-grade wood projects"
+                ],
+                "design_philosophy": "Fusing contemporary design with rustic materials to craft pieces that narrate unique stories. Clean lines, honest texture, human hands."
             }
         ],
         "unified_command": {

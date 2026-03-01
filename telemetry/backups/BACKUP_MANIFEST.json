@@ -1,0 +1,55 @@
+{
+  "backup_id": "dominion-demo-20260228-192955",
+  "timestamp": "2026-02-28T19:29:55Z",
+  "system": "dominion-os-demo-build",
+  "branch": "sovereign-power-mode-max",
+  "status": "COMPLETE",
+  "production": {
+    "service": "dominion-demo-service",
+    "revision": "dominion-demo-service-00010-kbh",
+    "generation": 10,
+    "url": "https://dominion-demo-service-reduwyf2ra-uc.a.run.app",
+    "health": "HEALTHY",
+    "build_id": "2bbd39a2-e413-4b87-987f-127fe1db6126"
+  },
+  "repository": {
+    "latest_commit": "9038bfab0",
+    "commits_ahead": 31,
+    "working_tree": "clean",
+    "files_changed": 31,
+    "lines_added": 3170,
+    "lines_removed": 539,
+    "net_change": 2631
+  },
+  "backup_files": {
+    "git_bundle": "sovereign-power-mode-max-FINAL.bundle",
+    "git_bundle_size": "192 KiB",
+    "archive": "backup-dominion-demo-20260228-192955.tar.gz",
+    "archive_size": "222 KiB",
+    "documentation": [
+      "README.md",
+      "PHI_COMPLETION_REPORT.md",
+      "SYSTEM_PRODUCTION_STATUS.md"
+    ],
+    "infrastructure": [
+      "Dockerfile",
+      "cloudbuild.yaml",
+      "skaffold.yaml",
+      "service.yaml",
+      "requirements.txt"
+    ],
+    "application": [
+      "scripts/expenditure_dashboard.py",
+      "scripts/expenditure_models.py"
+    ]
+  },
+  "verification": {
+    "commits_saved": true,
+    "working_tree_clean": true,
+    "production_deployed": true,
+    "endpoints_verified": true,
+    "documentation_complete": true,
+    "bundle_verified": true,
+    "archive_created": true
+  }
+}
