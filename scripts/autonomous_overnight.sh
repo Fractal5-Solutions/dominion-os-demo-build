@@ -8,8 +8,28 @@ set -e
 # Configuration
 DURATION_HOURS=8
 CHECK_INTERVAL_MINUTES=15
-PROJECT1="dominion-os-1-0-main"
-PROJECT2="dominion-core-prod"
+
+# ============================================================================
+# GCP Projects - NAMING ARCHITECTURE DOCUMENTATION
+# ============================================================================
+# WHY TWO NAMES?
+#   - Project IDs: Permanent identifiers (cannot change, used in all code/APIs)
+#   - Display Names: Console UI labels (can change, zero infrastructure impact)
+#
+# CURRENT CONFIGURATION:
+#   dominion-os-1-0-main → "Dominion Core Dev" (dev/staging, 9 services)
+#   dominion-core-prod → "dominion-core-prod" (production, 15 services)
+#
+# BENEFIT: Matthew sees clear "Dominion Core Dev" + "dominion-core-prod" labels
+# in GCP Console, while scripts use stable immutable Project IDs for reliability.
+#
+# ARCHITECTURE: Two-Environment Split
+# • Development: Safe testing, operational tooling (SLO: 95%+)
+# • Production: Customer-facing, revenue generation (SLO: 99.9%)
+# ============================================================================
+PROJECT1="dominion-os-1-0-main"     # DEV/STAGING: 9 services (Display: "Dominion Core Dev")
+PROJECT2="dominion-core-prod"       # PRODUCTION: 15 services (Display: "dominion-core-prod")
+
 START_TIME=$(date +%s)
 END_TIME=$((START_TIME + DURATION_HOURS * 3600))
 

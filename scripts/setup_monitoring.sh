@@ -16,8 +16,25 @@ echo "PHI CHIEF - CLOUD MONITORING SETUP"
 echo "========================================"
 echo ""
 
-PROJECT1="dominion-os-1-0-main"
-PROJECT2="dominion-core-prod"
+# ============================================================================
+# GCP Configuration - NAMING CLARITY FOR CONSOLE & SCRIPTS
+# ============================================================================
+# For Matthew's clarity in GCP Console:
+#   - Dev/Staging shows as "Dominion Core Dev" (display name)
+#   - Production shows as "dominion-core-prod" (display name)
+#
+# For infrastructure stability in scripts:
+#   - Use dominion-os-1-0-main (immutable Project ID)
+#   - Use dominion-core-prod (immutable Project ID)
+#
+# This dual approach provides console clarity without infrastructure risk.
+#
+# Environment Architecture:
+# • P1: Development/Staging - Testing and validation environment (95%+ SLO)
+# • P2: Production - Customer-facing services (99.9% SLO)
+# ============================================================================
+PROJECT1="dominion-os-1-0-main"     # DEV/STAGING (9 services, Console: "Dominion Core Dev")
+PROJECT2="dominion-core-prod"       # PRODUCTION (15 services)
 
 # Create uptime checks for critical services
 echo -e "${BLUE}[1/4] Creating Uptime Checks...${NC}"

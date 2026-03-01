@@ -1,0 +1,76 @@
+[2026-03-01 13:21:19] ═══════════════════════════════════════════════════════════════════
+[2026-03-01 13:21:19] Starting activation sequence at 2026-03-01 13:21:19 UTC
+[2026-03-01 13:21:19] ═══════════════════════════════════════════════════════════════════
+[0;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+[0;36mPHASE 1: PRE-FLIGHT VERIFICATION[0m
+[0;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+[2026-03-01 13:21:19] Step 1.1: Verifying GCP Authentication
+[0;32m✅ Authenticated as: matthewburbidge@fractal5solutions.com[0m
+[2026-03-01 13:21:19] Step 1.2: Checking GitHub Token
+[0;34mℹ️  Token prefix: ghu_7ESKiW...[0m
+[1;33m⚠️  Git push capability: LIMITED (integration token)[0m
+[2026-03-01 13:21:19] Step 1.3: Verifying network connectivity
+[0;32m✅ Internet connectivity verified[0m
+[2026-03-01 13:21:19] Step 1.4: Checking required tools
+[0;32m✅ gcloud: Available[0m
+[0;32m✅ git: Available[0m
+[0;32m✅ jq: Available[0m
+[0;32m✅ curl: Available[0m
+[0;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+[0;36mPHASE 2: INFRASTRUCTURE ACTIVATION & HEALTH CHECK[0m
+[0;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+[2026-03-01 13:21:20] Step 2.1: Scanning dominion-os-1-0-main (dominion-os-1-0-main)
+[0;32m✅   ✓ askphi-chatbot: OPERATIONAL[0m
+[0;32m✅   ✓ dominion-ai-gateway: OPERATIONAL[0m
+[0;32m✅   ✓ dominion-f5-gateway: OPERATIONAL[0m
+[0;32m✅   ✓ dominion-monitoring-dashboard: OPERATIONAL[0m
+[0;32m✅   ✓ dominion-os-1-0: OPERATIONAL[0m
+[0;32m✅   ✓ dominion-os-api: OPERATIONAL[0m
+[0;32m✅   ✓ dominion-phi-ui: OPERATIONAL[0m
+[0;32m✅   ✓ dominion-revenue-automation: OPERATIONAL[0m
+[0;32m✅   ✓ dominion-security-framework: OPERATIONAL[0m
+[0;34mℹ️  dominion-os-1-0-main Status: 9/9 services operational (100%)[0m
+[0;32m✅ dominion-os-1-0-main: Infrastructure HEALTHY[0m
+[2026-03-01 13:21:34] Step 2.2: Scanning dominion-core-prod (dominion-core-prod)
+[0;32m✅   ✓ api: OPERATIONAL[0m
+[0;32m✅   ✓ chatgpt-gateway: OPERATIONAL[0m
+[0;32m✅   ✓ demo: OPERATIONAL[0m
+[0;32m✅   ✓ dominion-ai-gateway: OPERATIONAL[0m
+[0;32m✅   ✓ dominion-api: OPERATIONAL[0m
+[0;32m✅   ✓ dominion-chief-of-staff: OPERATIONAL[0m
+[0;32m✅   ✓ dominion-demo: OPERATIONAL[0m
+[0;32m✅   ✓ dominion-demo-service: OPERATIONAL[0m
+[0;32m✅   ✓ dominion-gateway: OPERATIONAL[0m
+[0;32m✅   ✓ dominion-os: OPERATIONAL[0m
+[0;32m✅   ✓ dominion-os-1-0-101: OPERATIONAL[0m
+[0;32m✅   ✓ dominion-os-demo: OPERATIONAL[0m
+[0;32m✅   ✓ dominion-phi-ui: OPERATIONAL[0m
+[0;32m✅   ✓ phi-expenditure-dashboard: OPERATIONAL[0m
+[0;32m✅   ✓ pipeline: OPERATIONAL[0m
+[0;34mℹ️  dominion-core-prod Status: 15/15 services operational (100%)[0m
+[0;32m✅ dominion-core-prod: Infrastructure HEALTHY[0m
+[0;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+[0;36mPHASE 3: SERVICE COMPONENT VALIDATION[0m
+[0;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+[2026-03-01 13:21:56] Step 3.1: Validating AI Gateways
+[0;32m✅ AI Gateways detected: 2[0m
+[0;34mℹ️    • dominion-ai-gateway[0m
+[0;34mℹ️    • dominion-f5-gateway[0m
+[2026-03-01 13:22:01] Step 3.2: Validating PHI User Interfaces
+[0;32m✅ PHI UIs detected: 1[0m
+[0;34mℹ️    • dominion-phi-ui[0m
+[2026-03-01 13:22:04] Step 3.3: Validating Core APIs
+[0;32m✅ Core APIs detected: 3[0m
+[0;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+[0;36mPHASE 4: MONITORING & SLO VALIDATION[0m
+[0;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+[2026-03-01 13:22:06] Step 4.1: Checking Cloud Monitoring configuration
+[0;34mℹ️  No uptime checks found - consider running setup_monitoring.sh[0m
+[2026-03-01 13:22:08] Step 4.2: Checking SLO definitions
+[0;34mℹ️  SLO configuration script not found[0m
+[2026-03-01 13:22:08] Step 4.3: Running SLO compliance check
+[0;34mℹ️  SLO monitoring script not found[0m
+[0;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+[0;36mPHASE 5: REPOSITORY SYNCHRONIZATION[0m
+[0;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+[2026-03-01 13:22:08] Step 5.1: Checking repository status
