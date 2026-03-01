@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plane4 Grain | Contemporary Design • Rustic Materials • Inspired by Canada</title>
+    <meta name="description" content="Plane4 Grain makes modern furniture with a rustic soul. Contemporary design meets traditional craftsmanship with character-grade woods inspired by Canada's natural beauty.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            color: #1a202c;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #2d1810 0%, #5a3a2a 50%, #8b6342 100%);
+            color: white;
+            padding: 120px 20px 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0%, transparent 50%);
+            opacity: 0.6;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .company-logo {
+            font-size: 2.5em;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .hero h1 {
+            font-size: 3em;
+            margin-bottom: 25px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .tagline {
+            font-size: 1.4em;
+            margin-bottom: 40px;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+
+        /* Mission Section */
+        .mission {
+            padding: 80px 20px;
+            background: #f8fafc;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            color: #1e293b;
+            text-align: center;
+        }
+
+        .mission-statement {
+            font-size: 1.3em;
+            color: #475569;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto 60px;
+            line-height: 1.8;
+        }
+
+        /* Focus Areas Grid */
+        .focus-areas {
+            padding: 80px 20px;
+            background: white;
+        }
+
+        .focus-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 35px;
+            margin-top: 50px;
+        }
+
+        .focus-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 40px 30px;
+            border-radius: 15px;
+            border: 2px solid #cbd5e1;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .focus-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #8b6342, #5a3a2a);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .focus-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(139, 99, 66, 0.15);
+            border-color: #8b6342;
+        }
+
+        .focus-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .focus-icon {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .focus-card h3 {
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            color: #1e293b;
+        }
+
+        .focus-card p {
+            color: #64748b;
+            line-height: 1.7;
+        }
+
+        /* Services Section */
+        .services {
+            padding: 80px 20px;
+            background: #f8fafc;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            margin-top: 50px;
+        }
+
+        .service-card {
+            background: white;
+            padding: 45px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border-left: 5px solid #8b6342;
+            transition: all 0.3s ease;
+        }
+
+        .service-card:hover {
+            box-shadow: 0 10px 35px rgba(139, 99, 66, 0.15);
+            transform: translateY(-3px);
+        }
+
+        .service-number {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            line-height: 50px;
+            text-align: center;
+            background: linear-gradient(135deg, #8b6342, #5a3a2a);
+            color: white;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 1.3em;
+            margin-bottom: 25px;
+        }
+
+        .service-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 18px;
+            color: #1e293b;
+        }
+
+        .service-card p {
+            color: #64748b;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .service-features {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+        .service-features li {
+            padding: 8px 0;
+            color: #475569;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .service-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #8b6342;
+            font-weight: bold;
+        }
+
+        /* Research Areas */
+        .research {
+            padding: 80px 20px;
+            background: linear-gradient(135deg, #2d1810 0%, #5a3a2a 100%);
+            color: white;
+        }
+
+        .research-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .research-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 35px 25px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .research-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.05);
+        }
+
+        .research-item h4 {
+            font-size: 1.2em;
+            margin-bottom: 12px;
+        }
+
+        .research-item p {
+            opacity: 0.9;
+            font-size: 0.95em;
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: 80px 20px;
+            background: white;
+            text-align: center;
+        }
+
+        .contact-info {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 50px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .contact-info h3 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #1e293b;
+        }
+
+        .contact-info p {
+            font-size: 1.1em;
+            color: #64748b;
+            margin-bottom: 30px;
+        }
+
+        .contact-email {
+            display: inline-block;
+            padding: 15px 35px;
+            background: linear-gradient(135deg, #8b6342, #5a3a2a);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .contact-email:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(139, 99, 66, 0.3);
+        }
+
+        /* Footer */
+        .footer {
+            background: #1a0f0a;
+            color: #94a3b8;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #3b82f6;
+        }
+
+        .copyright {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2em;
+            }
+
+            .tagline {
+                font-size: 1.1em;
+            }
+
+            .section-title {
+                font-size: 1.8em;
+            }
+
+            .focus-grid,
+            .services-grid,
+            .research-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="company-logo">PLANE4 GRAIN</div>
+            <h1>Contemporary Design • Rustic Materials</h1>
+            <p class="tagline">Modern Furniture with a Rustic Soul • Inspired by Canada</p>
+            <div class="status-badge">CUSTOM COMMISSIONS AVAILABLE</div>
+        </div>
+    </section>
+
+    <!-- Mission Section -->
+    <section class="mission">
+        <div class="container">
+            <h2 class="section-title">Our Mission</h2>
+            <p class="mission-statement">
+                Our mission is to fuse contemporary design with rustic materials to craft pieces that narrate
+                unique stories. Inspired by the natural beauty of Canada, we balance modern aesthetics with
+                traditional craftsmanship—clean lines, honest texture, human hands. Each build is a conversation
+                between form and grain: contemporary geometry, traditional joinery, and materials that carry history.
+            </p>
+        </div>
+    </section>
+
+    <!-- Collections -->
+    <section class="focus-areas">
+        <div class="container">
+            <h2 class="section-title">Collections</h2>
+            <div class="focus-grid">
+                <div class="focus-card">
+                    <div class="focus-icon">🪑</div>
+                    <h3>Furniture</h3>
+                    <p>
+                        Tables, benches, shelving, and functional centerpieces that age well.
+                        Contemporary forms with traditional craftsmanship, built to last generations.
+                    </p>
+                </div>
+
+                <div class="focus-card">
+                    <div class="focus-icon">🏡</div>
+                    <h3>Home & Décor</h3>
+                    <p>
+                        Smaller works: accents, display pieces, and story-rich details that bring
+                        character and warmth to your space.
+                    </p>
+                </div>
+
+                <div class="focus-card">
+                    <div class="focus-icon">✏️</div>
+                    <h3>Custom Commissions</h3>
+                    <p>
+                        A piece designed for your space—dimensioned, built, and finished with intent.
+                        Tell us your vision and we'll craft something unique.
+                    </p>
+                </div>
+
+                <div class="focus-card">
+                    <div class="focus-icon">🇨🇦</div>
+                    <h3>Canada-Inspired</h3>
+                    <p>
+                        Inspired by Canada's natural beauty: forests, coastlines, and the quiet discipline
+                        of winter light. Honest materials that carry history.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Craft Process -->
+    <section class="services">
+        <div class="container">
+            <h2 class="section-title">Our Craft</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-number">01</div>
+                    <h3>Source</h3>
+                    <p>
+                        We start with honest material—texture, knots, grain movement—real life, not laminate fiction.
+                    </p>
+                    <ul class="service-features">
+                        <li>Rustic woods (often reclaimed/character-grade)</li>
+                        <li>Materials that carry history</li>
+                        <li>If the material has character, we don't "fix" it</li>
+                        <li>We compose with it</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-number">02</div>
+                    <h3>Design</h3>
+                    <p>
+                        Contemporary forms tuned to the board's personality. Modern aesthetics, not sterile minimalism.
+                    </p>
+                    <ul class="service-features">
+                        <li>Clean lines and honest texture</li>
+                        <li>Modern pairings (clean hardware, sharp silhouettes)</li>
+                        <li>Restrained detailing</li>
+                        <li>Forms that respect the grain</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-number">03</div>
+                    <h3>Build + Finish</h3>
+                    <p>
+                        Traditional craftsmanship: careful joinery, disciplined sanding, finishes that respect the story.
+                    </p>
+                    <ul class="service-features">
+                        <li>Traditional joinery techniques</li>
+                        <li>Hand-crafted details</li>
+                        <li>Finishes chosen to amplify grain, not bury it</li>
+                        <li>Built to age well</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Materials & Philosophy -->
+    <section class="research">
+        <div class="container">
+            <h2 class="section-title" style="color: white;">Materials & Philosophy</h2>
+            <div class="research-grid">
+                <div class="research-item">
+                    <h4>Rustic Woods</h4>
+                    <p>Often reclaimed or character-grade when available—grain, knots, and texture tell stories</p>
+                </div>
+
+                <div class="research-item">
+                    <h4>Modern Pairings</h4>
+                    <p>Clean hardware, sharp silhouettes, restrained detailing—contemporary meets rustic</p>
+                </div>
+
+                <div class="research-item">
+                    <h4>Honest Finishes</h4>
+                    <p>Finishes chosen to amplify grain, not bury it—celebrating natural beauty</p>
+                </div>
+
+                <div class="research-item">
+                    <h4>Traditional Joinery</h4>
+                    <p>Time-tested techniques that ensure strength and longevity</p>
+                </div>
+
+                <div class="research-item">
+                    <h4>Canadian Inspiration</h4>
+                    <p>Forests, coastlines, and the quiet discipline of winter light</p>
+                </div>
+
+                <div class="research-item">
+                    <h4>Built to Last</h4>
+                    <p>Furniture that ages well—pieces designed for generations, not seasons</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="contact">
+        <div class="container">
+            <div class="contact-info">
+                <h3>Commissions & On-Site Work</h3>
+                <p>
+                    Interested in a custom piece, a built-in, or on-site work? Use the contact form below or DM on Instagram.
+                    Include: dimensions, photos of the space, wood preference, finish vibe, and your timeline.
+                </p>
+                <a href="mailto:matthewburbidge@fractal5solutions.com" class="contact-email">
+                    Request a Commission
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#mission">Mission</a>
+                <a href="#focus">Collections</a>
+                <a href="#services">Craft</a>
+                <a href="#research">Materials</a>
+                <a href="mailto:matthewburbidge@fractal5solutions.com">Contact</a>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2026 Plane4 Grain Inc. All rights reserved.</p>
+                <p style="margin-top: 10px; font-size: 0.85em;">
+                    A C-Corporation wholly owned by Matthew Burbidge
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

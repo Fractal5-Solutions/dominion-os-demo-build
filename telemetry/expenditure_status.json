@@ -1,0 +1,9 @@
+{
+  "timestamp": "2026-02-28T00:06:53Z",
+  "status": "initializing",
+  "message": "Pre-flight checks in progress",
+  "deployment_mode": "docker",
+  "ingestion_interval": 3600,
+  "ai_optimization": "enabled",
+  "details": {}
+}

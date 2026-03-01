@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHI Expenditure Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.3rem;
+        }
+        .stat-card {
+            border-left: 4px solid #0066cc;
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0066cc;
+        }
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        .company-badge {
+            font-size: 0.85rem;
+            padding: 0.35rem 0.65rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-chart-line"></i> PHI Expenditure Tracker
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/expenditures">Expenditures</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/verify">Verify</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/recurring">Recurring</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/reports">Reports</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <!-- Summary Stats Row -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <div class="stat-label">Current Month</div>
+                        <div class="stat-value" id="currentMonthTotal">$0.00</div>
+                        <small class="text-muted" id="currentMonthLabel">Loading...</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <div class="stat-label">Year to Date</div>
+                        <div class="stat-value" id="ytdTotal">$0.00</div>
+                        <small class="text-muted" id="ytdCount">0 transactions</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <div class="stat-label">Verified</div>
+                        <div class="stat-value" id="verifiedPercent">0%</div>
+                        <small class="text-muted" id="verifiedCount">0 of 0</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <div class="stat-label">Pending Review</div>
+                        <div class="stat-value text-warning" id="pendingCount">0</div>
+                        <small class="text-muted">Items requiring verification</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Spending by Category (YTD)</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-building"></i> By Company</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="companyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Vendors Row -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-trophy"></i> Top Vendors (YTD)</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Vendor</th>
+                                    <th class="text-end">Amount</th>
+                                    <th class="text-end">% of Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="topVendorsTable">
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+    <script>
+        // Fetch dashboard summary data
+        async function loadDashboard() {
+            try {
+                const response = await fetch('/api/summary');
+                const data = await response.json();
+
+                // Update summary stats
+                document.getElementById('currentMonthTotal').textContent =
+                    `$${data.current_month.total.toLocaleString()}`;
+                document.getElementById('currentMonthLabel').textContent =
+                    `${data.current_month.month} • ${data.current_month.count} transactions`;
+
+                document.getElementById('ytdTotal').textContent =
+                    `$${data.ytd.total.toLocaleString()}`;
+                document.getElementById('ytdCount').textContent =
+                    `${data.ytd.count} transactions`;
+
+                document.getElementById('verifiedPercent').textContent =
+                    `${data.verification.percent_verified}%`;
+                document.getElementById('verifiedCount').textContent =
+                    `${data.verification.verified} of ${data.verification.verified + data.verification.pending}`;
+
+                document.getElementById('pendingCount').textContent =
+                    data.verification.pending;
+
+                // Category chart
+                const categoryLabels = data.by_category.map(c => c.category);
+                const categoryAmounts = data.by_category.map(c => c.amount);
+
+                new Chart(document.getElementById('categoryChart'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: categoryLabels,
+                        datasets: [{
+                            data: categoryAmounts,
+                            backgroundColor: [
+                                '#0066cc', '#00b8d4', '#00c853', '#ffd600',
+                                '#ff6d00', '#d50000', '#aa00ff', '#304ffe'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right'
+                            }
+                        }
+                    }
+                });
+
+                // Company chart
+                const companyLabels = data.by_company.map(c => c.company.split(' ')[0]);
+                const companyAmounts = data.by_company.map(c => c.amount);
+
+                new Chart(document.getElementById('companyChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: companyLabels,
+                        datasets: [{
+                            label: 'Spending',
+                            data: companyAmounts,
+                            backgroundColor: '#0066cc'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+
+                // Top vendors table
+                const vendorTable = document.getElementById('topVendorsTable');
+                const ytdTotal = data.ytd.total;
+                vendorTable.innerHTML = data.top_vendors.map((v, i) => `
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td>${v.vendor}</td>
+                        <td class="text-end">$${v.amount.toLocaleString()}</td>
+                        <td class="text-end">${((v.amount / ytdTotal) * 100).toFixed(1)}%</td>
+                    </tr>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                alert('Failed to load dashboard data. Please refresh the page.');
+            }
+        }
+
+        // Load on page load
+        loadDashboard();
+    </script>
+</body>
+</html>

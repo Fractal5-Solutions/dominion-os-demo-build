@@ -1,0 +1,21 @@
+{
+  "block_number": 0,
+  "timestamp": "2026-02-27T23:09:46+00:00",
+  "previous_hash": "GENESIS",
+  "current_hash": "25ed5a8ea084f9b65f77d327af7c81a6be9a437faed2aa913691ec833a2e9b0d",
+  "genesis_state": {
+    "organizational_authority_hash": "a9030e5be7770378980c778a5fa36cc64b6b4feff5ebb5cbdc7b9d849594ea4a",
+    "superuser_authority_hash": "09453cf353bccc4bcc3d97304074f107fa97a084659f04f7960f1c5f2db208f9",
+    "companies_count": 3,
+    "bims_version": "1.0.0"
+  },
+  "change_type": "GENESIS",
+  "changes": [],
+  "signature": "PHI_LEDGER_GENESIS",
+  "validation_metadata": {
+    "drift_status": "unknown",
+    "completeness_average": 0,
+    "validation_checks_passed": 0,
+    "validation_checks_failed": 0
+  }
+}

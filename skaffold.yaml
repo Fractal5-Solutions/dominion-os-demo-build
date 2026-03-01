@@ -1,0 +1,94 @@
+# Google Cloud Code - Skaffold Configuration
+# Optimized for Dominion OS continuous deployment
+apiVersion: skaffold/v4beta11
+kind: Config
+metadata:
+  name: dominion-os-demo
+
+build:
+  artifacts:
+    - image: gcr.io/dominion-core-prod/dominion-demo
+      context: .
+      docker:
+        dockerfile: Dockerfile
+        cacheFrom:
+          - gcr.io/dominion-core-prod/dominion-demo:latest
+        buildArgs:
+          BUILDKIT_INLINE_CACHE: "1"
+      platforms:
+        - "linux/amd64"
+  googleCloudBuild:
+    projectId: dominion-core-prod
+    region: us-central1
+    machineType: E2_HIGHCPU_8
+    timeout: 1200s
+    logging: LEGACY
+    diskSizeGb: 100
+
+deploy:
+  cloudrun:
+    projectid: dominion-core-prod
+    region: us-central1
+
+portForward:
+  - resourceType: service
+    resourceName: dominion-demo-service
+    port: 8080
+    localPort: 8080
+
+profiles:
+  - name: dev
+    build:
+      artifacts:
+        - image: gcr.io/dominion-core-prod/dominion-demo-dev
+          context: .
+          docker:
+            dockerfile: Dockerfile
+            target: runtime
+            cacheFrom:
+              - gcr.io/dominion-core-prod/dominion-demo-dev:latest
+      local:
+        push: true
+        useBuildkit: true
+        concurrency: 0
+    deploy:
+      cloudrun:
+        projectid: dominion-core-prod
+        region: us-central1
+
+  - name: prod
+    build:
+      artifacts:
+        - image: gcr.io/dominion-core-prod/dominion-demo
+          context: .
+          docker:
+            dockerfile: Dockerfile
+            cacheFrom:
+              - gcr.io/dominion-core-prod/dominion-demo:latest
+      googleCloudBuild:
+        projectId: dominion-core-prod
+        region: us-central1
+        machineType: E2_HIGHCPU_32
+        timeout: 1800s
+    deploy:
+      cloudrun:
+        projectid: dominion-core-prod
+        region: us-central1
+
+  - name: local
+    build:
+      artifacts:
+        - image: dominion-demo-local
+          context: .
+          docker:
+            dockerfile: Dockerfile
+      local:
+        push: false
+        useBuildkit: true
+    deploy:
+      kubectl: {}
+    portForward:
+      - resourceType: service
+        resourceName: dominion-demo-service
+        port: 8080
+        localPort: 8080

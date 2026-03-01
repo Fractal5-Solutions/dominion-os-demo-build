@@ -175,6 +175,32 @@
     // Docker & Cloud
     "docker.showStartPage": false,
     "cloudcode.enableTelemetry": false,
+    "cloudcode.project": "dominion-core-prod",
+    "cloudcode.defaultSkaffoldConfig": "skaffold.yaml",
+    "cloudcode.cloudrun.region": "us-central1",
+    "cloudcode.kubernetes.useMinikube": false,
+    "cloudcode.kubernetes.useGKE": true,
+    "cloudcode.gke.cluster": "dominion-cluster",
+    "cloudcode.gke.region": "us-central1",
+    "cloudcode.deployment.automaticBuild": true,
+    "cloudcode.deployment.watch": true,
+    "cloudcode.deployment.cleanupAfterStop": false,
+    "cloudcode.deployment.portForwardOnDebug": true,
+
+    // Startup integration for continuous deployment
+    "cloudcode.autoDetectProjectId": true,
+    "cloudcode.enableExperimentalFeatures": false,
+    "cloudcode.logsViewer.automaticScroll": true,
+    "cloudcode.logsViewer.timestampFormat": "ISO",
+    "cloudcode.streamLogs": true,
+    "terminal.integrated.env.linux": {
+        "GOOGLE_CLOUD_PROJECT": "dominion-core-prod",
+        "GOOGLE_CLOUD_REGION": "us-central1",
+        "SKAFFOLD_DEFAULT_REPO": "gcr.io/dominion-core-prod",
+        "CLOUDCODE_TELEMETRY_OPTOUT": "true",
+        "DOCKER_BUILDKIT": "1",
+        "COMPOSE_DOCKER_CLI_BUILD": "1"
+    },
 
     // PowerShell
     "powershell.powerShellDefaultVersion": "PowerShell Core 7+ (x64)",
@@ -220,7 +246,15 @@
         "pylance",
         "jsonc",
         "buildspec",
-        "gitlens"
+        "gitlens",
+        "skaffold",
+        "cloudcode",
+        "cloudbuild",
+        "buildkit",
+        "gunicorn",
+        "knative",
+        "gcr",
+        "autoscaling"
     ],
     "python-envs.pythonProjects": [
         {

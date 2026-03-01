@@ -1,0 +1,235 @@
+{
+  "cycle": 8,
+  "timestamp": "2026-02-27 21:40:15 UTC",
+  "services": [
+    {
+      "name": "askphi-chatbot",
+      "project": "dominion-os-1-0-main",
+      "url": "https://askphi-chatbot-66ymegzkya-uc.a.run.app",
+      "response_time_ms": 117,
+      "http_code": "200",
+      "status": "good",
+      "rating": "GOOD"
+    }
+,
+    {
+      "name": "dominion-ai-gateway",
+      "project": "dominion-os-1-0-main",
+      "url": "https://dominion-ai-gateway-66ymegzkya-uc.a.run.app",
+      "response_time_ms": 132,
+      "http_code": "404",
+      "status": "good",
+      "rating": "GOOD"
+    }
+,
+    {
+      "name": "dominion-f5-gateway",
+      "project": "dominion-os-1-0-main",
+      "url": "https://dominion-f5-gateway-66ymegzkya-uc.a.run.app",
+      "response_time_ms": 114,
+      "http_code": "200",
+      "status": "good",
+      "rating": "GOOD"
+    }
+,
+    {
+      "name": "dominion-monitoring-dashboard",
+      "project": "dominion-os-1-0-main",
+      "url": "https://dominion-monitoring-dashboard-66ymegzkya-uc.a.run.app",
+      "response_time_ms": 138,
+      "http_code": "200",
+      "status": "good",
+      "rating": "GOOD"
+    }
+,
+    {
+      "name": "dominion-os-1-0",
+      "project": "dominion-os-1-0-main",
+      "url": "https://dominion-os-1-0-66ymegzkya-uc.a.run.app",
+      "response_time_ms": 114,
+      "http_code": "404",
+      "status": "good",
+      "rating": "GOOD"
+    }
+,
+    {
+      "name": "dominion-os-api",
+      "project": "dominion-os-1-0-main",
+      "url": "https://dominion-os-api-66ymegzkya-uc.a.run.app",
+      "response_time_ms": 134,
+      "http_code": "404",
+      "status": "good",
+      "rating": "GOOD"
+    }
+,
+    {
+      "name": "dominion-phi-ui",
+      "project": "dominion-os-1-0-main",
+      "url": "https://dominion-phi-ui-66ymegzkya-uc.a.run.app",
+      "response_time_ms": 152,
+      "http_code": "200",
+      "status": "good",
+      "rating": "GOOD"
+    }
+,
+    {
+      "name": "dominion-revenue-automation",
+      "project": "dominion-os-1-0-main",
+      "url": "https://dominion-revenue-automation-66ymegzkya-uc.a.run.app",
+      "response_time_ms": 136,
+      "http_code": "404",
+      "status": "good",
+      "rating": "GOOD"
+    }
+,
+    {
+      "name": "dominion-security-framework",
+      "project": "dominion-os-1-0-main",
+      "url": "https://dominion-security-framework-66ymegzkya-uc.a.run.app",
+      "response_time_ms": 125,
+      "http_code": "307",
+      "status": "good",
+      "rating": "GOOD"
+    }
+,
+    {
+      "name": "api",
+      "project": "dominion-core-prod",
+      "url": "https://api-reduwyf2ra-uc.a.run.app",
+      "response_time_ms": 109,
+      "http_code": "404",
+      "status": "good",
+      "rating": "GOOD"
+    }
+,
+    {
+      "name": "chatgpt-gateway",
+      "project": "dominion-core-prod",
+      "url": "https://chatgpt-gateway-reduwyf2ra-uc.a.run.app",
+      "response_time_ms": 112,
+      "http_code": "404",
+      "status": "good",
+      "rating": "GOOD"
+    }
+,
+    {
+      "name": "demo",
+      "project": "dominion-core-prod",
+      "url": "https://demo-reduwyf2ra-uc.a.run.app",
+      "response_time_ms": 135,
+      "http_code": "200",
+      "status": "good",
+      "rating": "GOOD"
+    }
+,
+    {
+      "name": "dominion-ai-gateway",
+      "project": "dominion-core-prod",
+      "url": "https://dominion-ai-gateway-reduwyf2ra-uc.a.run.app",
+      "response_time_ms": 99,
+      "http_code": "404",
+      "status": "excellent",
+      "rating": "EXCELLENT"
+    }
+,
+    {
+      "name": "dominion-api",
+      "project": "dominion-core-prod",
+      "url": "https://dominion-api-reduwyf2ra-uc.a.run.app",
+      "response_time_ms": 142,
+      "http_code": "200",
+      "status": "good",
+      "rating": "GOOD"
+    }
+,
+    {
+      "name": "dominion-chief-of-staff",
+      "project": "dominion-core-prod",
+      "url": "https://dominion-chief-of-staff-reduwyf2ra-uc.a.run.app",
+      "response_time_ms": 109,
+      "http_code": "200",
+      "status": "good",
+      "rating": "GOOD"
+    }
+,
+    {
+      "name": "dominion-demo",
+      "project": "dominion-core-prod",
+      "url": "https://dominion-demo-reduwyf2ra-uc.a.run.app",
+      "response_time_ms": 135,
+      "http_code": "200",
+      "status": "good",
+      "rating": "GOOD"
+    }
+,
+    {
+      "name": "dominion-gateway",
+      "project": "dominion-core-prod",
+      "url": "https://dominion-gateway-reduwyf2ra-uc.a.run.app",
+      "response_time_ms": 138,
+      "http_code": "200",
+      "status": "good",
+      "rating": "GOOD"
+    }
+,
+    {
+      "name": "dominion-os",
+      "project": "dominion-core-prod",
+      "url": "https://dominion-os-reduwyf2ra-uc.a.run.app",
+      "response_time_ms": 137,
+      "http_code": "500",
+      "status": "good",
+      "rating": "GOOD"
+    }
+,
+    {
+      "name": "dominion-os-1-0-101",
+      "project": "dominion-core-prod",
+      "url": "https://dominion-os-1-0-101-reduwyf2ra-uc.a.run.app",
+      "response_time_ms": 127,
+      "http_code": "404",
+      "status": "good",
+      "rating": "GOOD"
+    }
+,
+    {
+      "name": "dominion-os-demo",
+      "project": "dominion-core-prod",
+      "url": "https://dominion-os-demo-reduwyf2ra-uc.a.run.app",
+      "response_time_ms": 103,
+      "http_code": "200",
+      "status": "good",
+      "rating": "GOOD"
+    }
+,
+    {
+      "name": "dominion-phi-ui",
+      "project": "dominion-core-prod",
+      "url": "https://dominion-phi-ui-reduwyf2ra-uc.a.run.app",
+      "response_time_ms": 182,
+      "http_code": "200",
+      "status": "good",
+      "rating": "GOOD"
+    }
+,
+    {
+      "name": "pipeline",
+      "project": "dominion-core-prod",
+      "url": "https://pipeline-reduwyf2ra-uc.a.run.app",
+      "response_time_ms": 147,
+      "http_code": "404",
+      "status": "good",
+      "rating": "GOOD"
+    }
+
+  ],
+  "summary": {
+    "total_services": 22,
+    "tested_services": 22,
+    "excellent": 1,
+    "good": 21,
+    "acceptable": 0,
+    "slow": 0,
+    "failed": 0
+  }
+}

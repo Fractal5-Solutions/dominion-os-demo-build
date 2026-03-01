@@ -12,6 +12,7 @@ out/autopilot/
 
 # Local environment files
 .env
+.env.*
 
 .fake
 
@@ -19,3 +20,16 @@ out/autopilot/
 out/
 tools/*/obj/
 tools/*/bin/
+
+# Telemetry and logs
+telemetry/*.log
+telemetry/*.json
+nohup.out
+*.log
+
+# IDE configurations
+.cloudcode/
+.vscode/*
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/settings.json

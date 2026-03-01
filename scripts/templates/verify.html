@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Expenditures - PHI Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .verify-card { border-left: 4px solid #ff6d00; margin-bottom: 1rem; }
+        .verify-card.processing { opacity: 0.5; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/"><i class="fas fa-chart-line"></i> PHI Expenditure Tracker</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/expenditures">Expenditures</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/verify">Verify</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/recurring">Recurring</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/reports">Reports</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-check-circle"></i> Human Verification Queue</h2>
+            <div>
+                <span class="badge bg-warning fs-6" id="pendingBadge">0 pending</span>
+                <button class="btn btn-outline-primary btn-sm ms-2" onclick="loadPending()">
+                    <i class="fas fa-sync"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <strong>Verification Priority:</strong> High-value transactions and LOW confidence extractions are shown first.
+            Review the details and approve or edit before verifying.
+        </div>
+
+        <div id="pendingList">
+            <div class="text-center py-5">
+                <i class="fas fa-spinner fa-spin fa-3x text-muted"></i>
+                <p class="mt-3 text-muted">Loading pending verifications...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        async function loadPending() {
+            try {
+                const response = await fetch('/api/pending_verification');
+                const data = await response.json();
+
+                document.getElementById('pendingBadge').textContent = `${data.count} pending`;
+
+                const listDiv = document.getElementById('pendingList');
+
+                if (data.pending.length === 0) {
+                    listDiv.innerHTML = `
+                        <div class="text-center py-5">
+                            <i class="fas fa-check-circle fa-3x text-success"></i>
+                            <h4 class="mt-3">All caught up!</h4>
+                            <p class="text-muted">No expenditures pending verification.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                listDiv.innerHTML = data.pending.map(exp => `
+                    <div class="card verify-card" id="card-${exp.id}">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h5>${exp.vendor}</h5>
+                                    <p class="mb-2">${exp.description}</p>
+                                    <div>
+                                        <span class="badge bg-secondary">${exp.company.split(' ')[0]}</span>
+                                        <span class="badge bg-info">${exp.date}</span>
+                                        ${exp.invoice_number ? `<span class="badge bg-light text-dark">Invoice: ${exp.invoice_number}</span>` : ''}
+                                        <span class="badge bg-danger">Confidence: ${exp.confidence}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <h3 class="text-primary mb-3">$${exp.amount.toLocaleString()}</h3>
+                                    <button class="btn btn-success" onclick="verifyExpenditure('${exp.id}')">
+                                        <i class="fas fa-check"></i> Verify
+                                    </button>
+                                    <button class="btn btn-outline-secondary" onclick="viewDetails('${exp.id}')">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading pending:', error);
+                document.getElementById('pendingList').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i> Error loading pending verifications. Please try again.
+                    </div>
+                `;
+            }
+        }
+
+        async function verifyExpenditure(id) {
+            const card = document.getElementById(`card-${id}`);
+            card.classList.add('processing');
+
+            try {
+                const response = await fetch(`/api/verify/${id}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        verified_by: 'Matthew Dillon',  // In production, get from auth
+                        updates: {}
+                    })
+                });
+
+                if (response.ok) {
+                    // Remove card with animation
+                    card.style.transition = 'all 0.3s ease-out';
+                    card.style.transform = 'translateX(100%)';
+                    card.style.opacity = '0';
+
+                    setTimeout(() => {
+                        card.remove();
+                        loadPending();  // Refresh count
+                    }, 300);
+
+                    // Show success toast
+                    showToast('success', 'Expenditure verified successfully!');
+                } else {
+                    card.classList.remove('processing');
+                    showToast('danger', 'Failed to verify expenditure');
+                }
+
+            } catch (error) {
+                console.error('Error verifying:', error);
+                card.classList.remove('processing');
+                showToast('danger', 'Error verifying expenditure');
+            }
+        }
+
+        function viewDetails(id) {
+            // Open detail view in new tab or modal
+            window.open(`/expenditures?id=${id}`, '_blank');
+        }
+
+        function showToast(type, message) {
+            // Simple toast notification
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type} position-fixed top-0 end-0 m-3`;
+            toast.style.zIndex = '9999';
+            toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check' : 'exclamation'}-circle"></i> ${message}`;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.transition = 'opacity 0.5s';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+
+        // Load on page load
+        loadPending();
+    </script>
+</body>
+</html>
