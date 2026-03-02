@@ -134,7 +134,11 @@ hour_2_documentation() {
     # Generate architecture overview
     log "Generating architecture documentation..."
 
-    cat > docs/INFRASTRUCTURE_OVERVIEW.md << 'EOF'
+    # Use temp directory for documentation
+    DOC_DIR="/tmp/dominion-docs"
+    mkdir -p "$DOC_DIR"
+
+    cat > "$DOC_DIR/INFRASTRUCTURE_OVERVIEW.md" << 'EOF'
 # Dominion OS Infrastructure Overview
 
 **Generated:** $(date)
