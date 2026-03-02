@@ -8,3 +8,5 @@ dominion-os-api                512Mi   1000m
 dominion-phi-ui                1Gi     1
 dominion-revenue-automation    1Gi     1
 dominion-security-framework    1Gi     1
+phi-askphi-widget              512Mi   1
+phi-oauth-server               1Gi     1

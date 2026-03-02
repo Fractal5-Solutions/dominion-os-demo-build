@@ -1,0 +1,228 @@
+{
+  "bindings": [
+    {
+      "members": [
+        "serviceAccount:447370233441-compute@developer.gserviceaccount.com",
+        "serviceAccount:dominion-deploy@dominion-core-prod.iam.gserviceaccount.com"
+      ],
+      "role": "roles/artifactregistry.admin"
+    },
+    {
+      "members": [
+        "serviceAccount:447370233441@cloudbuild.gserviceaccount.com",
+        "serviceAccount:dominion-build-signer@dominion-core-prod.iam.gserviceaccount.com",
+        "serviceAccount:service-447370233441@serverless-robot-prod.iam.gserviceaccount.com"
+      ],
+      "role": "roles/artifactregistry.reader"
+    },
+    {
+      "members": [
+        "serviceAccount:service-447370233441@gcp-sa-artifactregistry.iam.gserviceaccount.com"
+      ],
+      "role": "roles/artifactregistry.serviceAgent"
+    },
+    {
+      "members": [
+        "serviceAccount:447370233441@cloudbuild.gserviceaccount.com",
+        "serviceAccount:dominion-build-sa@dominion-core-prod.iam.gserviceaccount.com",
+        "serviceAccount:dominion-build-signer@dominion-core-prod.iam.gserviceaccount.com",
+        "serviceAccount:gateway-sa@dominion-core-prod.iam.gserviceaccount.com",
+        "serviceAccount:phi-ui-sa@dominion-core-prod.iam.gserviceaccount.com",
+        "user:matthewburbidge@fractal5solutions.com"
+      ],
+      "role": "roles/artifactregistry.writer"
+    },
+    {
+      "members": [
+        "serviceAccount:service-447370233441@gcp-sa-cloudaicompanion.iam.gserviceaccount.com"
+      ],
+      "role": "roles/cloudaicompanion.serviceAgent"
+    },
+    {
+      "members": [
+        "serviceAccount:447370233441-compute@developer.gserviceaccount.com",
+        "serviceAccount:447370233441@cloudbuild.gserviceaccount.com",
+        "serviceAccount:dominion-build-sa@dominion-core-prod.iam.gserviceaccount.com"
+      ],
+      "role": "roles/cloudbuild.builds.builder"
+    },
+    {
+      "members": [
+        "serviceAccount:dominion-deploy@dominion-core-prod.iam.gserviceaccount.com"
+      ],
+      "role": "roles/cloudbuild.builds.editor"
+    },
+    {
+      "members": [
+        "serviceAccount:service-447370233441@gcp-sa-cloudbuild.iam.gserviceaccount.com"
+      ],
+      "role": "roles/cloudbuild.serviceAgent"
+    },
+    {
+      "members": [
+        "serviceAccount:service-447370233441@gcp-sa-cloudscheduler.iam.gserviceaccount.com"
+      ],
+      "role": "roles/cloudscheduler.serviceAgent"
+    },
+    {
+      "members": [
+        "serviceAccount:service-447370233441@compute-system.iam.gserviceaccount.com"
+      ],
+      "role": "roles/compute.serviceAgent"
+    },
+    {
+      "members": [
+        "serviceAccount:service-447370233441@container-engine-robot.iam.gserviceaccount.com"
+      ],
+      "role": "roles/container.serviceAgent"
+    },
+    {
+      "members": [
+        "serviceAccount:service-447370233441@container-analysis.iam.gserviceaccount.com"
+      ],
+      "role": "roles/containeranalysis.ServiceAgent"
+    },
+    {
+      "members": [
+        "serviceAccount:service-447370233441@containerregistry.iam.gserviceaccount.com"
+      ],
+      "role": "roles/containerregistry.ServiceAgent"
+    },
+    {
+      "members": [
+        "serviceAccount:service-447370233441@dataproc-accounts.iam.gserviceaccount.com"
+      ],
+      "role": "roles/dataproc.serviceAgent"
+    },
+    {
+      "members": [
+        "serviceAccount:447370233441@cloudbuild.gserviceaccount.com"
+      ],
+      "role": "roles/datastore.owner"
+    },
+    {
+      "members": [
+        "serviceAccount:447370233441-compute@developer.gserviceaccount.com",
+        "serviceAccount:dominion-runtime@dominion-core-prod.iam.gserviceaccount.com"
+      ],
+      "role": "roles/datastore.user"
+    },
+    {
+      "members": [
+        "serviceAccount:447370233441@cloudservices.gserviceaccount.com"
+      ],
+      "role": "roles/editor"
+    },
+    {
+      "members": [
+        "serviceAccount:service-447370233441@firebase-rules.iam.gserviceaccount.com"
+      ],
+      "role": "roles/firebaserules.system"
+    },
+    {
+      "members": [
+        "serviceAccount:service-447370233441@gcp-sa-firestore.iam.gserviceaccount.com"
+      ],
+      "role": "roles/firestore.serviceAgent"
+    },
+    {
+      "members": [
+        "serviceAccount:447370233441-compute@developer.gserviceaccount.com",
+        "serviceAccount:gateway-sa@dominion-core-prod.iam.gserviceaccount.com",
+        "serviceAccount:phi-ui-sa@dominion-core-prod.iam.gserviceaccount.com"
+      ],
+      "role": "roles/iam.serviceAccountUser"
+    },
+    {
+      "members": [
+        "serviceAccount:447370233441-compute@developer.gserviceaccount.com",
+        "serviceAccount:gateway-sa@dominion-core-prod.iam.gserviceaccount.com",
+        "serviceAccount:phi-ui-sa@dominion-core-prod.iam.gserviceaccount.com"
+      ],
+      "role": "roles/logging.logWriter"
+    },
+    {
+      "members": [
+        "serviceAccount:gateway-sa@dominion-core-prod.iam.gserviceaccount.com",
+        "serviceAccount:phi-ui-sa@dominion-core-prod.iam.gserviceaccount.com"
+      ],
+      "role": "roles/monitoring.metricWriter"
+    },
+    {
+      "members": [
+        "user:matthewburbidge@fractal5solutions.com"
+      ],
+      "role": "roles/owner"
+    },
+    {
+      "members": [
+        "serviceAccount:447370233441@cloudbuild.gserviceaccount.com"
+      ],
+      "role": "roles/pubsub.admin"
+    },
+    {
+      "members": [
+        "serviceAccount:dominion-runtime@dominion-core-prod.iam.gserviceaccount.com"
+      ],
+      "role": "roles/pubsub.publisher"
+    },
+    {
+      "members": [
+        "serviceAccount:service-447370233441@gcp-sa-pubsub.iam.gserviceaccount.com"
+      ],
+      "role": "roles/pubsub.serviceAgent"
+    },
+    {
+      "members": [
+        "serviceAccount:447370233441-compute@developer.gserviceaccount.com",
+        "serviceAccount:447370233441@cloudbuild.gserviceaccount.com",
+        "serviceAccount:dominion-deploy@dominion-core-prod.iam.gserviceaccount.com",
+        "serviceAccount:gateway-sa@dominion-core-prod.iam.gserviceaccount.com",
+        "serviceAccount:phi-ui-sa@dominion-core-prod.iam.gserviceaccount.com"
+      ],
+      "role": "roles/run.admin"
+    },
+    {
+      "members": [
+        "serviceAccount:service-447370233441@serverless-robot-prod.iam.gserviceaccount.com"
+      ],
+      "role": "roles/run.serviceAgent"
+    },
+    {
+      "members": [
+        "serviceAccount:gateway-sa@dominion-core-prod.iam.gserviceaccount.com",
+        "serviceAccount:phi-ui-sa@dominion-core-prod.iam.gserviceaccount.com"
+      ],
+      "role": "roles/secretmanager.secretAccessor"
+    },
+    {
+      "members": [
+        "serviceAccount:447370233441-compute@developer.gserviceaccount.com"
+      ],
+      "role": "roles/serviceusage.serviceUsageConsumer"
+    },
+    {
+      "members": [
+        "serviceAccount:447370233441-compute@developer.gserviceaccount.com",
+        "serviceAccount:447370233441@cloudbuild.gserviceaccount.com",
+        "serviceAccount:dominion-deploy@dominion-core-prod.iam.gserviceaccount.com",
+        "user:matthewburbidge@fractal5solutions.com"
+      ],
+      "role": "roles/storage.admin"
+    },
+    {
+      "members": [
+        "serviceAccount:447370233441-compute@developer.gserviceaccount.com"
+      ],
+      "role": "roles/storage.objectViewer"
+    },
+    {
+      "members": [
+        "user:matthewburbidge@fractal5solutions.com"
+      ],
+      "role": "roles/viewer"
+    }
+  ],
+  "etag": "BwZL5hogpls=",
+  "version": 1
+}

@@ -1,0 +1,24 @@
+{
+  "timestamp": "2026-03-02T17:24:04+00:00",
+  "status": "operational",
+  "infrastructure": {
+    "total_services": 24,
+    "operational_services": 23,
+    "health_percentage": 95
+  },
+  "components": {
+    "ai_gateways": 2,
+    "phi_uis": 1,
+    "core_apis": 3
+  },
+  "projects": {
+    "dominion-os-1-0-main": {
+      "operational": 8,
+      "total": 9
+    },
+    "dominion-core-prod": {
+      "operational": 15,
+      "total": 15
+    }
+  }
+}

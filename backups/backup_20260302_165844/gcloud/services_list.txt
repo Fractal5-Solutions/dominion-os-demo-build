@@ -1,0 +1,16 @@
+NAME                       REGION       URL  LAST_DEPLOYED_TIME
+api                        us-central1
+chatgpt-gateway            us-central1
+demo                       us-central1
+dominion-ai-gateway        us-central1
+dominion-api               us-central1
+dominion-chief-of-staff    us-central1
+dominion-demo              us-central1
+dominion-demo-service      us-central1
+dominion-gateway           us-central1
+dominion-os                us-central1
+dominion-os-1-0-101        us-central1
+dominion-os-demo           us-central1
+dominion-phi-ui            us-central1
+phi-expenditure-dashboard  us-central1
+pipeline                   us-central1

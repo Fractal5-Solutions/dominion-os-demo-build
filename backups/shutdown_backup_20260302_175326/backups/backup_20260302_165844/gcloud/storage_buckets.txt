@@ -1,0 +1,5 @@
+NAME                                        LOCATION     STORAGE_CLASS
+dominion-core-prod-drydock-state            US
+dominion-core-prod-sbom                     US-CENTRAL1
+dominion-core-prod_cloudbuild               US
+run-sources-dominion-core-prod-us-central1  US-CENTRAL1
