@@ -1,0 +1,47 @@
+[2026-03-05 23:34:11] ═══════════════════════════════════════════════════════════════════
+[2026-03-05 23:34:11] Starting activation sequence at 2026-03-05 23:34:11 UTC
+[2026-03-05 23:34:11] ═══════════════════════════════════════════════════════════════════
+[0;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+[0;36mPHASE 1: PRE-FLIGHT VERIFICATION[0m
+[0;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+[2026-03-05 23:34:11] Step 1.1: Verifying GCP Authentication
+[0;32m✅ Authenticated as: matthewburbidge@fractal5solutions.com[0m
+[2026-03-05 23:34:12] Step 1.2: Checking GitHub Token
+[0;34mℹ️  Token prefix: ghu_7ESKiW...[0m
+[1;33m⚠️  Git push capability: LIMITED (integration token)[0m
+[2026-03-05 23:34:12] Step 1.3: Verifying network connectivity
+[0;32m✅ Internet connectivity verified[0m
+[2026-03-05 23:34:12] Step 1.4: Checking required tools
+[0;32m✅ gcloud: Available[0m
+[0;32m✅ git: Available[0m
+[0;32m✅ jq: Available[0m
+[0;32m✅ curl: Available[0m
+[0;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+[0;36mPHASE 2: INFRASTRUCTURE ACTIVATION & HEALTH CHECK[0m
+[0;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+[2026-03-05 23:34:12] Step 2.1: Scanning dominion-os-1-0-main (dominion-os-1-0-main)
+[1;33m⚠️  No services found in dominion-os-1-0-main[0m
+[2026-03-05 23:34:14] Step 2.2: Scanning dominion-core-prod (dominion-core-prod)
+[1;33m⚠️  No services found in dominion-core-prod[0m
+[0;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+[0;36mPHASE 3: SERVICE COMPONENT VALIDATION[0m
+[0;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+[2026-03-05 23:34:16] Step 3.1: Validating AI Gateways
+[1;33m⚠️  No AI Gateways found[0m
+[2026-03-05 23:34:18] Step 3.2: Validating PHI User Interfaces
+[1;33m⚠️  No PHI UIs found[0m
+[2026-03-05 23:34:19] Step 3.3: Validating Core APIs
+[1;33m⚠️  No Core APIs found[0m
+[0;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+[0;36mPHASE 4: MONITORING & SLO VALIDATION[0m
+[0;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+[2026-03-05 23:34:21] Step 4.1: Checking Cloud Monitoring configuration
+[0;34mℹ️  No uptime checks found - consider running setup_monitoring.sh[0m
+[2026-03-05 23:34:22] Step 4.2: Checking SLO definitions
+[0;34mℹ️  SLO configuration script not found[0m
+[2026-03-05 23:34:22] Step 4.3: Running SLO compliance check
+[0;34mℹ️  SLO monitoring script not found[0m
+[0;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+[0;36mPHASE 5: REPOSITORY SYNCHRONIZATION[0m
+[0;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+[2026-03-05 23:34:22] Step 5.1: Checking repository status

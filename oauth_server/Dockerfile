@@ -24,7 +24,16 @@ EXPOSE 5000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:5000/health || exit 1
+    CMD curl -f http://localhost:${PORT:-8080}/health || exit 1
 
-# Run application
-CMD ["python", "app.py"]
+# Run application with gunicorn (production WSGI server)
+CMD exec gunicorn --bind :${PORT:-8080} \
+    --workers 2 \
+    --threads 4 \
+    --worker-class gthread \
+    --timeout 300 \
+    --keep-alive 5 \
+    --log-level info \
+    --access-logfile - \
+    --error-logfile - \
+    app:app
