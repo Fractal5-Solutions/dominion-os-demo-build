@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 PHI AI Model Selection Engine
 Purpose: Autonomous model selection for cost optimization and performance scaling

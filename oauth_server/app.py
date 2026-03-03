@@ -44,6 +44,21 @@ def verify_state(expected_state, received_state):
 
 
 # Routes
+@app.route("/health")
+def health():
+    """Health check endpoint for Cloud Run"""
+    return (
+        jsonify(
+            {
+                "status": "healthy",
+                "service": "phi-oauth-server",
+                "timestamp": datetime.utcnow().isoformat(),
+            }
+        ),
+        200,
+    )
+
+
 @app.route("/")
 def index():
     """Serve the AskPhi widget"""
@@ -58,7 +73,7 @@ def index():
         <style>
             body {
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, #000000 0%, #797979 100%);
                 margin: 0;
                 padding: 20px;
                 min-height: 100vh;
@@ -80,7 +95,7 @@ def index():
             }
             .phi-logo {
                 font-size: 2.5em;
-                color: #667eea;
+                color: #000000;
                 margin-bottom: 10px;
             }
             .subtitle {
@@ -315,7 +330,7 @@ def chat():
         <style>
             body {{
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, #000000 0%, #797979 100%);
                 margin: 0;
                 padding: 20px;
                 min-height: 100vh;
@@ -355,13 +370,13 @@ def chat():
                 max-width: 70%;
             }}
             .message.user {{
-                background: #667eea;
+                background: #000000;
                 color: white;
                 margin-left: auto;
                 text-align: right;
             }}
             .message.phi {{
-                background: #f8f9fa;
+                background: #f5f5f5;
                 color: #333;
             }}
             .chat-input {{
@@ -378,7 +393,7 @@ def chat():
             }}
             .chat-input button {{
                 padding: 12px 24px;
-                background: #667eea;
+                background: #000000;
                 color: white;
                 border: none;
                 border-radius: 6px;
@@ -386,7 +401,7 @@ def chat():
                 font-size: 16px;
             }}
             .chat-input button:hover {{
-                background: #5a67d8;
+                background: #797979;
             }}
         </style>
     </head>
@@ -512,4 +527,4 @@ def generate_phi_response(message, user_payload):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=False, ssl_context="adhoc")
+    app.run(host="0.0.0.0", port=5000, debug=False)

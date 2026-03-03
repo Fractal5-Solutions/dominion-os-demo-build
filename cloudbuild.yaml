@@ -1,0 +1,161 @@
+# Canon Φ v1.0 Pre-Deploy Color Validation
+# Cloud Build configuration for GCP deployments
+# Enforces sealed five monochrome before Cloud Run deployment
+
+steps:
+  # Step 1: Canon Φ v1.0 Color Compliance Check
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'canon-phi-validation'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "🎨 Canon Φ v1.0 Color Compliance Validation"
+        echo "   Fractal5 Solutions Inc."
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo ""
+
+        # Sealed five monochrome system
+        echo "Authorized Colors (Sealed Five):"
+        echo "  - #000000 (Onyx metallic)"
+        echo "  - #ffffff (Platinum white)"
+        echo "  - #f5f5f5 (Light silver)"
+        echo "  - #d9d9d9 (Medium silver)"
+        echo "  - #797979 (Gunmetal/Bronze)"
+        echo ""
+
+        # Check for old purple gradient
+        echo "Checking for purple gradient violations..."
+        if grep -r "#667eea\|#764ba2" \
+          --include="*.html" \
+          --include="*.css" \
+          --include="*.py" \
+          --include="*.js" \
+          --exclude-dir=.venv \
+          --exclude-dir=__pycache__ \
+          --exclude-dir=node_modules \
+          . 2>/dev/null; then
+          echo ""
+          echo "❌ DEPLOYMENT BLOCKED!"
+          echo "   Old purple gradient detected (#667eea, #764ba2)"
+          echo "   These colors violate Canon Φ v1.0 sealed five system."
+          echo ""
+          exit 1
+        fi
+        echo "✅ No purple gradient violations"
+
+        # Extract all hex colors
+        echo ""
+        echo "Extracting hex colors from source files..."
+        COLORS=$(grep -rhoE "#[0-9a-fA-F]{6}" \
+          --include="*.html" \
+          --include="*.css" \
+          --include="*.py" \
+          --exclude-dir=.venv \
+          --exclude-dir=__pycache__ \
+          --exclude-dir=node_modules \
+          . 2>/dev/null | sed 's/#//' | tr '[:upper:]' '[:lower:]' | sort -u || echo "")
+
+        if [ -z "$COLORS" ]; then
+          echo "No hex colors found in source files."
+        else
+          echo "Found hex colors:"
+          echo "$COLORS" | sed 's/^/  #/'
+        fi
+
+        # Validate against sealed five
+        SEALED_FIVE=("000000" "ffffff" "f5f5f5" "d9d9d9" "797979")
+        VIOLATIONS_FOUND=false
+
+        for color in $COLORS; do
+          IS_SEALED=false
+          for sealed in "${SEALED_FIVE[@]}"; do
+            if [ "$color" = "$sealed" ]; then
+              IS_SEALED=true
+              break
+            fi
+          done
+
+          if [ "$IS_SEALED" = false ]; then
+            if [ "$VIOLATIONS_FOUND" = false ]; then
+              echo ""
+              echo "⚠️  Non-sealed-five colors detected:"
+              VIOLATIONS_FOUND=true
+            fi
+            echo "   #$color"
+          fi
+        done
+
+        if [ "$VIOLATIONS_FOUND" = true ]; then
+          echo ""
+          echo "❌ COLOR COMPLIANCE FAILED"
+          echo "   Deploy with caution or update to sealed five colors."
+          echo ""
+          # Warning only - not blocking deployment
+          # Change exit 1 to block deployment
+        fi
+
+        echo ""
+        echo "✅ Canon Φ v1.0 validation complete"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo ""
+
+  # Step 2: Build Container
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-container'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/$_SERVICE_NAME:$SHORT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/$_SERVICE_NAME:latest'
+      - '.'
+
+  # Step 3: Push Container
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-container'
+    args:
+      - 'push'
+      - '--all-tags'
+      - 'gcr.io/$PROJECT_ID/$_SERVICE_NAME'
+
+  # Step 4: Deploy to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'deploy-cloud-run'
+    args:
+      - 'run'
+      - 'deploy'
+      - '$_SERVICE_NAME'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/$_SERVICE_NAME:$SHORT_SHA'
+      - '--region'
+      - '$_REGION'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--quiet'
+
+# Substitutions for deployment configuration
+substitutions:
+  _SERVICE_NAME: 'phi-oauth-server'
+  _REGION: 'us-central1'
+
+# Build configuration
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'N1_HIGHCPU_8'
+
+# Timeout
+timeout: 1200s
+
+# Images to push
+images:
+  - 'gcr.io/$PROJECT_ID/$_SERVICE_NAME:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/$_SERVICE_NAME:latest'
+
+# Tags for build tracking
+tags:
+  - 'canon-phi-validated'
+  - '$_SERVICE_NAME'
+  - 'dominion-os-1-0'

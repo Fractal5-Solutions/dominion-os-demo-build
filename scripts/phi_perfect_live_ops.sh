@@ -72,7 +72,7 @@ execute_phase "AI Model Cost Analysis" "python3 scripts/phi_ai_model_selector.py
 echo "💰 PHASE 4: Cost Optimization"
 echo "============================"
 
-execute_phase "Cost Monitoring Setup" "./scripts/setup_cost_monitoring.sh"
+execute_phase "Cost Monitoring Setup (Async)" "./scripts/setup_cost_monitoring_async.sh"
 
 execute_phase "Cloud Cost Optimization" "./scripts/phi_cost_optimization.sh"
 

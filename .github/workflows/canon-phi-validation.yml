@@ -1,0 +1,154 @@
+name: Canon Φ v1.0 Color Compliance
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  color-validation:
+    name: Validate Sealed Five Compliance
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Check for purple gradient violations
+        run: |
+          echo "🎨 Checking for old purple gradient colors..."
+
+          # Check for forbidden purple gradients
+          if grep -r "#667eea\|#764ba2" \
+            --include="*.html" \
+            --include="*.css" \
+            --include="*.py" \
+            --include="*.js" \
+            --include="*.ts" \
+            --exclude-dir=node_modules \
+            --exclude-dir=.venv \
+            --exclude-dir=__pycache__ \
+            .; then
+            echo "❌ PURPLE GRADIENT DETECTED - Build failed!"
+            echo "Found forbidden colors: #667eea or #764ba2"
+            echo ""
+            echo "Canon Φ v1.0 requires sealed five monochrome only."
+            exit 1
+          fi
+
+          echo "✅ No purple gradient violations"
+
+      - name: Extract all hex colors
+        id: colors
+        run: |
+          echo "Extracting all hex colors from codebase..."
+
+          # Find all hex colors in relevant files
+          COLORS=$(grep -rhoE "#[0-9a-fA-F]{6}" \
+            --include="*.html" \
+            --include="*.css" \
+            --include="*.py" \
+            --include="*.js" \
+            --include="*.ts" \
+            --exclude-dir=node_modules \
+            --exclude-dir=.venv \
+            --exclude-dir=__pycache__ \
+            . | sed 's/#//' | tr '[:upper:]' '[:lower:]' | sort -u || echo "")
+
+          # Save colors to file for next step
+          echo "$COLORS" > /tmp/found_colors.txt
+
+          echo "Found $(echo "$COLORS" | wc -l) unique colors"
+          echo "$COLORS"
+
+      - name: Validate against sealed five
+        run: |
+          echo ""
+          echo "🎨 Validating colors against Canon Φ v1.0 sealed five..."
+          echo ""
+
+          # Sealed five monochrome (authorized colors)
+          SEALED_FIVE=(
+            "000000"  # Onyx metallic
+            "ffffff"  # Platinum white
+            "f5f5f5"  # Light silver
+            "d9d9d9"  # Medium silver
+            "797979"  # Gunmetal/Bronze
+          )
+
+          # Additional allowed colors (exceptions documented)
+          ALLOWED_EXCEPTIONS=(
+            "212529"  # Bootstrap text (if legacy)
+            "6c757d"  # Bootstrap muted (if legacy)
+            "f8f9fa"  # Bootstrap panel (if legacy)
+            "e9ecef"  # Bootstrap border (if legacy)
+          )
+
+          VIOLATIONS_FOUND=false
+
+          while IFS= read -r color; do
+            if [ -z "$color" ]; then
+              continue
+            fi
+
+            IS_AUTHORIZED=false
+
+            # Check sealed five
+            for sealed in "${SEALED_FIVE[@]}"; do
+              if [ "$color" = "$sealed" ]; then
+                IS_AUTHORIZED=true
+                break
+              fi
+            done
+
+            # Check exceptions (with warning)
+            if [ "$IS_AUTHORIZED" = false ]; then
+              for exception in "${ALLOWED_EXCEPTIONS[@]}"; do
+                if [ "$color" = "$exception" ]; then
+                  IS_AUTHORIZED=true
+                  echo "⚠️  Exception color found: #$color (Bootstrap legacy)"
+                  break
+                fi
+              done
+            fi
+
+            # Report violation
+            if [ "$IS_AUTHORIZED" = false ]; then
+              if [ "$VIOLATIONS_FOUND" = false ]; then
+                echo "❌ NON-COMPLIANT colors detected:"
+                VIOLATIONS_FOUND=true
+              fi
+              echo "   #$color"
+            fi
+          done < /tmp/found_colors.txt
+
+          if [ "$VIOLATIONS_FOUND" = true ]; then
+            echo ""
+            echo "Canon Φ v1.0 sealed five (authorized only):"
+            echo "  - #000000 (Onyx metallic)"
+            echo "  - #ffffff (Platinum white)"
+            echo "  - #f5f5f5 (Light silver)"
+            echo "  - #d9d9d9 (Medium silver)"
+            echo "  - #797979 (Gunmetal/Bronze)"
+            echo ""
+            echo "Build failed due to color compliance violations."
+            echo "Please update colors to sealed five monochrome system."
+            exit 1
+          fi
+
+          echo ""
+          echo "✅ All colors comply with Canon Φ v1.0!"
+
+      - name: Report compliance status
+        if: success()
+        run: |
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "✅ Canon Φ v1.0 Color Compliance: PASSED"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "Sealed Five Monochrome System Verified"
+          echo "Fractal5 Solutions Inc."
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
