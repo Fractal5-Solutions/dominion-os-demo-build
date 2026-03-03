@@ -27,8 +27,8 @@ class TestDemoBuild(unittest.TestCase):
             dst = run_demo()
             self.assertTrue(dst.exists())
             self.assertTrue((self.tmp / "dist" / "ticks.txt").exists())
-        except ModuleNotFoundError:
-            raise unittest.SkipTest("Sibling dominion-os-1.0 not available in this environment")
+        except ModuleNotFoundError as exc:
+            raise unittest.SkipTest("Sibling dominion-os-1.0 not available") from exc
 
     def test_demo_build_image(self):
         from demo_build import build_image
@@ -36,5 +36,5 @@ class TestDemoBuild(unittest.TestCase):
         try:
             dst = build_image()
             self.assertTrue(dst.exists())
-        except ModuleNotFoundError:
-            raise unittest.SkipTest("Sibling dominion-os-1.0 not available in this environment")
+        except ModuleNotFoundError as exc:
+            raise unittest.SkipTest("Sibling dominion-os-1.0 not available") from exc

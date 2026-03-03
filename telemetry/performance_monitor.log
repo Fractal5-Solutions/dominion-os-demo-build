@@ -1,0 +1,201 @@
+
+╔═══════════════════════════════════════════════════════════════╗
+║                                                               ║
+║   PHI PERFORMANCE MONITOR                                    ║
+║   Autonomous Service Benchmarking & Anomaly Detection         ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+
+[2026-03-03 16:54:54 UTC] Timestamp: 2026-03-03 16:54:54 UTC
+[2026-03-03 16:54:54 UTC] Authority: 9/9 Sovereign Power
+[2026-03-03 16:54:54 UTC] Mode: Continuous Performance Monitoring
+[2026-03-03 16:54:54 UTC] Check Interval: 15 minutes
+[2026-03-03 16:54:54 UTC]
+[2026-03-03 16:54:54 UTC] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[2026-03-03 16:54:54 UTC] PERFORMANCE CYCLE #1
+[2026-03-03 16:54:54 UTC] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[2026-03-03 16:54:54 UTC]
+[2026-03-03 16:54:54 UTC] [1/5] Discovering services...
+[2026-03-03 16:54:57 UTC]   ✓ Services discovered
+[2026-03-03 16:54:57 UTC]
+[2026-03-03 16:54:57 UTC] [2/5] Running performance tests...
+[2026-03-03 16:54:57 UTC]   Testing: askphi-chatbot
+[2026-03-03 16:54:57 UTC]     → 124ms (HTTP 200) [GOOD]
+[2026-03-03 16:54:57 UTC]   Testing: dominion-ai-gateway
+[2026-03-03 16:54:57 UTC]     → 109ms (HTTP 404) [GOOD]
+[2026-03-03 16:54:57 UTC]   Testing: dominion-f5-gateway
+[2026-03-03 16:54:57 UTC]     → 127ms (HTTP 200) [GOOD]
+[2026-03-03 16:54:57 UTC]   Testing: dominion-monitoring-dashboard
+[2026-03-03 16:54:57 UTC]     → 109ms (HTTP 200) [GOOD]
+[2026-03-03 16:54:57 UTC]   Testing: dominion-os-1-0
+[2026-03-03 16:54:57 UTC]     → 167ms (HTTP 404) [GOOD]
+[2026-03-03 16:54:57 UTC]   Testing: dominion-os-api
+[2026-03-03 16:54:58 UTC]     → 123ms (HTTP 404) [GOOD]
+[2026-03-03 16:54:58 UTC]   Testing: dominion-phi-ui
+[2026-03-03 16:54:58 UTC]     → 143ms (HTTP 200) [GOOD]
+[2026-03-03 16:54:58 UTC]   Testing: dominion-revenue-automation
+[2026-03-03 16:54:58 UTC]     → 107ms (HTTP 404) [GOOD]
+[2026-03-03 16:54:58 UTC]   Testing: dominion-security-framework
+[2026-03-03 16:54:58 UTC]     → 133ms (HTTP 307) [GOOD]
+[2026-03-03 16:54:58 UTC]   Testing: phi-askphi-widget
+[2026-03-03 16:55:00 UTC]     → 1817ms (HTTP 200) [SLOW]
+[2026-03-03 16:55:00 UTC]   Testing: phi-oauth-server
+[2026-03-03 16:55:03 UTC]     → 3459ms (HTTP 200) [TIMEOUT]
+[2026-03-03 16:55:03 UTC]   Testing: api
+[2026-03-03 16:55:03 UTC]     → 133ms (HTTP 404) [GOOD]
+[2026-03-03 16:55:03 UTC]   Testing: chatgpt-gateway
+[2026-03-03 16:55:04 UTC]     → 153ms (HTTP 404) [GOOD]
+[2026-03-03 16:55:04 UTC]   Testing: demo
+[2026-03-03 16:55:04 UTC]     → 134ms (HTTP 200) [GOOD]
+[2026-03-03 16:55:04 UTC]   Testing: dominion-ai-gateway
+[2026-03-03 16:55:04 UTC]     → 124ms (HTTP 404) [GOOD]
+[2026-03-03 16:55:04 UTC]   Testing: dominion-api
+[2026-03-03 16:55:04 UTC]     → 151ms (HTTP 200) [GOOD]
+[2026-03-03 16:55:04 UTC]   Testing: dominion-chief-of-staff
+[2026-03-03 16:55:04 UTC]     → 113ms (HTTP 200) [GOOD]
+[2026-03-03 16:55:04 UTC]   Testing: dominion-demo
+[2026-03-03 16:55:04 UTC]     → 105ms (HTTP 200) [GOOD]
+[2026-03-03 16:55:04 UTC]   Testing: dominion-demo-service
+[2026-03-03 16:55:04 UTC]     → 167ms (HTTP 200) [GOOD]
+[2026-03-03 16:55:04 UTC]   Testing: dominion-gateway
+[2026-03-03 16:55:05 UTC]     → 151ms (HTTP 200) [GOOD]
+[2026-03-03 16:55:05 UTC]   Testing: dominion-os
+[2026-03-03 16:55:05 UTC]     → 135ms (HTTP 500) [GOOD]
+[2026-03-03 16:55:05 UTC]   Testing: dominion-os-1-0-101
+[2026-03-03 16:55:05 UTC]     → 141ms (HTTP 404) [GOOD]
+[2026-03-03 16:55:05 UTC]   Testing: dominion-os-demo
+[2026-03-03 16:55:05 UTC]     → 115ms (HTTP 200) [GOOD]
+[2026-03-03 16:55:05 UTC]   Testing: dominion-phi-ui
+[2026-03-03 16:55:05 UTC]     → 134ms (HTTP 200) [GOOD]
+[2026-03-03 16:55:05 UTC]   Testing: phi-askphi-widget
+[2026-03-03 16:55:07 UTC]     → 2093ms (HTTP 200) [SLOW]
+[2026-03-03 16:55:07 UTC]   Testing: phi-expenditure-dashboard
+[2026-03-03 16:55:07 UTC]     → 142ms (HTTP 200) [GOOD]
+[2026-03-03 16:55:07 UTC]   Testing: phi-oauth-server
+[2026-03-03 16:55:08 UTC]     → 118ms (HTTP 200) [GOOD]
+[2026-03-03 16:55:08 UTC]   Testing: pipeline
+[2026-03-03 16:55:08 UTC]     → 150ms (HTTP 404) [GOOD]
+[2026-03-03 16:55:08 UTC]
+[2026-03-03 16:55:08 UTC] [3/5] Analyzing results...
+[2026-03-03 16:55:08 UTC]   ✓ Performance data analyzed
+[2026-03-03 16:55:08 UTC]
+[2026-03-03 16:55:08 UTC] [4/5] Generating recommendations...
+[2026-03-03 16:55:08 UTC]   ⚠ 2 anomalie(s) detected
+[2026-03-03 16:55:08 UTC]
+[2026-03-03 16:55:08 UTC] [5/5] Summary & Recommendations...
+[2026-03-03 16:55:08 UTC]   📊 Performance Distribution:
+[2026-03-03 16:55:08 UTC]      • Excellent (<100ms): 0 services
+[2026-03-03 16:55:08 UTC]      • Good (<300ms): 25 services
+[2026-03-03 16:55:08 UTC]      • Acceptable (<1000ms): 0 services
+[2026-03-03 16:55:08 UTC]      • Slow (<3000ms): 2 services
+[2026-03-03 16:55:08 UTC]      • Failed: 1 services
+[2026-03-03 16:55:08 UTC]
+[2026-03-03 16:55:08 UTC]   📋 Recommendations:
+
+     • Investigate 1 failed service(s) - possible downtime
+     • Review 2 slow service(s) - performance degradation detected
+[2026-03-03 16:55:08 UTC]
+[2026-03-03 16:55:08 UTC] ╔═══════════════════════════════════════════════════════════════╗
+[2026-03-03 16:55:08 UTC] ║  CYCLE #1 COMPLETE
+[2026-03-03 16:55:08 UTC] ║  Tested: 27/28 | Excellent: 0 | Good: 25 | Acceptable: 0
+[2026-03-03 16:55:08 UTC] ╚═══════════════════════════════════════════════════════════════╝
+[2026-03-03 16:55:08 UTC]
+[2026-03-03 16:55:08 UTC] ⏳ Next performance cycle in 15 minutes...
+[2026-03-03 16:55:08 UTC]
+[2026-03-03 17:10:08 UTC] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[2026-03-03 17:10:08 UTC] PERFORMANCE CYCLE #2
+[2026-03-03 17:10:08 UTC] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[2026-03-03 17:10:08 UTC]
+[2026-03-03 17:10:08 UTC] [1/5] Discovering services...
+[2026-03-03 17:10:11 UTC]   ✓ Services discovered
+[2026-03-03 17:10:11 UTC]
+[2026-03-03 17:10:11 UTC] [2/5] Running performance tests...
+[2026-03-03 17:10:11 UTC]   Testing: askphi-chatbot
+[2026-03-03 17:10:11 UTC]     → 213ms (HTTP 200) [GOOD]
+[2026-03-03 17:10:11 UTC]   Testing: dominion-ai-gateway
+[2026-03-03 17:10:11 UTC]     → 136ms (HTTP 404) [GOOD]
+[2026-03-03 17:10:11 UTC]   Testing: dominion-f5-gateway
+[2026-03-03 17:10:11 UTC]     → 116ms (HTTP 200) [GOOD]
+[2026-03-03 17:10:11 UTC]   Testing: dominion-monitoring-dashboard
+[2026-03-03 17:10:11 UTC]     → 145ms (HTTP 200) [GOOD]
+[2026-03-03 17:10:11 UTC]   Testing: dominion-os-1-0
+[2026-03-03 17:10:11 UTC]     → 153ms (HTTP 404) [GOOD]
+[2026-03-03 17:10:11 UTC]   Testing: dominion-os-api
+[2026-03-03 17:10:12 UTC]     → 112ms (HTTP 404) [GOOD]
+[2026-03-03 17:10:12 UTC]   Testing: dominion-phi-ui
+[2026-03-03 17:10:12 UTC]     → 108ms (HTTP 200) [GOOD]
+[2026-03-03 17:10:12 UTC]   Testing: dominion-revenue-automation
+[2026-03-03 17:10:12 UTC]     → 111ms (HTTP 404) [GOOD]
+[2026-03-03 17:10:12 UTC]   Testing: dominion-security-framework
+[2026-03-03 17:10:12 UTC]     → 124ms (HTTP 307) [GOOD]
+[2026-03-03 17:10:12 UTC]   Testing: phi-askphi-widget
+[2026-03-03 17:10:14 UTC]     → 2520ms (HTTP 200) [SLOW]
+[2026-03-03 17:10:14 UTC]   Testing: phi-oauth-server
+[2026-03-03 17:10:16 UTC]     → 1087ms (HTTP 200) [SLOW]
+[2026-03-03 17:10:16 UTC]   Testing: api
+[2026-03-03 17:10:16 UTC]     → 126ms (HTTP 404) [GOOD]
+[2026-03-03 17:10:16 UTC]   Testing: chatgpt-gateway
+[2026-03-03 17:10:16 UTC]     → 125ms (HTTP 404) [GOOD]
+[2026-03-03 17:10:16 UTC]   Testing: demo
+[2026-03-03 17:10:16 UTC]     → 150ms (HTTP 200) [GOOD]
+[2026-03-03 17:10:16 UTC]   Testing: dominion-ai-gateway
+[2026-03-03 17:10:16 UTC]     → 111ms (HTTP 404) [GOOD]
+[2026-03-03 17:10:16 UTC]   Testing: dominion-api
+[2026-03-03 17:10:16 UTC]     → 112ms (HTTP 200) [GOOD]
+[2026-03-03 17:10:16 UTC]   Testing: dominion-chief-of-staff
+[2026-03-03 17:10:16 UTC]     → 167ms (HTTP 200) [GOOD]
+[2026-03-03 17:10:16 UTC]   Testing: dominion-demo
+[2026-03-03 17:10:16 UTC]     → 128ms (HTTP 200) [GOOD]
+[2026-03-03 17:10:16 UTC]   Testing: dominion-demo-service
+[2026-03-03 17:10:17 UTC]     → 145ms (HTTP 200) [GOOD]
+[2026-03-03 17:10:17 UTC]   Testing: dominion-gateway
+[2026-03-03 17:10:17 UTC]     → 153ms (HTTP 200) [GOOD]
+[2026-03-03 17:10:17 UTC]   Testing: dominion-os
+[2026-03-03 17:10:17 UTC]     → 122ms (HTTP 500) [GOOD]
+[2026-03-03 17:10:17 UTC]   Testing: dominion-os-1-0-101
+[2026-03-03 17:10:17 UTC]     → 136ms (HTTP 404) [GOOD]
+[2026-03-03 17:10:17 UTC]   Testing: dominion-os-demo
+[2026-03-03 17:10:17 UTC]     → 118ms (HTTP 200) [GOOD]
+[2026-03-03 17:10:17 UTC]   Testing: dominion-phi-ui
+[2026-03-03 17:10:17 UTC]     → 178ms (HTTP 200) [GOOD]
+[2026-03-03 17:10:17 UTC]   Testing: phi-askphi-widget
+[2026-03-03 17:10:18 UTC]     → 922ms (HTTP 200) [ACCEPTABLE]
+[2026-03-03 17:10:18 UTC]   Testing: phi-expenditure-dashboard
+[2026-03-03 17:10:18 UTC]     → 113ms (HTTP 200) [GOOD]
+[2026-03-03 17:10:18 UTC]   Testing: phi-oauth-server
+[2026-03-03 17:10:19 UTC]     → 136ms (HTTP 200) [GOOD]
+[2026-03-03 17:10:19 UTC]   Testing: pipeline
+[2026-03-03 17:10:19 UTC]     → 125ms (HTTP 404) [GOOD]
+[2026-03-03 17:10:19 UTC]
+[2026-03-03 17:10:19 UTC] [3/5] Analyzing results...
+[2026-03-03 17:10:19 UTC]   ✓ Performance data analyzed
+[2026-03-03 17:10:19 UTC]
+[2026-03-03 17:10:19 UTC] [4/5] Generating recommendations...
+[2026-03-03 17:10:19 UTC]   ⚠ 1 anomalie(s) detected
+[2026-03-03 17:10:19 UTC]
+[2026-03-03 17:10:19 UTC] [5/5] Summary & Recommendations...
+[2026-03-03 17:10:19 UTC]   📊 Performance Distribution:
+[2026-03-03 17:10:19 UTC]      • Excellent (<100ms): 0 services
+[2026-03-03 17:10:19 UTC]      • Good (<300ms): 25 services
+[2026-03-03 17:10:19 UTC]      • Acceptable (<1000ms): 1 services
+[2026-03-03 17:10:19 UTC]      • Slow (<3000ms): 2 services
+[2026-03-03 17:10:19 UTC]      • Failed: 0 services
+[2026-03-03 17:10:19 UTC]
+[2026-03-03 17:10:19 UTC]   📋 Recommendations:
+
+     • Review 2 slow service(s) - performance degradation detected
+[2026-03-03 17:10:19 UTC]
+[2026-03-03 17:10:19 UTC] ╔═══════════════════════════════════════════════════════════════╗
+[2026-03-03 17:10:19 UTC] ║  CYCLE #2 COMPLETE
+[2026-03-03 17:10:19 UTC] ║  Tested: 28/28 | Excellent: 0 | Good: 25 | Acceptable: 1
+[2026-03-03 17:10:19 UTC] ╚═══════════════════════════════════════════════════════════════╝
+[2026-03-03 17:10:19 UTC]
+[2026-03-03 17:10:19 UTC] ⏳ Next performance cycle in 15 minutes...
+[2026-03-03 17:10:19 UTC]
+[2026-03-03 17:25:19 UTC] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[2026-03-03 17:25:19 UTC] PERFORMANCE CYCLE #3
+[2026-03-03 17:25:19 UTC] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[2026-03-03 17:25:19 UTC]
+[2026-03-03 17:25:19 UTC] [1/5] Discovering services...
+/workspaces/dominion-os-demo-build/scripts/phi_performance_monitor.sh: line 77: /workspaces/dominion-os-demo-build/telemetry/performance/cycle_3.json: No such file or directory
+[2026-03-03 17:25:22 UTC] ERROR: Script failed at line 77

@@ -1,0 +1,34 @@
+nohup: ignoring input
+⚡ PHI CHIEF AUTONOMOUS COST OPTIMIZATION
+========================================
+Target: $50-100/month savings through service rightsizing
+Execution: NHITL autonomous operations
+Timestamp: Tue Mar  3 17:01:56 UTC 2026
+
+🎯 PHASE 1: P1 PROJECT OPTIMIZATION (dominion-os-1-0-main)
+=========================================================
+🔧 Updating dominion-ai-gateway in dominion-os-1-0-main to 2Gi memory...
+Deploying...
+Creating Revision..................................................................................................................................................................................................................................................................done
+Routing traffic.....done
+Done.
+Service [[1mdominion-ai-gateway[m] revision [[1mdominion-ai-gateway-00030-llf[m] has been deployed and is serving [1m100[m percent of traffic.
+Service URL: [1mhttps://dominion-ai-gateway-829831815576.us-central1.run.app[m
+✅ dominion-ai-gateway updated to 2Gi
+
+🔧 Updating dominion-monitoring-dashboard in dominion-os-1-0-main to 1Gi memory...
+Deploying...
+Creating Revision........................................................................................................................................done
+Routing traffic.....done
+Done.
+Service [[1mdominion-monitoring-dashboard[m] revision [[1mdominion-monitoring-dashboard-00042-cmc[m] has been deployed and is serving [1m100[m percent of traffic.
+Service URL: [1mhttps://dominion-monitoring-dashboard-829831815576.us-central1.run.app[m
+✅ dominion-monitoring-dashboard updated to 1Gi
+
+🎯 PHASE 2: P2 PROJECT OPTIMIZATION (dominion-core-prod)
+=======================================================
+🔧 Updating dominion-ai-gateway in dominion-core-prod to 1Gi memory...
+Deploying...
+failed
+Deployment failed
+ERROR: (gcloud.run.services.update) PERMISSION_DENIED: Permission 'iam.serviceaccounts.actAs' denied on service account gateway-sa@dominion-core-prod.iam.gserviceaccount.com (or it may not exist). This command is authenticated as matthewburbidge@fractal5solutions.com which is the active account specified by the [core/account] property.
