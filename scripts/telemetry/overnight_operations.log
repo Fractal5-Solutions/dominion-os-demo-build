@@ -301,3 +301,8 @@
 [2026-03-04 17:59:15] ⚠️  WARNING: Some services are not ready in dominion-os-1-0-main
 [2026-03-04 17:59:15] Failed services: dominion-monitoring-dashboard
 [2026-03-04 17:59:15] Checking health for project: dominion-core-prod
+[2026-03-04 17:59:41] INCIDENT: Service phi-oauth-server in dominion-core-prod has status: False
+[2026-03-04 17:59:43] ⚠️  WARNING: Some services are not ready in dominion-core-prod
+[2026-03-04 17:59:43] Failed services: phi-oauth-server
+[2026-03-04 17:59:43] ⚠️  Health issues detected - see logs
+[2026-03-04 17:59:43] Next check in 15 minutes...
