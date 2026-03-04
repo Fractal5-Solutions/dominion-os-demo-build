@@ -21,3 +21,5 @@
 [2026-03-02 22:01:16] INCIDENT: Service phi-askphi-widget in dominion-os-1-0-main has status: False
 [2026-03-02 22:01:17] INCIDENT: Service phi-oauth-server in dominion-os-1-0-main has status: False
 [2026-03-03 00:25:09] INCIDENT: Service phi-oauth-server in dominion-os-1-0-main has status: False
+[2026-03-04 17:58:43] INCIDENT: Service phi-oauth-server in dominion-core-prod has status: False
+[2026-03-04 17:59:07] INCIDENT: Service dominion-monitoring-dashboard in dominion-os-1-0-main has status: Unknown

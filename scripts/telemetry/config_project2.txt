@@ -14,5 +14,5 @@ dominion-os-demo           512Mi   1000m
 dominion-phi-ui            512Mi   1000m
 phi-askphi-widget          512Mi   1
 phi-expenditure-dashboard  2Gi     2
-phi-oauth-server           512Mi   1
+phi-oauth-server           4Gi     2
 pipeline                   1Gi     1
