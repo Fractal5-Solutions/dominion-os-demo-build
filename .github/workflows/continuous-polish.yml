@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   polish:
@@ -23,8 +24,20 @@ jobs:
       - name: Run Prettier (safe formats only)
         run: |
           npx --yes prettier@3 --write "**/*.{md,mdx,json,yml,yaml}" || true
-      - name: Auto-commit changes
-        uses: stefanzweifel/git-auto-commit-action@v5
+      - name: Check for changes
+        id: changes
+        run: |
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Create Pull Request
+        if: steps.changes.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@v5
         with:
-          commit_message: "chore: autopolish"
-          branch: main
+          commit-message: "chore: autopolish formatting updates"
+          branch: autopolish/continuous-polish
+          delete-branch: true
+          title: "chore: autopolish formatting updates"
+          body: "Automated formatting updates from continuous-polish workflow"

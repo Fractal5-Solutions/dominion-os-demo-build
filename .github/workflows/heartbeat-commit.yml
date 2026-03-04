@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+  pull-requests: write
 jobs:
   beat:
     runs-on: ubuntu-latest
@@ -13,8 +14,20 @@ jobs:
         run: |
           mkdir -p telemetry
           date -u +"%Y-%m-%dT%H:%M:%SZ" > telemetry/heartbeat.txt
-          git config user.name "actions-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add telemetry/heartbeat.txt
-          git commit -m "chore: heartbeat" || exit 0
-          git push
+      - name: Check for changes
+        id: changes
+        run: |
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Create Pull Request
+        if: steps.changes.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          commit-message: "chore: heartbeat telemetry update"
+          branch: autopolish/heartbeat
+          delete-branch: true
+          title: "chore: heartbeat telemetry update"
+          body: "Automated heartbeat telemetry from monitoring system"
