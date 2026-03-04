@@ -306,3 +306,6 @@
 [2026-03-04 17:59:43] Failed services: phi-oauth-server
 [2026-03-04 17:59:43] ⚠️  Health issues detected - see logs
 [2026-03-04 17:59:43] Next check in 15 minutes...
+[2026-03-04 18:14:43] Health check #2 for hour 5
+[2026-03-04 18:14:43] Checking health for project: dominion-os-1-0-main
+[2026-03-04 18:15:00] Checking health for project: dominion-core-prod
