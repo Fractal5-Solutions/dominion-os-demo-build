@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-import yaml
 import sys
+
+import yaml
 
 workflows = [".github/workflows/continuous-polish.yml", ".github/workflows/heartbeat-commit.yml"]
 
