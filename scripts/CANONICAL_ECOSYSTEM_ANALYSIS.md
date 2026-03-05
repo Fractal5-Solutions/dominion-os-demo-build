@@ -684,7 +684,7 @@
 | 10 | Ethics & Security signoff workflows defined and enforced by PR policy | ❌ Not found | CRITICAL |
 | 11 | Data licensing recorded for all datasets; no data committed to repos | ⚠️ Unknown | HIGH |
 | 12 | Mobile portal implemented as secure portal (not marketing): device binding, action signing, cert pinning | ⚠️ Unknown | MEDIUM |
-| 13 | Vercel & third-party app audit completed; references removed or documented | ✅ Likely | LOW |
+| 13 | Deployment provider & third-party app audit completed; references removed or documented | ✅ Likely | LOW |
 | 14 | Operational playbook and training slides committed to repo-portfolio/docs/ | ❌ Not found | MEDIUM |
 | 15 | Scheduled onboarding meeting set | ❌ Not scheduled | LOW |
 
