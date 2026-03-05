@@ -2,6 +2,7 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .venv/
+.venv_phi2/
 dist/
 .DS_Store
 
@@ -12,6 +13,7 @@ out/autopilot/
 
 # Local environment files
 .env
+.env.local
 
 .fake
 
@@ -19,3 +21,55 @@ out/autopilot/
 out/
 tools/*/obj/
 tools/*/bin/
+
+# ============================================================================
+# PHI Sovereign - Runtime & Data Files
+# ============================================================================
+
+# Runtime data directories
+data/
+logs/
+telemetry/
+backups/
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# PID files
+*.pid
+dashboard.pid
+
+# Log files
+*.log
+nohup.out
+perfect_live_ops.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Docker volumes
+volumes/
+
+# Cache directories
+.cache/
+.mypy_cache/
+.ruff_cache/
+
+# IDE files
+.vscode/settings.json
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# ============================================================================
+# END PHI SOVEREIGN GITIGNORE
+# Ensures zero-change local/remote sync
+# ============================================================================
