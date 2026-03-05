@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0",
+  "project": {
+    "name": "",
+    "repository": ""
+  },
+  "release": {
+    "version": "0.0.0",
+    "tag": "",
+    "date_utc": "",
+    "notes": ""
+  },
+  "quality_gates": {
+    "ci_passed": false,
+    "security_review": false,
+    "sbom_generated": false
+  },
+  "artifacts": {
+    "containers": [],
+    "packages": [],
+    "sbom_paths": []
+  },
+  "approvals": {
+    "release_manager": "",
+    "security": "",
+    "compliance": ""
+  }
+}

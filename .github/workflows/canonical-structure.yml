@@ -1,0 +1,17 @@
+name: Canonical Structure
+on:
+  push:
+  pull_request:
+
+jobs:
+  structure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify canonical release skeleton
+        run: |
+          set -euo pipefail
+          test -f release/release_plan.json
+          test -f RELEASE_INSTRUCTIONS.md
+          test -f secrets.example
+          echo "OK: canonical release skeleton present."
