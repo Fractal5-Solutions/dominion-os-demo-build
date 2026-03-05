@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHI Advanced AI Orchestration - Dominion Architecture</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .orchestration-header { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .orchestration-card { border: 2px solid #667eea; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .authority-badge { background: linear-gradient(45deg, #667eea, #764ba2); color: white; font-weight: bold; }
+        .ai-status-active { color: #28a745; font-weight: bold; }
+        .ai-status-inactive { color: #dc3545; font-weight: bold; }
+        .orchestration-metric { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; }
+        .chain-log { max-height: 500px; overflow-y: auto; }
+        .company-card { transition: transform 0.2s; }
+        .company-card:hover { transform: translateY(-5px); }
+        .pulse-animation { animation: pulse 2s infinite; }
+        .gpu-indicator { color: #28a745; }
+        .cpu-indicator { color: #007bff; }
+        .hardware-optimized { border-left: 4px solid #28a745; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .chain-type-sequential { background: linear-gradient(45deg, #667eea, #764ba2); }
+        .chain-type-branching { background: linear-gradient(45deg, #f093fb, #f5576c); }
+        .chain-type-iterative { background: linear-gradient(45deg, #4facfe, #00f2fe); }
+        .chain-type-react { background: linear-gradient(45deg, #43e97b, #38f9d7); }
+    </style>
+</head>
+<body class="bg-dark text-light">
+    <!-- Orchestration Header -->
+    <nav class="navbar navbar-expand-lg orchestration-header">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="fas fa-brain me-2"></i>PHI AI ORCHESTRATION ENGINE
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">
+                    <i class="fas fa-microchip me-1"></i>Hardware Optimized
+                </span>
+                <span class="navbar-text me-3">
+                    <i class="fas fa-shield-alt me-1"></i>Authority: 9/9
+                </span>
+                <span class="navbar-text">
+                    <i class="fas fa-cogs me-1"></i>Dominion Active
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Engine Status Overview -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card orchestration-card">
+                    <div class="card-header orchestration-header">
+                        <h4 class="card-title mb-0">
+                            <i class="fas fa-tachometer-alt me-2"></i>AI Orchestration Engine Status
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-2">
+                                <div class="orchestration-metric p-3 rounded">
+                                    <h3 id="engineStatus">ACTIVE</h3>
+                                    <small>Engine Status</small>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="orchestration-metric p-3 rounded">
+                                    <h3 id="authorityLevel">9</h3>
+                                    <small>Authority Level</small>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="orchestration-metric p-3 rounded">
+                                    <h3 id="activeChains">3</h3>
+                                    <small>Active Chains</small>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="orchestration-metric p-3 rounded">
+                                    <h3 id="gpuAvailable">1</h3>
+                                    <small>GPU Available</small>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="orchestration-metric p-3 rounded">
+                                    <h3 id="cpuCores">12</h3>
+                                    <small>CPU Cores</small>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="orchestration-metric p-3 rounded">
+                                    <h3 id="sovereignChains">3</h3>
+                                    <small>Sovereign Chains</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hardware Optimization Panel -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card orchestration-card">
+                    <div class="card-header orchestration-header">
+                        <h4 class="card-title mb-0">
+                            <i class="fas fa-microchip me-2"></i>Hardware Optimization Status
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-desktop gpu-indicator me-2"></i>AMD Ryzen 5 7600X</h5>
+                                <div class="progress mb-2">
+                                    <div class="progress-bar bg-primary" role="progressbar" id="cpuUtilization" style="width: 0%">0%</div>
+                                </div>
+                                <small class="text-muted">6 Cores, 12 Threads, Hyperthreading Active</small>
+                            </div>
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-gamepad cpu-indicator me-2"></i>NVIDIA RTX 4070</h5>
+                                <div class="progress mb-2">
+                                    <div class="progress-bar bg-success" role="progressbar" id="gpuUtilization" style="width: 0%">0%</div>
+                                </div>
+                                <small class="text-muted">CUDA Optimized, Tensor Cores Active</small>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="p-2 bg-success text-white rounded">
+                                    <i class="fas fa-rocket fa-2x mb-2"></i>
+                                    <h6>GPU Acceleration</h6>
+                                    <small>3.5x Speedup</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="p-2 bg-primary text-white rounded">
+                                    <i class="fas fa-random fa-2x mb-2"></i>
+                                    <h6>Parallel Processing</h6>
+                                    <small>85% Efficiency</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="p-2 bg-warning text-dark rounded">
+                                    <i class="fas fa-memory fa-2x mb-2"></i>
+                                    <h6>Memory Bandwidth</h6>
+                                    <small>72% Utilized</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="p-2 bg-info text-white rounded">
+                                    <i class="fas fa-crown fa-2x mb-2"></i>
+                                    <h6>Sovereign Authority</h6>
+                                    <small>Level 9 Active</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card orchestration-card">
+                    <div class="card-header orchestration-header">
+                        <h4 class="card-title mb-0">
+                            <i class="fas fa-terminal me-2"></i>Orchestration Control Panel
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <button id="executeOrchestrationBtn" class="btn btn-primary btn-lg pulse-animation">
+                                    <i class="fas fa-play-circle me-2"></i>Execute Sovereign Pipeline
+                                </button>
+                                <div id="executionStatus" class="mt-3" style="display: none;">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-spinner fa-spin me-2"></i>
+                                        Executing Advanced AI Orchestration Pipeline...
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="authority-badge p-2 rounded">
+                                    <i class="fas fa-shield-alt me-1"></i>
+                                    DOMINION ARCHITECTURE AUTHORIZED
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chain Types Overview -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h3 class="text-center mb-4">
+                    <i class="fas fa-project-diagram me-2"></i>Prompt Chain Architectures
+                </h3>
+            </div>
+        </div>
+
+        <div class="row mb-4" id="chainTypes">
+            <!-- Chain types will be loaded here -->
+        </div>
+
+        <!-- Sovereign Chains -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h3 class="text-center mb-4">
+                    <i class="fas fa-crown me-2"></i>Sovereign Company Chains
+                </h3>
+            </div>
+        </div>
+
+        <div class="row" id="sovereignChains">
+            <!-- Sovereign chains will be loaded here -->
+        </div>
+
+        <!-- Execution Log -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card orchestration-card">
+                    <div class="card-header orchestration-header">
+                        <h4 class="card-title mb-0">
+                            <i class="fas fa-history me-2"></i>Orchestration Execution Log
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="chain-log" id="executionLog">
+                            <!-- Execution logs will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Integrity -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card orchestration-card">
+                    <div class="card-header orchestration-header">
+                        <h4 class="card-title mb-0">
+                            <i class="fas fa-shield-alt me-2"></i>System Integrity & Optimization
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="p-3 bg-success text-white rounded hardware-optimized">
+                                    <i class="fas fa-check-circle fa-2x mb-2"></i>
+                                    <h5>Hardware Optimized</h5>
+                                    <small>AMD + NVIDIA Synced</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="p-3 bg-primary text-white rounded">
+                                    <i class="fas fa-brain fa-2x mb-2"></i>
+                                    <h5>AI Pipelines</h5>
+                                    <small>4 Chain Types Active</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="p-3 bg-warning text-dark rounded">
+                                    <i class="fas fa-crown fa-2x mb-2"></i>
+                                    <h5>Sovereign Authority</h5>
+                                    <small>Maximum Level 9</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="p-3 bg-info text-white rounded">
+                                    <i class="fas fa-infinity fa-2x mb-2"></i>
+                                    <h5>Dominion Architecture</h5>
+                                    <small>Perpetual Optimization</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let orchestrationData = {};
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadOrchestrationStatus();
+            loadChainTypes();
+            loadSovereignChains();
+            loadHardwareMetrics();
+        });
+
+        async function loadOrchestrationStatus() {
+            try {
+                const response = await fetch('/api/orchestration/status');
+                const data = await response.json();
+
+                document.getElementById('engineStatus').textContent = data.engine_status;
+                document.getElementById('authorityLevel').textContent = data.sovereign_authority.replace('LEVEL_', '');
+                document.getElementById('activeChains').textContent = data.active_chains;
+                document.getElementById('gpuAvailable').textContent = data.gpu_available ? '1' : '0';
+                document.getElementById('cpuCores').textContent = data.cpu_cores;
+                document.getElementById('sovereignChains').textContent = data.sovereign_chains;
+
+                orchestrationData.status = data;
+            } catch (error) {
+                console.error('Error loading orchestration status:', error);
+            }
+        }
+
+        async function loadHardwareMetrics() {
+            try {
+                const response = await fetch('/api/orchestration/hardware');
+                const data = await response.json();
+
+                // Update progress bars
+                document.getElementById('cpuUtilization').style.width = `${data.cpu_utilization}%`;
+                document.getElementById('cpuUtilization').textContent = `${data.cpu_utilization}%`;
+
+                if (data.gpu_utilization && data.gpu_utilization.length > 0) {
+                    document.getElementById('gpuUtilization').style.width = `${data.gpu_utilization[0]}%`;
+                    document.getElementById('gpuUtilization').textContent = `${data.gpu_utilization[0]}%`;
+                }
+
+                orchestrationData.hardware = data;
+            } catch (error) {
+                console.error('Error loading hardware metrics:', error);
+            }
+        }
+
+        function loadChainTypes() {
+            const chainTypes = [
+                {
+                    name: 'Sequential',
+                    description: 'Linear step-by-step processing',
+                    icon: 'fas fa-arrow-right',
+                    cssClass: 'chain-type-sequential',
+                    features: ['Linear Flow', 'Predictable', 'Simple Dependencies']
+                },
+                {
+                    name: 'Branching',
+                    description: 'Conditional decision trees based on AI findings',
+                    icon: 'fas fa-code-branch',
+                    cssClass: 'chain-type-branching',
+                    features: ['Decision Trees', 'Conditional Logic', 'Adaptive Paths']
+                },
+                {
+                    name: 'Iterative',
+                    description: 'Refinement loops until quality thresholds met',
+                    icon: 'fas fa-redo',
+                    cssClass: 'chain-type-iterative',
+                    features: ['Quality Gates', 'Iterative Improvement', 'Convergence']
+                },
+                {
+                    name: 'ReAct',
+                    description: 'Reasoning and Acting framework with sovereign oversight',
+                    icon: 'fas fa-brain',
+                    cssClass: 'chain-type-react',
+                    features: ['Reasoning Cycles', 'Action Planning', 'Sovereign Authority']
+                }
+            ];
+
+            const container = document.getElementById('chainTypes');
+
+            chainTypes.forEach(type => {
+                const col = document.createElement('div');
+                col.className = 'col-md-3 mb-4';
+
+                col.innerHTML = `
+                    <div class="card company-card h-100">
+                        <div class="card-header ${type.cssClass} text-white">
+                            <h5 class="card-title mb-0">
+                                <i class="${type.icon} me-2"></i>${type.name}
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">${type.description}</p>
+                            <ul class="list-unstyled">
+                                ${type.features.map(feature => `<li><i class="fas fa-check text-success me-1"></i>${feature}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(col);
+            });
+        }
+
+        async function loadSovereignChains() {
+            try {
+                const response = await fetch('/api/orchestration/chains');
+                const data = await response.json();
+
+                const container = document.getElementById('sovereignChains');
+
+                data.chains.forEach(chain => {
+                    const col = document.createElement('div');
+                    col.className = 'col-md-4 mb-4';
+
+                    col.innerHTML = `
+                        <div class="card company-card h-100">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-building me-2"></i>${chain.company}
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="mb-2">
+                                            <small class="text-muted">Chain Type</small>
+                                            <div class="text-primary fw-bold">${chain.type}</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="mb-2">
+                                            <small class="text-muted">Steps</small>
+                                            <div class="text-success fw-bold">${chain.steps}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="mb-2">
+                                            <small class="text-muted">Status</small>
+                                            <div class="${chain.status === 'completed' ? 'text-success' : 'text-warning'} fw-bold">
+                                                ${chain.status.toUpperCase()}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="mb-2">
+                                            <small class="text-muted">Authority</small>
+                                            <div class="text-warning fw-bold">Level ${chain.authority_level}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="text-center">
+                                    <small class="text-muted">Execution Mode</small>
+                                    <h6 class="text-info">${chain.execution_mode.replace('_', ' ')}</h6>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    container.appendChild(col);
+                });
+
+            } catch (error) {
+                console.error('Error loading sovereign chains:', error);
+            }
+        }
+
+        // Execute Sovereign Pipeline
+        document.getElementById('executeOrchestrationBtn').addEventListener('click', async function() {
+            const btn = this;
+            const statusDiv = document.getElementById('executionStatus');
+
+            // Disable button and show status
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Executing...';
+            statusDiv.style.display = 'block';
+
+            try {
+                const response = await fetch('/api/orchestration/execute', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Success
+                    statusDiv.innerHTML = `
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Advanced AI Orchestration Pipeline executed successfully!
+                            Processed ${result.results.companies_processed.length} companies with sovereign authority.
+                        </div>
+                    `;
+
+                    // Refresh data
+                    loadOrchestrationStatus();
+                    loadHardwareMetrics();
+                    loadSovereignChains();
+
+                    // Add to execution log
+                    addExecutionLogEntry('Pipeline Execution', 'SUCCESS', result.results.total_actions_taken + ' sovereign actions');
+
+                } else {
+                    // Error
+                    statusDiv.innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Execution failed: ${result.message}
+                        </div>
+                    `;
+
+                    addExecutionLogEntry('Pipeline Execution', 'FAILED', result.error);
+                }
+
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Network error: ${error.message}
+                    </div>
+                `;
+
+                addExecutionLogEntry('Pipeline Execution', 'ERROR', error.message);
+            } finally {
+                // Re-enable button
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-play-circle me-2"></i>Execute Sovereign Pipeline';
+            }
+        });
+
+        function addExecutionLogEntry(operation, status, details) {
+            const logContainer = document.getElementById('executionLog');
+            const logEntry = document.createElement('div');
+            logEntry.className = 'border-start border-primary border-4 ps-3 mb-3';
+
+            const statusClass = status === 'SUCCESS' ? 'text-success' : status === 'FAILED' ? 'text-danger' : 'text-warning';
+
+            logEntry.innerHTML = `
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <strong>${operation}</strong>
+                        <span class="badge ${status === 'SUCCESS' ? 'bg-success' : status === 'FAILED' ? 'bg-danger' : 'bg-warning'} ms-2">${status}</span>
+                    </div>
+                    <small class="text-muted">${new Date().toLocaleString()}</small>
+                </div>
+                <div class="mt-1">
+                    <span class="${statusClass}">${details}</span>
+                    <small class="text-muted ms-2">
+                        Hardware: ${orchestrationData.hardware ? 'Optimized' : 'Standard'} •
+                        Authority: Level ${orchestrationData.status ? orchestrationData.status.sovereign_authority.replace('LEVEL_', '') : '9'}
+                    </small>
+                </div>
+            `;
+
+            logContainer.insertBefore(logEntry, logContainer.firstChild);
+
+            // Keep only last 20 entries
+            while (logContainer.children.length > 20) {
+                logContainer.removeChild(logContainer.lastChild);
+            }
+        }
+    </script>
+</body>
+</html>

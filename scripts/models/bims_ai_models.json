@@ -1,0 +1,50 @@
+{
+  "Fractal5 Solutions Inc": {
+    "config": {
+      "business_type": "Technology",
+      "jurisdiction": "Delaware",
+      "primary_business": "AI development and software solutions",
+      "revenue_streams": [
+        "Software Development",
+        "AI Consulting",
+        "Licensing"
+      ]
+    },
+    "trained_at": "2026-03-05T12:44:11.813308",
+    "revenue_rules_count": 3,
+    "compliance_rules_count": 3,
+    "anomaly_patterns_count": 3
+  },
+  "Blue Wave Action Group Inc": {
+    "config": {
+      "business_type": "Political",
+      "jurisdiction": "Delaware",
+      "primary_business": "Political action and campaign management",
+      "revenue_streams": [
+        "Campaign Contributions",
+        "Consulting Fees",
+        "Event Revenue"
+      ]
+    },
+    "trained_at": "2026-03-05T12:44:11.813367",
+    "revenue_rules_count": 3,
+    "compliance_rules_count": 4,
+    "anomaly_patterns_count": 3
+  },
+  "Plane4 Grain Inc": {
+    "config": {
+      "business_type": "Manufacturing",
+      "jurisdiction": "Delaware",
+      "primary_business": "Furniture manufacturing and sales",
+      "revenue_streams": [
+        "Furniture Sales",
+        "Custom Orders",
+        "Wholesale"
+      ]
+    },
+    "trained_at": "2026-03-05T12:44:11.813418",
+    "revenue_rules_count": 3,
+    "compliance_rules_count": 1,
+    "anomaly_patterns_count": 3
+  }
+}

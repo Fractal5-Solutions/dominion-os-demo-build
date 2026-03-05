@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHI Financial - Financial Statements</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .statement-section { margin-bottom: 2rem; }
+        .statement-table th { background-color: #f8f9fa; font-weight: bold; }
+        .total-row { border-top: 2px solid #dee2e6; font-weight: bold; }
+        .positive-amount { color: #28a745; }
+        .negative-amount { color: #dc3545; }
+    </style>
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-file-alt me-2"></i>PHI Financial
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/expenditures">Expenditures</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/companies">Companies</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/chart-of-accounts">Chart of Accounts</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/general-ledger">General Ledger</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/revenue">Revenue</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/financial-statements">Financial Statements</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1><i class="fas fa-file-alt me-2"></i>Financial Statements</h1>
+                    <div>
+                        <select class="form-select d-inline-block w-auto me-2" id="companyFilter">
+                            <option value="">All Companies</option>
+                        </select>
+                        <select class="form-select d-inline-block w-auto me-2" id="periodFilter">
+                            <option value="current">Current Period</option>
+                            <option value="previous">Previous Period</option>
+                            <option value="ytd">Year to Date</option>
+                        </select>
+                        <button class="btn btn-primary me-2" onclick="generateStatements()">
+                            <i class="fas fa-sync me-2"></i>Generate
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="exportStatements()">
+                            <i class="fas fa-download me-2"></i>Export PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Balance Sheet -->
+        <div class="statement-section">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Balance Sheet</h4>
+                    <small class="text-muted">As of <span id="balanceSheetDate"></span></small>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Assets</h5>
+                            <table class="table table-sm statement-table" id="assetsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Account</th>
+                                        <th class="text-end">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="assetsBody">
+                                    <!-- Assets will be loaded here -->
+                                </tbody>
+                                <tfoot>
+                                    <tr class="total-row">
+                                        <td><strong>Total Assets</strong></td>
+                                        <td class="text-end" id="totalAssets">$0.00</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Liabilities & Equity</h5>
+                            <table class="table table-sm statement-table" id="liabilitiesEquityTable">
+                                <thead>
+                                    <tr>
+                                        <th>Account</th>
+                                        <th class="text-end">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="liabilitiesEquityBody">
+                                    <!-- Liabilities and Equity will be loaded here -->
+                                </tbody>
+                                <tfoot>
+                                    <tr class="total-row">
+                                        <td><strong>Total Liabilities & Equity</strong></td>
+                                        <td class="text-end" id="totalLiabilitiesEquity">$0.00</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Income Statement -->
+        <div class="statement-section">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Income Statement</h4>
+                    <small class="text-muted">For the period ending <span id="incomeStatementDate"></span></small>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm statement-table" id="incomeStatementTable">
+                        <thead>
+                            <tr>
+                                <th>Account</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="incomeStatementBody">
+                            <!-- Income statement items will be loaded here -->
+                        </tbody>
+                        <tfoot>
+                            <tr class="total-row">
+                                <td><strong>Net Income</strong></td>
+                                <td class="text-end" id="netIncome">$0.00</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cash Flow Statement -->
+        <div class="statement-section">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Cash Flow Statement</h4>
+                    <small class="text-muted">For the period ending <span id="cashFlowDate"></span></small>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h5>Operating Activities</h5>
+                            <table class="table table-sm statement-table" id="operatingActivitiesTable">
+                                <tbody id="operatingActivitiesBody">
+                                    <!-- Operating activities will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-4">
+                            <h5>Investing Activities</h5>
+                            <table class="table table-sm statement-table" id="investingActivitiesTable">
+                                <tbody id="investingActivitiesBody">
+                                    <!-- Investing activities will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-4">
+                            <h5>Financing Activities</h5>
+                            <table class="table table-sm statement-table" id="financingActivitiesTable">
+                                <tbody id="financingActivitiesBody">
+                                    <!-- Financing activities will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-12">
+                            <table class="table table-sm">
+                                <tfoot>
+                                    <tr class="total-row">
+                                        <td><strong>Net Cash Flow</strong></td>
+                                        <td class="text-end" id="netCashFlow">$0.00</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let financialData = {};
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCompanies();
+            loadFinancialStatements();
+        });
+
+        async function loadCompanies() {
+            try {
+                const response = await fetch('/api/companies');
+                const data = await response.json();
+
+                const companyFilter = document.getElementById('companyFilter');
+
+                data.companies.forEach(company => {
+                    const option = new Option(company.company_name, company.id);
+                    companyFilter.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading companies:', error);
+            }
+        }
+
+        async function loadFinancialStatements() {
+            try {
+                const companyId = document.getElementById('companyFilter').value;
+                const period = document.getElementById('periodFilter').value;
+
+                const response = await fetch(`/api/financials/statements?company_id=${companyId}&period=${period}`);
+                const data = await response.json();
+
+                financialData = data;
+                updateBalanceSheet(data.balance_sheet);
+                updateIncomeStatement(data.income_statement);
+                updateCashFlowStatement(data.cash_flow);
+
+                // Update dates
+                const now = new Date().toLocaleDateString();
+                document.getElementById('balanceSheetDate').textContent = now;
+                document.getElementById('incomeStatementDate').textContent = now;
+                document.getElementById('cashFlowDate').textContent = now;
+
+            } catch (error) {
+                console.error('Error loading financial statements:', error);
+            }
+        }
+
+        function updateBalanceSheet(balanceSheet) {
+            // Update Assets
+            const assetsBody = document.getElementById('assetsBody');
+            assetsBody.innerHTML = '';
+
+            balanceSheet.assets.forEach(asset => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${asset.account_name}</td>
+                    <td class="text-end positive-amount">$${asset.amount.toFixed(2)}</td>
+                `;
+                assetsBody.appendChild(row);
+            });
+
+            document.getElementById('totalAssets').textContent = `$${balanceSheet.total_assets.toFixed(2)}`;
+
+            // Update Liabilities & Equity
+            const liabilitiesEquityBody = document.getElementById('liabilitiesEquityBody');
+            liabilitiesEquityBody.innerHTML = '';
+
+            balanceSheet.liabilities.forEach(liability => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${liability.account_name}</td>
+                    <td class="text-end negative-amount">$${liability.amount.toFixed(2)}</td>
+                `;
+                liabilitiesEquityBody.appendChild(row);
+            });
+
+            balanceSheet.equity.forEach(equity => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${equity.account_name}</td>
+                    <td class="text-end positive-amount">$${equity.amount.toFixed(2)}</td>
+                `;
+                liabilitiesEquityBody.appendChild(row);
+            });
+
+            document.getElementById('totalLiabilitiesEquity').textContent = `$${balanceSheet.total_liabilities_equity.toFixed(2)}`;
+        }
+
+        function updateIncomeStatement(incomeStatement) {
+            const incomeStatementBody = document.getElementById('incomeStatementBody');
+            incomeStatementBody.innerHTML = '';
+
+            // Revenue
+            incomeStatement.revenue.forEach(rev => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${rev.account_name}</td>
+                    <td class="text-end positive-amount">$${rev.amount.toFixed(2)}</td>
+                `;
+                incomeStatementBody.appendChild(row);
+            });
+
+            // Expenses
+            incomeStatement.expenses.forEach(exp => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${exp.account_name}</td>
+                    <td class="text-end negative-amount">$${exp.amount.toFixed(2)}</td>
+                `;
+                incomeStatementBody.appendChild(row);
+            });
+
+            document.getElementById('netIncome').textContent = `$${incomeStatement.net_income.toFixed(2)}`;
+            document.getElementById('netIncome').className = incomeStatement.net_income >= 0 ? 'text-end positive-amount' : 'text-end negative-amount';
+        }
+
+        function updateCashFlowStatement(cashFlow) {
+            // Operating Activities
+            const operatingBody = document.getElementById('operatingActivitiesBody');
+            operatingBody.innerHTML = '';
+
+            cashFlow.operating_activities.forEach(activity => {
+                const row = document.createElement('tr');
+                const amountClass = activity.amount >= 0 ? 'positive-amount' : 'negative-amount';
+                row.innerHTML = `
+                    <td>${activity.description}</td>
+                    <td class="text-end ${amountClass}">$${activity.amount.toFixed(2)}</td>
+                `;
+                operatingBody.appendChild(row);
+            });
+
+            // Investing Activities
+            const investingBody = document.getElementById('investingActivitiesBody');
+            investingBody.innerHTML = '';
+
+            cashFlow.investing_activities.forEach(activity => {
+                const row = document.createElement('tr');
+                const amountClass = activity.amount >= 0 ? 'positive-amount' : 'negative-amount';
+                row.innerHTML = `
+                    <td>${activity.description}</td>
+                    <td class="text-end ${amountClass}">$${activity.amount.toFixed(2)}</td>
+                `;
+                investingBody.appendChild(row);
+            });
+
+            // Financing Activities
+            const financingBody = document.getElementById('financingActivitiesBody');
+            financingBody.innerHTML = '';
+
+            cashFlow.financing_activities.forEach(activity => {
+                const row = document.createElement('tr');
+                const amountClass = activity.amount >= 0 ? 'positive-amount' : 'negative-amount';
+                row.innerHTML = `
+                    <td>${activity.description}</td>
+                    <td class="text-end ${amountClass}">$${activity.amount.toFixed(2)}</td>
+                `;
+                financingBody.appendChild(row);
+            });
+
+            document.getElementById('netCashFlow').textContent = `$${cashFlow.net_cash_flow.toFixed(2)}`;
+            document.getElementById('netCashFlow').className = cashFlow.net_cash_flow >= 0 ? 'text-end positive-amount' : 'text-end negative-amount';
+        }
+
+        function generateStatements() {
+            loadFinancialStatements();
+        }
+
+        function exportStatements() {
+            // TODO: Implement PDF export functionality
+            alert('PDF export functionality - Coming soon!');
+        }
+
+        // Filter change handlers
+        document.getElementById('companyFilter').addEventListener('change', loadFinancialStatements);
+        document.getElementById('periodFilter').addEventListener('change', loadFinancialStatements);
+    </script>
+</body>
+</html>

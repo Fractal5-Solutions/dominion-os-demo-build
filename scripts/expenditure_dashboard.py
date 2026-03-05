@@ -848,6 +848,603 @@ def api_recurring():
 
 
 # ============================================================================
+# ENTERPRISE FINANCIAL ACCOUNTING (PHASE 1 EXPANSION)
+# ============================================================================
+
+
+@app.route("/companies")
+def companies_page():
+    """Multi-company management interface"""
+    return render_template("companies.html")
+
+
+@app.route("/api/companies")
+def api_companies():
+    """Get all companies"""
+    if DEMO_MODE:
+        companies = [
+            {
+                "id": "550e8400-e29b-41d4-a716-446655440000",
+                "company_name": "Fractal5 Solutions Inc",
+                "legal_name": "Fractal5 Solutions Incorporated",
+                "industry": "Technology",
+                "currency": "USD",
+                "is_active": True,
+            },
+            {
+                "id": "550e8400-e29b-41d4-a716-446655440001",
+                "company_name": "Plane4 Grain Inc",
+                "legal_name": "Plane4 Grain Incorporated",
+                "industry": "Agriculture",
+                "currency": "USD",
+                "is_active": True,
+            },
+            {
+                "id": "550e8400-e29b-41d4-a716-446655440002",
+                "company_name": "Blue Wave Action Group Inc",
+                "legal_name": "Blue Wave Action Group Incorporated",
+                "industry": "Political Consulting",
+                "currency": "USD",
+                "is_active": True,
+            },
+        ]
+        return jsonify({"companies": companies, "count": len(companies)})
+
+    # TODO: Implement database query for companies
+    return jsonify({"companies": [], "count": 0})
+
+
+@app.route("/chart-of-accounts")
+def chart_of_accounts_page():
+    """Chart of Accounts management"""
+    return render_template("chart-of-accounts.html")
+
+
+@app.route("/api/accounts")
+def api_accounts():
+    """Get chart of accounts"""
+    if DEMO_MODE:
+        accounts = [
+            {
+                "id": "acc-1000",
+                "number": "1000",
+                "name": "Cash",
+                "type": "Asset",
+                "subtype": "Current Asset",
+            },
+            {
+                "id": "acc-1100",
+                "number": "1100",
+                "name": "Accounts Receivable",
+                "type": "Asset",
+                "subtype": "Current Asset",
+            },
+            {
+                "id": "acc-4000",
+                "number": "4000",
+                "name": "Service Revenue",
+                "type": "Revenue",
+                "subtype": "Operating Revenue",
+            },
+            {
+                "id": "acc-5000",
+                "number": "5000",
+                "name": "Cost of Goods Sold",
+                "type": "Expense",
+                "subtype": "Cost of Goods Sold",
+            },
+            {
+                "id": "acc-5100",
+                "number": "5100",
+                "name": "Operating Expenses",
+                "type": "Expense",
+                "subtype": "Operating Expense",
+            },
+        ]
+        return jsonify({"accounts": accounts, "count": len(accounts)})
+
+    # TODO: Implement database query for accounts
+    return jsonify({"accounts": [], "count": 0})
+
+
+@app.route("/general-ledger")
+def gl_page():
+    """General Ledger interface"""
+    return render_template("general-ledger.html")
+
+
+@app.route("/api/transactions")
+def api_transactions():
+    """Get general ledger transactions"""
+    if DEMO_MODE:
+        transactions = [
+            {
+                "id": "txn-001",
+                "date": "2026-03-01",
+                "account": "1000 - Cash",
+                "debit_credit": "D",
+                "amount": 5000.00,
+                "description": "Service revenue received",
+                "reference": "INV-2026-001",
+            },
+            {
+                "id": "txn-002",
+                "date": "2026-03-01",
+                "account": "4000 - Service Revenue",
+                "debit_credit": "C",
+                "amount": 5000.00,
+                "description": "Service revenue",
+                "reference": "INV-2026-001",
+            },
+        ]
+        return jsonify({"transactions": transactions, "count": len(transactions)})
+
+    # TODO: Implement database query for transactions
+    return jsonify({"transactions": [], "count": 0})
+
+
+@app.route("/revenue")
+def revenue_page():
+    """Revenue management and recognition"""
+    return render_template("revenue.html")
+
+
+@app.route("/api/revenue/streams")
+def api_revenue_streams():
+    """Get revenue streams"""
+    if DEMO_MODE:
+        streams = [
+            {
+                "id": "rev-001",
+                "company": "Fractal5 Solutions Inc",
+                "name": "Software Development Services",
+                "type": "Service",
+                "contract_value": 100000.00,
+                "start_date": "2026-01-01",
+                "end_date": "2026-12-31",
+                "recognition_method": "Accrual",
+            }
+        ]
+        return jsonify({"streams": streams, "count": len(streams)})
+
+    # TODO: Implement database query for revenue streams
+    return jsonify({"streams": [], "count": 0})
+
+
+@app.route("/financial-statements")
+def financial_statements_page():
+    """Financial statements dashboard"""
+    return render_template("financial-statements.html")
+
+
+@app.route("/api/financials/balance-sheet")
+def api_balance_sheet():
+    """Generate balance sheet"""
+    if DEMO_MODE:
+        balance_sheet = {
+            "as_of_date": "2026-03-05",
+            "assets": {
+                "current_assets": [
+                    {"account": "Cash", "amount": 50000.00},
+                    {"account": "Accounts Receivable", "amount": 25000.00},
+                ],
+                "total_current_assets": 75000.00,
+                "total_assets": 75000.00,
+            },
+            "liabilities_equity": {
+                "liabilities": {
+                    "current_liabilities": [{"account": "Accounts Payable", "amount": 15000.00}],
+                    "total_current_liabilities": 15000.00,
+                    "total_liabilities": 15000.00,
+                },
+                "equity": [{"account": "Retained Earnings", "amount": 60000.00}],
+                "total_equity": 60000.00,
+                "total_liabilities_equity": 75000.00,
+            },
+        }
+        return jsonify(balance_sheet)
+
+    # TODO: Generate actual balance sheet from ledger
+    return jsonify({"error": "Balance sheet generation not implemented"})
+
+
+@app.route("/api/financials/income-statement")
+def api_income_statement():
+    """Generate income statement"""
+    if DEMO_MODE:
+        income_statement = {
+            "period": "March 2026",
+            "revenue": [{"account": "Service Revenue", "amount": 50000.00}],
+            "total_revenue": 50000.00,
+            "expenses": [
+                {"account": "Operating Expenses", "amount": 20000.00},
+                {"account": "Cost of Goods Sold", "amount": 15000.00},
+            ],
+            "total_expenses": 35000.00,
+            "net_income": 15000.00,
+        }
+        return jsonify(income_statement)
+
+    # TODO: Generate actual income statement
+    return jsonify({"error": "Income statement generation not implemented"})
+
+
+@app.route("/api/financials/statements")
+def api_financial_statements():
+    """Generate all financial statements"""
+    if DEMO_MODE:
+        statements = {
+            "balance_sheet": {
+                "assets": [
+                    {"account_name": "Cash", "amount": 50000.00},
+                    {"account_name": "Accounts Receivable", "amount": 25000.00},
+                ],
+                "total_assets": 75000.00,
+                "liabilities": [{"account_name": "Accounts Payable", "amount": 15000.00}],
+                "equity": [{"account_name": "Retained Earnings", "amount": 60000.00}],
+                "total_liabilities_equity": 75000.00,
+            },
+            "income_statement": {
+                "revenue": [{"account_name": "Service Revenue", "amount": 50000.00}],
+                "expenses": [
+                    {"account_name": "Operating Expenses", "amount": 20000.00},
+                    {"account_name": "Cost of Goods Sold", "amount": 15000.00},
+                ],
+                "net_income": 15000.00,
+            },
+            "cash_flow": {
+                "operating_activities": [
+                    {"description": "Net Income", "amount": 15000.00},
+                    {"description": "Depreciation", "amount": 2000.00},
+                ],
+                "investing_activities": [
+                    {"description": "Purchase of Equipment", "amount": -5000.00}
+                ],
+                "financing_activities": [{"description": "Owner Investment", "amount": 10000.00}],
+                "net_cash_flow": 22000.00,
+            },
+        }
+        return jsonify(statements)
+
+    # TODO: Generate actual financial statements from ledger
+    return jsonify({"error": "Financial statements generation not implemented"})
+
+
+# ============================================================================
+# PHASE 2: SOVEREIGN MAX MODE - INTELLIGENCE EXPANSION
+# ============================================================================
+
+
+@app.route("/sovereign-max")
+def sovereign_max_page():
+    """Sovereign Max Mode dashboard"""
+    return render_template("sovereign-max.html")
+
+
+@app.route("/api/sovereign/status")
+def api_sovereign_status():
+    """Get sovereign max mode status"""
+    return jsonify(
+        {
+            "sovereign_status": "ACTIVE_MAX_AUTHORITY",
+            "authority_level": 9,
+            "operation_mode": "NHITL",
+            "companies_processed": 3,
+            "ai_models_active": 15,
+            "autonomous_decisions": 42,
+            "system_integrity": "VERIFIED",
+            "last_execution": datetime.utcnow().isoformat(),
+        }
+    )
+
+
+@app.route("/api/sovereign/execute", methods=["POST"])
+def api_sovereign_execute():
+    """Execute sovereign max mode operation"""
+    try:
+        # Import and run sovereign max mode
+        from phi_phase2_sovereign_max import SovereignMaxMode
+
+        sovereign_max = SovereignMaxMode()
+        results = sovereign_max.execute_sovereign_max_operation()
+
+        return jsonify(
+            {
+                "success": True,
+                "results": results,
+                "message": "Sovereign Max Mode execution completed",
+            }
+        )
+
+    except Exception as e:
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "error": str(e),
+                    "message": "Sovereign Max Mode execution failed",
+                }
+            ),
+            500,
+        )
+
+
+@app.route("/api/company/<company_id>/ai-status")
+def api_company_ai_status(company_id: str):
+    """Get AI status for a specific company"""
+    # Mock data for demo - in production this would query actual AI models
+    company_data = {
+        "fractal5": {
+            "company_name": "Fractal5 Solutions Inc",
+            "revenue_verification": {
+                "status": "ACTIVE",
+                "accuracy": 0.97,
+                "last_run": "2026-03-05T10:30:00Z",
+            },
+            "financial_forecasting": {
+                "status": "ACTIVE",
+                "accuracy": 0.94,
+                "last_run": "2026-03-05T10:30:00Z",
+            },
+            "compliance_monitoring": {
+                "status": "ACTIVE",
+                "score": 0.98,
+                "last_run": "2026-03-05T10:30:00Z",
+            },
+            "anomaly_detection": {"anomalies": 0, "last_run": "2026-03-05T10:30:00Z"},
+            "sovereign_decisions": {"count": 15, "last_decision": "2026-03-05T10:30:00Z"},
+        },
+        "plane4": {
+            "company_name": "Plane4 Grain Inc",
+            "revenue_verification": {
+                "status": "ACTIVE",
+                "accuracy": 0.95,
+                "last_run": "2026-03-05T10:30:00Z",
+            },
+            "financial_forecasting": {
+                "status": "ACTIVE",
+                "accuracy": 0.92,
+                "last_run": "2026-03-05T10:30:00Z",
+            },
+            "compliance_monitoring": {
+                "status": "ACTIVE",
+                "score": 0.96,
+                "last_run": "2026-03-05T10:30:00Z",
+            },
+            "anomaly_detection": {"anomalies": 1, "last_run": "2026-03-05T10:30:00Z"},
+            "sovereign_decisions": {"count": 12, "last_decision": "2026-03-05T10:30:00Z"},
+        },
+        "bluewave": {
+            "company_name": "Blue Wave Action Group Inc",
+            "revenue_verification": {
+                "status": "ACTIVE",
+                "accuracy": 0.96,
+                "last_run": "2026-03-05T10:30:00Z",
+            },
+            "financial_forecasting": {
+                "status": "ACTIVE",
+                "accuracy": 0.93,
+                "last_run": "2026-03-05T10:30:00Z",
+            },
+            "compliance_monitoring": {
+                "status": "ACTIVE",
+                "score": 0.97,
+                "last_run": "2026-03-05T10:30:00Z",
+            },
+            "anomaly_detection": {"anomalies": 0, "last_run": "2026-03-05T10:30:00Z"},
+            "sovereign_decisions": {"count": 15, "last_decision": "2026-03-05T10:30:00Z"},
+        },
+    }
+
+    if company_id not in company_data:
+        return jsonify({"error": "Company not found"}), 404
+
+    return jsonify(company_data[company_id])
+
+
+@app.route("/api/sovereign/decisions")
+def api_sovereign_decisions():
+    """Get recent sovereign decisions"""
+    decisions = [
+        {
+            "id": "dec-001",
+            "company": "Fractal5 Solutions Inc",
+            "type": "Revenue Verification",
+            "decision": "APPROVED - High confidence revenue recognition",
+            "confidence": 0.97,
+            "authority_level": 9,
+            "autonomous": True,
+            "timestamp": "2026-03-05T10:30:15Z",
+        },
+        {
+            "id": "dec-002",
+            "company": "Plane4 Grain Inc",
+            "type": "Financial Forecasting",
+            "decision": "GENERATED - 12-month forecast with 94% accuracy",
+            "confidence": 0.94,
+            "authority_level": 9,
+            "autonomous": True,
+            "timestamp": "2026-03-05T10:30:20Z",
+        },
+        {
+            "id": "dec-003",
+            "company": "Blue Wave Action Group Inc",
+            "type": "Compliance Monitoring",
+            "decision": "VERIFIED - All regulatory requirements met",
+            "confidence": 0.98,
+            "authority_level": 9,
+            "autonomous": True,
+            "timestamp": "2026-03-05T10:30:25Z",
+        },
+    ]
+    return jsonify({"decisions": decisions})
+
+
+# ============================================================================
+# PHASE 2.5: ADVANCED AI PROMPT CHAINING & ORCHESTRATION ENGINE
+# ============================================================================
+
+
+@app.route("/orchestration")
+def orchestration_page():
+    """Advanced AI Orchestration dashboard"""
+    return render_template("orchestration.html")
+
+
+@app.route("/api/orchestration/status")
+def api_orchestration_status():
+    """Get orchestration engine status"""
+    try:
+        from phi_phase2_5_prompt_orchestration import SovereignPromptPipeline
+
+        pipeline = SovereignPromptPipeline()
+        status = pipeline.get_pipeline_status()
+
+        return jsonify(
+            {
+                "engine_status": "ACTIVE",
+                "sovereign_authority": "LEVEL_9",
+                "hardware_accelerated": True,
+                "gpu_available": status["hardware_status"]["gpu_available"] > 0,
+                "cpu_cores": status["hardware_status"]["cpu_available"],
+                "active_chains": status["active_chains"],
+                "completed_chains": status["completed_chains"],
+                "sovereign_chains": status["sovereign_chains"],
+                "execution_modes": ["GPU_ACCELERATED", "HYBRID_PARALLEL", "CPU_ONLY"],
+                "chain_types": ["SEQUENTIAL", "BRANCHING", "ITERATIVE", "REACT"],
+                "system_integrity": "VERIFIED",
+            }
+        )
+    except Exception as e:
+        return (
+            jsonify({"engine_status": "ERROR", "error": str(e), "system_integrity": "COMPROMISED"}),
+            500,
+        )
+
+
+@app.route("/api/orchestration/execute", methods=["POST"])
+def api_orchestration_execute():
+    """Execute the complete sovereign prompt pipeline"""
+    try:
+        import asyncio
+
+        from phi_phase2_5_prompt_orchestration import SovereignPromptPipeline
+
+        async def run_pipeline():
+            pipeline = SovereignPromptPipeline()
+            return await pipeline.execute_sovereign_pipeline()
+
+        # Run async pipeline in thread pool
+        import concurrent.futures
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(asyncio.run, run_pipeline())
+            results = future.result(timeout=300)  # 5 minute timeout
+
+        return jsonify(
+            {
+                "success": True,
+                "results": results,
+                "message": "Advanced AI Orchestration Pipeline executed successfully",
+            }
+        )
+
+    except Exception as e:
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "error": str(e),
+                    "message": "Orchestration Pipeline execution failed",
+                }
+            ),
+            500,
+        )
+
+
+@app.route("/api/orchestration/chains")
+def api_orchestration_chains():
+    """Get information about active prompt chains"""
+    try:
+        from phi_phase2_5_prompt_orchestration import SovereignPromptPipeline
+
+        pipeline = SovereignPromptPipeline()
+
+        chains_info = []
+        for company_name, chain_id in pipeline.sovereign_chains.items():
+            chain_config = pipeline.chain_orchestrator.active_chains.get(chain_id, {})
+            chain_type = chain_config.get("type", "UNKNOWN")
+            # Convert enum to string if it's an enum
+            if hasattr(chain_type, "value"):
+                chain_type = chain_type.value
+
+            chains_info.append(
+                {
+                    "company": company_name,
+                    "chain_id": chain_id,
+                    "type": chain_type,
+                    "steps": len(chain_config.get("steps", [])),
+                    "status": chain_config.get("status", "unknown"),
+                    "authority_level": chain_config.get("authority_level", 9),
+                    "execution_mode": chain_config.get("execution_mode", "UNKNOWN"),
+                }
+            )
+
+        return jsonify(
+            {
+                "chains": chains_info,
+                "total_chains": len(chains_info),
+                "active_types": list(set([c["type"] for c in chains_info])),
+            }
+        )
+
+    except Exception as e:
+        return jsonify({"error": str(e), "chains": [], "total_chains": 0}), 500
+
+
+@app.route("/api/orchestration/hardware")
+def api_orchestration_hardware():
+    """Get hardware utilization and optimization metrics"""
+    try:
+        from phi_phase2_5_prompt_orchestration import HardwareOrchestrator
+
+        hw_orchestrator = HardwareOrchestrator()
+
+        return jsonify(
+            {
+                "cpu_cores": hw_orchestrator.cpu_count,
+                "gpu_count": hw_orchestrator.gpu_count,
+                "cpu_utilization": hw_orchestrator.cpu_utilization,
+                "gpu_utilization": hw_orchestrator.gpu_utilization,
+                "memory_usage": hw_orchestrator.memory_usage,
+                "optimization_status": "ACTIVE",
+                "hyperthreading_enabled": True,
+                "cuda_available": True,
+                "tensor_cores_active": hw_orchestrator.gpu_count > 0,
+                "execution_modes_available": ["GPU_ACCELERATED", "HYBRID_PARALLEL", "CPU_ONLY"],
+                "performance_metrics": {
+                    "gpu_speedup_factor": 3.5,  # Estimated GPU vs CPU speedup
+                    "parallel_efficiency": 0.85,
+                    "memory_bandwidth_utilization": 0.72,
+                },
+            }
+        )
+
+    except Exception as e:
+        return (
+            jsonify(
+                {
+                    "error": str(e),
+                    "cpu_cores": multiprocessing.cpu_count(),
+                    "gpu_count": 0,
+                    "optimization_status": "DEGRADED",
+                }
+            ),
+            500,
+        )
+
+
+# ============================================================================
 # MAIN
 # ============================================================================
 

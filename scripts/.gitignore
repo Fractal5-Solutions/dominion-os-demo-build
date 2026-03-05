@@ -154,3 +154,5 @@ temp/
 !.gitkeep
 !.env.example
 !config.env.template
+
+.fake

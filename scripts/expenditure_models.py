@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-PHI Expenditure Database Models
-PostgreSQL schema with encryption and audit trail
+PHI Financial Database Models - Enterprise Accounting System
+PostgreSQL/SQLite schema with encryption and audit trail
 
-Purpose: Define data models for expenditure tracking system
-Security: AES-256-GCM encryption, immutable audit trail
-Status: IMPLEMENTATION READY
+Purpose: Define comprehensive data models for full financial accounting
+Features: Multi-company, multi-currency, revenue recognition, general ledger
+Security: AES-256-GCM encryption, immutable audit trail, PHI sovereignty
+Status: EXPANDED FOR ENTERPRISE FINANCIAL MANAGEMENT
 """
 
 import hashlib
@@ -33,6 +34,79 @@ except ImportError:
 
 
 Base = declarative_base() if SQLALCHEMY_AVAILABLE else object
+
+
+# ===== EXPANDED ACCOUNTING ENUMS =====
+
+
+class AccountType(str, Enum):
+    """Chart of Accounts - Main account types"""
+
+    ASSET = "Asset"
+    LIABILITY = "Liability"
+    EQUITY = "Equity"
+    REVENUE = "Revenue"
+    EXPENSE = "Expense"
+
+
+class AccountSubType(str, Enum):
+    """Account subtypes for detailed classification"""
+
+    # Assets
+    CURRENT_ASSET = "Current Asset"
+    FIXED_ASSET = "Fixed Asset"
+    OTHER_ASSET = "Other Asset"
+
+    # Liabilities
+    CURRENT_LIABILITY = "Current Liability"
+    LONG_TERM_LIABILITY = "Long-term Liability"
+
+    # Equity
+    RETAINED_EARNINGS = "Retained Earnings"
+    COMMON_STOCK = "Common Stock"
+
+    # Revenue
+    OPERATING_REVENUE = "Operating Revenue"
+    OTHER_REVENUE = "Other Revenue"
+
+    # Expenses
+    OPERATING_EXPENSE = "Operating Expense"
+    COST_OF_GOODS_SOLD = "Cost of Goods Sold"
+    OTHER_EXPENSE = "Other Expense"
+
+
+class TransactionType(str, Enum):
+    """Transaction classification"""
+
+    JOURNAL_ENTRY = "Journal Entry"
+    RECEIPT = "Receipt"
+    PAYMENT = "Payment"
+    ADJUSTMENT = "Adjustment"
+    REVERSAL = "Reversal"
+
+
+class RevenueRecognitionMethod(str, Enum):
+    """Revenue recognition methods per GAAP/IFRS"""
+
+    ACCRUAL = "Accrual"
+    CASH = "Cash"
+    COMPLETED_CONTRACT = "Completed Contract"
+    PERCENTAGE_OF_COMPLETION = "Percentage of Completion"
+    STRAIGHT_LINE = "Straight Line"
+
+
+class Currency(str, Enum):
+    """Supported currencies"""
+
+    USD = "USD"
+    EUR = "EUR"
+    GBP = "GBP"
+    CAD = "CAD"
+    AUD = "AUD"
+    JPY = "JPY"
+
+
+# ===== LEGACY EXPENDITURE CATEGORIES (MAINTAINED FOR COMPATIBILITY) =====
 
 
 class ExpenditureCategory(str, Enum):
@@ -116,13 +190,160 @@ class DataSource(str, Enum):
     MANUAL_ENTRY = "Manual Entry"
     QUICKBOOKS_IMPORT = "QuickBooks Import"
     BANK_FEED = "Bank Feed"
+    STRIPE = "Stripe"
+    PAYPAL = "PayPal"
+    QUICKBOOKS_ONLINE = "QuickBooks Online"
+    XERO = "Xero"
+    SAP = "SAP"
 
+
+# ===== NEW ENTERPRISE FINANCIAL MODELS =====
 
 if SQLALCHEMY_AVAILABLE:
 
+    class Company(Base):
+        """
+        Multi-company support for enterprise deployments
+        """
+
+        __tablename__ = "companies"
+
+        id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+        company_name = Column(String(100), nullable=False, unique=True)
+        legal_name = Column(String(100))
+        tax_id = Column(String(50))
+        address = Column(Text)
+        phone = Column(String(20))
+        email = Column(String(100))
+        website = Column(String(200))
+        industry = Column(String(50))
+        fiscal_year_end = Column(String(10))  # MM-DD format
+        currency = Column(SQLEnum(Currency), default=Currency.USD)
+        is_active = Column(Boolean, default=True)
+        created_at = Column(DateTime, default=datetime.utcnow)
+        updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+        # Relationships
+        accounts = relationship("Account", back_populates="company")
+        revenue_streams = relationship("RevenueStream", back_populates="company")
+        expenditures = relationship("Expenditure", back_populates="company")
+
+    class Account(Base):
+        """
+        Chart of Accounts - Foundation of double-entry bookkeeping
+        """
+
+        __tablename__ = "accounts"
+
+        id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+        company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id"), nullable=False)
+        account_number = Column(String(20), nullable=False)
+        account_name = Column(String(100), nullable=False)
+        account_type = Column(SQLEnum(AccountType), nullable=False)
+        subtype = Column(SQLEnum(AccountSubType))
+        description = Column(Text)
+        is_active = Column(Boolean, default=True)
+        parent_account_id = Column(
+            UUID(as_uuid=True), ForeignKey("accounts.id")
+        )  # For hierarchical accounts
+        created_at = Column(DateTime, default=datetime.utcnow)
+        updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+        # Relationships
+        company = relationship("Company", back_populates="accounts")
+        transactions = relationship("Transaction", back_populates="account")
+        parent = relationship("Account", remote_side=[id])
+
+        # Indexes
+        __table_args__ = (Index("idx_company_account", "company_id", "account_number"),)
+
+    class Transaction(Base):
+        """
+        General Ledger transactions - Core of double-entry system
+        """
+
+        __tablename__ = "transactions"
+
+        id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+        company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id"), nullable=False)
+        transaction_date = Column(DateTime, nullable=False, index=True)
+        account_id = Column(UUID(as_uuid=True), ForeignKey("accounts.id"), nullable=False)
+        amount = Column(Float, nullable=False)
+        debit_credit = Column(String(1), nullable=False)  # 'D' or 'C'
+        description = Column(Text, nullable=False)
+        reference_number = Column(String(50), index=True)
+        transaction_type = Column(SQLEnum(TransactionType), default=TransactionType.JOURNAL_ENTRY)
+        source_document = Column(String(100))
+        currency = Column(SQLEnum(Currency), default=Currency.USD)
+        exchange_rate = Column(Float, default=1.0)
+        ai_confidence = Column(Float)  # AI categorization confidence
+        verified = Column(Boolean, default=False)
+        verified_by = Column(String(100))
+        verified_at = Column(DateTime)
+        created_at = Column(DateTime, default=datetime.utcnow)
+
+        # Relationships
+        account = relationship("Account", back_populates="transactions")
+        company = relationship("Company")
+
+        # Indexes
+        __table_args__ = (
+            Index("idx_company_date", "company_id", "transaction_date"),
+            Index("idx_account_date", "account_id", "transaction_date"),
+        )
+
+    class RevenueStream(Base):
+        """
+        Revenue streams for recognition and forecasting
+        """
+
+        __tablename__ = "revenue_streams"
+
+        id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+        company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id"), nullable=False)
+        stream_name = Column(String(100), nullable=False)
+        stream_type = Column(String(50))  # Subscription, Product, Service, etc.
+        recognition_method = Column(
+            SQLEnum(RevenueRecognitionMethod), default=RevenueRecognitionMethod.ACCRUAL
+        )
+        contract_value = Column(Float)
+        start_date = Column(DateTime)
+        end_date = Column(DateTime)
+        payment_terms = Column(String(100))
+        ai_forecast_model = Column(JSONB)  # Store ML model parameters
+        is_active = Column(Boolean, default=True)
+        created_at = Column(DateTime, default=datetime.utcnow)
+
+        # Relationships
+        company = relationship("Company", back_populates="revenue_streams")
+        recognitions = relationship("RevenueRecognition", back_populates="revenue_stream")
+
+    class RevenueRecognition(Base):
+        """
+        Revenue recognition entries with verification
+        """
+
+        __tablename__ = "revenue_recognitions"
+
+        id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+        revenue_stream_id = Column(
+            UUID(as_uuid=True), ForeignKey("revenue_streams.id"), nullable=False
+        )
+        recognition_date = Column(DateTime, nullable=False)
+        amount = Column(Float, nullable=False)
+        period_start = Column(DateTime)
+        period_end = Column(DateTime)
+        verification_sources = Column(JSONB)  # Bank statements, contracts, etc.
+        ai_verification_score = Column(Float)
+        blockchain_hash = Column(String(64))  # For immutable audit trail
+        created_at = Column(DateTime, default=datetime.utcnow)
+
+        # Relationships
+        revenue_stream = relationship("RevenueStream", back_populates="recognitions")
+
     class Expenditure(Base):
         """
-        Core expenditure table
+        Core expenditure table - Enhanced for multi-company support
         """
 
         __tablename__ = "expenditures"
@@ -132,12 +353,12 @@ if SQLALCHEMY_AVAILABLE:
         expenditure_id = Column(String(50), unique=True, nullable=False, index=True)
 
         # Company & date
-        company = Column(String(100), nullable=False, index=True)
+        company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id"), nullable=False)
         transaction_date = Column(DateTime, nullable=False, index=True)
 
         # Financial data
         amount = Column(Float, nullable=False)
-        currency = Column(String(3), default="USD")
+        currency = Column(SQLEnum(Currency), default=Currency.USD)
         tax_amount = Column(Float, nullable=True)
         tax_type = Column(String(50), nullable=True)
         tax_deductible = Column(Boolean, default=True)
@@ -190,11 +411,12 @@ if SQLALCHEMY_AVAILABLE:
         extra_metadata = Column(JSONB, nullable=True)
 
         # Relationships
+        company = relationship("Company", back_populates="expenditures")
         audit_logs = relationship("ExpenditureAuditLog", back_populates="expenditure")
 
         # Indexes for common queries
         __table_args__ = (
-            Index("idx_company_date", "company", "transaction_date"),
+            Index("idx_company_date", "company_id", "transaction_date"),
             Index("idx_category_date", "category", "transaction_date"),
             Index("idx_vendor_date", "vendor", "transaction_date"),
         )

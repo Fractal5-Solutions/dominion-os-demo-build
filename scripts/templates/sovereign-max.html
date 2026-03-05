@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHI Sovereign Max Mode - Intelligence Expansion</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sovereign-header { background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; }
+        .sovereign-card { border: 2px solid #ff6b6b; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3); }
+        .authority-badge { background: linear-gradient(45deg, #ff6b6b, #ffa500); color: white; font-weight: bold; }
+        .ai-status-active { color: #28a745; font-weight: bold; }
+        .ai-status-inactive { color: #dc3545; font-weight: bold; }
+        .sovereign-metric { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .decision-log { max-height: 400px; overflow-y: auto; }
+        .company-card { transition: transform 0.2s; }
+        .company-card:hover { transform: translateY(-5px); }
+        .pulse-animation { animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body class="bg-dark text-light">
+    <!-- Sovereign Header -->
+    <nav class="navbar navbar-expand-lg sovereign-header">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="fas fa-crown me-2"></i>PHI SOVEREIGN MAX MODE
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">
+                    <i class="fas fa-shield-alt me-1"></i>Authority Level: 9/9
+                </span>
+                <span class="navbar-text">
+                    <i class="fas fa-robot me-1"></i>NHITL Active
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Status Overview -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card sovereign-card">
+                    <div class="card-header sovereign-header">
+                        <h4 class="card-title mb-0">
+                            <i class="fas fa-crown me-2"></i>Sovereign Max Mode Status
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="sovereign-metric p-3 rounded">
+                                    <h3 id="sovereignStatus">ACTIVE</h3>
+                                    <small>Sovereign Status</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="sovereign-metric p-3 rounded">
+                                    <h3 id="authorityLevel">9</h3>
+                                    <small>Authority Level</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="sovereign-metric p-3 rounded">
+                                    <h3 id="companiesProcessed">3</h3>
+                                    <small>Companies Processed</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="sovereign-metric p-3 rounded">
+                                    <h3 id="autonomousDecisions">42</h3>
+                                    <small>Autonomous Decisions</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card sovereign-card">
+                    <div class="card-header sovereign-header">
+                        <h4 class="card-title mb-0">
+                            <i class="fas fa-terminal me-2"></i>Sovereign Control Panel
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <button id="executeSovereignBtn" class="btn btn-danger btn-lg pulse-animation">
+                                    <i class="fas fa-rocket me-2"></i>Execute Sovereign Max Operation
+                                </button>
+                                <div id="executionStatus" class="mt-3" style="display: none;">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-spinner fa-spin me-2"></i>
+                                        Executing Sovereign Max Mode operations...
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="authority-badge p-2 rounded">
+                                    <i class="fas fa-certificate me-1"></i>
+                                    MAXIMUM AUTHORITY GRANTED
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Company AI Status -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h3 class="text-center mb-4">
+                    <i class="fas fa-building me-2"></i>Company-Specific AI Intelligence
+                </h3>
+            </div>
+        </div>
+
+        <div class="row" id="companyCards">
+            <!-- Company cards will be loaded here -->
+        </div>
+
+        <!-- Sovereign Decision Log -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card sovereign-card">
+                    <div class="card-header sovereign-header">
+                        <h4 class="card-title mb-0">
+                            <i class="fas fa-gavel me-2"></i>Sovereign Decision Log
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="decision-log" id="decisionLog">
+                            <!-- Decisions will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Integrity -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card sovereign-card">
+                    <div class="card-header sovereign-header">
+                        <h4 class="card-title mb-0">
+                            <i class="fas fa-shield-alt me-2"></i>System Integrity Verification
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <div class="p-3 bg-success text-white rounded">
+                                    <i class="fas fa-check-circle fa-2x mb-2"></i>
+                                    <h5>AI Models</h5>
+                                    <small>15 Active</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-3 bg-primary text-white rounded">
+                                    <i class="fas fa-brain fa-2x mb-2"></i>
+                                    <h5>Intelligence</h5>
+                                    <small>Maximum Level</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-3 bg-warning text-dark rounded">
+                                    <i class="fas fa-crown fa-2x mb-2"></i>
+                                    <h5>Sovereignty</h5>
+                                    <small>Absolute Authority</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let sovereignData = {};
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSovereignStatus();
+            loadCompanyAIStatus();
+            loadSovereignDecisions();
+        });
+
+        async function loadSovereignStatus() {
+            try {
+                const response = await fetch('/api/sovereign/status');
+                const data = await response.json();
+
+                document.getElementById('sovereignStatus').textContent = data.sovereign_status;
+                document.getElementById('authorityLevel').textContent = data.authority_level;
+                document.getElementById('companiesProcessed').textContent = data.companies_processed;
+                document.getElementById('autonomousDecisions').textContent = data.autonomous_decisions;
+
+                sovereignData.status = data;
+            } catch (error) {
+                console.error('Error loading sovereign status:', error);
+            }
+        }
+
+        async function loadCompanyAIStatus() {
+            const companies = ['fractal5', 'bluewave', 'plane4'];
+            const companyCards = document.getElementById('companyCards');
+
+            for (const companyId of companies) {
+                try {
+                    const response = await fetch(`/api/company/${companyId}/ai-status`);
+                    const data = await response.json();
+
+                    const card = createCompanyCard(companyId, data);
+                    companyCards.appendChild(card);
+                } catch (error) {
+                    console.error(`Error loading ${companyId} AI status:`, error);
+                }
+            }
+        }
+
+        function createCompanyCard(companyId, data) {
+            const col = document.createElement('div');
+            col.className = 'col-md-4 mb-4';
+
+            col.innerHTML = `
+                <div class="card company-card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-building me-2"></i>${data.company_name}
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-2">
+                                    <small class="text-muted">Revenue AI</small>
+                                    <div class="${data.revenue_verification.status === 'ACTIVE' ? 'ai-status-active' : 'ai-status-inactive'}">
+                                        ${data.revenue_verification.status}
+                                    </div>
+                                    <small>${(data.revenue_verification.accuracy * 100).toFixed(1)}% accuracy</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="mb-2">
+                                    <small class="text-muted">Forecasting</small>
+                                    <div class="${data.financial_forecasting.status === 'ACTIVE' ? 'ai-status-active' : 'ai-status-inactive'}">
+                                        ${data.financial_forecasting.status}
+                                    </div>
+                                    <small>${(data.financial_forecasting.accuracy * 100).toFixed(1)}% accuracy</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-2">
+                                    <small class="text-muted">Compliance</small>
+                                    <div class="${data.compliance_monitoring.status === 'ACTIVE' ? 'ai-status-active' : 'ai-status-inactive'}">
+                                        ${data.compliance_monitoring.status}
+                                    </div>
+                                    <small>${(data.compliance_monitoring.score * 100).toFixed(1)}% score</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="mb-2">
+                                    <small class="text-muted">Anomalies</small>
+                                    <div class="ai-status-active">DETECTED</div>
+                                    <small>${data.anomaly_detection.anomalies} found</small>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="text-center">
+                            <small class="text-muted">Sovereign Decisions</small>
+                            <h4 class="text-primary">${data.sovereign_decisions.count}</h4>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            return col;
+        }
+
+        async function loadSovereignDecisions() {
+            try {
+                const response = await fetch('/api/sovereign/decisions');
+                const data = await response.json();
+
+                const decisionLog = document.getElementById('decisionLog');
+                decisionLog.innerHTML = '';
+
+                data.decisions.forEach(decision => {
+                    const decisionItem = document.createElement('div');
+                    decisionItem.className = 'border-start border-primary border-4 ps-3 mb-3';
+                    decisionItem.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>${decision.company}</strong>
+                                <span class="badge bg-primary ms-2">${decision.type}</span>
+                            </div>
+                            <small class="text-muted">${new Date(decision.timestamp).toLocaleString()}</small>
+                        </div>
+                        <div class="mt-1">
+                            <span class="text-success">${decision.decision}</span>
+                            <small class="text-muted ms-2">
+                                ${(decision.confidence * 100).toFixed(1)}% confidence •
+                                Authority Level ${decision.authority_level} •
+                                ${decision.autonomous ? 'Autonomous' : 'Manual'}
+                            </small>
+                        </div>
+                    `;
+                    decisionLog.appendChild(decisionItem);
+                });
+            } catch (error) {
+                console.error('Error loading sovereign decisions:', error);
+            }
+        }
+
+        // Execute Sovereign Max Operation
+        document.getElementById('executeSovereignBtn').addEventListener('click', async function() {
+            const btn = this;
+            const statusDiv = document.getElementById('executionStatus');
+
+            // Disable button and show status
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Executing...';
+            statusDiv.style.display = 'block';
+
+            try {
+                const response = await fetch('/api/sovereign/execute', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Success
+                    statusDiv.innerHTML = `
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Sovereign Max Mode execution completed successfully!
+                            ${result.results.total_actions_taken} autonomous actions taken.
+                        </div>
+                    `;
+
+                    // Refresh data
+                    loadSovereignStatus();
+                    loadCompanyAIStatus();
+                    loadSovereignDecisions();
+                } else {
+                    // Error
+                    statusDiv.innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Execution failed: ${result.message}
+                        </div>
+                    `;
+                }
+
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Network error: ${error.message}
+                    </div>
+                `;
+            } finally {
+                // Re-enable button
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-rocket me-2"></i>Execute Sovereign Max Operation';
+            }
+        });
+    </script>
+</body>
+</html>
