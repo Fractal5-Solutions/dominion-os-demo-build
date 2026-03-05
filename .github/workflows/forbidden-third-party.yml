@@ -1,0 +1,18 @@
+name: Forbidden Third-Party References
+on:
+  push:
+  pull_request:
+
+jobs:
+  forbid:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fail if forbidden providers are referenced
+        run: |
+          set -euo pipefail
+          if rg -n -i --hidden --glob '!.git/**' 'v[e]rcel|n[o]w\.[s]h' .; then
+            echo "Forbidden third-party provider reference found."
+            exit 1
+          fi
+          echo "OK: no forbidden references."
