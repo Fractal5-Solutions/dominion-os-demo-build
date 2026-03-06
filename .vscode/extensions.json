@@ -1,0 +1,96 @@
+{
+  // ═══════════════════════════════════════════════════════════════
+  // PHI DOMINION OS COMMAND CENTER - RECOMMENDED VS CODE EXTENSIONS
+  // Essential extensions for optimal command center operations
+  // ═══════════════════════════════════════════════════════════════
+
+  "recommendations": [
+    // ─────────────────────────────────────────────────────────────
+    // Core Development
+    // ─────────────────────────────────────────────────────────────
+    "ms-python.python",                    // Python language support
+    "ms-python.vscode-pylance",            // Python IntelliSense & type checking
+    "ms-python.black-formatter",           // Python code formatter
+    "ms-toolsai.jupyter",                  // Jupyter notebook support
+
+    // ─────────────────────────────────────────────────────────────
+    // Shell & Scripting
+    // ─────────────────────────────────────────────────────────────
+    "foxundermoon.shell-format",           // Shell script formatter
+    "timonwong.shellcheck",                // Shell script linter
+    "rogalmic.bash-debug",                 // Bash debugger
+
+    // ─────────────────────────────────────────────────────────────
+    // Git & Version Control
+    // ─────────────────────────────────────────────────────────────
+    "github.vscode-pull-request-github",   // GitHub PR & Issues
+    "eamodio.gitlens",                     // Git supercharged
+    "mhutchie.git-graph",                  // Git graph visualization
+    "donjayamanne.githistory",             // Git history viewer
+
+    // ─────────────────────────────────────────────────────────────
+    // Cloud & Infrastructure
+    // ─────────────────────────────────────────────────────────────
+    "googlecloudtools.cloudcode",          // Google Cloud SDK
+    "ms-azuretools.vscode-docker",         // Docker support
+    "ms-kubernetes-tools.vscode-kubernetes-tools", // Kubernetes
+
+    // ─────────────────────────────────────────────────────────────
+    // Configuration & Data Formats
+    // ─────────────────────────────────────────────────────────────
+    "redhat.vscode-yaml",                  // YAML language support
+    "mechatroner.rainbow-csv",             // CSV visualization
+    "tamasfe.even-better-toml",            // TOML support
+
+    // ─────────────────────────────────────────────────────────────
+    // Documentation & Markdown
+    // ─────────────────────────────────────────────────────────────
+    "yzhang.markdown-all-in-one",          // Markdown productivity
+    "davidanson.vscode-markdownlint",      // Markdown linter
+    "bierner.markdown-mermaid",            // Mermaid diagrams
+
+    // ─────────────────────────────────────────────────────────────
+    // AI & Productivity
+    // ─────────────────────────────────────────────────────────────
+    "github.copilot",                      // GitHub Copilot
+    "github.copilot-chat",                 // Copilot Chat
+
+    // ─────────────────────────────────────────────────────────────
+    // Code Quality & Linting
+    // ─────────────────────────────────────────────────────────────
+    "dbaeumer.vscode-eslint",              // ESLint (if JS needed)
+    "ms-python.flake8",                    // Python Flake8 linter
+    "ms-python.isort",                     // Python import sorter
+
+    // ─────────────────────────────────────────────────────────────
+    // UI & Themes
+    // ─────────────────────────────────────────────────────────────
+    "pkief.material-icon-theme",           // Material icon theme
+    "oderwat.indent-rainbow",              // Indent visualization
+    "aaron-bond.better-comments",          // Better comment highlighting
+
+    // ─────────────────────────────────────────────────────────────
+    // Debugging & Testing
+    // ─────────────────────────────────────────────────────────────
+    "ryanluker.vscode-coverage-gutters",   // Code coverage visualization
+    "littlefoxteam.vscode-python-test-adapter", // Test adapter
+
+    // ─────────────────────────────────────────────────────────────
+    // Remote Development
+    // ─────────────────────────────────────────────────────────────
+    "ms-vscode-remote.remote-containers",  // Dev containers
+    "ms-vscode-remote.remote-ssh",         // Remote SSH
+    "ms-vscode.remote-explorer",           // Remote explorer
+
+    // ─────────────────────────────────────────────────────────────
+    // Collaboration
+    // ─────────────────────────────────────────────────────────────
+    "ms-vsliveshare.vsliveshare"           // Live Share
+  ],
+
+  // Extensions to avoid or that conflict with command center ops
+  "unwantedRecommendations": [
+    "ms-python.autopep8",                  // Conflicts with black formatter
+    "ms-python.pylint"                     // Using flake8 instead
+  ]
+}

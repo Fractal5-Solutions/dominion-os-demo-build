@@ -35,7 +35,10 @@ logs/
 Thumbs.db
 
 # IDE
-.vscode/
+# Note: Workspace .vscode/ is committed for shared settings
+# User-specific settings should go in .vscode/*.local.json
+.vscode/*.local.json
+.vscode/settings.local.json
 .idea/
 *.swp
 *.swo

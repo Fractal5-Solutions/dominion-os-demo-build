@@ -1,0 +1,79 @@
+{
+  // ═══════════════════════════════════════════════════════════════
+  // PHI DOMINION OS COMMAND CENTER - DEBUG CONFIGURATIONS
+  // Launch configurations for debugging command center components
+  // ═══════════════════════════════════════════════════════════════
+
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: PHI MCP Server",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/../phi-mcp-server/main.py",
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "env": {
+        "PHI_MODE": "DEBUG",
+        "SOVEREIGNTY_LEVEL": "9/9"
+      }
+    },
+    {
+      "name": "Python: Current File",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Python: Module",
+      "type": "python",
+      "request": "launch",
+      "module": "${input:moduleName}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Python: pytest",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "-v",
+        "${file}"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Bash: Debug Script",
+      "type": "bashdb",
+      "request": "launch",
+      "program": "${file}",
+      "cwd": "${workspaceFolder}",
+      "args": [],
+      "pathBashdb": "/usr/local/bin/bashdb",
+      "pathBash": "/bin/bash",
+      "showDebugOutput": true,
+      "trace": true
+    },
+    {
+      "name": "Bash: Sovereign Autopilot",
+      "type": "bashdb",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/phi_sovereign_autopilot_nhitl.sh",
+      "cwd": "${workspaceFolder}/scripts",
+      "args": [],
+      "pathBash": "/bin/bash",
+      "showDebugOutput": true
+    }
+  ],
+  "inputs": [
+    {
+      "id": "moduleName",
+      "type": "promptString",
+      "description": "Module name to debug",
+      "default": "main"
+    }
+  ]
+}

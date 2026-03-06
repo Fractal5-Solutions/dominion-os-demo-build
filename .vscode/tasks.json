@@ -1,0 +1,231 @@
+{
+  // ═══════════════════════════════════════════════════════════════
+  // PHI DOMINION OS COMMAND CENTER - VS CODE TASKS
+  // Automated tasks for command center operations
+  // ═══════════════════════════════════════════════════════════════
+
+  "version": "2.0.0",
+  "tasks": [
+    // ─────────────────────────────────────────────────────────────
+    // Command Center Control Tasks
+    // ─────────────────────────────────────────────────────────────
+    {
+      "label": "🚀 Start Command Center",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "${workspaceFolder}/scripts/phi_command_center_activation.sh"
+      ],
+      "problemMatcher": [],
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "✅ Verify Command Center Live",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "${workspaceFolder}/scripts/verify_command_center_live.sh"
+      ],
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "📊 Check Sovereignty Status",
+      "type": "shell",
+      "command": "cat",
+      "args": [
+        "${workspaceFolder}/scripts/telemetry/sovereign_status.json"
+      ],
+      "problemMatcher": [],
+      "group": "none"
+    },
+
+    // ─────────────────────────────────────────────────────────────
+    // Python Tasks
+    // ─────────────────────────────────────────────────────────────
+    {
+      "label": "🐍 Install Python Dependencies",
+      "type": "shell",
+      "command": "pip install -r requirements.txt",
+      "options": {
+        "cwd": "${workspaceFolder}/scripts"
+      },
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "🔍 Run Python Tests",
+      "type": "shell",
+      "command": "pytest",
+      "args": [
+        "-v",
+        "--tb=short"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/scripts"
+      },
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "🧹 Python: Format with Black",
+      "type": "shell",
+      "command": "black",
+      "args": [
+        "${workspaceFolder}/scripts",
+        "--line-length",
+        "88"
+      ],
+      "problemMatcher": [],
+      "group": "none"
+    },
+    {
+      "label": "✨ Python: Lint with Flake8",
+      "type": "shell",
+      "command": "flake8",
+      "args": [
+        "${workspaceFolder}/scripts"
+      ],
+      "problemMatcher": [],
+      "group": "test"
+    },
+
+    // ─────────────────────────────────────────────────────────────
+    // Git Tasks
+    // ─────────────────────────────────────────────────────────────
+    {
+      "label": "📋 Git: Status",
+      "type": "shell",
+      "command": "git status",
+      "problemMatcher": [],
+      "group": "none"
+    },
+    {
+      "label": "📜 Git: Log (Recent)",
+      "type": "shell",
+      "command": "git log --oneline --graph -10",
+      "problemMatcher": [],
+      "group": "none"
+    },
+    {
+      "label": "🌿 Git: List Branches",
+      "type": "shell",
+      "command": "git branch -a",
+      "problemMatcher": [],
+      "group": "none"
+    },
+
+    // ─────────────────────────────────────────────────────────────
+    // GCP Tasks
+    // ─────────────────────────────────────────────────────────────
+    {
+      "label": "☁️ GCP: List Services (dominion-core-prod)",
+      "type": "shell",
+      "command": "gcloud run services list --project dominion-core-prod",
+      "problemMatcher": [],
+      "group": "none"
+    },
+    {
+      "label": "☁️ GCP: List Services (dominion-os-1-0-main)",
+      "type": "shell",
+      "command": "gcloud run services list --project dominion-os-1-0-main",
+      "problemMatcher": [],
+      "group": "none"
+    },
+    {
+      "label": "☁️ GCP: Auth Status",
+      "type": "shell",
+      "command": "gcloud auth list",
+      "problemMatcher": [],
+      "group": "none"
+    },
+
+    // ─────────────────────────────────────────────────────────────
+    // Docker Tasks
+    // ─────────────────────────────────────────────────────────────
+    {
+      "label": "🐳 Docker: List Containers",
+      "type": "shell",
+      "command": "docker ps -a",
+      "problemMatcher": [],
+      "group": "none"
+    },
+    {
+      "label": "🐳 Docker Compose: Up",
+      "type": "shell",
+      "command": "docker-compose up -d",
+      "options": {
+        "cwd": "${workspaceFolder}/scripts"
+      },
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "🐳 Docker Compose: Down",
+      "type": "shell",
+      "command": "docker-compose down",
+      "options": {
+        "cwd": "${workspaceFolder}/scripts"
+      },
+      "problemMatcher": [],
+      "group": "none"
+    },
+
+    // ─────────────────────────────────────────────────────────────
+    // Monitoring & Logs
+    // ─────────────────────────────────────────────────────────────
+    {
+      "label": "📊 View Continuous Monitor Log",
+      "type": "shell",
+      "command": "tail",
+      "args": [
+        "-f",
+        "${workspaceFolder}/scripts/telemetry/continuous_monitor.log"
+      ],
+      "problemMatcher": [],
+      "group": "none",
+      "isBackground": true
+    },
+    {
+      "label": "📋 View Activation Log",
+      "type": "shell",
+      "command": "cat",
+      "args": [
+        "${workspaceFolder}/scripts/activation.log"
+      ],
+      "problemMatcher": [],
+      "group": "none"
+    },
+    {
+      "label": "🔍 Check Running Processes",
+      "type": "shell",
+      "command": "ps aux | grep -E '(main.py|continuous_monitor|phi_)' | grep -v grep",
+      "problemMatcher": [],
+      "group": "test"
+    },
+
+    // ─────────────────────────────────────────────────────────────
+    // Cleanup Tasks
+    // ─────────────────────────────────────────────────────────────
+    {
+      "label": "🧹 Clean Python Cache",
+      "type": "shell",
+      "command": "find . -type d -name '__pycache__' -exec rm -rf {} + ; find . -type f -name '*.pyc' -delete",
+      "problemMatcher": [],
+      "group": "none"
+    },
+    {
+      "label": "🧹 Clean Logs (Old)",
+      "type": "shell",
+      "command": "find ${workspaceFolder}/scripts/telemetry -name '*.log' -mtime +7 -delete",
+      "problemMatcher": [],
+      "group": "none"
+    }
+  ]
+}
