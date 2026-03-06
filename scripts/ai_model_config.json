@@ -1,0 +1,26 @@
+{
+  "enabled": true,
+  "default_model": "grok",
+  "scaling_enabled": true,
+  "cost_optimization": {
+    "max_daily_cost": 50.0,
+    "cost_alert_threshold": 0.8,
+    "fallback_model": "grok-lite"
+  },
+  "model_hierarchy": {
+    "basic": ["grok-lite", "grok"],
+    "advanced": ["grok", "super-grok"],
+    "premium": ["super-grok", "gpt-4o-mini"]
+  },
+  "task_complexity_thresholds": {
+    "low": {"tokens": 1000, "complexity_score": 0.3},
+    "medium": {"tokens": 4000, "complexity_score": 0.7},
+    "high": {"tokens": 8000, "complexity_score": 0.9}
+  },
+  "auto_scaling": {
+    "enabled": true,
+    "scale_up_threshold": 0.85,
+    "scale_down_threshold": 0.6,
+    "cooldown_period": 300
+  }
+}

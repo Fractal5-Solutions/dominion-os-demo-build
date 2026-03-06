@@ -12,5 +12,7 @@ dominion-os                https://dominion-os-reduwyf2ra-uc.a.run.app
 dominion-os-1-0-101        https://dominion-os-1-0-101-reduwyf2ra-uc.a.run.app
 dominion-os-demo           https://dominion-os-demo-reduwyf2ra-uc.a.run.app
 dominion-phi-ui            https://dominion-phi-ui-reduwyf2ra-uc.a.run.app
+phi-askphi-widget          https://phi-askphi-widget-reduwyf2ra-uc.a.run.app
 phi-expenditure-dashboard  https://phi-expenditure-dashboard-reduwyf2ra-uc.a.run.app
+phi-oauth-server           https://phi-oauth-server-reduwyf2ra-uc.a.run.app
 pipeline                   https://pipeline-reduwyf2ra-uc.a.run.app

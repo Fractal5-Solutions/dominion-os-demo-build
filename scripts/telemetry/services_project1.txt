@@ -8,3 +8,5 @@ dominion-os-api                https://dominion-os-api-66ymegzkya-uc.a.run.app
 dominion-phi-ui                https://dominion-phi-ui-66ymegzkya-uc.a.run.app
 dominion-revenue-automation    https://dominion-revenue-automation-66ymegzkya-uc.a.run.app
 dominion-security-framework    https://dominion-security-framework-66ymegzkya-uc.a.run.app
+phi-askphi-widget              https://phi-askphi-widget-66ymegzkya-uc.a.run.app
+phi-oauth-server               https://phi-oauth-server-66ymegzkya-uc.a.run.app

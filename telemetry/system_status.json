@@ -1,0 +1,30 @@
+{
+  "timestamp": "2026-03-05T23:54:50Z",
+  "status": "operational",
+  "infrastructure": {
+    "total_services": 28,
+    "operational_services": 27,
+    "health_percentage": 96
+  },
+  "components": {
+    "ai_gateways": 2,
+    "phi_uis": 1,
+    "core_apis": 3
+  },
+  "projects": {
+    "dominion-os-1-0-main": {
+      "operational": 11,
+      "total": 11
+    },
+    "dominion-core-prod": {
+      "operational": 16,
+      "total": 17
+    }
+  },
+  "git": {
+    "local_sha": "073ee38",
+    "remote_sha": "475c4cf",
+    "commits_ahead": 9,
+    "can_push": false
+  }
+}
