@@ -44,6 +44,7 @@ Thumbs.db
 # Telemetry & Activation Logs
 telemetry/activation_*.log
 telemetry/intelligent_sync.log
+scripts/telemetry/continuous_monitor.log
 
 # Service-specific
 oauth_server/__pycache__/

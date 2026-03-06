@@ -1,30 +1,30 @@
 {
-  "timestamp": "2026-03-05T23:54:50Z",
-  "status": "operational",
+  "timestamp": "2026-03-06T17:54:24Z",
+  "status": "critical",
   "infrastructure": {
-    "total_services": 28,
-    "operational_services": 27,
-    "health_percentage": 96
+    "total_services": 0,
+    "operational_services": 0,
+    "health_percentage": 0
   },
   "components": {
-    "ai_gateways": 2,
-    "phi_uis": 1,
-    "core_apis": 3
+    "ai_gateways": 0,
+    "phi_uis": 0,
+    "core_apis": 0
   },
   "projects": {
     "dominion-os-1-0-main": {
-      "operational": 11,
-      "total": 11
+      "operational": 0,
+      "total": 0
     },
     "dominion-core-prod": {
-      "operational": 16,
-      "total": 17
+      "operational": 0,
+      "total": 0
     }
   },
   "git": {
-    "local_sha": "073ee38",
-    "remote_sha": "475c4cf",
-    "commits_ahead": 9,
+    "local_sha": "0717119",
+    "remote_sha": "0717119",
+    "commits_ahead": 0,
     "can_push": false
   }
 }
