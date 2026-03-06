@@ -1,0 +1,29 @@
+{
+  // Minimal diagnostics tasks for the `scripts/` workspace.
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "🩺 Terminal Doctor (scripts)",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "${workspaceFolder}/phi_terminal_doctor.sh"
+      ],
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "🟦 PowerShell: Version",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoLogo",
+        "-NoProfile",
+        "-Command",
+        "$PSVersionTable.PSVersion.ToString()"
+      ],
+      "problemMatcher": [],
+      "group": "test"
+    }
+  ]
+}
