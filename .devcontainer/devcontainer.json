@@ -1,0 +1,28 @@
+{
+  "name": "PHI Dominion OS Development",
+  "image": "mcr.microsoft.com/devcontainers/base:alpine-3.20",
+  
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "moby": true,
+      "dockerDashComposeVersion": "v2"
+    },
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.11"
+    },
+    "ghcr.io/devcontainers/features/gcloud:1": {
+      "version": "latest"
+    }
+  },
+
+  "forwardPorts": [8000, 8080, 8081, 5432, 6379, 9090, 3000],
+  
+  "postCreateCommand": "echo 'PHI Dominion OS Dev Container Ready'",
+  
+  "mounts": [
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+  ],
+  
+  "remoteUser": "vscode"
+}

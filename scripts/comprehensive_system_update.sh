@@ -51,7 +51,7 @@ verify_prerequisites() {
     log "Verifying system prerequisites..."
 
     # Check required tools
-    local tools=("gcloud" "docker" "python3" "pip" "npm" "node")
+    local tools=("gcloud" "docker" "python3" "pip" "npm" "node" "pwsh")
     for tool in "${tools[@]}"; do
         if command -v "$tool" &> /dev/null; then
             success "$tool found: $($tool --version | head -1)"
@@ -383,6 +383,14 @@ optimize_system_performance() {
     if command -v apt-get &> /dev/null; then
         log "Updating system packages..."
         apt-get update -qq && apt-get upgrade -qq -y
+        success "System packages updated"
+    elif command -v apk &> /dev/null; then
+        log "Updating system packages (apk)..."
+        if command -v sudo &> /dev/null; then
+            sudo apk update -q && sudo apk upgrade -q
+        else
+            apk update -q && apk upgrade -q
+        fi
         success "System packages updated"
     fi
 

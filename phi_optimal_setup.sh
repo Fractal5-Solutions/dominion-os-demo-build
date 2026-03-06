@@ -85,6 +85,33 @@ install_extension "bradlc.vscode-tailwindcss" "Tailwind CSS"
 install_extension "ms-windows-ai-studio.windows-ai-studio" "Windows AI Studio"
 
 echo ""
+echo "🟦 CHECKING POWERSHELL RUNTIME"
+echo "================================"
+
+if command -v pwsh &> /dev/null; then
+    echo -e "${GREEN}✓${NC} PowerShell runtime found: $(pwsh --version | head -1)"
+else
+    echo -e "${YELLOW}⚠${NC} PowerShell runtime (pwsh) not found"
+
+    if command -v apk &> /dev/null; then
+        echo -e "${BLUE}Installing PowerShell via apk...${NC}"
+        if command -v sudo &> /dev/null; then
+            sudo apk add --no-cache powershell || true
+            sudo ln -sf /usr/bin/pwsh /usr/bin/powershell 2>/dev/null || true
+        else
+            apk add --no-cache powershell || true
+            ln -sf /usr/bin/pwsh /usr/bin/powershell 2>/dev/null || true
+        fi
+    else
+        echo -e "${YELLOW}⚠${NC} Package manager not detected; install PowerShell (pwsh) manually."
+    fi
+fi
+
+if command -v powershell &> /dev/null; then
+    echo -e "${GREEN}✓${NC} powershell alias: $(command -v powershell)"
+fi
+
+echo ""
 echo "🐍 CHECKING PYTHON ENVIRONMENT"
 echo "================================"
 

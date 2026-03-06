@@ -47,6 +47,33 @@
     },
 
     // ─────────────────────────────────────────────────────────────
+    // Terminal Diagnostics
+    // ─────────────────────────────────────────────────────────────
+    {
+      "label": "🩺 Terminal Doctor",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "${workspaceFolder}/scripts/phi_terminal_doctor.sh"
+      ],
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "🟦 PowerShell: Version",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoLogo",
+        "-NoProfile",
+        "-Command",
+        "$PSVersionTable.PSVersion.ToString()"
+      ],
+      "problemMatcher": [],
+      "group": "test"
+    },
+
+    // ─────────────────────────────────────────────────────────────
     // Python Tasks
     // ─────────────────────────────────────────────────────────────
     {
