@@ -1,12 +1,21 @@
 {
-  "timestamp": "2026-03-06T17:56:51+00:00",
+  "timestamp": "2026-03-06T18:24:00+00:00",
   "sovereignty_level": "9/9",
   "mode": "NHITL_AUTOPILOT",
   "chief": "PHI",
-  "phase": "OPERATIONAL",
-  "status": "ACTIVE",
-  "details": "Full sovereign autopilot operational",
+  "phase": "FULL_REMOTE_ACCESS",
+  "status": "OPERATIONAL",
+  "details": "Full sovereign autopilot with GCP remote access confirmed",
   "max_power": "ENABLED",
+  "gcp_authenticated": true,
+  "remote_services": {
+    "dominion-core-prod": 17,
+    "dominion-os-1-0-main": 11,
+    "total": 28,
+    "operational": 27,
+    "health_percentage": 96
+  },
   "last_proof": "2026-03-06T17:57:11+00:00",
+  "last_gcp_sync": "2026-03-06T18:24:00+00:00",
   "proof_count": 1
 }
