@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+.venv/
+.venv_*/
+venv/
+ENV/
+env/
+
+# Logs
+*.log
+logs/
+*.out
+*.err
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Telemetry & Activation Logs
+telemetry/activation_*.log
+telemetry/intelligent_sync.log
+
+# Service-specific
+oauth_server/__pycache__/
+oauth_server/*.log
+oauth_server/*.service
+widget_service/__pycache__/
+widget_service/*.log
+widget_service/*.service
+
+# Test & Demo
+dominion_demo_test/
+scripts/data/
+scripts/logs/
+scripts/activation.log
+scripts/performance_metrics.json
+scripts/phi_financial_bims.db
+
+# Supervisor
+supervisord.conf
+supervisord.log
+supervisord.pid
