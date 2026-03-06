@@ -17,5 +17,9 @@
   },
   "last_proof": "2026-03-06T17:57:11+00:00",
   "last_gcp_sync": "2026-03-06T18:24:00+00:00",
-  "proof_count": 1
+  "proof_count": 1,
+  "decisions_made": 1,
+  "autonomous_actions": 1,
+  "last_action": "github_cost_optimization",
+  "github_optimized": true
 }
