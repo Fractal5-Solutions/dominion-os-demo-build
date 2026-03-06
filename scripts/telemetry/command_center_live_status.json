@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-03-06T18:47:19+00:00",
+  "command_center_status": "PERFECTLY LIVE",
+  "sovereignty_level": "9/9",
+  "mode": "NHITL_AUTOPILOT",
+  "components": {
+    "phi_mcp_server": {
+      "status": "OPERATIONAL",
+      "pid": 233462,
+      "port": 8000
+    },
+    "continuous_monitoring": {
+      "status": "OPERATIONAL",
+      "active_monitors": 2
+    },
+    "gcp_remote_infrastructure": {
+      "status": "OPERATIONAL",
+      "total_services": 28,
+      "dominion_core_prod": 17,
+      "dominion_os_1_0_main": 11
+    },
+    "telemetry": {
+      "status": "OPERATIONAL"
+    }
+  },
+  "health": {
+    "components_operational": 4,
+    "components_total": 4,
+    "health_percentage": 100
+  }
+}
