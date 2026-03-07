@@ -6,5 +6,11 @@
   "phase": "OPERATIONAL",
   "status": "ACTIVE",
   "details": "Full sovereign autopilot operational",
-  "max_power": "ENABLED"
+  "max_power": "ENABLED",
+  "remote_services": {
+    "total": 28,
+    "operational": 27,
+    "health_percentage": 96
+  },
+  "last_health_check": "2026-03-07T00:44:21+00:00"
 }
