@@ -1,0 +1,34 @@
+nohup: ignoring input
+[0;32m[2026-03-07 02:50:06][0m Starting PHI Sovereign Controller in monitor mode...
+[0;32m[2026-03-07 02:50:06][0m Press Ctrl+C to stop
+[0;32m[2026-03-07 02:50:06][0m 
+[0;32m[2026-03-07 02:50:06][0m ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[0;32m[2026-03-07 02:50:06][0m PHI SOVEREIGN CONTROLLER - Monitoring Cycle
+[0;32m[2026-03-07 02:50:06][0m ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[0;34mℹ️  [0mCurrent mode: SOVEREIGN_LOCAL
+[0;34mℹ️  [0m💰 Budget healthy: $4.95 / $10.00
+[0;32m✅ [0m📝 Detected 0 changed files, 0 services affected
+[0;32m✅ [0mChanges detected - evaluating sync decision
+[0;34mℹ️  [0m🤔 Evaluating sync decision...
+[0;34mℹ️  [0m   Mode: SOVEREIGN_LOCAL
+[0;34mℹ️  [0m   Pending changes: 0
+[0;34mℹ️  [0m   Syncs today: 0
+[0;34mℹ️  [0m   Current hour: 02
+[0;34mℹ️  [0m   ❌ SOVEREIGN_LOCAL mode - no auto-sync
+
+[0;35m╔════════════════════════════════════════════════════════════╗[0m
+[0;35m║[1;37m       PHI SOVEREIGN POWER - STATUS DASHBOARD          [0;35m║[0m
+[0;35m╚════════════════════════════════════════════════════════════╝[0m
+
+  [0;36mMode:[0m             [1;37mSOVEREIGN_LOCAL[0m
+  [0;36mHealth:[0m           [0;32mHEALTHY[0m
+  [0;36mCost (MTD):[0m       [1;33m$4.95 / $10.00[0m
+  [0;36mPending Changes:[0m  [1;37m0[0m
+  [0;36mSyncs Today:[0m      [1;37m0 / 4[0m
+  [0;36mLast Sync:[0m        [1;37mnever[0m
+
+[0;34mLocal Services:[0m
+  [0;32m✓[0m 4 services running
+
+[0;34mℹ️  [0mMonitoring cycle complete. Next check in 15 minutes.
+[0;34mℹ️  [0mMonitoring cycle complete. Next check in 15 minutes.

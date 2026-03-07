@@ -1,0 +1,14 @@
+{
+  "mode": "SOVEREIGN_LOCAL",
+  "last_sync": "never",
+  "last_cloud_deploy": "never",
+  "cost_this_month": "4.95",
+  "sync_count_today": 0,
+  "health_status": "HEALTHY",
+  "cloud_enabled": false,
+  "pending_changes": 0,
+  "last_git_commit": "",
+  "services_running_local": 4,
+  "services_running_cloud": 33,
+  "failover_mode": false
+}
