@@ -1,0 +1,44 @@
+# PHI Dominion OS - Scripts Directory
+# Dynamic runtime files, logs, and telemetry
+
+# Logs - Keep structure, ignore content
+logs/*.log
+logs/**/*.log
+
+# Telemetry - Keep strategic snapshots only
+telemetry/*.log
+telemetry/background_*.log
+telemetry/cost_minimization_*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+.nohup.out
+nohup.out
+
+# Keep these important state files (not ignored)
+!telemetry/sovereign_state.json
+!telemetry/resource_status.json
+!telemetry/system_status.json

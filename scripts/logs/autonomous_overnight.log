@@ -70,3 +70,16 @@ To update your Application Default Credentials quota project, use the `gcloud au
 Updated property [core/project].
 [2026-03-07 02:43:34] ✓ All services healthy
 [2026-03-07 02:43:34] Next check in 15 minutes...
+[2026-03-07 02:58:34] Health check #2 for hour 5
+[2026-03-07 02:58:34] Checking health for project: dominion-os-1-0-main
+WARNING: Your active project does not match the quota project in your local Application Default Credentials file. This might result in unexpected quota issues.
+
+To update your Application Default Credentials quota project, use the `gcloud auth application-default set-quota-project` command.
+Updated property [core/project].
+[2026-03-07 02:58:57] Checking health for project: dominion-core-prod
+WARNING: Your active project does not match the quota project in your local Application Default Credentials file. This might result in unexpected quota issues.
+
+To update your Application Default Credentials quota project, use the `gcloud auth application-default set-quota-project` command.
+Updated property [core/project].
+[2026-03-07 02:59:21] ✓ All services healthy
+[2026-03-07 02:59:21] Next check in 15 minutes...

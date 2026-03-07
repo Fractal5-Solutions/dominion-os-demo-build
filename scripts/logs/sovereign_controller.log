@@ -32,3 +32,6 @@ nohup: ignoring input
 
 [0;34mℹ️  [0mMonitoring cycle complete. Next check in 15 minutes.
 [0;34mℹ️  [0mMonitoring cycle complete. Next check in 15 minutes.
+[0;32m[2026-03-07 02:55:29][0m 🔄 Switching to INTELLIGENT HYBRID mode
+[0;32m✅ [0mNow in INTELLIGENT HYBRID mode - smart sync enabled
+[0;34mℹ️  [0mMode changed: SOVEREIGN_LOCAL → INTELLIGENT_HYBRID
