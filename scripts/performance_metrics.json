@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-03-06T00:14:29.656544Z",
+  "cpu_percent": 7.1,
+  "memory": {
+    "total": 67427434496,
+    "available": 54846431232,
+    "percent": 18.7
+  },
+  "disk": {
+    "total": 135085703168,
+    "free": 75982577664,
+    "percent": 40.7
+  },
+  "sovereign_status": "optimal_performance"
+}
