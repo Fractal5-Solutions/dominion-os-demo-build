@@ -248,6 +248,7 @@ services:
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/provisioning/dashboards/mcp-overview.json
     deploy:
       resources:
         limits:
@@ -260,6 +261,7 @@ services:
       - mcp-network
     volumes:
       - grafana-data:/var/lib/grafana
+      - ./grafana-dashboards:/etc/grafana/provisioning/dashboards:ro
     ports:
       - "3008:3000"
     depends_on:
