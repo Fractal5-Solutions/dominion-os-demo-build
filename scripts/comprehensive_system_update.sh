@@ -51,7 +51,7 @@ verify_prerequisites() {
     log "Verifying system prerequisites..."
 
     # Check required tools
-    local tools=("gcloud" "docker" "python3" "pip" "npm" "node")
+    local tools=("gcloud" "docker" "python3" "npm" "node")
     for tool in "${tools[@]}"; do
         if command -v "$tool" &> /dev/null; then
             success "$tool found: $($tool --version | head -1)"
@@ -59,6 +59,13 @@ verify_prerequisites() {
             warning "$tool not found - some updates may be limited"
         fi
     done
+
+    # Check pip in virtual environment
+    if [ -f "/workspaces/dominion-os-demo-build/scripts/.venv/bin/pip" ]; then
+        success "pip found in virtual environment"
+    else
+        warning "pip not found - some updates may be limited"
+    fi
 
     # Check VS Code
     if command -v code &> /dev/null; then
@@ -82,6 +89,14 @@ update_command_center() {
     header "UPDATING PHI CHIEF AI COMMAND CENTER"
 
     log "Updating PHI Chief AI core systems..."
+
+    # Activate virtual environment
+    if [ -f "/workspaces/dominion-os-demo-build/scripts/.venv/bin/activate" ]; then
+        source "/workspaces/dominion-os-demo-build/scripts/.venv/bin/activate"
+        success "Virtual environment activated"
+    else
+        warning "Virtual environment not found"
+    fi
 
     # Update Python dependencies
     if [ -f "requirements.txt" ]; then

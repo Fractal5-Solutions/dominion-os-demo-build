@@ -50,7 +50,7 @@ check_process() {
 echo "🔍 PHASE 1: System Status Assessment"
 echo "===================================="
 
-execute_phase "Sovereign Status Check" "./scripts/phi_sovereign_status.sh"
+execute_phase "Sovereign Status Check" "./phi_sovereign_status.sh"
 
 echo "📊 PHASE 2: Process Health Verification"
 echo "======================================"
@@ -65,28 +65,28 @@ echo ""
 echo "🤖 PHASE 3: AI Model Optimization"
 echo "================================="
 
-execute_phase "AI Model Selection Verification" "python3 scripts/phi_ai_model_selector.py --confirm-grok"
+execute_phase "AI Model Selection Verification" "python3 phi_ai_model_selector.py --confirm-grok"
 
-execute_phase "AI Model Cost Analysis" "python3 scripts/phi_ai_model_selector.py --summary"
+execute_phase "AI Model Cost Analysis" "python3 phi_ai_model_selector.py --summary"
 
 echo "💰 PHASE 4: Cost Optimization"
 echo "============================"
 
-execute_phase "Cost Monitoring Setup (Async)" "./scripts/setup_cost_monitoring_async.sh"
+execute_phase "Cost Monitoring Setup (Async)" "./setup_cost_monitoring_async.sh"
 
-execute_phase "Cloud Cost Optimization" "./scripts/phi_cost_optimization.sh"
+execute_phase "Cloud Cost Optimization" "./phi_cost_optimization.sh"
 
 echo "📈 PHASE 5: Performance & SLO Monitoring"
 echo "========================================"
 
-execute_phase "SLO Monitoring Activation" "./scripts/phi_slo_monitoring.sh"
+execute_phase "SLO Monitoring Activation" "./phi_slo_monitoring.sh"
 
-execute_phase "Performance Optimization" "./scripts/optimize_performance.sh"
+execute_phase "Performance Optimization" "./optimize_performance.sh"
 
 echo "🔄 PHASE 6: Autonomous Operations"
 echo "================================="
 
-execute_phase "Overnight Autonomous Execution" "./scripts/autonomous_overnight.sh"
+execute_phase "Overnight Autonomous Execution" "./autonomous_overnight.sh"
 
 execute_phase "Sovereign Keepalive" "./scripts/phi_sovereign_keepalive.sh"
 

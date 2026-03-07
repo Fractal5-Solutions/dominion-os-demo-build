@@ -171,7 +171,8 @@ check_endpoint() {
     local url=$1
     local name=$2
     
-    if curl -s -f -m 2 "$url" > /dev/null 2>&1; then
+    # Check /healthz first, then fallback to root
+    if curl -s -f -m 2 "${url}/healthz" > /dev/null 2>&1 || curl -s -f -m 2 "$url" > /dev/null 2>&1; then
         echo -e "${GREEN}✓${NC} $name: $url"
         return 0
     else

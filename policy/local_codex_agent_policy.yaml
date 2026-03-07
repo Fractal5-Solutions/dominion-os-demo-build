@@ -1,0 +1,69 @@
+version: 1
+mode: SOVEREIGN_LOCAL_LIVEOPS_9_9
+
+authority:
+  sole_human_user:
+    name: Matthew Burbidge
+    email: matthewburbidge@fractal5solutions.com
+    github: "@Fractal5-X"
+
+source_of_truth:
+  primary_repo: dominion-command-center
+
+repository_roles:
+  dominion-command-center:
+    role: sovereign_control_plane
+    stacks: [business, politics]
+    enforcement: allow_both
+
+  dominion-os-demo-build:
+    role: public_demo
+    stacks: [business]
+    enforcement: business_only
+
+  dominion-os-1.0-gcloud:
+    role: commercial_hyperscaler
+    stacks: [business]
+    enforcement: business_only
+
+  dominion-os-1.0-aws:
+    role: commercial_hyperscaler
+    stacks: [business]
+    enforcement: business_only
+
+  dominion-os-1.0-azure:
+    role: commercial_hyperscaler
+    stacks: [business]
+    enforcement: business_only
+
+  dominion-os-1.0-politics:
+    role: political_product
+    stacks: [politics]
+    enforcement: politics_only
+
+agent_rules:
+  sole_human_authority: true
+  require_truthful_status: true
+  require_tests_before_success: true
+  require_auditability: true
+  require_rollback_readiness: true
+
+approval_required:
+  - destructive_data_deletion
+  - irreversible_schema_migration
+  - credential_rotation_live
+  - disabling_security_controls
+  - cross_tenant_data_actions
+  - external_commitments
+
+deny_markers_for_business_repos:
+  - politics
+  - political_stack
+  - campaign
+  - voter
+  - voter_file
+  - nationbuilder
+  - pac
+  - civic
+  - field_ops
+  - war_room
