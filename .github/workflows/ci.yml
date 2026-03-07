@@ -1,5 +1,10 @@
 name: PHI + MCP CI/CD Pipeline
 
+permissions:
+  contents: read
+  security-events: write
+  pull-requests: read
+
 on:
   push:
     branches: [ main, feature/** ]
@@ -10,6 +15,8 @@ jobs:
   lint-and-test:
     name: Lint and Test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       
@@ -50,11 +57,14 @@ jobs:
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
     steps:
       - uses: actions/checkout@v4
       
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.28.0
         with:
           scan-type: 'fs'
           scan-ref: '.'
@@ -69,6 +79,8 @@ jobs:
   docker-desktop-pro-readiness:
     name: Verify Docker Desktop Pro Readiness
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       

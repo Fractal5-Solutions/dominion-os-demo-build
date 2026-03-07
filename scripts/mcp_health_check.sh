@@ -90,7 +90,7 @@ for server in "${!MCP_SERVERS[@]}"; do
         if [ "$status" = "running" ]; then
             if [ "$health" = "healthy" ] || [ "$health" = "none" ]; then
                 echo -e "${GREEN}✅${NC} $server - Running on port $port - Status: $status"
-                ((HEALTHY_COUNT++))
+                HEALTHY_COUNT=$((HEALTHY_COUNT + 1))
             else
                 echo -e "${YELLOW}⚠️${NC}  $server - Running but unhealthy - Health: $health"
             fi

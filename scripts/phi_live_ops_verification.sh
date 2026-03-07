@@ -72,7 +72,7 @@ check_service() {
             echo -e "  └─ Status: ${YELLOW}RUNNING (no health check)${NC}"
         fi
         echo ""
-        ((SERVICES_UP++))
+        SERVICES_UP=$((SERVICES_UP + 1))
         return 0
     else
         echo -e "${RED}✗${NC} $name - ${YELLOW}NOT RUNNING${NC}"
