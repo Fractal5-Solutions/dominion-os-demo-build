@@ -47,6 +47,8 @@ services:
       - AUTHORITY_LEVEL=9
       - SOVEREIGNTY_LEVEL=9/9
       - PROJECT_ID=dominion-core-prod
+      - SERVICE_NAME=dominion-os-demo
+      - PORT=5000
       - FLASK_ENV=production
       - PYTHONUNBUFFERED=1
       - CPU_CORES=6

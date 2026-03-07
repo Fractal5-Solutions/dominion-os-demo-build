@@ -184,7 +184,7 @@ HTML_TEMPLATE = """
         <div class="status">
             <span class="status-badge">✅ SYSTEM OPERATIONAL</span>
             <div style="margin-top: 10px; color: #a8dadc;">
-                Last Updated: {{ timestamp }} | Port: 5000 | Status: Live
+                Last Updated: {{ timestamp }} | Endpoint: {{ host }} | Status: Live
             </div>
         </div>
         
@@ -263,6 +263,7 @@ HTML_TEMPLATE = """
                 <div class="endpoint">GET /api/accounts - Retrieve chart of accounts</div>
                 <div class="endpoint">GET /api/transactions - Retrieve transaction history</div>
                 <div class="endpoint">GET /api/financial-statements - Retrieve financial statements</div>
+                <div class="endpoint">GET /health - Health check endpoint</div>
                 <div class="endpoint">GET /healthz - Health check endpoint</div>
             </div>
         </div>
@@ -280,6 +281,7 @@ def dashboard():
         accounts=ACCOUNTS,
         transactions=TRANSACTIONS,
         financial_statements=FINANCIAL_STATEMENTS,
+        host=request.host,
         total_revenue=f"{total_revenue:,}",
         timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     )
@@ -306,8 +308,13 @@ def healthz():
         "status": "healthy",
         "service": "PHI Command Center - BIMS",
         "timestamp": datetime.now().isoformat(),
-        "port": 5000
+        "port": int(os.environ.get('PORT', 5000))
     })
+
+
+@app.route('/health')
+def health():
+    return healthz()
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
