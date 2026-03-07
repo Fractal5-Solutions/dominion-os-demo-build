@@ -1,0 +1,14 @@
+[0;34m[2026-03-07 02:43:06] Starting PHI Chief AI performance optimization[0m
+[0;34m[2026-03-07 02:43:06] Optimizing Cloud Run services for PHI Chief AI...[0m
+[0;34m[2026-03-07 02:43:06] Optimizing phi-oauth-server...[0m
+Deploying...
+Creating Revision...................done
+Done.
+Service [[1mphi-oauth-server[m] revision [[1mphi-oauth-server-00023-lqh[m] has been deployed and is serving [1m100[m percent of traffic.
+Service URL: [1mhttps://phi-oauth-server-447370233441.us-central1.run.app[m
+[0;32m✅ phi-oauth-server optimized[0m
+[0;34m[2026-03-07 02:43:10] Optimizing phi-askphi-widget...[0m
+Deploying...
+failed
+Deployment failed
+ERROR: (gcloud.run.services.update) PERMISSION_DENIED: Permission 'iam.serviceaccounts.actAs' denied on service account 447370233441-compute@developer.gserviceaccount.com (or it may not exist). This command is authenticated as matthewburbidge@fractal5solutions.com which is the active account specified by the [core/account] property.
