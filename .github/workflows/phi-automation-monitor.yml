@@ -37,4 +37,4 @@ jobs:
           path: |
             scripts/telemetry/*.log
             logs/*.log
-            || true
+          continue-on-error: true
