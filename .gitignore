@@ -41,3 +41,4 @@ temp/
 # Docker volumes (local data)
 docker-volumes/
 *.pid
+scripts/telemetry/*.json
