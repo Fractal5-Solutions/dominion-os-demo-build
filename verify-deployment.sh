@@ -70,6 +70,8 @@ check_port() {
 
 echo -e "${BLUE}[1/3] Checking HTTP Services...${NC}"
 check_endpoint "PHI Dashboard" "http://localhost:5000"
+check_endpoint "Demo Experience" "http://localhost:5000/demo"
+check_endpoint "Store Experience" "http://localhost:5000/store"
 check_endpoint "OAuth Server" "http://localhost:8080"
 check_endpoint "AskPHI Widget" "http://localhost:8081"
 check_endpoint "Prometheus" "http://localhost:9090"
