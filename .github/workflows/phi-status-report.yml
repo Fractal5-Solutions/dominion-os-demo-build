@@ -16,7 +16,11 @@ jobs:
           chmod +x scripts/phi_status.sh || true
           bash scripts/phi_status.sh || true
       - name: Archive status
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: phi-status
-          path: logs/*.log || scripts/*.log || true
+          path: |
+            logs/*.log
+            scripts/*.log
+        continue-on-error: true
