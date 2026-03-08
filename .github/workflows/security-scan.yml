@@ -29,8 +29,9 @@ jobs:
         python scripts/ai_token_detector.py
 
     - name: Upload security report
-      uses: actions/upload-artifact@v3
       if: always()
+      continue-on-error: true
+      uses: actions/upload-artifact@v4
       with:
         name: security-report
         path: security_report.md
