@@ -296,8 +296,8 @@ def github_callback():
         # Redirect to widget with token
         return redirect(f"/?token={jwt_token}")
 
-    except Exception as e:
-        return redirect(f"/?error=server_error")
+    except Exception:
+        return redirect("/?error=server_error")
 
 
 @app.route("/chat")
@@ -498,7 +498,7 @@ def chat_api():
         return jsonify({"error": "Token expired"}), 401
     except jwt.InvalidTokenError:
         return jsonify({"error": "Invalid token"}), 401
-    except Exception as e:
+    except Exception:
         return jsonify({"error": "Server error"}), 500
 
 
@@ -527,4 +527,5 @@ def generate_phi_response(message, user_payload):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    port = int(os.getenv("PORT", "8080"))
+    app.run(host="0.0.0.0", port=port, debug=False)

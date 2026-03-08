@@ -1,0 +1,22 @@
+name: PHI Status Report
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - main
+
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run status script
+        run: |
+          chmod +x scripts/phi_status.sh || true
+          bash scripts/phi_status.sh || true
+      - name: Archive status
+        uses: actions/upload-artifact@v4
+        with:
+          name: phi-status
+          path: logs/*.log || scripts/*.log || true

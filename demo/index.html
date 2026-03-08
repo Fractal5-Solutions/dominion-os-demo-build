@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dominion OS Demo | Command-Center Proof</title>
+    <style>
+        :root {
+            --ink: #000000;
+            --paper: #ffffff;
+            --mist: #f5f5f5;
+            --steel: #d9d9d9;
+            --ash: #797979;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at top right, rgba(217, 217, 217, 0.95), transparent 30%),
+                radial-gradient(circle at bottom left, rgba(121, 121, 121, 0.14), transparent 30%),
+                linear-gradient(180deg, #ffffff, #f4f4f4);
+        }
+
+        main {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 28px 20px 72px;
+        }
+
+        .hero {
+            position: relative;
+            overflow: hidden;
+            display: grid;
+            gap: 22px;
+            padding: clamp(28px, 5vw, 56px);
+            border-radius: 32px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(245, 245, 245, 0.9));
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.08);
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            inset: auto -12% -28% auto;
+            width: 360px;
+            height: 360px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(121, 121, 121, 0.28), transparent 66%);
+            pointer-events: none;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            width: fit-content;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: var(--ink);
+            color: var(--paper);
+            font-size: 0.82rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0;
+            max-width: 12ch;
+            font-size: clamp(3rem, 7vw, 5.8rem);
+            line-height: 0.92;
+        }
+
+        .hero-copy {
+            max-width: 68ch;
+            color: rgba(0, 0, 0, 0.72);
+            font-size: 1.08rem;
+        }
+
+        .hero-actions,
+        .section-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
+            padding: 0 18px;
+            border-radius: 999px;
+            border: 1px solid transparent;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: var(--ink);
+            color: var(--paper);
+        }
+
+        .btn-secondary {
+            border-color: rgba(0, 0, 0, 0.12);
+            color: var(--ink);
+            background: rgba(255, 255, 255, 0.75);
+        }
+
+        .panel-grid,
+        .metrics-grid,
+        .tutorial-grid,
+        .service-grid {
+            display: grid;
+            gap: 16px;
+            margin-top: 18px;
+        }
+
+        .panel-grid,
+        .service-grid {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        .metrics-grid,
+        .tutorial-grid {
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+
+        .section {
+            margin-top: 26px;
+            padding: 28px;
+            border-radius: 28px;
+            background: rgba(255, 255, 255, 0.86);
+            border: 1px solid rgba(0, 0, 0, 0.07);
+        }
+
+        .section h2,
+        .card h3 {
+            margin: 0;
+        }
+
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            flex-wrap: wrap;
+            align-items: end;
+        }
+
+        .section-copy {
+            max-width: 60ch;
+            margin-top: 6px;
+            color: rgba(0, 0, 0, 0.68);
+        }
+
+        .card {
+            display: grid;
+            gap: 12px;
+            padding: 18px;
+            border-radius: 22px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(245, 245, 245, 0.88));
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .status-chip {
+            display: inline-flex;
+            width: fit-content;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(0, 0, 0, 0.06);
+            color: rgba(0, 0, 0, 0.7);
+            font-size: 0.84rem;
+        }
+
+        .status-healthy {
+            background: rgba(0, 0, 0, 0.9);
+            color: var(--paper);
+        }
+
+        .status-degraded {
+            background: rgba(121, 121, 121, 0.18);
+        }
+
+        .data-list {
+            display: grid;
+            gap: 8px;
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+
+        .data-list li {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .data-list li:first-child {
+            border-top: 0;
+            padding-top: 0;
+        }
+
+        .muted {
+            color: rgba(0, 0, 0, 0.62);
+        }
+
+        .skeleton {
+            min-height: 120px;
+            border-radius: 20px;
+            background:
+                linear-gradient(110deg, rgba(217, 217, 217, 0.3), rgba(255, 255, 255, 0.78), rgba(217, 217, 217, 0.3));
+            background-size: 200% 100%;
+            animation: shimmer 1.4s linear infinite;
+        }
+
+        @keyframes shimmer {
+            from { background-position: 200% 0; }
+            to { background-position: -200% 0; }
+        }
+
+        @media (max-width: 768px) {
+            .section,
+            .hero {
+                padding: 22px;
+                border-radius: 24px;
+            }
+
+            h1 {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <section class="hero">
+            <span class="eyebrow">Demo Surface</span>
+            <h1>Command-center proof that actually maps to live ports.</h1>
+            <p class="hero-copy">
+                This page audits the local command-center stack, surfaces the route contracts
+                that matter to the demo flow, and turns the repo's JSON inventory into a
+                presentable operator walkthrough.
+            </p>
+            <div class="hero-actions">
+                <a class="btn btn-primary" id="open-command-center" href="http://127.0.0.1:5000" target="_blank" rel="noreferrer">Open Command Center</a>
+                <a class="btn btn-secondary" href="/status">Inspect /status</a>
+                <a class="btn btn-secondary" href="/store">Open Store</a>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-head">
+                <div>
+                    <h2>Live Ops Topology</h2>
+                    <p class="section-copy">Local services are probed from the same app that serves this experience so port claims and route checks stay close to the runtime surface.</p>
+                </div>
+            </div>
+            <div class="service-grid" id="service-grid">
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-head">
+                <div>
+                    <h2>Demo Targets</h2>
+                    <p class="section-copy">Performance budgets and accessibility commitments are loaded directly from the repo's demo configuration.</p>
+                </div>
+            </div>
+            <div class="metrics-grid" id="targets-grid">
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-head">
+                <div>
+                    <h2>Feature Commitments</h2>
+                    <p class="section-copy">These switches are the features the repo claims for the polished demo path.</p>
+                </div>
+            </div>
+            <div class="panel-grid" id="feature-grid">
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-head">
+                <div>
+                    <h2>Tutorial Sequence</h2>
+                    <p class="section-copy">Tutorials are assembled from the checked-in JSON so operators can validate the narrative against the repo instead of stale markdown.</p>
+                </div>
+            </div>
+            <div class="tutorial-grid" id="tutorial-grid">
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-head">
+                <div>
+                    <h2>Remote Project Inventory</h2>
+                    <p class="section-copy">GCP telemetry files still define two project inventories. They are displayed here without overstating runtime health when direct control-plane auth is unavailable.</p>
+                </div>
+            </div>
+            <div class="panel-grid" id="remote-grid">
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const featureGrid = document.getElementById("feature-grid");
+        const serviceGrid = document.getElementById("service-grid");
+        const targetsGrid = document.getElementById("targets-grid");
+        const tutorialGrid = document.getElementById("tutorial-grid");
+        const remoteGrid = document.getElementById("remote-grid");
+
+        function titleize(key) {
+            return key.replace(/_/g, " ").replace(/\b\w/g, (match) => match.toUpperCase());
+        }
+
+        function createCard(title, body, meta = "") {
+            return `
+                <article class="card">
+                    <h3>${title}</h3>
+                    <div>${body}</div>
+                    ${meta ? `<div class="muted">${meta}</div>` : ""}
+                </article>
+            `;
+        }
+
+        function renderServices(services) {
+            serviceGrid.innerHTML = services.map((service) => {
+                const probe = service.probe || {};
+                const probeClass = probe.healthy ? "status-chip status-healthy" : "status-chip status-degraded";
+                const probeLabel = probe.status ? probe.status.replace(/_/g, " ") : "unknown";
+                const rows = [
+                    ["Port", service.port ?? "n/a"],
+                    ["Role", titleize(service.role)],
+                    ["URL", `<a href="${service.url}" target="_blank" rel="noreferrer">${service.url}</a>`],
+                    ["Health", probe.checked_url ? `<code>${probe.checked_url}</code>` : "not probed"]
+                ].map(([label, value]) => `<li><span class="muted">${label}</span><span>${value}</span></li>`).join("");
+
+                return createCard(
+                    service.name,
+                    `<span class="${probeClass}">${probeLabel}</span><ul class="data-list">${rows}</ul>`,
+                    probe.status_code ? `HTTP ${probe.status_code}` : (probe.error || "no probe response")
+                );
+            }).join("");
+        }
+
+        function renderTargets(demo) {
+            const targets = demo.performance_targets || {};
+            const accessibility = demo.accessibility || {};
+            const cards = [
+                {
+                    title: "Performance Budget",
+                    body: Object.entries(targets).map(([key, value]) => `<li><span class="muted">${titleize(key)}</span><span>${value}</span></li>`).join("")
+                },
+                {
+                    title: "Accessibility",
+                    body: Object.entries(accessibility).map(([key, value]) => `<li><span class="muted">${titleize(key)}</span><span>${value}</span></li>`).join("")
+                },
+                {
+                    title: "Optimization Level",
+                    body: `<li><span class="muted">Mode</span><span>${demo.optimization_level || "n/a"}</span></li>
+                           <li><span class="muted">Version</span><span>${demo.version || "n/a"}</span></li>`
+                }
+            ];
+
+            targetsGrid.innerHTML = cards.map((card) => createCard(card.title, `<ul class="data-list">${card.body}</ul>`)).join("");
+        }
+
+        function renderFeatures(demo) {
+            const features = Object.entries(demo.features || {});
+            featureGrid.innerHTML = features.map(([feature, enabled]) => createCard(
+                titleize(feature),
+                `<span class="status-chip ${enabled ? "status-healthy" : "status-degraded"}">${enabled ? "enabled" : "disabled"}</span>`,
+                enabled ? "ready for the demo path" : "not claimed by config"
+            )).join("");
+        }
+
+        function renderTutorials(tutorials) {
+            tutorialGrid.innerHTML = Object.values(tutorials).map((tutorial) => {
+                const steps = (tutorial.steps || []).map((step, index) => `
+                    <li>
+                        <span class="muted">${index + 1}. ${step.title}</span>
+                        <span>${step.validation}</span>
+                    </li>
+                `).join("");
+                return createCard(
+                    tutorial.title,
+                    `<div class="muted">${tutorial.steps?.length || 0} steps</div><ul class="data-list">${steps}</ul>`
+                );
+            }).join("");
+        }
+
+        function renderRemoteProjects(projects) {
+            remoteGrid.innerHTML = Object.entries(projects).map(([projectId, payload]) => {
+                const services = (payload.services || []).slice(0, 5).map((service) => `
+                    <li>
+                        <span class="muted">${service.name}</span>
+                        <span><a href="${service.url}" target="_blank" rel="noreferrer">open</a></span>
+                    </li>
+                `).join("");
+
+                return createCard(
+                    projectId,
+                    `<div class="status-chip">${payload.count} services mapped</div>
+                     <ul class="data-list">${services}</ul>`,
+                    payload.count > 5 ? `Showing first 5 of ${payload.count}` : `${payload.count} total`
+                );
+            }).join("");
+        }
+
+        async function boot() {
+            const [demoResponse, topologyResponse] = await Promise.all([
+                fetch("/api/demo/experience"),
+                fetch("/api/v1/topology")
+            ]);
+
+            const demoPayload = await demoResponse.json();
+            const topologyPayload = await topologyResponse.json();
+            const localServices = topologyPayload.local_services || [];
+            const remoteProjects = topologyPayload.remote_projects || {};
+            const demo = demoPayload.config || {};
+
+            renderServices(localServices);
+            renderTargets(demo);
+            renderFeatures(demo);
+            renderTutorials(demoPayload.tutorials || {});
+            renderRemoteProjects(remoteProjects);
+
+            const commandCenter = localServices.find((service) => service.id === "command-center-bims");
+            if (commandCenter) {
+                document.getElementById("open-command-center").href = commandCenter.url;
+            }
+        }
+
+        boot().catch((error) => {
+            const fallback = createCard(
+                "Demo surface unavailable",
+                `<div class="muted">The command core API could not be loaded. ${error.message}</div>`
+            );
+            serviceGrid.innerHTML = fallback;
+            targetsGrid.innerHTML = fallback;
+            featureGrid.innerHTML = fallback;
+            tutorialGrid.innerHTML = fallback;
+            remoteGrid.innerHTML = fallback;
+        });
+    </script>
+</body>
+</html>
