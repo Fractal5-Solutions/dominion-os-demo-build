@@ -264,7 +264,7 @@ def probe_service(base_url: str, health_paths: tuple[str, ...], enabled: bool) -
         "status": "unreachable",
         "healthy": False,
         "checked_url": f"{base_url.rstrip('/')}{health_paths[0]}",
-        "error": last_error or "probe_failed",
+        "error": "Connection failed",
     }
 
 
@@ -372,6 +372,10 @@ def build_topology(local_probe: bool, remote_probe: bool) -> dict:
 
 
 def send_static_page(directory: str):
+    # Validate directory to prevent path traversal
+    allowed_dirs = {"demo", "store"}
+    if directory not in allowed_dirs:
+        abort(404)
     return send_from_directory(str(BASE_DIR / directory), "index.html")
 
 
@@ -470,6 +474,9 @@ def products_api():
 
 @app.route("/api/products/<slug>")
 def product_detail(slug: str):
+    # Sanitize slug to prevent path traversal
+    if not slug or not slug.replace('-', '').replace('_', '').isalnum():
+        abort(400)
     product_file = BASE_DIR / "products" / slug / "product.json"
     payload = read_json_file(product_file, None)
     if payload is None:

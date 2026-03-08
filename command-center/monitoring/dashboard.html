@@ -337,7 +337,10 @@
                     const alertContainer = document.getElementById('alerts-container');
                     const alert = document.createElement('div');
                     alert.className = 'alert-item';
-                    alert.innerHTML = '<strong>CRITICAL:</strong> Service ' + service.previousElementSibling.textContent + ' stopped unexpectedly';
+                    const strong = document.createElement('strong');
+                    strong.textContent = 'CRITICAL:';
+                    alert.appendChild(strong);
+                    alert.appendChild(document.createTextNode(' Service ' + service.previousElementSibling.textContent + ' stopped unexpectedly'));
                     alertContainer.appendChild(alert);
                 }
             });

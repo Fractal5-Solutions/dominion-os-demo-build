@@ -5,7 +5,6 @@ Real-time performance optimization and monitoring
 """
 
 import json
-import time
 from datetime import datetime
 from typing import Any, Dict
 
@@ -33,13 +32,6 @@ def get_system_metrics() -> Dict[str, Any]:
 
 def optimize_relationship_processing():
     """Apply performance optimizations to relationship processing"""
-    optimizations = {
-        "caching_enabled": True,
-        "batch_processing": True,
-        "memory_efficient": True,
-        "parallel_processing": False,  # Disabled for stability
-    }
-
     # Apply optimizations to unified relationships script
     try:
         with open("scripts/create_unified_relationships.py", "r") as f:
@@ -67,4 +59,4 @@ if __name__ == "__main__":
         json.dump(metrics, f, indent=2)
 
     print("✅ PHI Chief AI Performance Optimization Complete")
-    print(f"📊 Metrics saved to: performance_metrics.json")
+    print("📊 Metrics saved to: performance_metrics.json")

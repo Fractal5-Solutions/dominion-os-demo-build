@@ -7,8 +7,7 @@ Comprehensive security analysis and fixes
 import hashlib
 import json
 import os
-from pathlib import Path
-from typing import Dict, List, Set
+from typing import Dict, List
 
 
 def calculate_file_hash(filepath: str) -> str:
@@ -105,4 +104,4 @@ if __name__ == "__main__":
         json.dump(report, f, indent=2)
 
     print("✅ PHI Chief AI Security Audit Complete")
-    print(f"📊 Report saved to: security_audit_report.json")
+    print("📊 Report saved to: security_audit_report.json")
