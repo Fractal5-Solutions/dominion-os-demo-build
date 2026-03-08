@@ -62,12 +62,20 @@ fi
 
 # 3. Check for unpushed commits
 verify_log "Checking for unpushed commits..."
-UNPUSHED_COUNT=$(git log --oneline origin/phi-sovereignty-deployment..HEAD | wc -l)
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+UPSTREAM=$(git rev-parse --abbrev-ref --symbolic-full-name @{upstream} 2>/dev/null || echo "")
+if [ -n "$UPSTREAM" ]; then
+    UNPUSHED_COUNT=$(git rev-list --count "$UPSTREAM"..HEAD 2>/dev/null || echo 0)
+else
+    UNPUSHED_COUNT=0
+fi
 if [ "$UNPUSHED_COUNT" -eq 0 ]; then
     success_log "Zero unpushed commits found ✓"
 else
-    issue_log "Found $UNPUSHED_COUNT unpushed commits"
-    git log --oneline origin/phi-sovereignty-deployment..HEAD
+    issue_log "Found $UNPUSHED_COUNT unpushed commits on branch $CURRENT_BRANCH"
+    if [ -n "$UPSTREAM" ]; then
+        git log --oneline "$UPSTREAM"..HEAD
+    fi
 fi
 
 # 4. Check staged files count

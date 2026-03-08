@@ -70,6 +70,8 @@ echo ""
 check_process "phi_background_completion_monitor" "Background Completion Monitor" && ((ACTIVE++))
 check_process "phi_cost_minimization" "Cost Minimization Engine" && ((ACTIVE++))
 check_process "autonomous_overnight" "Autonomous Overnight Executor" && ((ACTIVE++))
+check_process "phi_channel_connect" "Channel Connect SaaS Service" && ((ACTIVE++))
+check_process "phi_google_workspace" "Google Workspace Integration" && ((ACTIVE++))
 
 echo -e "${CYAN}━━━ SUMMARY ━━━${NC}"
 echo ""

@@ -106,11 +106,13 @@ steps:
     id: 'build-container'
     args:
       - 'build'
+      - '-f'
+      - '$_DOCKERFILE'
       - '-t'
       - 'gcr.io/$PROJECT_ID/$_SERVICE_NAME:$SHORT_SHA'
       - '-t'
       - 'gcr.io/$PROJECT_ID/$_SERVICE_NAME:latest'
-      - '.'
+      - '$_BUILD_CONTEXT'
 
   # Step 3: Push Container
   - name: 'gcr.io/cloud-builders/docker'
@@ -133,13 +135,19 @@ steps:
       - '$_REGION'
       - '--platform'
       - 'managed'
+      - '--port'
+      - '8080'
+      - '--set-env-vars'
+      - 'SERVICE_NAME=$_SERVICE_NAME'
       - '--allow-unauthenticated'
       - '--quiet'
 
 # Substitutions for deployment configuration
 substitutions:
-  _SERVICE_NAME: 'phi-oauth-server'
+  _SERVICE_NAME: 'dominion-os-demo'
   _REGION: 'us-central1'
+  _DOCKERFILE: 'Dockerfile.production'
+  _BUILD_CONTEXT: '.'
 
 # Build configuration
 options:

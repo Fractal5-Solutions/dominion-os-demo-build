@@ -57,6 +57,11 @@ start_python_service() {
     export FLASK_ENV=development
     export PORT=$port
     
+    # Activate virtual environment if available
+    if [ -f "$SCRIPT_DIR/.venv/bin/activate" ]; then
+        source "$SCRIPT_DIR/.venv/bin/activate"
+    fi
+    
     nohup python3 app.py > "$LOG_DIR/$(basename $name).log" 2>&1 &
     local pid=$!
     echo $pid > "$LOG_DIR/$(basename $name).pid"
@@ -138,6 +143,28 @@ if [ -f "$SCRIPT_DIR/phi_background_completion_monitor.sh" ]; then
         echo -e "${GREEN}✓ Started${NC}"
     else
         echo -e "${GREEN}✓ Background monitor already running${NC}"
+    fi
+fi
+
+# Start Channel Connect SaaS Service
+if [ -f "$SCRIPT_DIR/phi_channel_connect.sh" ]; then
+    if ! pgrep -f "phi_channel_connect" > /dev/null; then
+        echo -n -e "${BLUE}Starting Channel Connect SaaS Service...${NC} "
+        nohup bash "$SCRIPT_DIR/phi_channel_connect.sh" start > "$LOG_DIR/channel_connect.log" 2>&1 &
+        echo -e "${GREEN}✓ Started${NC}"
+    else
+        echo -e "${GREEN}✓ Channel Connect SaaS Service already running${NC}"
+    fi
+fi
+
+# Start Google Workspace Integration
+if [ -f "$SCRIPT_DIR/phi_google_workspace.sh" ]; then
+    if ! pgrep -f "phi_google_workspace" > /dev/null; then
+        echo -n -e "${BLUE}Starting Google Workspace Integration...${NC} "
+        nohup bash "$SCRIPT_DIR/phi_google_workspace.sh" start > "$LOG_DIR/google_workspace.log" 2>&1 &
+        echo -e "${GREEN}✓ Started${NC}"
+    else
+        echo -e "${GREEN}✓ Google Workspace Integration already running${NC}"
     fi
 fi
 
