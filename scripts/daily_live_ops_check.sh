@@ -8,8 +8,8 @@
 set -e
 
 # Configuration
-THRESHOLD="${1:-85}"
-ALERT_EMAIL="${2:-ops@fractal5solutions.com}"
+THRESHOLD="${THRESHOLD:-85}"
+ALERT_EMAIL="${ALERT_EMAIL:-ops@fractal5solutions.com}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 LOG_FILE="/var/log/phi-live-ops-daily.log"
@@ -38,8 +38,8 @@ echo ""
 print_info "Checking PHI systems..."
 PHI_SCORE=0
 if [ -f "$SCRIPT_DIR/phi_complete_status.sh" ]; then
-    PHI_OUTPUT=$(bash "$SCRIPT_DIR/phi_complete_status.sh" 2>/dev/null || echo "SCORE: 0/100")
-    PHI_SCORE=$(echo "$PHI_OUTPUT" | grep -oP 'SCORE:\s*\K\d+' | head -1 || echo "0")
+    PHI_OUTPUT=$(bash "$SCRIPT_DIR/phi_complete_status.sh" 2>/dev/null || echo "Overall Score: 0/100")
+    PHI_SCORE=$(echo "$PHI_OUTPUT" | grep -oP 'Overall Score:\s*\K\d+' | head -1 || echo "0")
     print_success "PHI Score: $PHI_SCORE/100"
 else
     print_warning "PHI scoring script not found"

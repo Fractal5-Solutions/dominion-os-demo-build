@@ -14,14 +14,8 @@ services:
       - ATLASSIAN_BASE_URL=${ATLASSIAN_BASE_URL}
       - NODE_ENV=production
       - LOG_LEVEL=info
-    deploy:
-      resources:
-        limits:
-          cpus: '2'
-          memory: 2G
-        reservations:
-          cpus: '0.5'
-          memory: 512M
+    mem_limit: 2g
+    cpus: 2.0
     networks:
       - mcp-network
     healthcheck:
@@ -43,14 +37,8 @@ services:
       - GITHUB_TOKEN=${GITHUB_TOKEN}
       - GITHUB_API_URL=https://api.github.com
       - NODE_ENV=production
-    deploy:
-      resources:
-        limits:
-          cpus: '2'
-          memory: 2G
-        reservations:
-          cpus: '0.5'
-          memory: 512M
+    mem_limit: 2g
+    cpus: 2.0
     networks:
       - mcp-network
     healthcheck:
@@ -72,14 +60,8 @@ services:
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
       - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
       - NODE_ENV=production
-    deploy:
-      resources:
-        limits:
-          cpus: '2'
-          memory: 2G
-        reservations:
-          cpus: '0.5'
-          memory: 512M
+    mem_limit: 2g
+    cpus: 2.0
     networks:
       - mcp-network
     healthcheck:
@@ -132,14 +114,8 @@ services:
       - CONNECTION_TIMEOUT=60000
       - PREBOOT_CHROME=true
       - ENABLE_DEBUGGER=false
-    deploy:
-      resources:
-        limits:
-          cpus: '4'
-          memory: 4G
-        reservations:
-          cpus: '1'
-          memory: 1G
+    mem_limit: 4g
+    cpus: 4.0
     networks:
       - mcp-network
     shm_size: '2gb'
@@ -161,14 +137,8 @@ services:
     environment:
       - PYTHON_VERSION=3.12
       - PYTHONUNBUFFERED=1
-    deploy:
-      resources:
-        limits:
-          cpus: '2'
-          memory: 3G
-        reservations:
-          cpus: '0.5'
-          memory: 1G
+    mem_limit: 3g
+    cpus: 2.0
     networks:
       - mcp-network
     volumes:

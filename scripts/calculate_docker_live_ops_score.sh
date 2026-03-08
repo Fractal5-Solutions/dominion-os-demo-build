@@ -13,6 +13,7 @@ NC='\033[0m'
 
 SCORE=0
 MAX_SCORE=100
+PERF_SCORE=0
 
 echo "═══════════════════════════════════════════════════════════════"
 echo "  DOCKER DESKTOP PRO LIVE OPS ALIGNMENT SCORE CALCULATOR"
@@ -210,6 +211,7 @@ if [ "$RUNNING_CONTAINERS" -gt 0 ]; then
     SCORE=$((SCORE + PERF_SCORE))
 else
     echo -e "${YELLOW}⚠️  No containers to measure +0 points${NC}"
+    PERF_SCORE=0
 fi
 
 # ==============================================================================

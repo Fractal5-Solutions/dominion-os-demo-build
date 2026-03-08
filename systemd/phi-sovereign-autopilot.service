@@ -7,7 +7,7 @@ PartOf=phi-enterprise-stack.target
 
 [Service]
 Type=simple
-User=%i
+User=dominion
 Group=docker
 WorkingDirectory=/opt/dominion-os-demo-build
 Environment="PATH=/usr/local/bin:/usr/bin:/bin"
