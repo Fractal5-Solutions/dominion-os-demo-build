@@ -674,7 +674,7 @@ create_deployment_package() {
     sha256sum deploy.sh > deploy.sh.sha256
 
     # Create deployment manifest
-    cat > manifest.json << EOF
+    cat > manifest.json << MANIFEST_EOF
 {
     "name": "PHI Chief AI - AskPhi Widget",
     "version": "2.0.0",
@@ -696,7 +696,7 @@ create_deployment_package() {
     "deployment_date": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')",
     "checksum_algorithm": "sha256"
 }
-EOF
+MANIFEST_EOF
 
     log "Deployment package created"
 }
