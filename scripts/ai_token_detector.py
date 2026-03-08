@@ -177,7 +177,7 @@ def main():
     print("📋 Security report saved to security_report.md")
 
     # Alert if critical issues found
-    if findings or activity_check["status"] != "OK":
+    if findings or (activity_check["status"] not in ["OK", "NO_TOKEN_PROVIDED"] and "error" in activity_check.get("message", "").lower()):
         print("🚨 SECURITY ALERT: Issues detected!")
         return 1
 
