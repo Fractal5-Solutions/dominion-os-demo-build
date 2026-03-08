@@ -1,0 +1,110 @@
+name: PHI + MCP CI/CD Pipeline
+
+permissions:
+  contents: read
+  security-events: write
+  pull-requests: read
+
+on:
+  push:
+    branches: [ main, feature/** ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-and-test:
+    name: Lint and Test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest black
+          find . -name requirements.txt -exec pip install -r {} \;
+      
+      - name: Lint with flake8
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --max-complexity=10 --max-line-length=127 --statistics
+      
+      - name: Check formatting with black
+        run: black --check .
+      
+      - name: Run tests with pytest
+        run: pytest
+      
+      - name: Validate bash scripts
+        run: |
+          chmod +x scripts/*.sh *.sh 2>/dev/null || true
+          for script in scripts/*.sh *.sh; do
+            if [ -f "$script" ]; then
+              bash -n "$script" || exit 1
+            fi
+          done
+          echo "✅ All bash scripts validated"
+      
+      - name: Validate docker-compose
+        run: |
+          docker-compose -f docker-compose-mcp.yml config > /dev/null
+          echo "✅ docker-compose-mcp.yml is valid"
+  
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.34.0
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+      
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  docker-desktop-pro-readiness:
+    name: Verify Docker Desktop Pro Readiness
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check configuration files
+        run: |
+          echo "Verifying deployment readiness..."
+          test -f docker-compose-mcp.yml || exit 1
+          test -f .env.mcp.template || exit 1
+          test -f prometheus.yml || exit 1
+          test -f scripts/deploy_mcp_full.sh || exit 1
+          test -x scripts/deploy_mcp_full.sh || exit 1
+          echo "✅ All configuration files present and valid"
+      
+      - name: Generate deployment report
+        run: |
+          echo "## 📊 Deployment Readiness Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Configuration Files" >> $GITHUB_STEP_SUMMARY
+          ls -lh docker-compose-mcp.yml .env.mcp.template prometheus.yml >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Automation Scripts" >> $GITHUB_STEP_SUMMARY
+          ls -lh scripts/*.sh >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Ready for Docker Desktop Pro deployment" >> $GITHUB_STEP_SUMMARY

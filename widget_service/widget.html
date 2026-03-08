@@ -19,6 +19,6 @@
             <div id="status" class="status"></div>
         </div>
     </div>
-    <script>const OAUTH_SERVER_URL="";function initiateAuth(){window.location.href=OAUTH_SERVER_URL+"/auth/github"}const urlParams=new URLSearchParams(window.location.search),token=urlParams.get("token"),error=urlParams.get("error");if(token){localStorage.setItem("phi_token",token);showStatus("Authentication successful! Redirecting...","success");setTimeout(()=>{window.location.href="/chat"},2e3)}else if(error){showStatus("Authentication failed: "+error,"error")}function showStatus(e,t){const s=document.getElementById("status");s.textContent=e,s.className="status "+t,s.style.display="block"}</script>
+    <script>const OAUTH_SERVER_URL="https://phi-oauth-server-reduwyf2ra-uc.a.run.app";function initiateAuth(){window.location.href=OAUTH_SERVER_URL+"/auth/github"}const urlParams=new URLSearchParams(window.location.search),token=urlParams.get("token"),error=urlParams.get("error");if(token){localStorage.setItem("phi_token",token);showStatus("Authentication successful! Redirecting...","success");setTimeout(()=>{window.location.href="https://phi-oauth-server-reduwyf2ra-uc.a.run.app/chat"},2e3)}else if(error){showStatus("Authentication failed: "+error,"error")}function showStatus(e,t){const s=document.getElementById("status");s.textContent=e,s.className="status "+t,s.style.display="block"}</script>
 </body>
 </html>
