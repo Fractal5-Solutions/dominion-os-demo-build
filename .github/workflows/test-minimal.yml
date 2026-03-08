@@ -1,0 +1,23 @@
+name: Minimal Test Workflow
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ test-* ]
+
+jobs:
+  test:
+    name: Minimal Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Echo test
+        run: echo "✅ Workflow executed successfully"
+      
+      - name: System info
+        run: |
+          echo "Runner: $(uname -a)"
+          echo "Date: $(date)"
+          echo "Commit: ${{ github.sha }}"
