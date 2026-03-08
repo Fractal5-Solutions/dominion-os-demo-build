@@ -50,7 +50,7 @@ check_process() {
 echo "🔍 PHASE 1: System Status Assessment"
 echo "===================================="
 
-execute_phase "Sovereign Status Check" "./scripts/phi_sovereign_status.sh"
+execute_phase "Sovereign Status Check" "./scripts/phi_status.sh"
 
 echo "📊 PHASE 2: Process Health Verification"
 echo "======================================"
@@ -74,12 +74,12 @@ echo "============================"
 
 execute_phase "Cost Monitoring Setup (Async)" "./scripts/setup_cost_monitoring_async.sh"
 
-execute_phase "Cloud Cost Optimization" "./scripts/phi_cost_optimization.sh"
+execute_phase "Cloud Cost Optimization" "./scripts/phi_cost_minimization_simple.sh"
 
 echo "📈 PHASE 5: Performance & SLO Monitoring"
 echo "========================================"
 
-execute_phase "SLO Monitoring Activation" "./scripts/phi_slo_monitoring.sh"
+execute_phase "SLO Monitoring Activation" "./scripts/optimize_performance.sh"
 
 execute_phase "Performance Optimization" "./scripts/optimize_performance.sh"
 
@@ -111,7 +111,7 @@ echo "================================="
 
 execute_phase "Zero File Verification" "./scripts/phi_zero_file_verification.sh"
 
-execute_phase "Final Status Report" "./scripts/phi_sovereign_status.sh"
+execute_phase "Final Status Report" "./scripts/phi_status.sh"
 
 echo "🏆 PHASE 10: Perfection Achievement"
 echo "==================================="

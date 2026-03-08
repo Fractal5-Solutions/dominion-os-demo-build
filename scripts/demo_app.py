@@ -1,5 +1,4 @@
-from flask import Flask, jsonify, request
-import json
+from flask import Flask, jsonify
 import time
 from datetime import datetime
 

@@ -25,3 +25,7 @@ remote: Invalid username or token. Password authentication is not supported for 
 fatal: Authentication failed for 'https://github.com/Fractal5-Solutions/dominion-os-demo-build.git/'
 Push failed
 [2026-03-07T00:46:08Z] Intelligent sync finished
+[2026-03-08T00:34:32Z] Intelligent sync start
+https://github.com/Fractal5-Solutions/dominion-os-demo-build.git
+Commits ahead: 1
+Token present but not a Classic PAT (ghp_*). Autonomous push skipped.
