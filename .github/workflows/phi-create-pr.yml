@@ -1,0 +1,31 @@
+name: PHI Create Pull Request
+
+on:
+  push:
+    branches:
+      - 'phi-*'
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create Pull Request to main
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'Create PR: PHI automation updates'
+          title: 'PHI Automation: Workflow & Monitor'
+          body: |
+            This PR contains automation workflows and monitoring scripts added by PHI Sovereign Autopilot.
+
+            - Scheduled monitor
+            - PR automation
+            - Documentation
+          base: main
+          branch: ${{ github.ref_name }}
