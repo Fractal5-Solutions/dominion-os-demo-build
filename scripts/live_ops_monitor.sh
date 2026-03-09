@@ -61,8 +61,12 @@ check_service_health() {
 
     # Check if port is listening
     if lsof -i :$port | grep -q LISTEN; then
-        # Check health endpoint
-        if curl -s -f "http://localhost:$port/health" > /dev/null 2>&1; then
+        # For services without health endpoints, just check port availability
+        if [[ "$port" == "5002" || "$port" == "5003" ]]; then
+            log_success "$name ($port): PORT LISTENING (no health endpoint)"
+            return 0
+        # For services with health endpoints
+        elif curl -s -f "http://localhost:$port/health" > /dev/null 2>&1; then
             log_success "$name ($port): HEALTHY"
             return 0
         else
@@ -77,25 +81,63 @@ check_service_health() {
 
 check_background_services() {
     local bg_services=("phi_background_completion_monitor" "phi_cost_minimization_simple" "autonomous_overnight")
-    local total_bg=0
+    local total_bg=${#bg_services[@]}
     local healthy_bg=0
 
     for service in "${bg_services[@]}"; do
         local count=$(ps aux | grep -c "$service" | grep -v grep)
-        total_bg=$((total_bg + 1))
 
         if [ "$count" -gt 0 ]; then
             healthy_bg=$((healthy_bg + 1))
+        fi
+    done
+
+    # Return only the count, no logging here
+    echo "$healthy_bg/$total_bg"
+}
+
+log_background_services() {
+    local bg_services=("phi_background_completion_monitor" "phi_cost_minimization_simple" "autonomous_overnight")
+
+    for service in "${bg_services[@]}"; do
+        local count=$(ps aux | grep -c "$service" | grep -v grep)
+
+        if [ "$count" -gt 0 ]; then
             log_success "Background service '$service': RUNNING ($count processes)"
         else
             log_error "Background service '$service': NOT RUNNING"
         fi
     done
-
-    echo "$healthy_bg/$total_bg"
 }
 
 check_system_resources() {
+    # CPU usage
+    local cpu_usage=$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{print 100 - $1}')
+    local cpu_status="HEALTHY"
+    if (( $(echo "$cpu_usage > 80" | bc -l) )); then
+        cpu_status="HIGH"
+    fi
+
+    # Memory usage
+    local mem_usage=$(free | grep Mem | awk '{printf "%.2f", $3/$2 * 100.0}')
+    local mem_status="HEALTHY"
+    if (( $(echo "$mem_usage > 85" | bc -l) )); then
+        mem_status="HIGH"
+    fi
+
+    # Disk usage
+    local disk_usage=$(df / | tail -1 | awk '{print $5}' | sed 's/%//')
+    local disk_status="HEALTHY"
+    if [ "$disk_usage" -gt 90 ]; then
+        disk_status="CRITICAL"
+    elif [ "$disk_usage" -gt 80 ]; then
+        disk_status="HIGH"
+    fi
+
+    echo "{\"cpu\": {\"usage\": $cpu_usage, \"status\": \"$cpu_status\"}, \"memory\": {\"usage\": $mem_usage, \"status\": \"$mem_status\"}, \"disk\": {\"usage\": $disk_usage, \"status\": \"$disk_status\"}}"
+}
+
+log_system_resources() {
     # CPU usage
     local cpu_usage=$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{print 100 - $1}')
     local cpu_status="HEALTHY"
@@ -128,15 +170,24 @@ check_system_resources() {
     else
         log_info "Disk usage: ${disk_usage}%"
     fi
-
-    echo "{\"cpu\": {\"usage\": $cpu_usage, \"status\": \"$cpu_status\"}, \"memory\": {\"usage\": $mem_usage, \"status\": \"$mem_status\"}, \"disk\": {\"usage\": $disk_usage, \"status\": \"$disk_status\"}}"
 }
 
 generate_status_report() {
     local web_healthy=0
     local web_total=0
-    local bg_healthy_bg=$(check_background_services)
+    local bg_status=$(check_background_services)
+    local bg_healthy=$(echo $bg_status | cut -d'/' -f1)
+    local bg_total=$(echo $bg_status | cut -d'/' -f2)
     local resources=$(check_system_resources)
+
+    # Log background service status
+    log_background_services
+
+    # Log system resources
+    log_system_resources
+
+    # Log system resources
+    log_system_resources
 
     # Check web services
     for service_info in "${SERVICES[@]}"; do
@@ -148,11 +199,16 @@ generate_status_report() {
         fi
     done
 
+    # Calculate live ops score (weighted average)
+    local total_score=$(( (web_healthy * 100) + (bg_healthy * 100) ))
+    local total_possible=$(( (web_total * 100) + (bg_total * 100) ))
+    local live_ops_score=$(( total_score * 100 / total_possible )) # Percentage out of 10000 for 2 decimal places
+
     # Generate JSON status
     cat > "$STATUS_FILE" << EOF
 {
   "timestamp": "$(date -Iseconds)",
-  "live_ops_score": "$(( (web_healthy * 100 + $(echo $bg_healthy_bg | cut -d'/' -f1) * 100) / (web_total + 3) ))/100",
+  "live_ops_score": "$(printf "%.2f" $(echo "scale=2; $live_ops_score / 100" | bc))",
   "services": {
     "web": {
       "healthy": $web_healthy,
@@ -160,9 +216,9 @@ generate_status_report() {
       "status": "$([ $web_healthy -eq $web_total ] && echo "PERFECT" || echo "DEGRADED")"
     },
     "background": {
-      "healthy": $(echo $bg_healthy_bg | cut -d'/' -f1),
-      "total": 3,
-      "status": "$([ $(echo $bg_healthy_bg | cut -d'/' -f1) -eq 3 ] && echo "PERFECT" || echo "DEGRADED")"
+      "healthy": $bg_healthy,
+      "total": $bg_total,
+      "status": "$([ $bg_healthy -eq $bg_total ] && echo "PERFECT" || echo "DEGRADED")"
     }
   },
   "system_resources": $resources,
