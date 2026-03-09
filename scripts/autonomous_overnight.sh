@@ -75,9 +75,7 @@ check_service_health() {
     local project=$1
     log "Checking health for project: $project"
 
-    gcloud config set project "$project" --quiet 2>&1 | grep -v environment || true
-
-    local services=$(gcloud run services list --format="csv[no-heading](metadata.name)")
+    local services=$(gcloud run services list --project "$project" --format="csv[no-heading](metadata.name)")
     local ready_count=0
     local total_count=0
     local failed_services=""
@@ -85,7 +83,7 @@ check_service_health() {
     while IFS= read -r service; do
         if [ -n "$service" ]; then
             total_count=$((total_count + 1))
-            local status=$(gcloud run services describe "$service" --region=us-central1 --format="value(status.conditions[0].status)" 2>/dev/null || echo "Unknown")
+            local status=$(gcloud run services describe "$service" --region=us-central1 --project "$project" --format="value(status.conditions[0].status)" 2>/dev/null || echo "Unknown")
 
             if [ "$status" = "True" ]; then
                 ready_count=$((ready_count + 1))
@@ -118,11 +116,9 @@ hour_1_monitoring() {
 
     # Collect service URLs
     log "Collecting service URLs..."
-    gcloud config set project "$PROJECT1" --quiet 2>&1 | grep -v environment || true
-    gcloud run services list --format="table(metadata.name,status.url)" > "$LOG_DIR/services_project1.txt"
+    gcloud run services list --project "$PROJECT1" --format="table(metadata.name,status.url)" > "$LOG_DIR/services_project1.txt"
 
-    gcloud config set project "$PROJECT2" --quiet 2>&1 | grep -v environment || true
-    gcloud run services list --format="table(metadata.name,status.url)" > "$LOG_DIR/services_project2.txt"
+    gcloud run services list --project "$PROJECT2" --format="table(metadata.name,status.url)" > "$LOG_DIR/services_project2.txt"
 
     log "✅ Hour 1 complete: Baseline established"
 }
@@ -190,13 +186,12 @@ hour_3_testing() {
     local gateway_success=0
 
     # Get gateway URLs from project 1
-    gcloud config set project "$PROJECT1" --quiet 2>&1 | grep -v environment || true
-    local gateways=$(gcloud run services list --format="value(metadata.name)" | grep -i gateway || true)
+    local gateways=$(gcloud run services list --project "$PROJECT1" --format="value(metadata.name)" | grep -i gateway || true)
 
     while IFS= read -r gateway; do
         if [ -n "$gateway" ]; then
             gateway_count=$((gateway_count + 1))
-            local url=$(gcloud run services describe "$gateway" --region=us-central1 --format="value(status.url)" 2>/dev/null || echo "")
+            local url=$(gcloud run services describe "$gateway" --region=us-central1 --project "$PROJECT1" --format="value(status.url)" 2>/dev/null || echo "")
 
             if [ -n "$url" ]; then
                 log "Testing gateway: $gateway at $url"
@@ -222,11 +217,9 @@ hour_4_optimization() {
     log "Analyzing service configurations..."
 
     # Collect configuration data
-    gcloud config set project "$PROJECT1" --quiet 2>&1 | grep -v environment || true
-    gcloud run services list --format="table(metadata.name,spec.template.spec.containers[0].resources.limits.memory,spec.template.spec.containers[0].resources.limits.cpu)" > "$LOG_DIR/config_project1.txt"
+    gcloud run services list --project "$PROJECT1" --format="table(metadata.name,spec.template.spec.containers[0].resources.limits.memory,spec.template.spec.containers[0].resources.limits.cpu)" > "$LOG_DIR/config_project1.txt"
 
-    gcloud config set project "$PROJECT2" --quiet 2>&1 | grep -v environment || true
-    gcloud run services list --format="table(metadata.name,spec.template.spec.containers[0].resources.limits.memory,spec.template.spec.containers[0].resources.limits.cpu)" > "$LOG_DIR/config_project2.txt"
+    gcloud run services list --project "$PROJECT2" --format="table(metadata.name,spec.template.spec.containers[0].resources.limits.memory,spec.template.spec.containers[0].resources.limits.cpu)" > "$LOG_DIR/config_project2.txt"
 
     log "Configuration analysis saved to $LOG_DIR/config_project*.txt"
     log "✅ Hour 4 complete: Optimization analysis done"
