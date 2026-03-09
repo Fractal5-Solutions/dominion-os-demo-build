@@ -46,3 +46,14 @@ colorama>=0.4.6
 # Utilities
 python-dotenv>=1.0.0
 pathlib>=1.0.1
+
+# AI/ML Frameworks - Compatible versions
+torch>=2.4.0
+torchvision>=0.19.0
+torchaudio>=2.4.0
+transformers>=4.45.0
+
+# Dependency conflict resolution
+sympy>=1.13.1
+pydantic>=2.12.5
+pydantic-core>=2.41.5
