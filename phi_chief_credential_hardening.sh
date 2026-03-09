@@ -67,5 +67,4 @@ echo "║                                                              ║"
 echo "║  AUTHORITY: FULL_ACCESS_APPROVED                             ║"
 echo "║  APPROVED BY: Fractal5-X                                     ║"
 echo "╚════════════════════════════════════════════════════════════════╝"
-echo ""</content>
-<parameter name="filePath">/workspaces/dominion-os-demo-build/phi_chief_credential_hardening.sh
+echo ""

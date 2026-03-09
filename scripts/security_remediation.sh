@@ -148,8 +148,14 @@ EOF
 create_ai_detection() {
     log "Creating AI-based token detection system..."
 
+    # Check if AI detector already exists
+    if [ -f "ai_token_detector.py" ]; then
+        log "AI token detector already exists"
+        return 0
+    fi
+
     # Create the detection script
-    cat > scripts/ai_token_detector.py << 'EOF'
+    cat > ai_token_detector.py << 'EOF'
 #!/usr/bin/env python3
 """
 PHI Chief AI - Token Detection and Protection System
@@ -327,7 +333,7 @@ if __name__ == '__main__':
     exit(main())
 EOF
 
-    chmod +x scripts/ai_token_detector.py
+    chmod +x ai_token_detector.py
     success "AI-based token detection system created"
 }
 

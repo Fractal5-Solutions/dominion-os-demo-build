@@ -3,363 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dominion OS Store | Sovereign Infrastructure Offers</title>
+    <title>Dominion OS Store - Sovereign AI Infrastructure</title>
     <style>
-        :root {
-            --ink: #000000;
-            --paper: #ffffff;
-            --mist: #f5f5f5;
-            --steel: #d9d9d9;
-            --ash: #797979;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-
-        * { box-sizing: border-box; }
 
         body {
-            margin: 0;
-            font-family: "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif;
-            color: var(--ink);
-            background:
-                radial-gradient(circle at top left, rgba(121, 121, 121, 0.18), transparent 28%),
-                linear-gradient(180deg, var(--paper), var(--mist));
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
 
-        main {
-            max-width: 1240px;
+        .container {
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 28px 20px 72px;
+            padding: 20px;
         }
 
-        .hero,
-        .section {
-            padding: clamp(24px, 4vw, 40px);
-            border-radius: 30px;
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            background: rgba(255, 255, 255, 0.88);
-            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.08);
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
         }
 
-        .section {
-            margin-top: 22px;
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
-        .eyebrow {
-            display: inline-flex;
-            width: fit-content;
-            padding: 6px 12px;
-            border-radius: 999px;
-            background: var(--ink);
-            color: var(--paper);
-            font-size: 0.82rem;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-        }
-
-        h1 {
-            margin: 14px 0 10px;
-            font-size: clamp(3rem, 6.5vw, 5.4rem);
-            line-height: 0.93;
-            max-width: 10ch;
-        }
-
-        .lead,
-        .section-copy,
-        .footer-copy {
-            color: rgba(0, 0, 0, 0.7);
-            max-width: 66ch;
-        }
-
-        .hero-actions,
-        .product-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 48px;
-            padding: 0 18px;
-            border-radius: 999px;
-            border: 1px solid transparent;
-            text-decoration: none;
-            font-weight: 600;
-            transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
-        }
-
-        .btn:hover {
-            transform: translateY(-1px);
-        }
-
-        .btn-primary {
-            background: var(--ink);
-            color: var(--paper);
-        }
-
-        .btn-secondary {
-            color: var(--ink);
-            background: rgba(255, 255, 255, 0.82);
-            border-color: rgba(0, 0, 0, 0.12);
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
         }
 
         .products {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-            gap: 16px;
-            margin-top: 18px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
         }
 
         .product-card {
-            display: grid;
-            gap: 18px;
-            padding: 22px;
-            border-radius: 24px;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(245, 245, 245, 0.9));
-            border: 1px solid rgba(0, 0, 0, 0.08);
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .product-topline {
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            align-items: start;
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .product-icon {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 20px;
         }
 
         .product-title {
-            margin: 0;
             font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
         }
 
         .product-description {
-            color: rgba(0, 0, 0, 0.7);
+            color: #666;
+            margin-bottom: 20px;
+            min-height: 60px;
+        }
+
+        .product-features {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+
+        .product-features li {
+            padding: 5px 0;
+            color: #555;
+        }
+
+        .product-features li:before {
+            content: "✓ ";
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .pricing {
+            text-align: center;
+            margin-bottom: 25px;
         }
 
         .price {
             font-size: 2rem;
-            font-weight: 700;
+            font-weight: bold;
+            color: #27ae60;
         }
 
-        .price-period,
-        .meta-note {
-            color: rgba(0, 0, 0, 0.62);
+        .price-period {
+            color: #666;
+            font-size: 0.9rem;
         }
 
-        .support-badge,
-        .status-badge {
-            display: inline-flex;
-            width: fit-content;
-            padding: 6px 10px;
-            border-radius: 999px;
-            background: rgba(0, 0, 0, 0.08);
-            font-size: 0.84rem;
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            transition: transform 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
         }
 
-        .feature-list,
-        .compare-list {
-            display: grid;
-            gap: 8px;
-            padding: 0;
-            margin: 0;
-            list-style: none;
-        }
-
-        .feature-list li,
-        .compare-list li {
-            padding-top: 8px;
-            border-top: 1px solid rgba(0, 0, 0, 0.08);
-        }
-
-        .section-head {
-            display: flex;
-            justify-content: space-between;
-            gap: 16px;
-            flex-wrap: wrap;
-            align-items: end;
-        }
-
-        .compare-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-            gap: 16px;
-            margin-top: 18px;
-        }
-
-        .compare-card {
-            padding: 20px;
-            border-radius: 22px;
-            background: rgba(245, 245, 245, 0.86);
-            border: 1px solid rgba(0, 0, 0, 0.07);
+        .btn:hover {
+            transform: scale(1.05);
         }
 
         .footer {
-            margin-top: 22px;
-            padding: 28px;
-            border-radius: 30px;
-            background: var(--ink);
-            color: var(--paper);
+            text-align: center;
+            color: white;
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.2);
         }
 
-        .footer-copy {
-            color: rgba(255, 255, 255, 0.72);
-        }
-
-        .skeleton {
-            min-height: 180px;
-            border-radius: 22px;
-            background:
-                linear-gradient(110deg, rgba(217, 217, 217, 0.28), rgba(255, 255, 255, 0.82), rgba(217, 217, 217, 0.28));
-            background-size: 200% 100%;
-            animation: shimmer 1.4s linear infinite;
-        }
-
-        @keyframes shimmer {
-            from { background-position: 200% 0; }
-            to { background-position: -200% 0; }
+        .sovereign-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
         }
 
         @media (max-width: 768px) {
-            .hero,
-            .section,
-            .footer {
-                padding: 22px;
-                border-radius: 24px;
+            .header h1 {
+                font-size: 2rem;
             }
 
-            h1 {
-                max-width: 100%;
+            .products {
+                grid-template-columns: 1fr;
+            }
+
+            .product-card {
+                padding: 20px;
             }
         }
     </style>
 </head>
 <body>
-    <main>
-        <section class="hero">
-            <span class="eyebrow">Commercial Surface</span>
+    <div class="container">
+        <header class="header">
+            <div class="sovereign-badge">🔒 Maximum Sovereign Power: 9/9</div>
             <h1>Dominion OS Store</h1>
-            <p class="lead">
-                Sales-ready packaging for the three repo-defined offers: cloud deployment,
-                desktop deployment, and managed cloud compute. This page uses API-backed
-                product data so commercial copy and technical specs stay in sync.
-            </p>
-            <div class="hero-actions">
-                <a class="btn btn-primary" href="mailto:sales@fractal5solutions.com?subject=Dominion%20OS%20Sales%20Inquiry">Contact Sales</a>
-                <a class="btn btn-secondary" href="/demo">View Demo</a>
-                <a class="btn btn-secondary" href="/status">Open Runtime Status</a>
-            </div>
-        </section>
+            <p>Complete Sovereign AI Infrastructure Solutions</p>
+        </header>
 
-        <section class="section">
-            <div class="section-head">
-                <div>
-                    <h2>Offer Catalog</h2>
-                    <p class="section-copy">Each card exposes pricing, support expectations, deployment mode, and a spec endpoint instead of a fake checkout flow.</p>
-                </div>
-            </div>
-            <section class="products" id="products">
-                <div class="skeleton"></div>
-                <div class="skeleton"></div>
-                <div class="skeleton"></div>
-            </section>
-        </section>
-
-        <section class="section">
-            <div class="section-head">
-                <div>
-                    <h2>Commercial Guardrails</h2>
-                    <p class="section-copy">The repo can now route prospects into proposal and spec review without pretending there is a payment processor behind a button that does not exist.</p>
-                </div>
-            </div>
-            <div class="compare-grid">
-                <article class="compare-card">
-                    <h3>Spec-backed</h3>
-                    <ul class="compare-list">
-                        <li>All cards link to repo-backed JSON specs</li>
-                        <li>Copy stays aligned with product inventory</li>
-                        <li>SKU-level proposal routing</li>
-                    </ul>
-                </article>
-                <article class="compare-card">
-                    <h3>Operationally honest</h3>
-                    <ul class="compare-list">
-                        <li>No fake checkout or alert-box purchase flow</li>
-                        <li>Sales CTA routes to a human process</li>
-                        <li>Support SLA is visible per offer</li>
-                    </ul>
-                </article>
-                <article class="compare-card">
-                    <h3>Deployable</h3>
-                    <ul class="compare-list">
-                        <li>Backed by the same command core as /demo</li>
-                        <li>Available behind /store and /api/products</li>
-                        <li>Fits local plus Cloud Run entrypoints</li>
-                    </ul>
-                </article>
-            </div>
+        <section class="products" id="products">
+            <!-- Products will be loaded dynamically -->
         </section>
 
         <footer class="footer">
-            <h2>Sales handoff</h2>
-            <p class="footer-copy">
-                Route enterprise conversations to
-                <a href="mailto:sales@fractal5solutions.com" style="color: #ffffff;">sales@fractal5solutions.com</a>
-                and use the spec links for SKU-accurate follow-up.
-            </p>
+            <p>&copy; 2024 Dominion OS. All rights reserved. | Sovereign AI Infrastructure</p>
         </footer>
-    </main>
+    </div>
 
     <script>
-        const FALLBACK_PRODUCTS = [
-            {
-                name: "Dominion OS 1.0 - Google Cloud",
-                description: "Complete sovereign AI infrastructure deployed on Google Cloud Platform.",
-                features: ["Cloud Run deployment", "Autonomous monitoring", "Security hardening"],
-                pricing: { monthly: 299, annual: 2999, currency: "USD" },
-                support: { level: "commercial", response_time: "4_hours", uptime_sla: "99.9%" },
-                deployment: { platform: "gcp", monitoring: "autonomous" },
-                slug: "dominion-os-1.0-gcloud",
-                sku: "DOM-OS-GCLOUD-001"
-            },
-            {
-                name: "Dominion OS 1.0 - Desktop PC",
-                description: "Complete sovereign AI infrastructure for local desktop deployment.",
-                features: ["Local autonomy", "Docker Desktop Pro workflow", "Offline-capable runtime"],
-                pricing: { one_time: 499, currency: "USD" },
-                support: { level: "community", response_time: "24_hours", uptime_sla: "self_managed" },
-                deployment: { platform: "desktop", monitoring: "local" },
-                slug: "dominion-os-1.0-desktop-pc",
-                sku: "DOM-OS-DESKTOP-001"
-            },
-            {
-                name: "Dominion Cloud Computer",
-                description: "Managed cloud compute offer with sovereign infrastructure.",
-                features: ["Managed cloud compute", "Performance optimization", "Enterprise support"],
-                pricing: { hourly: 2.99, monthly: 199, currency: "USD" },
-                support: { level: "enterprise", response_time: "1_hour", uptime_sla: "99.99%" },
-                deployment: { platform: "multi-cloud", monitoring: "enterprise" },
-                slug: "dominion-cloud-computer",
-                sku: "DOM-CC-001"
-            }
-        ];
-
-        const currency = new Intl.NumberFormat("en-US", {
-            style: "currency",
-            currency: "USD",
-            maximumFractionDigits: 2
-        });
-
+        // Load products dynamically
         async function loadProducts() {
             try {
                 const response = await fetch('/api/products');
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
                 const products = await response.json();
                 displayProducts(products);
             } catch (error) {
                 console.error('Failed to load products:', error);
-                displayProducts(FALLBACK_PRODUCTS);
+                // Fallback to static products
+                displayStaticProducts();
             }
         }
 
@@ -367,32 +198,46 @@
             const container = document.getElementById('products');
             container.innerHTML = products.map(product => `
                 <div class="product-card">
-                    <div class="product-topline">
-                        <div>
-                            <div class="support-badge">${titleize(product.support?.level || 'custom')} support</div>
-                            <h3 class="product-title">${product.name}</h3>
-                        </div>
-                        <div>${getProductIcon(product.name)}</div>
-                    </div>
+                    <div class="product-icon">${getProductIcon(product.name)}</div>
+                    <h3 class="product-title">${product.name}</h3>
                     <p class="product-description">${product.description}</p>
-                    <div class="pricing">
-                        <div class="price">${getPricingDisplay(product.pricing)}</div>
-                        <div class="price-period">${getPricingPeriod(product.pricing)}</div>
-                    </div>
-                    <ul class="feature-list">
+                    <ul class="product-features">
                         ${product.features.map(feature => `<li>${feature}</li>`).join('')}
                     </ul>
-                    <div class="meta-note">
-                        Platform: ${titleize(product.deployment?.platform || 'custom')} ·
-                        Monitoring: ${titleize(product.deployment?.monitoring || 'custom')} ·
-                        SLA: ${product.support?.uptime_sla || 'custom'}
+                    <div class="pricing">
+                        <div class="price">$${getPricingDisplay(product.pricing)}</div>
+                        <div class="price-period">${getPricingPeriod(product.pricing)}</div>
                     </div>
-                    <div class="product-actions">
-                        <a class="btn btn-primary" href="${buildProposalLink(product)}">Request Proposal</a>
-                        <a class="btn btn-secondary" href="/api/products/${product.slug}" target="_blank" rel="noreferrer">View Spec</a>
-                    </div>
+                    <button class="btn" onclick="purchaseProduct('${product.sku}')">Purchase Now</button>
                 </div>
             `).join('');
+        }
+
+        function displayStaticProducts() {
+            const products = [
+                {
+                    name: "Dominion OS 1.0 - Google Cloud",
+                    description: "Complete sovereign AI infrastructure deployed on Google Cloud Platform",
+                    features: ["MCP deployment automation", "Sovereign AI infrastructure", "24/7 monitoring", "Security hardening"],
+                    pricing: { monthly: 299 },
+                    sku: "DOM-OS-GCLOUD-001"
+                },
+                {
+                    name: "Dominion OS 1.0 - Desktop PC",
+                    description: "Complete sovereign AI infrastructure for local desktop deployment",
+                    features: ["Local MCP deployment", "Docker integration", "Offline operation", "Security hardening"],
+                    pricing: { one_time: 499 },
+                    sku: "DOM-OS-DESKTOP-001"
+                },
+                {
+                    name: "Dominion Cloud Computer",
+                    description: "Cloud-based computing service with sovereign AI infrastructure",
+                    features: ["Cloud computing service", "Performance optimization", "Auto-scaling", "Enterprise support"],
+                    pricing: { hourly: 2.99 },
+                    sku: "DOM-CC-001"
+                }
+            ];
+            displayProducts(products);
         }
 
         function getProductIcon(name) {
@@ -403,37 +248,25 @@
         }
 
         function getPricingDisplay(pricing) {
-            if (pricing.monthly) return currency.format(pricing.monthly);
-            if (pricing.one_time) return currency.format(pricing.one_time);
-            if (pricing.hourly) return currency.format(pricing.hourly);
+            if (pricing.monthly) return pricing.monthly;
+            if (pricing.one_time) return pricing.one_time;
+            if (pricing.hourly) return pricing.hourly;
             return 'Contact Us';
         }
 
         function getPricingPeriod(pricing) {
-            if (pricing.annual) return `${currency.format(pricing.annual)} annual option`;
-            if (pricing.monthly) return 'monthly';
-            if (pricing.one_time) return 'one-time';
-            if (pricing.hourly) return 'hourly';
+            if (pricing.monthly) return 'per month';
+            if (pricing.one_time) return 'one-time purchase';
+            if (pricing.hourly) return 'per hour';
             return '';
         }
 
-        function buildProposalLink(product) {
-            const sku = product.sku || product.slug || 'DOMINION-OS';
-            const subject = encodeURIComponent(`Proposal Request: ${product.name}`);
-            const body = encodeURIComponent(
-                `Please send a proposal for ${product.name} (${sku}).\n\n` +
-                `Deployment target: ${product.deployment?.platform || 'custom'}\n` +
-                `Support level: ${product.support?.level || 'custom'}`
-            );
-            return `mailto:sales@fractal5solutions.com?subject=${subject}&body=${body}`;
+        function purchaseProduct(sku) {
+            // Implement purchase flow
+            alert(`Initiating purchase for ${sku}. Integration with payment processor required.`);
         }
 
-        function titleize(value) {
-            return String(value)
-                .replace(/_/g, ' ')
-                .replace(/\b\w/g, (match) => match.toUpperCase());
-        }
-
+        // Load products on page load
         document.addEventListener('DOMContentLoaded', loadProducts);
     </script>
 </body>
