@@ -1,0 +1,12 @@
+{
+  "displayName": "Dominion OS Alerts - Primary",
+  "description": "Primary notification channel for Dominion OS production alerts",
+  "type": "email",
+  "labels": {
+    "email_address": "matthewburbidge@fractal5solutions.com"
+  },
+  "userLabels": {
+    "team": "dominion",
+    "priority": "primary"
+  }
+}
