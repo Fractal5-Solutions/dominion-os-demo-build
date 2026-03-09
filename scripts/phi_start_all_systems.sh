@@ -7,7 +7,7 @@
 # Generated: March 7, 2026
 # ═══════════════════════════════════════════════════════════════════
 
-set -e
+# set -e
 
 # Color definitions
 RED='\033[0;31m'
@@ -76,7 +76,12 @@ start_service() {
     
     # Start service in background
     cd "$(dirname "$service_path")"
-    nohup bash -c "source $SCRIPT_DIR/.venv/bin/activate 2>/dev/null; $start_cmd" > "$LOG_DIR/${service_name}.log" 2>&1 &
+    if [ -f ".venv/bin/activate" ]; then
+        VENV_ACTIVATE=".venv/bin/activate"
+    else
+        VENV_ACTIVATE="$SCRIPT_DIR/.venv/bin/activate"
+    fi
+    nohup bash -c "source $VENV_ACTIVATE 2>/dev/null; $start_cmd" > "$LOG_DIR/${service_name}.log" 2>&1 &
     local pid=$!
     echo $pid > "$LOG_DIR/${service_name}.pid"
     
@@ -196,7 +201,7 @@ fi
 if [ -f "/workspaces/dominion-command-center/demo/app.py" ]; then
     start_service "Demo-Application" \
                   "/workspaces/dominion-command-center/demo/app.py" \
-                  "python3 app.py" \
+                  "PORT=5002 $SCRIPT_DIR/.venv/bin/python app.py" \
                   "5002"
 fi
 
