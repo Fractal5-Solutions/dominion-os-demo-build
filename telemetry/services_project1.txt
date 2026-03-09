@@ -7,6 +7,7 @@ dominion-f5-gateway            https://dominion-f5-gateway-66ymegzkya-uc.a.run.a
 dominion-monitoring-dashboard  https://dominion-monitoring-dashboard-66ymegzkya-uc.a.run.app
 dominion-os-1-0                https://dominion-os-1-0-66ymegzkya-uc.a.run.app
 dominion-os-api                https://dominion-os-api-66ymegzkya-uc.a.run.app
+dominion-os-demo               https://dominion-os-demo-66ymegzkya-uc.a.run.app
 dominion-phi-ui                https://dominion-phi-ui-66ymegzkya-uc.a.run.app
 dominion-relationships         https://dominion-relationships-66ymegzkya-uc.a.run.app
 dominion-revenue-automation    https://dominion-revenue-automation-66ymegzkya-uc.a.run.app
