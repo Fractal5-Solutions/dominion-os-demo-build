@@ -23,6 +23,7 @@ print_info() { echo -e "${BLUE}ℹ${NC} $1"; }
 
 # Change to project root
 cd "$(dirname "$0")/.." || exit 1
+COMPOSE_CMD=(docker-compose --env-file .env.mcp -f docker-compose-mcp.yml)
 
 # Show usage if no arguments
 if [ $# -eq 0 ]; then
@@ -47,42 +48,48 @@ fi
 
 COMMAND=$1
 
+if [ "$COMMAND" != "urls" ] && [ ! -f ".env.mcp" ]; then
+    print_error ".env.mcp not found"
+    print_info "Create it from .env.mcp.template before managing MCP services"
+    exit 1
+fi
+
 case $COMMAND in
     start)
         print_header "Starting MCP Services"
-        docker-compose -f docker-compose-mcp.yml up -d
+        "${COMPOSE_CMD[@]}" up -d
         print_success "Services started"
         print_info "Run '$0 status' to check service status"
         ;;
     
     stop)
         print_header "Stopping MCP Services"
-        docker-compose -f docker-compose-mcp.yml stop
+        "${COMPOSE_CMD[@]}" stop
         print_success "Services stopped"
         ;;
     
     restart)
         print_header "Restarting MCP Services"
-        docker-compose -f docker-compose-mcp.yml restart
+        "${COMPOSE_CMD[@]}" restart
         print_success "Services restarted"
         ;;
     
     status)
         print_header "MCP Services Status"
-        docker-compose -f docker-compose-mcp.yml ps
+        "${COMPOSE_CMD[@]}" ps
         echo ""
-        RUNNING=$(docker-compose -f docker-compose-mcp.yml ps | grep -c "Up" || true)
+        RUNNING=$("${COMPOSE_CMD[@]}" ps | grep -c "Up" || true)
         print_info "$RUNNING services running"
         ;;
     
     logs)
         print_header "MCP Services Logs (Press Ctrl+C to exit)"
-        docker-compose -f docker-compose-mcp.yml logs -f
+        "${COMPOSE_CMD[@]}" logs -f
         ;;
     
     logs-tail)
         print_header "MCP Services Logs (Last 50 Lines)"
-        docker-compose -f docker-compose-mcp.yml logs --tail=50
+        "${COMPOSE_CMD[@]}" logs --tail=50
         ;;
     
     health)
@@ -108,7 +115,7 @@ case $COMMAND in
     clean)
         print_header "Cleaning Up (Preserving Volumes)"
         print_info "This will stop and remove containers, but keep data volumes"
-        docker-compose -f docker-compose-mcp.yml down
+        "${COMPOSE_CMD[@]}" down
         print_success "Cleanup complete"
         ;;
     
@@ -117,7 +124,7 @@ case $COMMAND in
         print_info "WARNING: This will delete all data!"
         read -p "Are you sure? (type 'yes' to confirm): " -r
         if [ "$REPLY" = "yes" ]; then
-            docker-compose -f docker-compose-mcp.yml down -v
+            "${COMPOSE_CMD[@]}" down -v
             docker network rm mcp-network 2>/dev/null || true
             print_success "Complete cleanup done"
         else

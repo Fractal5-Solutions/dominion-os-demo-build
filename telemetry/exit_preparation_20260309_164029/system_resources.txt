@@ -1,0 +1,18 @@
+=== SYSTEM RESOURCES AT EXIT ===
+Timestamp: 2026-03-09 16:40:29 UTC
+
+CPU Info:
+model name	: AMD EPYC 7763 64-Core Processor
+Cores: 16
+
+Memory:
+               total        used        free      shared  buff/cache   available
+Mem:            62Gi        13Gi       8.3Gi        64Mi        41Gi        48Gi
+Swap:             0B          0B          0B
+
+Disk:
+Filesystem      Size  Used Avail Use% Mounted on
+overlay         126G   51G   69G  43% /
+
+Load Average:
+ 16:40:29 up  3:51,  0 users,  load average: 1.12, 1.10, 1.40

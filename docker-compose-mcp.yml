@@ -1,6 +1,5 @@
 # Docker Compose for MCP Servers - Optimal Configuration
 # For Docker Desktop Pro with 16+ CPUs and 48+ GB RAM
-version: '3.8'
 
 services:
   # Atlassian MCP Server (Jira/Confluence)
@@ -9,11 +8,11 @@ services:
     container_name: mcp-atlassian
     restart: unless-stopped
     command: sh -c "npm install -g @modelcontextprotocol/server-atlassian && mcp-server-atlassian"
+    env_file:
+      - .env.mcp
     environment:
-      - ATLASSIAN_API_TOKEN=${ATLASSIAN_API_TOKEN}
-      - ATLASSIAN_BASE_URL=${ATLASSIAN_BASE_URL}
-      - NODE_ENV=production
-      - LOG_LEVEL=info
+      NODE_ENV: ${NODE_ENV:-production}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
     mem_limit: 2g
     cpus: 2.0
     networks:
@@ -33,10 +32,11 @@ services:
     container_name: mcp-github
     restart: unless-stopped
     command: sh -c "npm install -g @modelcontextprotocol/server-github && mcp-server-github"
+    env_file:
+      - .env.mcp
     environment:
-      - GITHUB_TOKEN=${GITHUB_TOKEN}
-      - GITHUB_API_URL=https://api.github.com
-      - NODE_ENV=production
+      GITHUB_API_URL: https://api.github.com
+      NODE_ENV: ${NODE_ENV:-production}
     mem_limit: 2g
     cpus: 2.0
     networks:
@@ -56,10 +56,10 @@ services:
     container_name: mcp-stripe
     restart: unless-stopped
     command: sh -c "npm install -g @stripe/mcp-server && stripe-mcp-server"
+    env_file:
+      - .env.mcp
     environment:
-      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
-      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
-      - NODE_ENV=production
+      NODE_ENV: ${NODE_ENV:-production}
     mem_limit: 2g
     cpus: 2.0
     networks:
@@ -159,10 +159,11 @@ services:
     container_name: mcp-figma
     restart: unless-stopped
     command: sh -c "npm install -g @figma/mcp-server && figma-mcp-server"
+    env_file:
+      - .env.mcp
     environment:
-      - FIGMA_API_TOKEN=${FIGMA_API_TOKEN}
-      - FIGMA_CACHE_ENABLED=true
-      - NODE_ENV=production
+      FIGMA_CACHE_ENABLED: "true"
+      NODE_ENV: ${NODE_ENV:-production}
     deploy:
       resources:
         limits:

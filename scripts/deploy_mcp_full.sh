@@ -38,6 +38,7 @@ print_info() {
 
 # Change to project root
 cd "$(dirname "$0")/.." || exit 1
+COMPOSE_CMD=(docker-compose --env-file .env.mcp -f docker-compose-mcp.yml)
 
 print_header "MCP SERVICES DEPLOYMENT - Docker Desktop Pro"
 echo "Started: $(date)"
@@ -98,6 +99,14 @@ for file in "${REQUIRED_FILES[@]}"; do
     fi
     print_success "Found: $file"
 done
+
+print_info "Validating Docker Compose configuration..."
+if "${COMPOSE_CMD[@]}" config > /dev/null; then
+    print_success "Docker Compose configuration is valid"
+else
+    print_error "Docker Compose configuration is invalid"
+    exit 1
+fi
 
 # Check .env.mcp configuration
 print_info "Checking .env.mcp configuration..."
@@ -162,7 +171,7 @@ done
 print_header "Phase 3: Pulling Docker Images"
 
 print_info "This may take several minutes on first run..."
-if docker-compose -f docker-compose-mcp.yml pull; then
+if "${COMPOSE_CMD[@]}" pull; then
     print_success "All images pulled successfully"
 else
     print_error "Failed to pull some images"
@@ -176,7 +185,7 @@ fi
 print_header "Phase 4: Deploying MCP Services"
 
 print_info "Starting all services..."
-if docker-compose -f docker-compose-mcp.yml up -d; then
+if "${COMPOSE_CMD[@]}" up -d; then
     print_success "Services started successfully"
 else
     print_error "Failed to start services"
@@ -195,13 +204,13 @@ print_header "Phase 5: Deployment Verification"
 
 # Check container status
 print_info "Checking container status..."
-RUNNING_COUNT=$(docker-compose -f docker-compose-mcp.yml ps | grep -c "Up" || true)
+RUNNING_COUNT=$("${COMPOSE_CMD[@]}" ps | grep -c "Up" || true)
 print_success "$RUNNING_COUNT services are running"
 
 # List services
 echo ""
 echo "Service Status:"
-docker-compose -f docker-compose-mcp.yml ps
+"${COMPOSE_CMD[@]}" ps
 
 # Run health check
 echo ""
@@ -242,9 +251,9 @@ echo "  • Chrome MCP:     http://localhost:3005"
 echo "  • Pylance MCP:    http://localhost:3007"
 echo ""
 echo "Management Commands:"
-echo "  • View logs:      docker-compose -f docker-compose-mcp.yml logs -f"
-echo "  • Stop services:  docker-compose -f docker-compose-mcp.yml down"
-echo "  • Restart all:    docker-compose -f docker-compose-mcp.yml restart"
+echo "  • View logs:      docker-compose --env-file .env.mcp -f docker-compose-mcp.yml logs -f"
+echo "  • Stop services:  docker-compose --env-file .env.mcp -f docker-compose-mcp.yml down"
+echo "  • Restart all:    docker-compose --env-file .env.mcp -f docker-compose-mcp.yml restart"
 echo "  • Check status:   bash scripts/calculate_docker_live_ops_score.sh"
 echo ""
 print_success "All systems deployed successfully!"
