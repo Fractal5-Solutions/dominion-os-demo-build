@@ -1,0 +1,247 @@
+#!/bin/bash
+###############################################################################
+# PHI Unified Command Interface
+# Single entry point for status, commands, and mode management
+# Detects current mode (autonomous/interactive) and provides appropriate options
+###############################################################################
+
+set -e
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+MAGENTA='\033[0;35m'
+GOLD='\033[38;5;220m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+# Directories
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOG_DIR="$SCRIPT_DIR/logs"
+TELEMETRY_DIR="$SCRIPT_DIR/telemetry"
+
+# Detect current mode
+detect_mode() {
+    if [ -f "/tmp/phi_autonomous_mode.flag" ]; then
+        echo "AUTONOMOUS"
+    elif [ -f "$TELEMETRY_DIR/interactive_status.json" ] && \
+         grep -q "OPERATIONAL\\|STARTING" "$TELEMETRY_DIR/interactive_status.json" 2>/dev/null; then
+        echo "INTERACTIVE"
+    else
+        echo "STOPPED"
+    fi
+}
+
+# Get system status
+get_status() {
+    local mode=$(detect_mode)
+    local active_services=0
+    local service_details=()
+
+    # Check ports
+    for port in 5000 5001 8080 8081; do
+        if lsof -ti:$port > /dev/null 2>&1; then
+            ((active_services++))
+            local pid=$(lsof -ti:$port)
+            case $port in
+                5000) service_details+=("Command Center (Port 5000, PID: $pid)") ;;
+                5001) service_details+=("Billing Service (Port 5001, PID: $pid)") ;;
+                8080) service_details+=("OAuth Server (Port 8080, PID: $pid)") ;;
+                8081) service_details+=("Widget Service (Port 8081, PID: $pid)") ;;
+            esac
+        fi
+    done
+
+    # Check sovereign processes
+    local sovereign_active=false
+    if pgrep -f "phi_sovereign_keepalive" > /dev/null 2>&1; then
+        sovereign_active=true
+    fi
+
+    echo "$mode|$active_services|$sovereign_active|${service_details[@]}"
+}
+
+# Display formatted status
+show_status() {
+    local status=$(get_status)
+    IFS='|' read -r mode active_services sovereign_active service_list <<< "$status"
+
+    echo ""
+    echo -e "${GOLD}${BOLD}╔═══════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${GOLD}${BOLD}║           PHI SYSTEM STATUS - UNIFIED COMMAND CENTER              ║${NC}"
+    echo -e "${GOLD}${BOLD}╚═══════════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+
+    # Mode Display
+    echo -e "${CYAN}━━━ OPERATIONAL MODE ━━━${NC}"
+    case $mode in
+        "AUTONOMOUS")
+            echo -e "${GREEN}${BOLD}Mode: AUTONOMOUS 24/7 (NHITL)${NC}"
+            echo -e "Sovereignty Level: ${GOLD}9/9 Maximum Power${NC}"
+            ;;
+        "INTERACTIVE")
+            echo -e "${BLUE}${BOLD}Mode: INTERACTIVE (VS Code Development)${NC}"
+            echo -e "User Status: ${GREEN}Active${NC}"
+            ;;
+        "STOPPED")
+            echo -e "${YELLOW}${BOLD}Mode: STOPPED${NC}"
+            echo -e "Status: ${YELLOW}No active processes${NC}"
+            ;;
+    esac
+
+    echo ""
+    echo -e "${CYAN}━━━ SERVICES STATUS ━━━${NC}"
+    echo -e "${BOLD}Active Services: $active_services/4${NC}"
+
+    if [ $active_services -gt 0 ]; then
+        IFS='|' read -ra SERVICES <<< "$service_list"
+        for service in "${SERVICES[@]}"; do
+            if [ -n "$service" ]; then
+                echo -e "  ${GREEN}✓${NC} $service"
+            fi
+        done
+    else
+        echo -e "  ${YELLOW}⚠  No services currently running${NC}"
+    fi
+
+    echo ""
+    echo -e "${CYAN}━━━ SOVEREIGN PROCESSES ━━━${NC}"
+    if [ "$sovereign_active" = "true" ]; then
+        echo -e "  ${GREEN}✓${NC} Sovereign Keepalive: Active"
+    else
+        echo -e "  ${YELLOW}⏸${NC}  Sovereign Keepalive: Inactive"
+    fi
+
+    # System Resources
+    echo ""
+    echo -e "${CYAN}━━━ SYSTEM RESOURCES ━━━${NC}"
+    local disk_usage=$(df -h /workspaces 2>/dev/null | awk 'NR==2 {print $5}' || echo "N/A")
+    local mem_usage=$(free -h 2>/dev/null | awk 'NR==2 {print $3 "/" $2}' || echo "N/A")
+    echo -e "  Disk Usage: $disk_usage"
+    echo -e "  Memory Usage: $mem_usage"
+
+    echo ""
+}
+
+# Show available commands based on mode
+show_commands() {
+    local mode=$(detect_mode)
+
+    echo -e "${CYAN}━━━ AVAILABLE COMMANDS ━━━${NC}"
+    echo ""
+
+    case $mode in
+        "AUTONOMOUS")
+            echo -e "${BOLD}Autonomous Mode Commands:${NC}"
+            echo -e "  ${GREEN}status${NC}     - Show this status display"
+            echo -e "  ${YELLOW}stop${NC}       - Stop autonomous mode (use phi_perfect_autonomous_shutdown.sh)"
+            echo -e "  ${BLUE}logs${NC}       - View sovereign logs (tail -f logs/sovereign_keepalive.log)"
+            echo -e "  ${CYAN}telemetry${NC}  - View telemetry data (cat telemetry/autonomous_status.json)"
+            ;;
+        "INTERACTIVE")
+            echo -e "${BOLD}Interactive Mode Commands:${NC}"
+            echo -e "  ${GREEN}status${NC}     - Show this status display"
+            echo -e "  ${YELLOW}stop${NC}       - Stop services (bash phi_interactive_shutdown.sh)"
+            echo -e "  ${BLUE}restart${NC}    - Restart services (bash phi_interactive_startup.sh)"
+            echo -e "  ${CYAN}logs${NC}       - View service logs (tail -f logs/*.log)"
+            echo -e "  ${MAGENTA}mode${NC}       - Switch to autonomous mode"
+            ;;
+        "STOPPED")
+            echo -e "${BOLD}System Stopped - Startup Options:${NC}"
+            echo -e "  ${GREEN}autonomous${NC} - Start in autonomous 24/7 mode (bash phi_perfect_autonomous_startup.sh)"
+            echo -e "  ${BLUE}interactive${NC} - Start in interactive mode (bash phi_interactive_startup.sh)"
+            echo -e "  ${CYAN}quick${NC}      - Quick start (bash phi_quick_start.sh)"
+            ;;
+    esac
+
+    echo ""
+    echo -e "${BOLD}Universal Commands (any mode):${NC}"
+    echo -e "  ${GREEN}phi status${NC}             - Full system status"
+    echo -e "  ${GREEN}phi help${NC}               - Show this help"
+    echo -e "  ${CYAN}phi switch-mode${NC}        - Switch between autonomous/interactive"
+    echo -e "  ${BLUE}phi emergency-stop${NC}     - Emergency shutdown all services"
+    echo ""
+}
+
+# Main command handler
+main() {
+    local command="${1:-status}"
+
+    case $command in
+        "status"|"s")
+            show_status
+            show_commands
+            ;;
+        "help"|"h"|"--help"|"-h")
+            show_status
+            show_commands
+            ;;
+        "start-autonomous")
+            echo "Starting autonomous mode..."
+            bash "$SCRIPT_DIR/phi_perfect_autonomous_startup.sh"
+            ;;
+        "start-interactive")
+            echo "Starting interactive mode..."
+            bash "$SCRIPT_DIR/phi_interactive_startup.sh"
+            ;;
+        "stop")
+            local mode=$(detect_mode)
+            if [ "$mode" = "AUTONOMOUS" ]; then
+                bash "$SCRIPT_DIR/phi_perfect_autonomous_shutdown.sh"
+            elif [ "$mode" = "INTERACTIVE" ]; then
+                bash "$SCRIPT_DIR/phi_interactive_shutdown.sh"
+            else
+                echo "No active services to stop"
+            fi
+            ;;
+        "emergency-stop")
+            echo -e "${RED}${BOLD}EMERGENCY STOP - Killing all PHI processes${NC}"
+            pkill -f "phi_" 2>/dev/null || true
+            pkill -f "python3 app.py" 2>/dev/null || true
+            rm -f /tmp/phi_autonomous_mode.flag /tmp/.stop-nhitl-loop
+            echo -e "${GREEN}All processes stopped${NC}"
+            ;;
+        "switch-mode")
+            local current_mode=$(detect_mode)
+            echo "Current mode: $current_mode"
+            echo "Select new mode:"
+            echo "  1) Autonomous 24/7"
+            echo "  2) Interactive Development"
+            read -p "Choice (1-2): " choice
+            case $choice in
+                1)
+                    [ "$current_mode" != "STOPPED" ] && bash "$SCRIPT_DIR/phi_perfect_autonomous_shutdown.sh" || true
+                    bash "$SCRIPT_DIR/phi_perfect_autonomous_startup.sh"
+                    ;;
+                2)
+                    [ "$current_mode" != "STOPPED" ] && bash "$SCRIPT_DIR/phi_interactive_shutdown.sh" || true
+                    bash "$SCRIPT_DIR/phi_interactive_startup.sh"
+                    ;;
+                *)
+                    echo "Invalid choice"
+                    ;;
+            esac
+            ;;
+        "logs")
+            echo "Recent logs:"
+            tail -n 50 "$LOG_DIR"/*.log 2>/dev/null || echo "No logs found"
+            ;;
+        "telemetry")
+            echo "Autonomous Status:"
+            [ -f "$TELEMETRY_DIR/autonomous_status.json" ] && cat "$TELEMETRY_DIR/autonomous_status.json" || echo "Not available"
+            echo ""
+            echo "Interactive Status:"
+            [ -f "$TELEMETRY_DIR/interactive_status.json" ] && cat "$TELEMETRY_DIR/interactive_status.json" || echo "Not available"
+            ;;
+        *)
+            echo "Unknown command: $command"
+            echo "Run 'phi help' for available commands"
+            ;;
+    esac
+}
+
+# Run main
+main "$@"
