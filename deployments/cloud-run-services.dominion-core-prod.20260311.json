@@ -1,0 +1,194 @@
+{
+  "generated_at": "2026-03-11T17:35:00Z",
+  "project_id": "dominion-core-prod",
+  "region": "us-central1",
+  "services": [
+    {
+      "name": "api",
+      "url": "https://api-reduwyf2ra-uc.a.run.app",
+      "revision": "api-00002-2lb",
+      "image": "gcr.io/dominion-core-prod/dominion-api",
+      "port": 8080,
+      "memory": "1Gi",
+      "cpu": "1",
+      "min_scale": "1",
+      "max_scale": "10"
+    },
+    {
+      "name": "chatgpt-gateway",
+      "url": "https://chatgpt-gateway-reduwyf2ra-uc.a.run.app",
+      "revision": "chatgpt-gateway-00007-sx5",
+      "image": "us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/chatgpt-gateway:185daef7ab",
+      "port": 8000,
+      "memory": "512Mi",
+      "cpu": "1000m",
+      "min_scale": "1",
+      "max_scale": "10"
+    },
+    {
+      "name": "demo",
+      "url": "https://demo-reduwyf2ra-uc.a.run.app",
+      "revision": "demo-00002-gff",
+      "image": "gcr.io/dominion-core-prod/dominion-demo",
+      "port": 8080,
+      "memory": "1Gi",
+      "cpu": "1",
+      "min_scale": "1",
+      "max_scale": "10"
+    },
+    {
+      "name": "dominion-ai-gateway",
+      "url": "https://dominion-ai-gateway-reduwyf2ra-uc.a.run.app",
+      "revision": "dominion-ai-gateway-00021-xv5",
+      "image": "us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/chatgpt-gateway:1.0.12",
+      "port": 8080,
+      "memory": "1Gi",
+      "cpu": "2",
+      "min_scale": "2",
+      "max_scale": "10"
+    },
+    {
+      "name": "dominion-api",
+      "url": "https://dominion-api-reduwyf2ra-uc.a.run.app",
+      "revision": "dominion-api-00030-x78",
+      "image": "us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/dominion-api:185daef7ab",
+      "port": 8000,
+      "memory": "512Mi",
+      "cpu": "1000m",
+      "min_scale": "1",
+      "max_scale": "2"
+    },
+    {
+      "name": "dominion-chief-of-staff",
+      "url": "https://dominion-chief-of-staff-reduwyf2ra-uc.a.run.app",
+      "revision": "dominion-chief-of-staff-00004-n9g",
+      "image": "us-docker.pkg.dev/cloudrun/container/hello",
+      "port": 8080,
+      "memory": "512Mi",
+      "cpu": "1000m",
+      "min_scale": "1",
+      "max_scale": "10"
+    },
+    {
+      "name": "dominion-demo",
+      "url": "https://dominion-demo-reduwyf2ra-uc.a.run.app",
+      "revision": "dominion-demo-00009-7rz",
+      "image": "us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/dominion-demo:185daef7ab",
+      "port": 8080,
+      "memory": "512Mi",
+      "cpu": "1000m",
+      "min_scale": "1",
+      "max_scale": "10"
+    },
+    {
+      "name": "dominion-demo-service",
+      "url": "https://dominion-demo-service-reduwyf2ra-uc.a.run.app",
+      "revision": "dominion-demo-service-00010-kbh",
+      "image": "gcr.io/dominion-core-prod/dominion-demo-service:manual-20260228-191623",
+      "port": 8080,
+      "memory": "4Gi",
+      "cpu": "2",
+      "min_scale": "1",
+      "max_scale": "100"
+    },
+    {
+      "name": "dominion-gateway",
+      "url": "https://dominion-gateway-reduwyf2ra-uc.a.run.app",
+      "revision": "dominion-gateway-00002-86p",
+      "image": "us-central1-docker.pkg.dev/dominion-core-prod/dominion-docker-repo/gateway:v1.0.0",
+      "port": 8080,
+      "memory": "512Mi",
+      "cpu": "1000m",
+      "min_scale": "1",
+      "max_scale": "10"
+    },
+    {
+      "name": "dominion-os",
+      "url": "https://dominion-os-reduwyf2ra-uc.a.run.app",
+      "revision": "dominion-os-00037-2r2",
+      "image": "us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/dominion-os:v1.0.101",
+      "port": 8080,
+      "memory": "512Mi",
+      "cpu": "1",
+      "min_scale": "1",
+      "max_scale": "20"
+    },
+    {
+      "name": "dominion-os-1-0-101",
+      "url": "https://dominion-os-1-0-101-reduwyf2ra-uc.a.run.app",
+      "revision": "dominion-os-1-0-101-00022-v5f",
+      "image": "gcr.io/dominion-core-prod/dominion-os:1.0.101",
+      "port": 8000,
+      "memory": "1Gi",
+      "cpu": "1",
+      "min_scale": "1",
+      "max_scale": "10"
+    },
+    {
+      "name": "dominion-os-demo",
+      "url": "https://dominion-os-demo-reduwyf2ra-uc.a.run.app",
+      "revision": "dominion-os-demo-00011-jwj",
+      "image": "gcr.io/dominion-core-prod/dominion-os-demo:latest",
+      "port": 8080,
+      "memory": "512Mi",
+      "cpu": "1000m",
+      "min_scale": "1",
+      "max_scale": "10"
+    },
+    {
+      "name": "dominion-phi-ui",
+      "url": "https://dominion-phi-ui-reduwyf2ra-uc.a.run.app",
+      "revision": "dominion-phi-ui-00002-ds5",
+      "image": "us-central1-docker.pkg.dev/dominion-core-prod/dominion-docker-repo/phi-ui:v1.0.0",
+      "port": 8080,
+      "memory": "512Mi",
+      "cpu": "1000m",
+      "min_scale": "1",
+      "max_scale": "10"
+    },
+    {
+      "name": "phi-askphi-widget",
+      "url": "https://phi-askphi-widget-reduwyf2ra-uc.a.run.app",
+      "revision": "phi-askphi-widget-00015-zv4",
+      "image": "gcr.io/dominion-core-prod/phi-askphi-widget",
+      "port": 8080,
+      "memory": "512Mi",
+      "cpu": "1",
+      "min_scale": null,
+      "max_scale": "10"
+    },
+    {
+      "name": "phi-expenditure-dashboard",
+      "url": "https://phi-expenditure-dashboard-reduwyf2ra-uc.a.run.app",
+      "revision": "phi-expenditure-dashboard-00003-mjt",
+      "image": "us-central1-docker.pkg.dev/dominion-core-prod/cloud-run-source-deploy/phi-expenditure-dashboard@sha256:cc79ead181ffadf85606339c17e874dde08c8de92aba5755272462c20daa0a45",
+      "port": 5000,
+      "memory": "2Gi",
+      "cpu": "2",
+      "min_scale": "1",
+      "max_scale": "10"
+    },
+    {
+      "name": "phi-oauth-server",
+      "url": "https://phi-oauth-server-reduwyf2ra-uc.a.run.app",
+      "revision": "phi-oauth-server-00023-lqh",
+      "image": "gcr.io/dominion-core-prod/phi-oauth-server",
+      "port": 5000,
+      "memory": "512Mi",
+      "cpu": "1",
+      "min_scale": "1",
+      "max_scale": "10"
+    },
+    {
+      "name": "pipeline",
+      "url": "https://pipeline-reduwyf2ra-uc.a.run.app",
+      "revision": "pipeline-00002-dps",
+      "image": "gcr.io/dominion-core-prod/dominion-pipeline",
+      "port": 8080,
+      "memory": "1Gi",
+      "cpu": "1",
+      "min_scale": "1",
+      "max_scale": "10"
+    }
+  ]
+}
