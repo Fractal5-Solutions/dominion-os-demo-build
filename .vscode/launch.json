@@ -1,0 +1,27 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Script: start (dominion-os-1.0)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "bash -lc 'cd /workspaces/dominion-os-demo-build && PORT=8080 SERVICE_NAME=dominion-os-1.0 PROJECT_ID=dominion-os-1-0-main REGION=us-central1 if [ -x .venv/bin/python ]; then exec .venv/bin/python command_core.py; elif [ -x scripts/.venv/bin/python ]; then exec scripts/.venv/bin/python command_core.py; else exec python3 command_core.py; fi'"
+    },
+    {
+      "name": "Python: Current File",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Bash: Debug Script",
+      "type": "bashdb",
+      "request": "launch",
+      "program": "${file}",
+      "cwd": "${workspaceFolder}",
+      "internalConsoleOptions": "openOnSessionStart"
+    }
+  ]
+}

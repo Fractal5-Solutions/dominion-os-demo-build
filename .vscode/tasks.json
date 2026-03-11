@@ -1,0 +1,57 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "start (dominion-os-1.0)",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "-lc",
+        "cd /workspaces/dominion-os-demo-build && PORT=8080 SERVICE_NAME=dominion-os-1.0 PROJECT_ID=dominion-os-1-0-main REGION=us-central1 if [ -x .venv/bin/python ]; then exec .venv/bin/python command_core.py; elif [ -x scripts/.venv/bin/python ]; then exec scripts/.venv/bin/python command_core.py; else exec python3 command_core.py; fi"
+      ],
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Deploy MCP Full",
+      "type": "shell",
+      "command": "./scripts/deploy_mcp_full.sh",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Sovereign Autopilot: Status",
+      "type": "shell",
+      "command": "./phi_sovereign_autopilot_nhitl.sh status",
+      "problemMatcher": []
+    },
+    {
+      "label": "Sovereign Autopilot: Monitor",
+      "type": "shell",
+      "command": "./phi_sovereign_autopilot_nhitl.sh monitor",
+      "problemMatcher": [],
+      "isBackground": true
+    },
+    {
+      "label": "MCP: Start Services",
+      "type": "shell",
+      "command": "./scripts/mcp_manage.sh start",
+      "problemMatcher": []
+    },
+    {
+      "label": "MCP: Stop Services",
+      "type": "shell",
+      "command": "./scripts/mcp_manage.sh stop",
+      "problemMatcher": []
+    },
+    {
+      "label": "Git: Push All",
+      "type": "shell",
+      "command": "git add . && git commit -m 'chore: update' && git push",
+      "problemMatcher": []
+    }
+  ]
+}
