@@ -2,6 +2,18 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "PHI: Start All Systems",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "bash -lc 'cd /workspaces/dominion-os-demo-build/scripts && ./phi_start_all_systems.sh'"
+    },
+    {
+      "name": "PHI: Live Ops Verification",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "bash -lc 'cd /workspaces/dominion-os-demo-build/scripts && ./phi_live_ops_verification.sh'"
+    },
+    {
       "name": "Run Script: start (dominion-os-1.0)",
       "type": "node-terminal",
       "request": "launch",

@@ -2,6 +2,77 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "PHI: Verify Command Center Context",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "-lc",
+        "cd /workspaces/dominion-command-center && pwd && echo 'DOMINION_LIVE_OPS_ROOT=/workspaces/dominion-os-demo-build' && git rev-parse --show-toplevel"
+      ],
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "problemMatcher": [],
+      "runOptions": {
+        "runOn": "folderOpen"
+      }
+    },
+    {
+      "label": "PHI: Start All Systems",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "-lc",
+        "cd /workspaces/dominion-os-demo-build/scripts && ./phi_start_all_systems.sh"
+      ],
+      "options": {
+        "cwd": "/workspaces/dominion-os-demo-build/scripts"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "PHI: Quick Start",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "-lc",
+        "cd /workspaces/dominion-os-demo-build/scripts && ./phi_quick_start.sh"
+      ],
+      "options": {
+        "cwd": "/workspaces/dominion-os-demo-build/scripts"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "PHI: Live Ops Verification",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "-lc",
+        "cd /workspaces/dominion-os-demo-build/scripts && ./phi_live_ops_verification.sh"
+      ],
+      "options": {
+        "cwd": "/workspaces/dominion-os-demo-build/scripts"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "PHI: Complete Status",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "-lc",
+        "cd /workspaces/dominion-os-demo-build/scripts && ./phi_complete_status.sh"
+      ],
+      "options": {
+        "cwd": "/workspaces/dominion-os-demo-build/scripts"
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "start (dominion-os-1.0)",
       "type": "shell",
       "command": "bash",
@@ -51,6 +122,15 @@
       "label": "Git: Push All",
       "type": "shell",
       "command": "git add . && git commit -m 'chore: update' && git push",
+      "problemMatcher": []
+    },
+    {
+      "label": "PHI: Live Ops Bringup + Verify",
+      "dependsOn": [
+        "PHI: Start All Systems",
+        "PHI: Live Ops Verification"
+      ],
+      "dependsOrder": "sequence",
       "problemMatcher": []
     }
   ]
