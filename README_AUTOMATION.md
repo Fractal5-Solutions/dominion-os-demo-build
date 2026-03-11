@@ -37,4 +37,8 @@ sudo /workspaces/dominion-os-demo-build/host_docker_iptables_bootstrap.sh
 ```
 
 - Run that on the Linux host OS, not from inside a dev container or Codespace.
-- Override allowed inbound TCP ports if needed, for example: `sudo ALLOWED_TCP_PORTS="22 80 443 8080 9090" /workspaces/dominion-os-demo-build/host_docker_iptables_bootstrap.sh`
+- The default `STACK_PROFILE` is `local`, which opens only the host ports used by `docker-compose.yml`: `22 3000 5432 6379 8080 8081 9090`.
+- Use `STACK_PROFILE=production` for `docker-compose.production.yml`.
+- Use `STACK_PROFILE=mcp` for `docker-compose-mcp.yml`.
+- Combine profiles if the host runs more than one stack, for example: `sudo STACK_PROFILE="local,mcp" /workspaces/dominion-os-demo-build/host_docker_iptables_bootstrap.sh`
+- Override the port set directly only when needed, for example: `sudo ALLOWED_TCP_PORTS="22 8080 9090" /workspaces/dominion-os-demo-build/host_docker_iptables_bootstrap.sh`

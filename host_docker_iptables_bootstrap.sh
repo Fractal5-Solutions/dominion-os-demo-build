@@ -9,7 +9,11 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MANAGED_CHAIN="PHI-HOST-INPUT"
-DEFAULT_ALLOWED_TCP_PORTS=(22 80 443 3000 5000 5001 5002 5003 5004 5005 5432 6379 8000 8080 8081 9090)
+DEFAULT_STACK_PROFILE="${STACK_PROFILE:-local}"
+BASE_ALLOWED_TCP_PORTS=(22)
+LOCAL_ALLOWED_TCP_PORTS=(3000 5432 6379 8080 8081 9090)
+PRODUCTION_ALLOWED_TCP_PORTS=(3000 8080 8081 8082 8083 9090)
+MCP_ALLOWED_TCP_PORTS=(3000 3001 3002 3003 3004 3005 3007 3008 9090)
 
 log() {
     echo -e "${BLUE}[$(date +'%Y-%m-%d %H:%M:%S')]${NC} $*"
@@ -179,13 +183,50 @@ ensure_chain_exists() {
     fi
 }
 
+dedupe_ports() {
+    awk '
+        {
+            for (i = 1; i <= NF; i++) {
+                if (!seen[$i]++) {
+                    out[++count] = $i
+                }
+            }
+        }
+        END {
+            for (i = 1; i <= count; i++) {
+                printf "%s%s", out[i], (i < count ? " " : "")
+            }
+        }
+    '
+}
+
 resolve_allowed_ports() {
     if [[ -n "${ALLOWED_TCP_PORTS:-}" ]]; then
         echo "${ALLOWED_TCP_PORTS}"
         return
     fi
 
-    printf '%s ' "${DEFAULT_ALLOWED_TCP_PORTS[@]}"
+    local profile
+    local port_words=("${BASE_ALLOWED_TCP_PORTS[@]}")
+
+    for profile in ${DEFAULT_STACK_PROFILE//,/ }; do
+        case "${profile}" in
+            local)
+                port_words+=("${LOCAL_ALLOWED_TCP_PORTS[@]}")
+                ;;
+            production)
+                port_words+=("${PRODUCTION_ALLOWED_TCP_PORTS[@]}")
+                ;;
+            mcp)
+                port_words+=("${MCP_ALLOWED_TCP_PORTS[@]}")
+                ;;
+            *)
+                fail "Unsupported STACK_PROFILE: ${profile}. Use local, production, mcp, or a comma-separated combination."
+                ;;
+        esac
+    done
+
+    printf '%s\n' "${port_words[*]}" | dedupe_ports
 }
 
 configure_firewall_services() {
