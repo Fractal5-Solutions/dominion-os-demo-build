@@ -26,6 +26,7 @@ LOG_DIR="$SCRIPT_DIR/logs"
 mkdir -p "$LOG_DIR"
 
 STARTUP_LOG="$LOG_DIR/phi_startup_$(date +%Y%m%d_%H%M%S).log"
+TRACKED_PIDFILES=()
 
 # Functions
 log() {
@@ -60,20 +61,24 @@ start_service() {
     local service_path="$2"
     local start_cmd="$3"
     local port="$4"
-    
+
     log "Starting $service_name..."
-    
+
     if [ ! -f "$service_path" ]; then
         warning "$service_name not found at $service_path - skipping"
         return 1
     fi
-    
+
     # Check if already running
     if lsof -ti:$port > /dev/null 2>&1; then
+        local running_pid
+        running_pid=$(lsof -ti:$port | head -1)
+        echo "$running_pid" > "$LOG_DIR/${service_name}.pid"
+        TRACKED_PIDFILES+=("$LOG_DIR/${service_name}.pid")
         success "$service_name already running on port $port"
         return 0
     fi
-    
+
     # Start service in background
     cd "$(dirname "$service_path")"
     if [ -f ".venv/bin/activate" ]; then
@@ -84,7 +89,8 @@ start_service() {
     nohup bash -c "source $VENV_ACTIVATE 2>/dev/null; $start_cmd" > "$LOG_DIR/${service_name}.log" 2>&1 &
     local pid=$!
     echo $pid > "$LOG_DIR/${service_name}.pid"
-    
+    TRACKED_PIDFILES+=("$LOG_DIR/${service_name}.pid")
+
     # Wait for service to start (with timeout)
     local timeout=10
     local elapsed=0
@@ -96,7 +102,7 @@ start_service() {
         sleep 1
         ((elapsed++))
     done
-    
+
     # Check if process is still alive but port not bound
     if ps -p $pid > /dev/null 2>&1; then
         warning "$service_name started but port $port not ready yet (PID: $pid)"
@@ -172,7 +178,7 @@ fi
 if [ -f "/workspaces/dominion-os-demo-build/widget_service/app.py" ]; then
     start_service "PHI-AskPHI-Widget" \
                   "/workspaces/dominion-os-demo-build/widget_service/app.py" \
-                  "python3 app.py" \
+                  "PORT=8081 python3 app.py" \
                   "8081"
 fi
 
@@ -182,10 +188,10 @@ fi
 section "PHASE 3: COMMAND CENTER SERVICES"
 
 # Main Command Center
-if [ -f "/workspaces/dominion-command-center/src/main.py" ]; then
+if [ -f "/workspaces/dominion-command-center/app/main.py" ]; then
     start_service "Dominion-Command-Center" \
-                  "/workspaces/dominion-command-center/src/main.py" \
-                  "python3 main.py" \
+                  "/workspaces/dominion-command-center/app/main.py" \
+                  "cd /workspaces/dominion-command-center && python3 -m uvicorn app.main:app --host 0.0.0.0 --port 5000" \
                   "5000"
 fi
 
@@ -193,7 +199,7 @@ fi
 if [ -f "/workspaces/dominion-command-center/billing-service/app.py" ]; then
     start_service "Billing-Service" \
                   "/workspaces/dominion-command-center/billing-service/app.py" \
-                  "python3 app.py" \
+                  "PORT=5001 python3 app.py" \
                   "5001"
 fi
 
@@ -201,7 +207,7 @@ fi
 if [ -f "/workspaces/dominion-command-center/demo/app.py" ]; then
     start_service "Demo-Application" \
                   "/workspaces/dominion-command-center/demo/app.py" \
-                  "PORT=5002 $SCRIPT_DIR/.venv/bin/python app.py" \
+                  "FLASK_APP=app.py python3 -m flask run --host 0.0.0.0 --port 5002" \
                   "5002"
 fi
 
@@ -209,16 +215,20 @@ fi
 if [ -f "/workspaces/dominion-command-center/sidecar/app.py" ]; then
     start_service "Sidecar-Service" \
                   "/workspaces/dominion-command-center/sidecar/app.py" \
-                  "python3 app.py" \
+                  "python3 -m uvicorn app:app --host 0.0.0.0 --port 5003" \
                   "5003"
 fi
 
 # ChatGPT Gateway
 if [ -f "/workspaces/dominion-command-center/chatgpt-gateway/main.py" ]; then
-    start_service "ChatGPT-Gateway" \
-                  "/workspaces/dominion-command-center/chatgpt-gateway/main.py" \
-                  "python3 main.py" \
-                  "5004"
+    if [ -f "/workspaces/dominion-command-center/ai_utils/guardrails.py" ]; then
+        start_service "ChatGPT-Gateway" \
+                      "/workspaces/dominion-command-center/chatgpt-gateway/main.py" \
+                      "PORT=5004 python3 main.py" \
+                      "5004"
+    else
+        warning "ChatGPT-Gateway dependency missing: /workspaces/dominion-command-center/ai_utils/guardrails.py"
+    fi
 fi
 
 # ═══════════════════════════════════════════════════════════════════
@@ -228,10 +238,17 @@ section "PHASE 4: LEGACY SYSTEMS"
 
 # Politics Local (Legacy)
 if [ -f "/workspaces/dominion-os-1.0-politics.local-20260305/app.py" ]; then
-    start_service "Politics-Local-Legacy" \
-                  "/workspaces/dominion-os-1.0-politics.local-20260305/app.py" \
-                  "python3 app.py" \
-                  "5005"
+    # Activate Politics-Local-Legacy venv and use unique port
+    VENV_POLITICS="/workspaces/dominion-os-1.0-politics.local-20260305/.venv/bin/activate"
+    if [ -f "$VENV_POLITICS" ]; then
+        nohup bash -c "source $VENV_POLITICS 2>/dev/null; python3 app.py" > "$LOG_DIR/Politics-Local-Legacy.log" 2>&1 &
+        pid=$!
+        echo $pid > "$LOG_DIR/Politics-Local-Legacy.pid"
+        TRACKED_PIDFILES+=("$LOG_DIR/Politics-Local-Legacy.pid")
+        success "Politics-Local-Legacy started successfully (PID: $pid, Port: 5005)"
+    else
+        error "Politics-Local-Legacy venv not found - check setup"
+    fi
 fi
 
 # ═══════════════════════════════════════════════════════════════════
@@ -244,6 +261,7 @@ if [ -f "$SCRIPT_DIR/phi_background_completion_monitor.sh" ]; then
     log "Starting background completion monitor..."
     nohup bash "$SCRIPT_DIR/phi_background_completion_monitor.sh" > "$LOG_DIR/background_monitor.log" 2>&1 &
     echo $! > "$LOG_DIR/background_monitor.pid"
+    TRACKED_PIDFILES+=("$LOG_DIR/background_monitor.pid")
     success "Background completion monitor started"
 fi
 
@@ -253,6 +271,7 @@ if [ -f "$SCRIPT_DIR/phi_cost_minimization_simple.sh" ]; then
         log "Starting cost minimization engine..."
         nohup bash "$SCRIPT_DIR/phi_cost_minimization_simple.sh" > "$LOG_DIR/cost_minimization.log" 2>&1 &
         echo $! > "$LOG_DIR/cost_minimization.pid"
+        TRACKED_PIDFILES+=("$LOG_DIR/cost_minimization.pid")
         success "Cost minimization engine started"
     else
         success "Cost minimization engine already running"
@@ -270,7 +289,7 @@ echo -e "${BOLD}Active Services:${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 SERVICE_COUNT=0
-for pidfile in "$LOG_DIR"/*.pid; do
+for pidfile in "${TRACKED_PIDFILES[@]}"; do
     if [ -f "$pidfile" ]; then
         SERVICE_NAME=$(basename "$pidfile" .pid)
         PID=$(cat "$pidfile")

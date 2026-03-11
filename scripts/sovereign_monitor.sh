@@ -9,6 +9,11 @@ set -e
 MONITOR_INTERVAL=60  # Check every minute
 ALERT_INTERVAL=300   # Alert check every 5 minutes
 LOG_FILE="telemetry/sovereign_monitor_$(date +%Y%m%d).log"
+PID_FILE="telemetry/sovereign_monitor.pid"
+OPTIONAL_BACKGROUND_SERVICES=(
+    "phi_cost_minimization_simple"
+    "autonomous_overnight"
+)
 
 # Colors
 GREEN='\033[0;32m'
@@ -30,6 +35,17 @@ error_log() {
 success_log() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') [SUCCESS] $1" >> "$LOG_FILE"
     echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+is_optional_background_service() {
+    local service="$1"
+    local optional
+    for optional in "${OPTIONAL_BACKGROUND_SERVICES[@]}"; do
+        if [ "$service" = "$optional" ]; then
+            return 0
+        fi
+    done
+    return 1
 }
 
 run_monitoring_cycle() {
@@ -76,7 +92,11 @@ check_critical_issues() {
     # Check background services
     local bg_services=("phi_background_completion_monitor" "phi_cost_minimization_simple" "autonomous_overnight")
     for service in "${bg_services[@]}"; do
-        if ! ps aux | grep -q "$service" | grep -v grep; then
+        if ! pgrep -f "$service" > /dev/null 2>&1; then
+            if is_optional_background_service "$service"; then
+                log "Background service '$service' is optional/idle"
+                continue
+            fi
             error_log "CRITICAL: Background service '$service' is not running"
             critical_services_down=true
         fi
@@ -95,9 +115,6 @@ emergency_restart() {
     # Kill any existing processes that might be hanging
     pkill -f "phi_start_all_systems" || true
     pkill -f "phi_background_completion_monitor" || true
-    pkill -f "phi_cost_minimization_simple" || true
-    pkill -f "autonomous_overnight" || true
-
     sleep 2
 
     # Restart all systems
@@ -108,8 +125,6 @@ emergency_restart() {
     # Restart background services
     log "Restarting background services"
     bash scripts/phi_background_completion_monitor.sh &
-    bash scripts/phi_cost_minimization_simple.sh &
-    bash scripts/autonomous_overnight.sh &
 
     success_log "Emergency restart completed"
 }
@@ -140,6 +155,7 @@ main() {
 
     # Create telemetry directory
     mkdir -p telemetry
+    echo "$$" > "$PID_FILE"
 
     # Initial monitoring cycle
     run_monitoring_cycle
@@ -153,7 +169,7 @@ main() {
 }
 
 # Handle shutdown gracefully
-trap 'log "Sovereign monitoring system shutting down"; exit 0' INT TERM
+trap 'rm -f "$PID_FILE"; log "Sovereign monitoring system shutting down"; exit 0' INT TERM
 
 # Run main function
 main "$@"

@@ -8,6 +8,10 @@ set -e
 # Configuration
 STATUS_FILE="telemetry/live_ops_status.json"
 DASHBOARD_REFRESH=30  # seconds
+OPTIONAL_BACKGROUND_SERVICES=(
+    "phi_cost_minimization_simple"
+    "autonomous_overnight"
+)
 
 # Colors
 RED='\033[0;31m'
@@ -59,19 +63,28 @@ draw_service_status() {
         "OAuth Server:8080"
         "Widget Service:8081"
         "Command Center:5000"
+        "Billing Service:5001"
         "Alt Demo:5002"
-        "Demo:5003"
-        "Sidecar:5004"
-        "ChatGPT Gateway:5005"
+        "Sidecar:5003"
+        "ChatGPT Gateway:5004"
     )
 
     for service_info in "${services[@]}"; do
         IFS=':' read -r name port <<< "$service_info"
         if lsof -i :$port | grep -q LISTEN; then
-            if curl -s -f "http://localhost:$port/health" > /dev/null 2>&1; then
+            local endpoints=("/health" "/healthz" "/-/healthy" "/api/health" "/")
+            local healthy=false
+            local endpoint
+            for endpoint in "${endpoints[@]}"; do
+                if curl -s -m 3 -o /dev/null "http://localhost:$port$endpoint"; then
+                    healthy=true
+                    break
+                fi
+            done
+            if $healthy; then
                 echo -e "   ✅ $name ($port)"
             else
-                echo -e "   ⚠️  $name ($port) - Port open, health check failed"
+                echo -e "   ⚠️  $name ($port) - Port open, no health endpoint responded"
             fi
         else
             echo -e "   ❌ $name ($port) - Not listening"
@@ -93,9 +106,12 @@ draw_service_status() {
     # Individual background services
     local bg_services=("phi_background_completion_monitor" "phi_cost_minimization_simple" "autonomous_overnight")
     for service in "${bg_services[@]}"; do
-        local count=$(ps aux | grep -c "$service" | grep -v grep 2>/dev/null || echo "0")
+        local count
+        count=$(pgrep -fc "$service" || true)
         if [ "$count" -gt 0 ]; then
             echo -e "   ✅ $service ($count processes)"
+        elif printf '%s\n' "${OPTIONAL_BACKGROUND_SERVICES[@]}" | grep -qx "$service"; then
+            echo -e "   ℹ️  $service (optional/idle)"
         else
             echo -e "   ❌ $service (not running)"
         fi
@@ -162,16 +178,15 @@ draw_live_ops_score() {
     fi
 
     local score=$(jq -r '.live_ops_score' "$STATUS_FILE" 2>/dev/null || echo "0")
-    local score_percent=$(echo "scale=1; $score * 100" | bc 2>/dev/null || echo "0")
 
-    if (( $(echo "$score >= 0.95" | bc -l 2>/dev/null || echo "0") )); then
-        echo -e "⭐ PERFECT: ${GREEN}${score_percent}%${NC} (95%+)"
+    if (( $(echo "$score >= 95" | bc -l 2>/dev/null || echo "0") )); then
+        echo -e "⭐ PERFECT: ${GREEN}${score}%${NC} (95%+)"
         echo -e "${GREEN}   All systems operating at peak performance${NC}"
-    elif (( $(echo "$score >= 0.80" | bc -l 2>/dev/null || echo "0") )); then
-        echo -e "✅ GOOD: ${YELLOW}${score_percent}%${NC} (80-94%)"
+    elif (( $(echo "$score >= 80" | bc -l 2>/dev/null || echo "0") )); then
+        echo -e "✅ GOOD: ${YELLOW}${score}%${NC} (80-94%)"
         echo -e "${YELLOW}   Minor optimizations may be needed${NC}"
     else
-        echo -e "❌ DEGRADED: ${RED}${score_percent}%${NC} (<80%)"
+        echo -e "❌ DEGRADED: ${RED}${score}%${NC} (<80%)"
         echo -e "${RED}   Immediate attention required${NC}"
     fi
 

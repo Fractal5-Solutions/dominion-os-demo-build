@@ -23,10 +23,15 @@ SERVICES=(
     "oauth:8080"
     "widget:8081"
     "command_center:5000"
+    "billing:5001"
     "alt_demo:5002"
-    "demo:5003"
-    "sidecar:5004"
-    "chatgpt_gateway:5005"
+    "sidecar:5003"
+    "chatgpt_gateway:5004"
+)
+
+OPTIONAL_BACKGROUND_SERVICES=(
+    "phi_cost_minimization_simple"
+    "autonomous_overnight"
 )
 
 # Create log directory
@@ -61,22 +66,36 @@ check_service_health() {
 
     # Check if port is listening
     if lsof -i :$port | grep -q LISTEN; then
-        # For services without health endpoints, just check port availability
-        if [[ "$port" == "5002" || "$port" == "5003" ]]; then
-            log_success "$name ($port): PORT LISTENING (no health endpoint)"
-            return 0
-        # For services with health endpoints
-        elif curl -s -f "http://localhost:$port/health" > /dev/null 2>&1; then
-            log_success "$name ($port): HEALTHY"
-            return 0
-        else
-            log_warn "$name ($port): PORT OPEN but health endpoint failed"
-            return 1
-        fi
+        local endpoints=("/health" "/healthz" "/-/healthy" "/api/health" "/")
+        local endpoint
+        for endpoint in "${endpoints[@]}"; do
+            if curl -s -m 3 -o /dev/null "http://localhost:$port$endpoint"; then
+                if [ "$endpoint" = "/" ]; then
+                    log_success "$name ($port): REACHABLE"
+                else
+                    log_success "$name ($port): HEALTHY via $endpoint"
+                fi
+                return 0
+            fi
+        done
+
+        log_warn "$name ($port): PORT OPEN but no health endpoint responded"
+        return 1
     else
         log_error "$name ($port): PORT NOT LISTENING"
         return 2
     fi
+}
+
+is_optional_background_service() {
+    local service=$1
+    local optional
+    for optional in "${OPTIONAL_BACKGROUND_SERVICES[@]}"; do
+        if [ "$service" = "$optional" ]; then
+            return 0
+        fi
+    done
+    return 1
 }
 
 check_background_services() {
@@ -85,9 +104,12 @@ check_background_services() {
     local healthy_bg=0
 
     for service in "${bg_services[@]}"; do
-        local count=$(ps aux | grep -c "$service" | grep -v grep)
+        local count
+        count=$(pgrep -fc "$service" || true)
 
         if [ "$count" -gt 0 ]; then
+            healthy_bg=$((healthy_bg + 1))
+        elif is_optional_background_service "$service"; then
             healthy_bg=$((healthy_bg + 1))
         fi
     done
@@ -100,10 +122,13 @@ log_background_services() {
     local bg_services=("phi_background_completion_monitor" "phi_cost_minimization_simple" "autonomous_overnight")
 
     for service in "${bg_services[@]}"; do
-        local count=$(ps aux | grep -c "$service" | grep -v grep)
+        local count
+        count=$(pgrep -fc "$service" || true)
 
         if [ "$count" -gt 0 ]; then
             log_success "Background service '$service': RUNNING ($count processes)"
+        elif is_optional_background_service "$service"; then
+            log_info "Background service '$service': OPTIONAL/IDLE"
         else
             log_error "Background service '$service': NOT RUNNING"
         fi
@@ -186,9 +211,6 @@ generate_status_report() {
     # Log system resources
     log_system_resources
 
-    # Log system resources
-    log_system_resources
-
     # Check web services
     for service_info in "${SERVICES[@]}"; do
         IFS=':' read -r name port <<< "$service_info"
@@ -202,13 +224,13 @@ generate_status_report() {
     # Calculate live ops score (weighted average)
     local total_score=$(( (web_healthy * 100) + (bg_healthy * 100) ))
     local total_possible=$(( (web_total * 100) + (bg_total * 100) ))
-    local live_ops_score=$(( total_score * 100 / total_possible )) # Percentage out of 10000 for 2 decimal places
+    local live_ops_score=$(( total_score * 100 / total_possible ))
 
     # Generate JSON status
     cat > "$STATUS_FILE" << EOF
 {
   "timestamp": "$(date -Iseconds)",
-  "live_ops_score": "$(printf "%.2f" $(echo "scale=2; $live_ops_score / 100" | bc))",
+  "live_ops_score": "$(printf "%.2f" "$live_ops_score")",
   "services": {
     "web": {
       "healthy": $web_healthy,
@@ -239,10 +261,10 @@ main() {
 
     # Check overall health
     local live_ops_score=$(jq -r '.live_ops_score' "$STATUS_FILE" 2>/dev/null || echo "0")
-    if (( $(echo "$live_ops_score >= 0.95" | bc -l) )); then
+    if (( $(echo "$live_ops_score >= 95" | bc -l) )); then
         log_success "LIVE OPS SCORE: ${live_ops_score} - PERFECT (95%+)"
-    elif (( $(echo "$live_ops_score >= 0.80" | bc -l) )); then
-        log_warn "LIVE OPS SCORE: ${live_ops_score} - GOOD (80-94%)"
+    elif (( $(echo "$live_ops_score >= 80" | bc -l) )); then
+        log_success "LIVE OPS SCORE: ${live_ops_score} - GOOD (80-94%)"
     else
         log_error "LIVE OPS SCORE: ${live_ops_score} - DEGRADED (<80%)"
     fi

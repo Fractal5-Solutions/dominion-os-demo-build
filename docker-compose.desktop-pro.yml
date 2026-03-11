@@ -59,7 +59,6 @@ services:
       - ./scripts:/app/scripts:ro
       - phi-data:/app/data
       - phi-logs:/app/logs
-    <<: *resource-limits
     deploy:
       resources:
         limits:
@@ -77,7 +76,7 @@ services:
 
   # OAuth Server - Sovereign Authentication
   phi-oauth-server:
-    <<: *common-config
+    <<: [*common-config, *resource-limits]
     build:
       context: ./oauth_server
       dockerfile: Dockerfile
@@ -91,7 +90,6 @@ services:
     volumes:
       - ./oauth_server:/app:ro
       - oauth-data:/app/data
-    <<: *resource-limits
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
@@ -100,7 +98,7 @@ services:
 
   # AskPHI Widget - Sovereign Interface
   phi-askphi-widget:
-    <<: *common-config
+    <<: [*common-config, *resource-limits]
     build:
       context: ./widget_service
       dockerfile: Dockerfile
@@ -114,7 +112,6 @@ services:
     volumes:
       - ./widget_service:/app:ro
       - widget-data:/app/data
-    <<: *resource-limits
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s

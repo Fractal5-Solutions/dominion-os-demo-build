@@ -28,9 +28,9 @@ services:
   phi-database:
     image: postgres:15-alpine
     environment:
-      POSTGRES_DB: phi_dominion
-      POSTGRES_USER: phi_admin
-      POSTGRES_PASSWORD: sovereign_password
+      POSTGRES_DB: ${POSTGRES_DB:-phi_dominion}
+      POSTGRES_USER: ${POSTGRES_USER:-phi_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -60,7 +60,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      GF_SECURITY_ADMIN_PASSWORD: sovereign_admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
     volumes:
       - grafana_data:/var/lib/grafana
     restart: unless-stopped

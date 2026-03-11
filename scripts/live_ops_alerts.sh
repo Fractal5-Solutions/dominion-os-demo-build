@@ -9,6 +9,10 @@ set -e
 ALERT_LOG="telemetry/live_ops_alerts_$(date +%Y%m%d).log"
 STATUS_FILE="telemetry/live_ops_status.json"
 ALERT_COOLDOWN=300  # 5 minutes between similar alerts
+OPTIONAL_BACKGROUND_SERVICES=(
+    "phi_cost_minimization_simple"
+    "autonomous_overnight"
+)
 
 # Colors
 RED='\033[0;31m'
@@ -85,13 +89,24 @@ check_service_alerts() {
 check_live_ops_score() {
     local score=$(jq -r '.live_ops_score' "$STATUS_FILE" 2>/dev/null || echo "0")
 
-    if (( $(echo "$score < 0.80" | bc -l 2>/dev/null || echo "0") )); then
+    if (( $(echo "$score < 80" | bc -l 2>/dev/null || echo "0") )); then
         alert "CRITICAL" "Live Ops Score critical: ${score} (<80%)"
-    elif (( $(echo "$score < 0.95" | bc -l 2>/dev/null || echo "0") )); then
+    elif (( $(echo "$score < 95" | bc -l 2>/dev/null || echo "0") )); then
         alert "WARNING" "Live Ops Score degraded: ${score} (80-94%)"
     else
         alert "INFO" "Live Ops Score perfect: ${score} (95%+)"
     fi
+}
+
+is_optional_background_service() {
+    local service="$1"
+    local optional
+    for optional in "${OPTIONAL_BACKGROUND_SERVICES[@]}"; do
+        if [ "$service" = "$optional" ]; then
+            return 0
+        fi
+    done
+    return 1
 }
 
 auto_recovery_actions() {
@@ -99,7 +114,7 @@ auto_recovery_actions() {
     local recovery_needed=false
 
     # Check each service
-    for port in 8080 8081 5000 5002 5003 5004 5005; do
+    for port in 8080 8081 5000 5001 5002 5003 5004; do
         if ! lsof -i :$port | grep -q LISTEN; then
             alert "WARNING" "Service on port $port not responding, attempting restart"
             recovery_needed=true
@@ -118,7 +133,7 @@ auto_recovery_actions() {
                     # Command center restart
                     bash scripts/phi_start_all_systems.sh &
                     ;;
-                5002|5003|5004|5005)
+                5001|5002|5003|5004)
                     # Other services restart
                     bash scripts/phi_start_all_systems.sh &
                     ;;
@@ -129,7 +144,11 @@ auto_recovery_actions() {
     # Check background services
     local bg_services=("phi_background_completion_monitor" "phi_cost_minimization_simple" "autonomous_overnight")
     for service in "${bg_services[@]}"; do
-        if ! ps aux | grep -q "$service" | grep -v grep; then
+        if ! pgrep -f "$service" > /dev/null 2>&1; then
+            if is_optional_background_service "$service"; then
+                alert "INFO" "Background service '$service' is optional/idle"
+                continue
+            fi
             alert "WARNING" "Background service '$service' not running, restarting"
             recovery_needed=true
 
