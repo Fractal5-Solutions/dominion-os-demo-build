@@ -36,25 +36,25 @@ jobs:
           CRED_FILE="$RUNNER_TEMP/gcp-authorized-user.json"
           TOKEN_FILE="$RUNNER_TEMP/gcp-access-token.txt"
           printf '%s' "$GCP_AUTHORIZED_USER_JSON" > "$CRED_FILE"
-          python3 - <<'PY' "$CRED_FILE" "$TOKEN_FILE"
-import json
-import sys
-import urllib.parse
-import urllib.request
+          python3 - "$CRED_FILE" "$TOKEN_FILE" <<'PY'
+          import json
+          import sys
+          import urllib.parse
+          import urllib.request
 
-cred_path, token_path = sys.argv[1], sys.argv[2]
-cred = json.load(open(cred_path))
-payload = urllib.parse.urlencode({
-    "client_id": cred["client_id"],
-    "client_secret": cred["client_secret"],
-    "refresh_token": cred["refresh_token"],
-    "grant_type": "refresh_token",
-}).encode()
-request = urllib.request.Request("https://oauth2.googleapis.com/token", data=payload)
-with urllib.request.urlopen(request, timeout=30) as response:
-    token = json.load(response)["access_token"]
-open(token_path, "w", encoding="utf-8").write(token)
-PY
+          cred_path, token_path = sys.argv[1], sys.argv[2]
+          cred = json.load(open(cred_path))
+          payload = urllib.parse.urlencode({
+              "client_id": cred["client_id"],
+              "client_secret": cred["client_secret"],
+              "refresh_token": cred["refresh_token"],
+              "grant_type": "refresh_token",
+          }).encode()
+          request = urllib.request.Request("https://oauth2.googleapis.com/token", data=payload)
+          with urllib.request.urlopen(request, timeout=30) as response:
+              token = json.load(response)["access_token"]
+          open(token_path, "w", encoding="utf-8").write(token)
+          PY
           echo "token_file=$TOKEN_FILE" >> "$GITHUB_OUTPUT"
 
       - name: Configure Docker
