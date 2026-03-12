@@ -13,17 +13,44 @@ jobs:
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
 
-      - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093
-        with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-
       - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db
 
       - uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435
 
+      - name: Mint Google Access Token
+        id: gcp-token
+        env:
+          GCP_AUTHORIZED_USER_JSON: ${{ secrets.GCP_AUTHORIZED_USER_JSON }}
+        run: |
+          set -euo pipefail
+          CRED_FILE="$RUNNER_TEMP/gcp-authorized-user.json"
+          TOKEN_FILE="$RUNNER_TEMP/gcp-access-token.txt"
+          printf '%s' "$GCP_AUTHORIZED_USER_JSON" > "$CRED_FILE"
+          python3 - <<'PY' "$CRED_FILE" "$TOKEN_FILE"
+import json
+import sys
+import urllib.parse
+import urllib.request
+
+cred_path, token_path = sys.argv[1], sys.argv[2]
+cred = json.load(open(cred_path))
+payload = urllib.parse.urlencode({
+    "client_id": cred["client_id"],
+    "client_secret": cred["client_secret"],
+    "refresh_token": cred["refresh_token"],
+    "grant_type": "refresh_token",
+}).encode()
+request = urllib.request.Request("https://oauth2.googleapis.com/token", data=payload)
+with urllib.request.urlopen(request, timeout=30) as response:
+    token = json.load(response)["access_token"]
+open(token_path, "w", encoding="utf-8").write(token)
+PY
+          echo "token_file=$TOKEN_FILE" >> "$GITHUB_OUTPUT"
+
       - name: Configure Docker
-        run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+        run: |
+          set -euo pipefail
+          cat "${{ steps.gcp-token.outputs.token_file }}" | docker login -u oauth2accesstoken --password-stdin https://us-central1-docker.pkg.dev
 
       - name: Build and Push Command Core
         run: |
@@ -59,6 +86,8 @@ jobs:
           WIDGET_URL="$(gcloud run services describe phi-askphi-widget --project dominion-core-prod --region us-central1 --format='value(status.url)')"
           echo "oauth_url=${OAUTH_URL}" >> "$GITHUB_OUTPUT"
           echo "widget_url=${WIDGET_URL}" >> "$GITHUB_OUTPUT"
+        env:
+          CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ steps.gcp-token.outputs.token_file }}
 
       - name: Deploy Command Core
         run: |
@@ -71,6 +100,8 @@ jobs:
             --service-account dominion-runtime@dominion-core-prod.iam.gserviceaccount.com \
             --set-env-vars SERVICE_NAME=dominion-os-demo,OAUTH_SERVER_URL=${{ steps.urls.outputs.oauth_url }},ASKPHI_WIDGET_URL=${{ steps.urls.outputs.widget_url }} \
             --quiet
+        env:
+          CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ steps.gcp-token.outputs.token_file }}
 
       - name: Deploy OAuth Server
         run: |
@@ -86,6 +117,8 @@ jobs:
             --set-secrets GITHUB_CLIENT_ID=github-oauth-client-id:latest,GITHUB_CLIENT_SECRET=github-oauth-client-secret:latest \
             --set-env-vars JWT_SECRET=${JWT_SECRET},SESSION_SECRET=${SESSION_SECRET},OAUTH_BASE_URL=${{ steps.urls.outputs.oauth_url }},ASKPHI_WIDGET_URL=${{ steps.urls.outputs.widget_url }},AUTHORIZED_GITHUB_ORGS=Fractal5-Solutions,COOKIE_SECURE=1,ENV=production \
             --quiet
+        env:
+          CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ steps.gcp-token.outputs.token_file }}
 
       - name: Deploy AskPHI Widget
         run: |
@@ -97,6 +130,8 @@ jobs:
             --port 8080 \
             --service-account dominion-runtime@dominion-core-prod.iam.gserviceaccount.com \
             --quiet
+        env:
+          CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ steps.gcp-token.outputs.token_file }}
 
       - name: Verify Endpoints
         run: |
@@ -110,3 +145,5 @@ jobs:
           curl -fsS "${OAUTH_URL}/ready"
           curl -fsS "${WIDGET_URL}/health"
           curl -fsS "${WIDGET_URL}/ready"
+        env:
+          CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ steps.gcp-token.outputs.token_file }}
