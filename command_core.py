@@ -7,6 +7,7 @@ import json
 import os
 from datetime import datetime, timezone
 from pathlib import Path
+import re
 from urllib.parse import urlparse
 
 import requests
@@ -40,14 +41,14 @@ LOCAL_SERVICE_TARGETS = (
         "name": "PHI OAuth Server",
         "role": "auth-gateway",
         "url": os.getenv("OAUTH_SERVER_URL", "http://127.0.0.1:8080"),
-        "health_paths": ("/health",),
+        "health_paths": ("/ready", "/health"),
     },
     {
         "id": "phi-askphi-widget",
         "name": "AskPHI Widget",
         "role": "assistant-ui",
         "url": os.getenv("ASKPHI_WIDGET_URL", "http://127.0.0.1:8081"),
-        "health_paths": ("/health",),
+        "health_paths": ("/ready", "/health", "/"),
     },
 )
 
@@ -228,6 +229,14 @@ def read_json_file(path: Path, default):
         return default
     except json.JSONDecodeError:
         return default
+
+
+def is_safe_slug(value: str) -> bool:
+    if not value:
+        return False
+    if value.startswith(".") or ".." in value or "/" in value or "\\" in value:
+        return False
+    return re.fullmatch(r"[A-Za-z0-9._-]+", value) is not None
 
 
 def url_port(url: str) -> int | None:
@@ -474,8 +483,8 @@ def products_api():
 
 @app.route("/api/products/<slug>")
 def product_detail(slug: str):
-    # Sanitize slug to prevent path traversal
-    if not slug or not slug.replace('-', '').replace('_', '').isalnum():
+    # Accept repo slugs like dominion-os-1.0-gcloud while blocking traversal.
+    if not is_safe_slug(slug):
         abort(400)
     product_file = BASE_DIR / "products" / slug / "product.json"
     payload = read_json_file(product_file, None)

@@ -1,0 +1,123 @@
+name: Deploy Dominion Auth Surfaces
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Configure Docker
+        run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+
+      - name: Build and Push Command Core
+        run: |
+          docker buildx build \
+            --push \
+            --file Dockerfile.production \
+            --tag us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/dominion-os-demo:${GITHUB_SHA} \
+            --tag us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/dominion-os-demo:latest \
+            .
+
+      - name: Build and Push OAuth Server
+        run: |
+          docker buildx build \
+            --push \
+            --file oauth_server/Dockerfile \
+            --tag us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/phi-oauth-server:${GITHUB_SHA} \
+            --tag us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/phi-oauth-server:latest \
+            oauth_server
+
+      - name: Build and Push AskPHI Widget
+        run: |
+          docker buildx build \
+            --push \
+            --file widget_service/Dockerfile \
+            --tag us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/phi-askphi-widget:${GITHUB_SHA} \
+            --tag us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/phi-askphi-widget:latest \
+            widget_service
+
+      - name: Resolve Live Service URLs
+        id: urls
+        run: |
+          OAUTH_URL="$(gcloud run services describe phi-oauth-server --project dominion-core-prod --region us-central1 --format='value(status.url)')"
+          WIDGET_URL="$(gcloud run services describe phi-askphi-widget --project dominion-core-prod --region us-central1 --format='value(status.url)')"
+          echo "oauth_url=${OAUTH_URL}" >> "$GITHUB_OUTPUT"
+          echo "widget_url=${WIDGET_URL}" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy Command Core
+        run: |
+          gcloud run deploy dominion-os-demo \
+            --project dominion-core-prod \
+            --region us-central1 \
+            --image us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/dominion-os-demo:${GITHUB_SHA} \
+            --allow-unauthenticated \
+            --port 8080 \
+            --service-account dominion-runtime@dominion-core-prod.iam.gserviceaccount.com \
+            --set-env-vars SERVICE_NAME=dominion-os-demo,OAUTH_SERVER_URL=${{ steps.urls.outputs.oauth_url }},ASKPHI_WIDGET_URL=${{ steps.urls.outputs.widget_url }} \
+            --quiet
+
+      - name: Deploy OAuth Server
+        run: |
+          JWT_SECRET="$(openssl rand -hex 32)"
+          SESSION_SECRET="$(openssl rand -hex 32)"
+          gcloud run deploy phi-oauth-server \
+            --project dominion-core-prod \
+            --region us-central1 \
+            --image us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/phi-oauth-server:${GITHUB_SHA} \
+            --allow-unauthenticated \
+            --port 8080 \
+            --service-account dominion-runtime@dominion-core-prod.iam.gserviceaccount.com \
+            --set-secrets GITHUB_CLIENT_ID=github-oauth-client-id:latest,GITHUB_CLIENT_SECRET=github-oauth-client-secret:latest \
+            --set-env-vars JWT_SECRET=${JWT_SECRET},SESSION_SECRET=${SESSION_SECRET},OAUTH_BASE_URL=${{ steps.urls.outputs.oauth_url }},ASKPHI_WIDGET_URL=${{ steps.urls.outputs.widget_url }},AUTHORIZED_GITHUB_ORGS=Fractal5-Solutions,COOKIE_SECURE=1,ENV=production \
+            --quiet
+
+      - name: Deploy AskPHI Widget
+        run: |
+          gcloud run deploy phi-askphi-widget \
+            --project dominion-core-prod \
+            --region us-central1 \
+            --image us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/phi-askphi-widget:${GITHUB_SHA} \
+            --allow-unauthenticated \
+            --port 8080 \
+            --service-account dominion-runtime@dominion-core-prod.iam.gserviceaccount.com \
+            --quiet
+
+      - name: Verify Endpoints
+        run: |
+          set -euo pipefail
+          DOMINION_URL="$(gcloud run services describe dominion-os-demo --project dominion-core-prod --region us-central1 --format='value(status.url)')"
+          OAUTH_URL="$(gcloud run services describe phi-oauth-server --project dominion-core-prod --region us-central1 --format='value(status.url)')"
+          WIDGET_URL="$(gcloud run services describe phi-askphi-widget --project dominion-core-prod --region us-central1 --format='value(status.url)')"
+          curl -fsS "${DOMINION_URL}/health"
+          curl -fsS "${DOMINION_URL}/status"
+          curl -fsS "${OAUTH_URL}/health"
+          curl -fsS "${OAUTH_URL}/ready"
+          curl -fsS "${WIDGET_URL}/health"
+          curl -fsS "${WIDGET_URL}/ready"
+
+      - name: Summarize
+        run: |
+          {
+            echo "## Dominion Auth Surfaces Deployment"
+            echo ""
+            echo "- Branch: ${GITHUB_REF_NAME}"
+            echo "- Commit: ${GITHUB_SHA}"
+            echo "- Services: dominion-os-demo, phi-oauth-server, phi-askphi-widget"
+            echo "- Verification: passed"
+          } >> "$GITHUB_STEP_SUMMARY"

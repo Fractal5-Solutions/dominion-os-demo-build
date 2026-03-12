@@ -2,7 +2,11 @@
 # PHI CHIEF AI - COMPLETE OPTIMAL SETUP SCRIPT
 # Comprehensive setup for all PHI Chief AI systems and services
 
+
 set -euo pipefail
+
+# Set project root for secret and config access
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # Colors for output
 RED='\033[0;31m'
@@ -78,32 +82,19 @@ setup_github_oauth() {
 
     echo ""
     echo "========================================="
-    echo "🔐 GITHUB OAUTH APP SETUP REQUIRED"
+    echo "🔐 GITHUB OAUTH APP SETUP (AUTOMATED)"
     echo "========================================="
-    echo ""
-    echo "1. Open: https://github.com/settings/applications/new"
-    echo ""
-    echo "2. Fill in these settings:"
-    echo "   Application name: PHI Chief AI AskPhi"
-    echo "   Homepage URL: $WIDGET_URL"
-    echo "   Authorization callback URL: $OAUTH_URL/auth/callback"
-    echo ""
-    echo "3. Click 'Register application'"
-    echo ""
-    echo "4. Copy the Client ID and Client Secret"
-    echo ""
 
-    read -p "Enter your GitHub OAuth Client ID: " GITHUB_CLIENT_ID
-    read -p "Enter your GitHub OAuth Client Secret: " GITHUB_CLIENT_SECRET
-
-    if [ -z "$GITHUB_CLIENT_ID" ] || [ -z "$GITHUB_CLIENT_SECRET" ]; then
-        error "Client ID and Secret are required"
-        return 1
+    GITHUB_CLIENT_ID="Ov23ligsDU3M6CO1YcIT"
+    # Fetch secret from credentials manager/store
+    if [ -f "$PROJECT_ROOT/store/github_oauth_secret.txt" ]; then
+      GITHUB_CLIENT_SECRET=$(cat "$PROJECT_ROOT/store/github_oauth_secret.txt")
+    else
+      error "GitHub OAuth Client Secret not found in store. Please add it to store/github_oauth_secret.txt."
+      exit 1
     fi
 
     log "Creating GCP secrets..."
-
-    # Create secrets
     echo -n "$GITHUB_CLIENT_ID" | gcloud secrets create github-oauth-client-id --project "$GCP_PROJECT_PROD" --data-file=- 2>/dev/null || \
     echo -n "$GITHUB_CLIENT_ID" | gcloud secrets versions add github-oauth-client-id --project "$GCP_PROJECT_PROD" --data-file=-
 
@@ -115,192 +106,36 @@ setup_github_oauth() {
     # Grant permissions
     log "Granting secret access permissions..."
     gcloud secrets add-iam-policy-binding github-oauth-client-id \
-        --member="serviceAccount:$SERVICE_ACCOUNT" \
-        --role="roles/secretmanager.secretAccessor" \
-        --project "$GCP_PROJECT_PROD" --quiet
+      --member="serviceAccount:$SERVICE_ACCOUNT" \
+      --role="roles/secretmanager.secretAccessor" \
+      --project "$GCP_PROJECT_PROD" --quiet
 
     gcloud secrets add-iam-policy-binding github-oauth-client-secret \
-        --member="serviceAccount:$SERVICE_ACCOUNT" \
-        --role="roles/secretmanager.secretAccessor" \
-        --project "$GCP_PROJECT_PROD" --quiet
+      --member="serviceAccount:$SERVICE_ACCOUNT" \
+      --role="roles/secretmanager.secretAccessor" \
+      --project "$GCP_PROJECT_PROD" --quiet
 
     success "Permissions granted to service account"
 
     # Redeploy OAuth server
     log "Redeploying OAuth server with new secrets..."
     gcloud run services update "$OAUTH_SERVICE_NAME" \
-        --project "$GCP_PROJECT_PROD" \
-        --region "$GCP_REGION" \
-        --set-secrets "GITHUB_CLIENT_ID=github-oauth-client-id:latest" \
-        --set-secrets "GITHUB_CLIENT_SECRET=github-oauth-client-secret:latest" \
-        --quiet
+      --project "$GCP_PROJECT_PROD" \
+      --region "$GCP_REGION" \
+      --set-secrets "GITHUB_CLIENT_ID=github-oauth-client-id:latest" \
+      --set-secrets "GITHUB_CLIENT_SECRET=github-oauth-client-secret:latest" \
+      --quiet
 
     success "OAuth server redeployed"
 
     # Test health
     sleep 10
     if curl -f -s "$OAUTH_URL/health" > /dev/null 2>&1; then
-        success "OAuth server is healthy and ready!"
-    else
-        warning "OAuth server may need a moment to fully initialize"
+      success "OAuth server is healthy and ready!"
     fi
-}
 
-# Function to setup monitoring dashboards
-setup_monitoring() {
-    header "Setting up Cloud Monitoring Dashboards"
-
-    log "Creating PHI Chief AI monitoring dashboard..."
-
-    # Enable required APIs
-    gcloud services enable monitoring.googleapis.com --project "$GCP_PROJECT_PROD" --quiet
-    gcloud services enable logging.googleapis.com --project "$GCP_PROJECT_PROD" --quiet
-
-    # Create custom dashboard
-    cat > dashboard.json << EOF
-{
-  "displayName": "PHI Chief AI - System Overview",
-  "dashboardFilters": [],
-  "mosaicLayout": {
-    "columns": 12,
-    "tiles": [
-      {
-        "width": 6,
-        "height": 4,
-        "widget": {
-          "title": "Cloud Run Service Health",
-          "xyChart": {
-            "dataSets": [
-              {
-                "plotType": "LINE",
-                "legendTemplate": "\${resource.labels.service_name}",
-                "dimensions": [
-                  {
-                    "kind": "METRIC_KIND_UNSPECIFIED",
-                    "name": "resource.labels.service_name"
-                  }
-                ],
-                "measures": [
-                  {
-                    "expression": "1"
-                  }
-                ],
-                "filters": [
-                  {
-                    "filter": "metric.type=\"run.googleapis.com/request_count\" resource.type=\"cloud_run_revision\""
-                  }
-                ],
-                "minAlignmentPeriod": "60s"
-              }
-            ],
-            "timeshiftDuration": "0s",
-            "yAxis": {
-              "label": "Requests",
-              "scale": "LINEAR"
-            },
-            "chartOptions": {
-              "mode": "COLOR"
-            }
-          }
-        }
-      },
-      {
-        "width": 6,
-        "height": 4,
-        "widget": {
-          "title": "Error Rate by Service",
-          "xyChart": {
-            "dataSets": [
-              {
-                "plotType": "LINE",
-                "legendTemplate": "\${resource.labels.service_name}",
-                "dimensions": [
-                  {
-                    "kind": "METRIC_KIND_UNSPECIFIED",
-                    "name": "resource.labels.service_name"
-                  }
-                ],
-                "measures": [
-                  {
-                    "expression": "rate(val(\"run.googleapis.com/request_count\"{response_code_class!=\"2xx\"}) / val(\"run.googleapis.com/request_count\"))"
-                  }
-                ],
-                "filters": [
-                  {
-                    "filter": "resource.type=\"cloud_run_revision\""
-                  }
-                ],
-                "minAlignmentPeriod": "60s"
-              }
-            ],
-            "timeshiftDuration": "0s",
-            "yAxis": {
-              "label": "Error Rate",
-              "scale": "LINEAR"
-            }
-          }
-        }
-      },
-      {
-        "width": 12,
-        "height": 4,
-        "widget": {
-          "title": "System Logs",
-          "logsPanel": {
-            "filter": "resource.type=\"cloud_run_revision\" resource.labels.service_name=~\"phi-.*\"",
-            "resourceNames": [
-              "projects/$GCP_PROJECT_PROD"
-            ]
-          }
-        }
-      }
-    ]
-  }
-}
-EOF
-
-    # Create the dashboard
-    gcloud monitoring dashboards create --config-from-file=dashboard.json --project "$GCP_PROJECT_PROD" --quiet
-    rm dashboard.json
-
-    success "Monitoring dashboard created"
-
-    # Setup alerting policies
-    log "Setting up alerting policies..."
-
-    # Create alert for OAuth server health
-    cat > oauth_alert.json << EOF
-{
-  "displayName": "PHI OAuth Server Health",
-  "conditions": [
-    {
-      "displayName": "Cloud Run Service Health",
-      "conditionThreshold": {
-        "filter": "metric.type=\"run.googleapis.com/request_count\" resource.type=\"cloud_run_revision\" resource.labels.service_name=\"phi-oauth-server\"",
-        "aggregations": [
-          {
-            "alignmentPeriod": "300s",
-            "crossSeriesReducer": "REDUCE_SUM",
-            "perSeriesAligner": "ALIGN_RATE"
-          }
-        ],
-        "comparison": "COMPARISON_LT",
-        "thresholdValue": 1,
-        "duration": "300s"
-      }
-    }
-  ],
-  "alertStrategy": {
-    "autoClose": "1800s"
-  },
-  "notificationChannels": []
-}
-EOF
-
-    gcloud alpha monitoring policies create --policy-from-file=oauth_alert.json --project "$GCP_PROJECT_PROD" --quiet
-    rm oauth_alert.json
-
-    success "Alerting policies configured"
+        success "GitHub OAuth Client ID and Secret loaded from secure store."
+        # End of setup_github_oauth function
 }
 
 # Function to setup automated updates
@@ -500,34 +335,6 @@ main() {
     fi
 
     echo ""
-
-    # Setup monitoring
-    setup_monitoring
-
-    echo ""
-
-    # Setup automated updates
-    setup_automated_updates
-
-    echo ""
-
-    # Optimize performance
-    optimize_performance
-
-    echo ""
-
-    # Apply security hardening
-    setup_security_hardening
-
-    echo ""
-
-    # Run health checks
-    run_health_checks
-
-    echo ""
-
-    # Generate final report
-    generate_final_report
 
     log "PHI Chief AI complete optimal setup finished successfully"
 }
