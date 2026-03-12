@@ -38,35 +38,44 @@ jobs:
           echo "token_file=$TOKEN_FILE" >> "$GITHUB_OUTPUT"
 
       - name: Configure Docker
+        env:
+          DOCKER_USER: ${{ vars.DOCKER_USER }}
+          DOCKER_PAT: ${{ secrets.DOCKER_PAT }}
         run: |
           set -euo pipefail
-          cat "${{ steps.gcp-token.outputs.token_file }}" | docker login -u oauth2accesstoken --password-stdin https://us-central1-docker.pkg.dev
+          printf '%s' "$DOCKER_PAT" | docker login -u "$DOCKER_USER" --password-stdin
 
       - name: Build and Push Command Core
+        env:
+          DOCKER_USER: ${{ vars.DOCKER_USER }}
         run: |
           docker buildx build \
             --push \
             --file Dockerfile.production \
-            --tag us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/dominion-os-demo:${GITHUB_SHA} \
-            --tag us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/dominion-os-demo:latest \
+            --tag docker.io/${DOCKER_USER}/dominion-os-demo:${GITHUB_SHA} \
+            --tag docker.io/${DOCKER_USER}/dominion-os-demo:latest \
             .
 
       - name: Build and Push OAuth Server
+        env:
+          DOCKER_USER: ${{ vars.DOCKER_USER }}
         run: |
           docker buildx build \
             --push \
             --file oauth_server/Dockerfile \
-            --tag us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/phi-oauth-server:${GITHUB_SHA} \
-            --tag us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/phi-oauth-server:latest \
+            --tag docker.io/${DOCKER_USER}/phi-oauth-server:${GITHUB_SHA} \
+            --tag docker.io/${DOCKER_USER}/phi-oauth-server:latest \
             oauth_server
 
       - name: Build and Push AskPHI Widget
+        env:
+          DOCKER_USER: ${{ vars.DOCKER_USER }}
         run: |
           docker buildx build \
             --push \
             --file widget_service/Dockerfile \
-            --tag us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/phi-askphi-widget:${GITHUB_SHA} \
-            --tag us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/phi-askphi-widget:latest \
+            --tag docker.io/${DOCKER_USER}/phi-askphi-widget:${GITHUB_SHA} \
+            --tag docker.io/${DOCKER_USER}/phi-askphi-widget:latest \
             widget_service
 
       - name: Resolve Live Service URLs
@@ -86,7 +95,7 @@ jobs:
           gcloud run deploy dominion-os-demo \
             --project dominion-core-prod \
             --region us-central1 \
-            --image us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/dominion-os-demo:${GITHUB_SHA} \
+            --image docker.io/${{ vars.DOCKER_USER }}/dominion-os-demo:${GITHUB_SHA} \
             --allow-unauthenticated \
             --port 8080 \
             --service-account dominion-runtime@dominion-core-prod.iam.gserviceaccount.com \
@@ -102,7 +111,7 @@ jobs:
           gcloud run deploy phi-oauth-server \
             --project dominion-core-prod \
             --region us-central1 \
-            --image us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/phi-oauth-server:${GITHUB_SHA} \
+            --image docker.io/${{ vars.DOCKER_USER }}/phi-oauth-server:${GITHUB_SHA} \
             --allow-unauthenticated \
             --port 8080 \
             --service-account dominion-runtime@dominion-core-prod.iam.gserviceaccount.com \
@@ -117,7 +126,7 @@ jobs:
           gcloud run deploy phi-askphi-widget \
             --project dominion-core-prod \
             --region us-central1 \
-            --image us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/phi-askphi-widget:${GITHUB_SHA} \
+            --image docker.io/${{ vars.DOCKER_USER }}/phi-askphi-widget:${GITHUB_SHA} \
             --allow-unauthenticated \
             --port 8080 \
             --service-account dominion-runtime@dominion-core-prod.iam.gserviceaccount.com \
