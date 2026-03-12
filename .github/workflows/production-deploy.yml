@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Target environment'
+        description: Target environment
         required: true
         type: choice
         options:
@@ -15,148 +15,145 @@ on:
           - staging
 
 jobs:
-  test:
-    name: Run Tests
+  deploy:
     runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: 'pip'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Run pytest
-        run: |
-          pytest -v --tb=short --cov=. --cov-report=term-missing
-
-      - name: Run security scan
-        run: |
-          pip install bandit safety
-          bandit -r . -f json -o bandit-report.json || true
-          safety check --json || true
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: |
-            bandit-report.json
-            .coverage
-
-  build-and-deploy:
-    name: Build and Deploy to Google Cloud
-    runs-on: ubuntu-latest
-    needs: test
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-
     permissions:
       contents: read
-      id-token: write
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
 
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db
 
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+      - uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435
 
-      - name: Configure Docker for Artifact Registry
+      - name: Mint Google Access Token
+        id: gcp-token
+        env:
+          GCP_AUTHORIZED_USER_JSON: ${{ secrets.GCP_AUTHORIZED_USER_JSON }}
         run: |
-          gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev
+          set -euo pipefail
+          CRED_FILE="$RUNNER_TEMP/gcp-authorized-user.json"
+          TOKEN_FILE="$RUNNER_TEMP/gcp-access-token.txt"
+          printf '%s' "$GCP_AUTHORIZED_USER_JSON" > "$CRED_FILE"
+          python3 - <<'PY' "$CRED_FILE" "$TOKEN_FILE"
+import json
+import sys
+import urllib.parse
+import urllib.request
 
-      - name: Build Docker image
+cred_path, token_path = sys.argv[1], sys.argv[2]
+cred = json.load(open(cred_path))
+payload = urllib.parse.urlencode({
+    "client_id": cred["client_id"],
+    "client_secret": cred["client_secret"],
+    "refresh_token": cred["refresh_token"],
+    "grant_type": "refresh_token",
+}).encode()
+request = urllib.request.Request("https://oauth2.googleapis.com/token", data=payload)
+with urllib.request.urlopen(request, timeout=30) as response:
+    token = json.load(response)["access_token"]
+open(token_path, "w", encoding="utf-8").write(token)
+PY
+          echo "token_file=$TOKEN_FILE" >> "$GITHUB_OUTPUT"
+
+      - name: Configure Docker
         run: |
-          docker build -f Dockerfile.production \
-            -t ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dominion-artifacts/demo-build:${{ github.sha }} \
-            -t ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dominion-artifacts/demo-build:latest \
+          set -euo pipefail
+          cat "${{ steps.gcp-token.outputs.token_file }}" | docker login -u oauth2accesstoken --password-stdin https://us-central1-docker.pkg.dev
+
+      - name: Build and Push Command Core
+        run: |
+          docker buildx build \
+            --push \
+            --file Dockerfile.production \
+            --tag us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/dominion-os-demo:${GITHUB_SHA} \
+            --tag us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/dominion-os-demo:latest \
             .
 
-      - name: Push Docker image
+      - name: Build and Push OAuth Server
         run: |
-          docker push ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dominion-artifacts/demo-build:${{ github.sha }}
-          docker push ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dominion-artifacts/demo-build:latest
+          docker buildx build \
+            --push \
+            --file oauth_server/Dockerfile \
+            --tag us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/phi-oauth-server:${GITHUB_SHA} \
+            --tag us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/phi-oauth-server:latest \
+            oauth_server
 
-      - name: Deploy to Cloud Run
+      - name: Build and Push AskPHI Widget
         run: |
-          gcloud run deploy dominion-demo-service \
-            --image=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dominion-artifacts/demo-build:${{ github.sha }} \
-            --region=${{ secrets.GCP_REGION }} \
-            --platform=managed \
+          docker buildx build \
+            --push \
+            --file widget_service/Dockerfile \
+            --tag us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/phi-askphi-widget:${GITHUB_SHA} \
+            --tag us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/phi-askphi-widget:latest \
+            widget_service
+
+      - name: Resolve Live Service URLs
+        id: urls
+        env:
+          CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ steps.gcp-token.outputs.token_file }}
+        run: |
+          OAUTH_URL="$(gcloud run services describe phi-oauth-server --project dominion-core-prod --region us-central1 --format='value(status.url)')"
+          WIDGET_URL="$(gcloud run services describe phi-askphi-widget --project dominion-core-prod --region us-central1 --format='value(status.url)')"
+          echo "oauth_url=${OAUTH_URL}" >> "$GITHUB_OUTPUT"
+          echo "widget_url=${WIDGET_URL}" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy Command Core
+        env:
+          CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ steps.gcp-token.outputs.token_file }}
+        run: |
+          gcloud run deploy dominion-os-demo \
+            --project dominion-core-prod \
+            --region us-central1 \
+            --image us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/dominion-os-demo:${GITHUB_SHA} \
             --allow-unauthenticated \
-            --service-account=dominion-runtime@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com \
-            --memory=4Gi \
-            --cpu=2 \
-            --concurrency=250 \
-            --min-instances=1 \
-            --max-instances=100 \
-            --timeout=300s \
-            --set-env-vars="PROJECT_ID=${{ secrets.GCP_PROJECT_ID }},REGION=${{ secrets.GCP_REGION }},VERSION=${{ github.sha }}" \
+            --port 8080 \
+            --service-account dominion-runtime@dominion-core-prod.iam.gserviceaccount.com \
+            --set-env-vars SERVICE_NAME=dominion-os-demo,OAUTH_SERVER_URL=${{ steps.urls.outputs.oauth_url }},ASKPHI_WIDGET_URL=${{ steps.urls.outputs.widget_url }} \
             --quiet
 
-      - name: Run smoke tests
+      - name: Deploy OAuth Server
+        env:
+          CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ steps.gcp-token.outputs.token_file }}
         run: |
-          SERVICE_URL=$(gcloud run services describe dominion-demo-service \
-            --region=${{ secrets.GCP_REGION }} \
-            --format="value(status.url)")
+          JWT_SECRET="$(openssl rand -hex 32)"
+          SESSION_SECRET="$(openssl rand -hex 32)"
+          gcloud run deploy phi-oauth-server \
+            --project dominion-core-prod \
+            --region us-central1 \
+            --image us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/phi-oauth-server:${GITHUB_SHA} \
+            --allow-unauthenticated \
+            --port 8080 \
+            --service-account dominion-runtime@dominion-core-prod.iam.gserviceaccount.com \
+            --set-secrets GITHUB_CLIENT_ID=github-oauth-client-id:latest,GITHUB_CLIENT_SECRET=github-oauth-client-secret:latest \
+            --set-env-vars JWT_SECRET=${JWT_SECRET},SESSION_SECRET=${SESSION_SECRET},OAUTH_BASE_URL=${{ steps.urls.outputs.oauth_url }},ASKPHI_WIDGET_URL=${{ steps.urls.outputs.widget_url }},AUTHORIZED_GITHUB_ORGS=Fractal5-Solutions,COOKIE_SECURE=1,ENV=production \
+            --quiet
 
-          echo "Testing service at: $SERVICE_URL"
-
-          # Health check
-          if curl -sf "${SERVICE_URL}/health" -o /dev/null; then
-            echo "✅ Health check passed"
-          else
-            echo "❌ Health check failed"
-            exit 1
-          fi
-
-      - name: Deploy monitoring
+      - name: Deploy AskPHI Widget
+        env:
+          CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ steps.gcp-token.outputs.token_file }}
         run: |
-          # Create log-based metrics
-          gcloud logging metrics create dominion_demo_errors \
-            --description="Error rate for demo service" \
-            --log-filter='resource.type="cloud_run_revision" AND resource.labels.service_name="dominion-demo-service" AND severity>=ERROR' \
-            --quiet || echo "Metric already exists"
+          gcloud run deploy phi-askphi-widget \
+            --project dominion-core-prod \
+            --region us-central1 \
+            --image us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/phi-askphi-widget:${GITHUB_SHA} \
+            --allow-unauthenticated \
+            --port 8080 \
+            --service-account dominion-runtime@dominion-core-prod.iam.gserviceaccount.com \
+            --quiet
 
-      - name: Create deployment summary
+      - name: Verify Endpoints
+        env:
+          CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ steps.gcp-token.outputs.token_file }}
         run: |
-          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Project:** ${{ secrets.GCP_PROJECT_ID }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Region:** ${{ secrets.GCP_REGION }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Service:** dominion-demo-service" >> $GITHUB_STEP_SUMMARY
-          echo "- **Image Tag:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Status:** ✅ Deployed" >> $GITHUB_STEP_SUMMARY
-
-  notify:
-    name: Send Notifications
-    runs-on: ubuntu-latest
-    needs: build-and-deploy
-    if: always()
-
-    steps:
-      - name: Notify on success
-        if: needs.build-and-deploy.result == 'success'
-        run: |
-          echo "✅ Deployment successful!"
-          # Add Slack/Discord/Email notification here
-
-      - name: Notify on failure
-        if: needs.build-and-deploy.result == 'failure'
-        run: |
-          echo "❌ Deployment failed!"
-          # Add Slack/Discord/Email notification here
+          set -euo pipefail
+          DOMINION_URL="$(gcloud run services describe dominion-os-demo --project dominion-core-prod --region us-central1 --format='value(status.url)')"
+          OAUTH_URL="$(gcloud run services describe phi-oauth-server --project dominion-core-prod --region us-central1 --format='value(status.url)')"
+          WIDGET_URL="$(gcloud run services describe phi-askphi-widget --project dominion-core-prod --region us-central1 --format='value(status.url)')"
+          curl -fsS "${DOMINION_URL}/health"
+          curl -fsS "${DOMINION_URL}/status"
+          curl -fsS "${OAUTH_URL}/health"
+          curl -fsS "${OAUTH_URL}/ready"
+          curl -fsS "${WIDGET_URL}/health"
+          curl -fsS "${WIDGET_URL}/ready"
