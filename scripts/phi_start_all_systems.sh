@@ -222,17 +222,17 @@ if [ -f "/workspaces/dominion-command-center/chatgpt-gateway/main.py" ]; then
 fi
 
 # ═══════════════════════════════════════════════════════════════════
-# PHASE 4: LEGACY SYSTEMS
+# PHASE 4: LEGACY SYSTEMS (DISABLED)
 # ═══════════════════════════════════════════════════════════════════
-section "PHASE 4: LEGACY SYSTEMS"
+# section "PHASE 4: LEGACY SYSTEMS"
 
 # Politics Local (Legacy)
-if [ -f "/workspaces/dominion-os-1.0-politics.local-20260305/app.py" ]; then
-    start_service "Politics-Local-Legacy" \
-                  "/workspaces/dominion-os-1.0-politics.local-20260305/app.py" \
-                  "python3 app.py" \
-                  "5005"
-fi
+# if [ -f "/workspaces/dominion-os-1.0-politics.local-20260305/app.py" ]; then
+#     start_service "Politics-Local-Legacy" \
+#                   "/workspaces/dominion-os-1.0-politics.local-20260305/app.py" \
+#                   "python3 app.py" \
+#                   "5005"
+# fi
 
 # ═══════════════════════════════════════════════════════════════════
 # PHASE 5: MONITORING & BACKGROUND SERVICES
