@@ -42,3 +42,8 @@ temp/
 docker-volumes/
 *.pid
 scripts/telemetry/*.json
+
+# Large backup archives (too big for GitHub)
+backups/**/*.tar.gz
+backups/**/*.zip
+*.tar.gz
