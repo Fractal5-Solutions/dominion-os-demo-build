@@ -1,0 +1,49 @@
+# Environment files with secrets
+.env.mcp
+.env
+*.env.local
+
+# Python virtual environments
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+scripts/logs/*.log
+scripts/logs/*.pid
+scripts/telemetry/*.log
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+.tmp/
+temp/
+
+# Docker volumes (local data)
+docker-volumes/
+*.pid
+scripts/telemetry/*.json
+
+# Large backup archives (too big for GitHub)
+backups/**/*.tar.gz
+backups/**/*.zip
+*.tar.gz
