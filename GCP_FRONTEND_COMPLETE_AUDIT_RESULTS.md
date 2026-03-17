@@ -22,7 +22,7 @@
 ## ✅ COMPLIANT SERVICES (6)
 
 ### 1. **phi-oauth-server** ✅
-- **URL**: https://phi-oauth-server-829831815576.us-central1.run.app
+- **URL**: https://phi-oauth-server-reduwyf2ra-uc.a.run.app
 - **Status**: CANON Φ V1.0 COMPLIANT
 - **Colors Used**:
   - Background gradient: `#000000` → `#797979` (black metallic → gunmetal) ✅
@@ -63,7 +63,7 @@
 ## 🟡 PARTIAL COMPLIANCE / NON-COMPLIANT SERVICES (3)
 
 ### 4. **dominion-phi-ui** 🟡
-- **URL**: https://dominion-phi-ui-829831815576.us-central1.run.app
+- **URL**: https://dominion-phi-ui-reduwyf2ra-uc.a.run.app
 - **Status**: PARTIAL COMPLIANCE - Bootstrap-like colors + custom blues
 - **CSS File**: `/static/css/phi_interface.css`
 
@@ -112,7 +112,7 @@
 ```
 
 ### 5. **dominion-monitoring-dashboard** 🟡
-- **URL**: https://dominion-monitoring-dashboard-829831815576.us-central1.run.app
+- **URL**: https://dominion-monitoring-dashboard-reduwyf2ra-uc.a.run.app
 - **Status**: NON-COMPLIANT - Uses semantic status colors
 - **Colors Found**:
   - `#ddd` - Border color (should be `#d9d9d9`)
@@ -136,7 +136,7 @@ For monitoring dashboards, consider one of these approaches:
 Keep current colors but acknowledge as exception for operational dashboards
 
 ### 6. **askphi-chatbot** 🟡
-- **URL**: https://askphi-chatbot-829831815576.us-central1.run.app
+- **URL**: https://askphi-chatbot-reduwyf2ra-uc.a.run.app
 - **Status**: NEEDS AUDIT
 - **Note**: Chat interface likely has UI components requiring color audit
 - **Action Required**: Fetch and audit HTML/CSS
@@ -409,13 +409,13 @@ gcloud run services list --format="value(status.url)" | ForEach-Object {
 ### Manual Verification Commands
 ```bash
 # Check oauth server colors
-curl -sL https://phi-oauth-server-829831815576.us-central1.run.app | grep -E "#000000|#797979"
+curl -sL https://phi-oauth-server-reduwyf2ra-uc.a.run.app | grep -E "#000000|#797979"
 
 # Audit phi-ui CSS
-curl -sL https://dominion-phi-ui-829831815576.us-central1.run.app/static/css/phi_interface.css | grep -E "^    --"
+curl -sL https://dominion-phi-ui-reduwyf2ra-uc.a.run.app/static/css/phi_interface.css | grep -E "^    --"
 
 # Check monitoring dashboard colors
-curl -sL https://dominion-monitoring-dashboard-829831815576.us-central1.run.app | grep -oE "#[0-9a-fA-F]{6}" | sort -u
+curl -sL https://dominion-monitoring-dashboard-reduwyf2ra-uc.a.run.app | grep -oE "#[0-9a-fA-F]{6}" | sort -u
 
 # List all live services
 gcloud run services list --project dominion-os-1-0-main --format="table(name,status.url)"
@@ -424,8 +424,8 @@ gcloud run services list --project dominion-os-1-0-main --format="table(name,sta
 ### Visual Regression Testing
 ```bash
 # Take screenshots of all UI services for before/after comparison
-npx playwright screenshot https://phi-oauth-server-829831815576.us-central1.run.app oauth-after.png
-npx playwright screenshot https://dominion-phi-ui-829831815576.us-central1.run.app phi-ui-before.png
+npx playwright screenshot https://phi-oauth-server-reduwyf2ra-uc.a.run.app oauth-after.png
+npx playwright screenshot https://dominion-phi-ui-reduwyf2ra-uc.a.run.app phi-ui-before.png
 ```
 
 ---

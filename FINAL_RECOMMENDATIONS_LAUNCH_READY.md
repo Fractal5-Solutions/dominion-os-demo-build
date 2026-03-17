@@ -257,7 +257,7 @@ pip install locust
 
 # Run load test
 locust -f tests/load_test.py \
-  --host=https://dominion-os-demo-829831815576.us-central1.run.app \
+  --host=https://dominion-os-demo-reduwyf2ra-uc.a.run.app \
   --users=100 \
   --spawn-rate=10
 ```
@@ -365,9 +365,9 @@ gcloud monitoring dashboards create --config-from-file=monitoring/operations-das
 gcloud run services list --platform=managed --region=us-central1
 
 # Test critical endpoints
-curl https://dominion-os-demo-829831815576.us-central1.run.app/health
-curl https://phi-askphi-widget-829831815576.us-central1.run.app/health
-curl https://phi-oauth-server-829831815576.us-central1.run.app/health
+curl https://dominion-os-demo-reduwyf2ra-uc.a.run.app/health
+curl https://phi-askphi-widget-reduwyf2ra-uc.a.run.app/health
+curl https://phi-oauth-server-reduwyf2ra-uc.a.run.app/health
 ```
 
 ### Deployment

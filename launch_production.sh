@@ -11,7 +11,7 @@ echo "╚═══════════════════════�
 echo ""
 
 # Configuration
-PROJECT_ID="dominion-os-1-0-main"
+PROJECT_ID="dominion-core-prod"
 REGION="us-central1"
 CRITICAL_SERVICES=("dominion-os-demo" "phi-askphi-widget" "phi-oauth-server")
 
@@ -45,9 +45,9 @@ echo "⏳ [3/7] Testing health endpoints..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 ENDPOINTS=(
-    "https://dominion-os-demo-829831815576.us-central1.run.app/health"
-    "https://phi-askphi-widget-829831815576.us-central1.run.app/health"
-    "https://phi-oauth-server-829831815576.us-central1.run.app/health"
+    "https://dominion-demo-t3z5qlcd3q-uc.a.run.app/health"
+    "https://phi-askphi-widget-reduwyf2ra-uc.a.run.app/health"
+    "https://phi-oauth-server-reduwyf2ra-uc.a.run.app/"
 )
 
 for endpoint in "${ENDPOINTS[@]}"; do
@@ -141,4 +141,3 @@ echo "📞 Support: Check logs with 'gcloud run services logs read SERVICE_NAME'
 echo "🔄 Rollback: Use './scripts/emergency_rollback.sh SERVICE_NAME REVISION'"
 echo ""
 echo "Launch completed at: $(date)"
-

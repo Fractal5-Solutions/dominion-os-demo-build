@@ -8,15 +8,15 @@
 
 #### Deployed Services:
 - ✅ **dominion-crm** - CRM Service with Apollo integration
-  - URL: https://dominion-crm-829831815576.us-central1.run.app
+  - URL: https://dominion-crm-reduwyf2ra-uc.a.run.app
   - Status: HTTP 200 ✓
   
 - ✅ **dominion-bims** - Business Information Management System  
-  - URL: https://dominion-bims-829831815576.us-central1.run.app
+  - URL: https://dominion-bims-reduwyf2ra-uc.a.run.app
   - Status: HTTP 200 ✓
   
 - ✅ **dominion-relationships** - Unified Relationships API
-  - URL: https://dominion-relationships-829831815576.us-central1.run.app
+  - URL: https://dominion-relationships-reduwyf2ra-uc.a.run.app
   - Status: HTTP 200 ✓
   
 - ✅ **phi-oauth-server** - Fixed (routed to healthy revision 00023-lqh)
