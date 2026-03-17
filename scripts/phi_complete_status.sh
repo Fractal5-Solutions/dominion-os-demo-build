@@ -1,6 +1,11 @@
 #!/bin/bash
 # PHI Complete System Status - March 7, 2026
 
+DOCKER_CONTROL_AVAILABLE=false
+if command -v systemctl > /dev/null 2>&1 || command -v service > /dev/null 2>&1; then
+    DOCKER_CONTROL_AVAILABLE=true
+fi
+
 echo "════════════════════════════════════════════════════════════"
 echo "  PHI COMPLETE SYSTEM STATUS & LIVE OPS VERIFICATION"
 echo "════════════════════════════════════════════════════════════"
@@ -28,7 +33,11 @@ if docker info > /dev/null 2>&1; then
     echo "✓ Docker Daemon: RUNNING"
     docker ps --format "{{.Names}} - {{.Status}}" | sed 's/^/  /' || echo "  No containers"
 else
-    echo "⚠ Docker Daemon: NOT RUNNING (normal in Codespaces)"
+    if $DOCKER_CONTROL_AVAILABLE; then
+        echo "⚠ Docker Daemon: NOT RUNNING"
+    else
+        echo "ℹ Docker Daemon: N/A in this runtime (informational only)"
+    fi
 fi
 echo ""
 

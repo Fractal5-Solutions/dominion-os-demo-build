@@ -40,7 +40,7 @@
         "https://www.googleapis.com/auth/drive.file",
         "https://www.googleapis.com/auth/drive.metadata"
       ],
-      "sync_schedule": "*/10 * * * *",
+      "sync_schedule": "*/5 * * * *",
       "features": {
         "file_sync": true,
         "version_control": true,
@@ -72,7 +72,7 @@
         "https://www.googleapis.com/auth/documents",
         "https://www.googleapis.com/auth/drive"
       ],
-      "sync_schedule": "*/15 * * * *",
+      "sync_schedule": "*/5 * * * *",
       "features": {
         "document_creation": true,
         "collaborative_editing": true,
@@ -92,7 +92,7 @@
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive"
       ],
-      "sync_schedule": "*/15 * * * *",
+      "sync_schedule": "*/5 * * * *",
       "features": {
         "spreadsheet_processing": true,
         "data_analysis": true,
@@ -131,7 +131,7 @@
       "api_scopes": [
         "https://www.googleapis.com/auth/meetings.space.created"
       ],
-      "sync_schedule": "*/30 * * * *",
+      "sync_schedule": "*/5 * * * *",
       "features": {
         "meeting_creation": true,
         "recording_management": true,
@@ -149,7 +149,7 @@
       "api_scopes": [
         "https://www.googleapis.com/auth/chat.bot"
       ],
-      "sync_schedule": "*/2 * * * *",
+      "sync_schedule": "*/5 * * * *",
       "features": {
         "message_processing": true,
         "bot_integration": true,
@@ -168,7 +168,7 @@
         "https://www.googleapis.com/auth/forms",
         "https://www.googleapis.com/auth/drive"
       ],
-      "sync_schedule": "0 */2 * * *",
+      "sync_schedule": "*/5 * * * *",
       "features": {
         "form_creation": true,
         "response_collection": true,
@@ -187,7 +187,7 @@
         "https://www.googleapis.com/auth/sites",
         "https://www.googleapis.com/auth/drive"
       ],
-      "sync_schedule": "0 */4 * * *",
+      "sync_schedule": "*/5 * * * *",
       "features": {
         "site_creation": true,
         "content_management": true,
@@ -205,7 +205,7 @@
       "api_scopes": [
         "https://www.googleapis.com/auth/keep"
       ],
-      "sync_schedule": "*/10 * * * *",
+      "sync_schedule": "*/5 * * * *",
       "features": {
         "note_management": true,
         "reminder_system": true,
@@ -224,7 +224,7 @@
         "https://www.googleapis.com/auth/photoslibrary",
         "https://www.googleapis.com/auth/photoslibrary.sharing"
       ],
-      "sync_schedule": "0 */6 * * *",
+      "sync_schedule": "*/5 * * * *",
       "features": {
         "photo_upload": true,
         "album_management": true,
@@ -261,7 +261,7 @@
         "https://www.googleapis.com/auth/contacts",
         "https://www.googleapis.com/auth/contacts.readonly"
       ],
-      "sync_schedule": "*/15 * * * *",
+      "sync_schedule": "*/5 * * * *",
       "features": {
         "contact_sync": true,
         "group_management": true,

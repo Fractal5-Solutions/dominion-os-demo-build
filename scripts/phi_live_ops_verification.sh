@@ -6,7 +6,7 @@
 # Purpose: Verify all live operations systems and Docker configuration
 # ═══════════════════════════════════════════════════════════════════
 
-set -e
+set -uo pipefail
 
 # Colors
 RED='\033[0;31m'
@@ -17,6 +17,20 @@ CYAN='\033[0;36m'
 MAGENTA='\033[0;35m'
 BOLD='\033[1m'
 NC='\033[0m'
+
+DOCKER_DAEMON_AVAILABLE=false
+DOCKER_CONTROL_AVAILABLE=false
+DOCKER_POINTS_AVAILABLE=20
+
+if command -v systemctl > /dev/null 2>&1 || command -v service > /dev/null 2>&1; then
+    DOCKER_CONTROL_AVAILABLE=true
+fi
+
+if docker info > /dev/null 2>&1; then
+    DOCKER_DAEMON_AVAILABLE=true
+elif ! $DOCKER_CONTROL_AVAILABLE; then
+    DOCKER_POINTS_AVAILABLE=0
+fi
 
 echo -e "${MAGENTA}╔═══════════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${MAGENTA}║        PHI LIVE OPS VERIFICATION & SYSTEM STATUS                  ║${NC}"
@@ -81,14 +95,14 @@ check_service() {
     fi
 }
 
-check_service 5000 "Command Center Demo (BIMS)" "http://localhost:5000"
-check_service 5001 "Billing Service" "http://localhost:5001"
-check_service 8080 "OAuth Server" "http://localhost:8080"
-check_service 8081 "AskPHI Widget Service" "http://localhost:8081"
+check_service 5000 "Command Center Demo (BIMS)" "http://localhost:5000" || true
+check_service 5001 "Billing Service" "http://localhost:5001" || true
+check_service 8080 "OAuth Server" "http://localhost:8080" || true
+check_service 8081 "AskPHI Widget Service" "http://localhost:8081" || true
 
 # Check for alternative services
 if lsof -ti:5002 > /dev/null 2>&1; then
-    check_service 5002 "Alternative Demo" "http://localhost:5002"
+    check_service 5002 "Alternative Demo" "http://localhost:5002" || true
 else
     SERVICES_TOTAL=4  # Adjust total if alt demo not required
 fi
@@ -108,7 +122,7 @@ echo -e "${CYAN}Docker CLI:${NC} $DOCKER_VERSION"
 echo -e "${CYAN}Docker Compose:${NC} $DOCKER_COMPOSE_VERSION"
 echo ""
 
-if docker info > /dev/null 2>&1; then
+if $DOCKER_DAEMON_AVAILABLE; then
     echo -e "${GREEN}✓${NC} Docker Daemon: RUNNING"
     echo ""
     echo -e "${CYAN}Docker Configuration:${NC}"
@@ -123,7 +137,12 @@ if docker info > /dev/null 2>&1; then
         echo -e "  ${YELLOW}No containers running${NC}"
     fi
 else
-    echo -e "${YELLOW}⚠${NC}  Docker Daemon: NOT RUNNING"
+    if ! $DOCKER_CONTROL_AVAILABLE; then
+        echo -e "${CYAN}i${NC}  Docker Daemon: N/A in this runtime"
+        echo -e "${CYAN}  Docker checks are informational only${NC}"
+    else
+        echo -e "${YELLOW}⚠${NC}  Docker Daemon: NOT RUNNING"
+    fi
     echo ""
     echo -e "${CYAN}Docker Desktop Pro Optimal Configuration:${NC}"
     echo -e "  ${BLUE}Recommended Settings:${NC}"
@@ -167,12 +186,17 @@ echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━�
 echo -e "${CYAN}NETWORK CONNECTIVITY${NC}"
 echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
+CONNECTIVITY_UP=0
+CONNECTIVITY_TOTAL=4
+
 check_endpoint() {
     local url=$1
     local name=$2
     
-    if curl -s -f -m 2 "$url" > /dev/null 2>&1; then
+    # Treat any HTTP response as reachable; this catches services without /health endpoints.
+    if curl -s -m 2 -o /dev/null "$url"; then
         echo -e "${GREEN}✓${NC} $name: $url"
+        CONNECTIVITY_UP=$((CONNECTIVITY_UP + 1))
         return 0
     else
         echo -e "${RED}✗${NC} $name: $url ${YELLOW}(not reachable)${NC}"
@@ -203,7 +227,7 @@ echo -e "${CYAN}TELEMETRY & MONITORING${NC}"
 echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TELEMETRY_DIR="$SCRIPT_DIR/../telemetry"
+TELEMETRY_DIR="$SCRIPT_DIR/telemetry"
 
 if [ -d "$TELEMETRY_DIR" ]; then
     echo -e "${GREEN}✓${NC} Telemetry directory exists"
@@ -228,6 +252,7 @@ echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━�
 
 SCORE=0
 MAX_SCORE=100
+APPLICABLE_MAX_SCORE=$((MAX_SCORE - 20 + DOCKER_POINTS_AVAILABLE))
 
 # Services (40 points - 10 each for primary services)
 SERVICE_POINTS=$((SERVICES_UP * 10))
@@ -245,23 +270,32 @@ else
 fi
 
 # Docker (20 points)
-if docker info > /dev/null 2>&1; then
+if $DOCKER_DAEMON_AVAILABLE; then
     SCORE=$((SCORE + 20))
 fi
 
 # Connectivity (10 points)
-CONNECTIVITY=$((SERVICES_UP * 2))
-[ $CONNECTIVITY -gt 10 ] && CONNECTIVITY=10
+CONNECTIVITY=$((CONNECTIVITY_UP * 10 / CONNECTIVITY_TOTAL))
 SCORE=$((SCORE + CONNECTIVITY))
 
-echo -e "${CYAN}Overall Score:${NC} ${BOLD}${SCORE}/100${NC}"
+echo -e "${CYAN}Overall Score:${NC} ${BOLD}${SCORE}/${MAX_SCORE}${NC}"
+if [ "$APPLICABLE_MAX_SCORE" -lt "$MAX_SCORE" ]; then
+    NORMALIZED_SCORE=$((SCORE * MAX_SCORE / APPLICABLE_MAX_SCORE))
+    echo -e "${CYAN}Applicable Score:${NC} ${BOLD}${SCORE}/${APPLICABLE_MAX_SCORE}${NC} ${YELLOW}(Docker excluded in this runtime)${NC}"
+    echo -e "${CYAN}Normalized Score:${NC} ${BOLD}${NORMALIZED_SCORE}/${MAX_SCORE}${NC}"
+fi
 echo ""
 
-if [ $SCORE -ge 90 ]; then
+ASSESSMENT_SCORE=$SCORE
+if [ "$APPLICABLE_MAX_SCORE" -lt "$MAX_SCORE" ]; then
+    ASSESSMENT_SCORE=$((SCORE * MAX_SCORE / APPLICABLE_MAX_SCORE))
+fi
+
+if [ $ASSESSMENT_SCORE -ge 90 ]; then
     echo -e "${GREEN}✅ EXCELLENT${NC} - All systems optimal"
-elif [ $SCORE -ge 70 ]; then
+elif [ $ASSESSMENT_SCORE -ge 70 ]; then
     echo -e "${GREEN}✓ GOOD${NC} - Core systems operational"
-elif [ $SCORE -ge 50 ]; then
+elif [ $ASSESSMENT_SCORE -ge 50 ]; then
     echo -e "${YELLOW}⚠ FAIR${NC} - Some systems need attention"
 else
     echo -e "${RED}✗ ATTENTION NEEDED${NC} - Critical systems offline"
@@ -271,8 +305,10 @@ echo ""
 echo -e "${BOLD}Breakdown:${NC}"
 echo -e "  ├─ Services: ${SERVICE_POINTS}/40"
 echo -e "  ├─ Resources: ${MEM_PERCENT}% memory available"
-if docker info > /dev/null 2>&1; then
+if $DOCKER_DAEMON_AVAILABLE; then
     echo -e "  ├─ Docker: 20/20"
+elif [ "$DOCKER_POINTS_AVAILABLE" -eq 0 ]; then
+    echo -e "  ├─ Docker: N/A ${YELLOW}(informational only in this runtime)${NC}"
 else
     echo -e "  ├─ Docker: 0/20 ${YELLOW}(daemon not running)${NC}"
 fi

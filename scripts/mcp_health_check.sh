@@ -19,6 +19,11 @@ echo ""
 
 # Check if Docker is running
 if ! docker info > /dev/null 2>&1; then
+    if ! command -v systemctl > /dev/null 2>&1 && ! command -v service > /dev/null 2>&1; then
+        echo -e "${YELLOW}⚠️  Docker daemon unavailable and no local service manager detected${NC}"
+        echo -e "${YELLOW}⏭️  Skipping MCP Docker health checks in this environment${NC}"
+        exit 0
+    fi
     echo -e "${RED}❌ Docker daemon is not running${NC}"
     exit 1
 fi
