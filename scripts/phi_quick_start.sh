@@ -39,35 +39,35 @@ start_python_service() {
     local app_path=$2
     local port=$3
     local work_dir=$(dirname "$app_path")
-    
+
     echo -n -e "${BLUE}Starting $name on port $port...${NC} "
-    
+
     if check_port $port; then
         echo -e "${GREEN}Already running${NC}"
         return 0
     fi
-    
+
     if [ ! -f "$app_path" ]; then
         echo -e "${YELLOW}Not found - skipped${NC}"
         return 1
     fi
-    
+
     cd "$work_dir"
     export FLASK_APP=app.py
     export FLASK_ENV=development
     export PORT=$port
-    
+
     # Activate virtual environment if available
     if [ -f "$SCRIPT_DIR/.venv/bin/activate" ]; then
         source "$SCRIPT_DIR/.venv/bin/activate"
     fi
-    
+
     nohup python3 app.py > "$LOG_DIR/$(basename $name).log" 2>&1 &
     local pid=$!
     echo $pid > "$LOG_DIR/$(basename $name).pid"
-    
+
     sleep 2
-    
+
     if ps -p $pid > /dev/null 2>&1; then
         if check_port $port; then
             echo -e "${GREEN}✓ Started (PID: $pid)${NC}"
@@ -83,25 +83,25 @@ start_python_service() {
 start_background_script() {
     local name=$1
     local script=$2
-    
+
     echo -n -e "${BLUE}Starting $name...${NC} "
-    
+
     if pgrep -f "$script" > /dev/null; then
         echo -e "${GREEN}Already running${NC}"
         return 0
     fi
-    
+
     if [ ! -f "$script" ]; then
         echo -e "${YELLOW}Not found - skipped${NC}"
         return 1
     fi
-    
+
     nohup bash "$script" > "$LOG_DIR/$(basename $script .sh).log" 2>&1 &
     local pid=$!
     echo $pid > "$LOG_DIR/$(basename $script .sh).pid"
-    
+
     sleep 1
-    
+
     if ps -p $pid > /dev/null 2>&1; then
         echo -e "${GREEN}✓ Started (PID: $pid)${NC}"
     else
@@ -114,22 +114,22 @@ echo -e "${CYAN}━━━ CORE SERVICES ━━━${NC}"
 
 # Start Command Center Demo (Financial BIMS)
 start_python_service "Command-Center-Demo" \
-                     "/workspaces/dominion-command-center/demo/app.py" \
+                     "D:/phi-ops/live_ops/command-center/demo/app.py" \
                      "5000"
 
 # Start Billing Service
 start_python_service "Billing-Service" \
-                     "/workspaces/dominion-command-center/billing-service/app.py" \
+                     "D:/phi-ops/live_ops/command-center/billing-service/app.py" \
                      "5001"
 
 # Start OAuth Server (if dependencies installed)
 start_python_service "OAuth-Server" \
-                     "/workspaces/dominion-os-demo-build/oauth_server/app.py" \
+                     "D:/phi-ops/live_ops/os-demo-build/oauth_server/app.py" \
                      "8080"
 
-# Start Widget Service  
+# Start Widget Service
 start_python_service "Widget-Service" \
-                     "/workspaces/dominion-os-demo-build/widget_service/app.py" \
+                     "D:/phi-ops/live_ops/os-demo-build/widget_service/app.py" \
                      "8081"
 
 echo ""

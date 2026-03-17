@@ -17,7 +17,7 @@ NC='\033[0m' # No Color
 GCP_PROJECT_DEV="dominion-os-1-0-main"
 GCP_PROJECT_PROD="dominion-core-prod"
 GCP_REGION="us-central1"
-UPDATE_LOG="/tmp/phi_update_$(date +%Y%m%d_%H%M%S).log"
+UPDATE_LOG="D:/phi-ops/temp/phi_update_$(date +%Y%m%d_%H%M%S).log"
 
 # Logging functions
 log() {

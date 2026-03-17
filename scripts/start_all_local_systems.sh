@@ -8,6 +8,9 @@
 
 set -e
 
+ROOT_DIR="/workspaces/dominion-os-demo-build"
+HOST_BOOTSTRAP_SCRIPT="$ROOT_DIR/host_docker_iptables_bootstrap.sh"
+
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -17,6 +20,10 @@ CYAN='\033[0;36m'
 MAGENTA='\033[0;35m'
 BOLD='\033[1m'
 NC='\033[0m'
+
+print_info_line() {
+    echo -e "${BLUE}  ℹ️  $1${NC}"
+}
 
 echo ""
 echo "═══════════════════════════════════════════════════════════════════"
@@ -30,12 +37,17 @@ echo ""
 check_running() {
     local name="$1"
     local pattern="$2"
+    local missing_level="${3:-warn}"
     echo -e "${BLUE}[CHECK]${NC} $name..."
     if pgrep -f "$pattern" > /dev/null 2>&1; then
         echo -e "${GREEN}  ✅ $name is running${NC}"
         return 0
     else
-        echo -e "${YELLOW}  ⚠️  $name is not running${NC}"
+        if [ "$missing_level" = "info" ]; then
+            print_info_line "$name is not running"
+        else
+            echo -e "${YELLOW}  ⚠️  $name is not running${NC}"
+        fi
         return 1
     fi
 }
@@ -58,16 +70,28 @@ start_service() {
     fi
 }
 
+docker_daemon_running() {
+    docker info > /dev/null 2>&1
+}
+
+docker_control_available() {
+    command -v systemctl > /dev/null 2>&1 || command -v service > /dev/null 2>&1
+}
+
+running_in_container() {
+    [ -f "/.dockerenv" ]
+}
+
 # ═══════════════════════════════════════════════════════════════════
 # STEP 1: VS CODE VERIFICATION
 # ═══════════════════════════════════════════════════════════════════
 echo -e "${BOLD}${MAGENTA}[1/5] VS Code Status${NC}"
 echo "───────────────────────────────────────────────────────────────────"
 
-if check_running "VS Code Server" "vscode-server"; then
+if check_running "VS Code Server" "vscode-server" "info"; then
     echo -e "${GREEN}  ✨ VS Code is active${NC}"
 else
-    echo -e "${YELLOW}  ℹ️  VS Code not detected (may be running on host)${NC}"
+    print_info_line "VS Code not detected (may be running on host)"
 fi
 echo ""
 
@@ -119,7 +143,7 @@ if [ -f "$DOCKER_DIR/docker-compose.yml" ]; then
     cd "$DOCKER_DIR"
     
     echo -e "${BLUE}  🐳 Checking Docker status...${NC}"
-    if docker info > /dev/null 2>&1; then
+    if docker_daemon_running; then
         echo -e "${GREEN}  ✅ Docker is running${NC}"
         
         echo -e "${BLUE}  🔧 Starting Docker Compose services...${NC}"
@@ -130,11 +154,19 @@ if [ -f "$DOCKER_DIR/docker-compose.yml" ]; then
         
         echo -e "${GREEN}  ✨ Docker services started${NC}"
     else
-        echo -e "${RED}  ❌ Docker is not running${NC}"
-        echo -e "${YELLOW}  💡 You may need to start Docker manually${NC}"
+        if docker_control_available; then
+            echo -e "${RED}  ❌ Docker daemon is not running${NC}"
+            echo -e "${YELLOW}  💡 Start Docker daemon, then rerun this script${NC}"
+        else
+            print_info_line "Docker daemon unavailable and no local service manager detected"
+            print_info_line "Skipping Docker Compose startup in this environment"
+            if running_in_container && [ -x "$HOST_BOOTSTRAP_SCRIPT" ]; then
+                print_info_line "Prepare the host OS first with: sudo $HOST_BOOTSTRAP_SCRIPT"
+            fi
+        fi
     fi
 else
-    echo -e "${YELLOW}  ⚠️  docker-compose.yml not found${NC}"
+    print_info_line "docker-compose.yml not found"
 fi
 echo ""
 
@@ -157,7 +189,7 @@ if [ -d "$COMMAND_CENTER_DIR" ]; then
         echo -e "${YELLOW}  ℹ️  No active Command Center services detected${NC}"
     fi
 else
-    echo -e "${YELLOW}  ⚠️  Command Center directory not found${NC}"
+    print_info_line "Command Center directory not found"
 fi
 echo ""
 
@@ -174,7 +206,7 @@ echo ""
 if pgrep -f "vscode-server" > /dev/null 2>&1; then
     echo -e "  ${GREEN}✅${NC} VS Code Server"
 else
-    echo -e "  ${YELLOW}⚠️${NC}  VS Code Server (may be on host)"
+    echo -e "  ${BLUE}ℹ️${NC}  VS Code Server (may be on host)"
 fi
 
 # PHI MCP Server
@@ -185,15 +217,22 @@ else
 fi
 
 # Docker Services
-if docker info > /dev/null 2>&1; then
+if docker_daemon_running; then
     DOCKER_RUNNING=$(docker ps --format "{{.Names}}" | wc -l)
     if [ $DOCKER_RUNNING -gt 0 ]; then
         echo -e "  ${GREEN}✅${NC} Docker Services ($DOCKER_RUNNING containers running)"
     else
-        echo -e "  ${YELLOW}⚠️${NC}  Docker Services (0 containers running)"
+        echo -e "  ${BLUE}ℹ️${NC}  Docker Services (0 containers running)"
     fi
 else
-    echo -e "  ${RED}❌${NC} Docker Services"
+    if docker_control_available; then
+        echo -e "  ${RED}❌${NC} Docker Services (daemon down)"
+    else
+        echo -e "  ${BLUE}ℹ️${NC}  Docker Services (skipped: daemon control unavailable)"
+        if running_in_container && [ -x "$HOST_BOOTSTRAP_SCRIPT" ]; then
+            echo -e "  ${BLUE}ℹ️${NC}  Host bootstrap: ${CYAN}sudo $HOST_BOOTSTRAP_SCRIPT${NC}"
+        fi
+    fi
 fi
 
 echo ""

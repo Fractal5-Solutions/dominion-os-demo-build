@@ -1,11 +1,11 @@
 #!/bin/bash
 # Daily automated live ops verification
 # Runs scoring and sends alerts if score drops below threshold
-# 
+#
 # Usage: ./daily_live_ops_check.sh [--threshold 85] [--email ops@example.com]
 # Cron: 0 9 * * * /path/to/daily_live_ops_check.sh
 
-set -e
+set -euo pipefail
 
 # Configuration
 THRESHOLD="${THRESHOLD:-85}"
@@ -25,6 +25,10 @@ print_success() { echo -e "${GREEN}✅ $1${NC}"; }
 print_error() { echo -e "${RED}❌ $1${NC}"; }
 print_warning() { echo -e "${YELLOW}⚠️  $1${NC}"; }
 print_info() { echo -e "${BLUE}ℹ️  $1${NC}"; }
+
+MCP_SCORE_APPLICABLE=true
+TOTAL_POSSIBLE=200
+ALERT_TRIGGERED=false
 
 # Header
 echo "========================================="
@@ -49,32 +53,47 @@ fi
 print_info "Checking MCP services..."
 MCP_SCORE=0
 if [ -f "$SCRIPT_DIR/calculate_docker_live_ops_score.sh" ]; then
-    MCP_OUTPUT=$(bash "$SCRIPT_DIR/calculate_docker_live_ops_score.sh" 2>/dev/null || echo "TOTAL SCORE: 0/100")
-    MCP_SCORE=$(echo "$MCP_OUTPUT" | grep "TOTAL SCORE:" | awk '{print $3}' | cut -d'/' -f1 || echo "0")
-    print_success "MCP Score: $MCP_SCORE/100"
+    MCP_OUTPUT=$(bash "$SCRIPT_DIR/calculate_docker_live_ops_score.sh" 2>/dev/null || echo "Score: 0")
+    if echo "$MCP_OUTPUT" | grep -q "Score: N/A"; then
+        MCP_SCORE_APPLICABLE=false
+        TOTAL_POSSIBLE=100
+        print_info "MCP Score: N/A (Docker checks informational only in this runtime)"
+    else
+        MCP_SCORE=$(echo "$MCP_OUTPUT" | grep -oP 'Final Score:\s*\K\d+' | head -1 || true)
+        if [ -z "$MCP_SCORE" ]; then
+            MCP_SCORE=$(echo "$MCP_OUTPUT" | grep -oP 'Score:\s*\K\d+' | head -1 || echo "0")
+        fi
+        print_success "MCP Score: $MCP_SCORE/100"
+    fi
 else
     print_warning "MCP scoring script not found"
 fi
 
 # Calculate combined score
 TOTAL_SCORE=$((PHI_SCORE + MCP_SCORE))
-if [ "$TOTAL_SCORE" -gt 200 ]; then
-    TOTAL_SCORE=200
+if [ "$TOTAL_SCORE" -gt "$TOTAL_POSSIBLE" ]; then
+    TOTAL_SCORE=$TOTAL_POSSIBLE
 fi
 
 echo ""
 echo "========================================="
-echo "TOTAL SYSTEM SCORE: $TOTAL_SCORE/200"
+echo "TOTAL SYSTEM SCORE: $TOTAL_SCORE/$TOTAL_POSSIBLE"
 echo "========================================="
 
 # Determine status
-if [ "$TOTAL_SCORE" -ge 180 ]; then
+if [ "$TOTAL_POSSIBLE" -eq 100 ]; then
+    STATUS_SCORE=$TOTAL_SCORE
+else
+    STATUS_SCORE=$((TOTAL_SCORE * 100 / TOTAL_POSSIBLE))
+fi
+
+if [ "$STATUS_SCORE" -ge 90 ]; then
     print_success "Status: EXCELLENT - System operating at peak performance"
     STATUS="EXCELLENT"
-elif [ "$TOTAL_SCORE" -ge 150 ]; then
+elif [ "$STATUS_SCORE" -ge 75 ]; then
     print_success "Status: GOOD - System operating normally"
     STATUS="GOOD"
-elif [ "$TOTAL_SCORE" -ge 120 ]; then
+elif [ "$STATUS_SCORE" -ge 60 ]; then
     print_warning "Status: FAIR - Some issues detected"
     STATUS="FAIR"
 else
@@ -83,7 +102,8 @@ else
 fi
 
 # Alert if below threshold (using MCP score for threshold check)
-if [ "$MCP_SCORE" -lt "$THRESHOLD" ] || [ "$STATUS" = "POOR" ]; then
+if { $MCP_SCORE_APPLICABLE && [ "$MCP_SCORE" -lt "$THRESHOLD" ]; } || [ "$STATUS" = "POOR" ]; then
+    ALERT_TRIGGERED=true
     print_error "ALERT: System score below threshold or in POOR state"
     
     # Try to send email alert (if mail command available)
@@ -95,7 +115,7 @@ if [ "$MCP_SCORE" -lt "$THRESHOLD" ] || [ "$STATUS" = "POOR" ]; then
             echo "Time: $(date '+%Y-%m-%d %H:%M:%S')"
             echo "PHI Score: $PHI_SCORE/100"
             echo "MCP Score: $MCP_SCORE/100"
-            echo "Total Score: $TOTAL_SCORE/200"
+            echo "Total Score: $TOTAL_SCORE/$TOTAL_POSSIBLE"
             echo "Status: $STATUS"
             echo ""
             echo "Threshold: $THRESHOLD/100"
@@ -110,7 +130,7 @@ if [ "$MCP_SCORE" -lt "$THRESHOLD" ] || [ "$STATUS" = "POOR" ]; then
 fi
 
 # Log result
-LOG_ENTRY="$(date '+%Y-%m-%d %H:%M:%S') | PHI: $PHI_SCORE | MCP: $MCP_SCORE | Total: $TOTAL_SCORE | Status: $STATUS"
+LOG_ENTRY="$(date '+%Y-%m-%d %H:%M:%S') | PHI: $PHI_SCORE | MCP: $([ "$MCP_SCORE_APPLICABLE" = true ] && echo "$MCP_SCORE" || echo "N/A") | Total: $TOTAL_SCORE/$TOTAL_POSSIBLE | Status: $STATUS"
 echo "$LOG_ENTRY" >> "$LOG_FILE" 2>/dev/null || print_warning "Could not write to log file: $LOG_FILE"
 
 # Create telemetry data
@@ -120,11 +140,13 @@ if [ -d "$TELEMETRY_DIR" ]; then
 {
   "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
   "phi_score": $PHI_SCORE,
-  "mcp_score": $MCP_SCORE,
+  "mcp_score": $([ "$MCP_SCORE_APPLICABLE" = true ] && echo "$MCP_SCORE" || echo "null"),
+  "mcp_score_applicable": $([ "$MCP_SCORE_APPLICABLE" = true ] && echo "true" || echo "false"),
   "total_score": $TOTAL_SCORE,
+  "total_possible": $TOTAL_POSSIBLE,
   "status": "$STATUS",
   "threshold": $THRESHOLD,
-  "alert_triggered": $([ "$MCP_SCORE" -lt "$THRESHOLD" ] && echo "true" || echo "false")
+  "alert_triggered": $ALERT_TRIGGERED
 }
 EOF
     print_success "Telemetry saved to $TELEMETRY_DIR"
@@ -135,9 +157,9 @@ print_info "Daily check complete. Next check: $(date -d 'tomorrow 9:00' '+%Y-%m-
 echo ""
 
 # Exit with status code based on score
-if [ "$TOTAL_SCORE" -ge 180 ]; then
+if [ "$STATUS_SCORE" -ge 90 ]; then
     exit 0
-elif [ "$TOTAL_SCORE" -ge 120 ]; then
+elif [ "$STATUS_SCORE" -ge 60 ]; then
     exit 1
 else
     exit 2

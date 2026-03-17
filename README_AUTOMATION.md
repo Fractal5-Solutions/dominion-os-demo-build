@@ -29,3 +29,12 @@ journalctl -u phi-continuous-monitor -f
 Notes:
 - GitHub Actions run in ephemeral runners; scripts that start long-lived local services won't persist there. The monitor workflows perform checks, collect logs, and upload artifacts.
 - If you want GitHub to take action (create issues, open PRs), ensure repository secrets and permissions are configured appropriately.
+
+Host preparation for local Docker-based runs:
+
+```bash
+sudo /workspaces/dominion-os-demo-build/host_docker_iptables_bootstrap.sh
+```
+
+- Run that on the Linux host OS, not from inside a dev container or Codespace.
+- Override allowed inbound TCP ports if needed, for example: `sudo ALLOWED_TCP_PORTS="22 80 443 8080 9090" /workspaces/dominion-os-demo-build/host_docker_iptables_bootstrap.sh`

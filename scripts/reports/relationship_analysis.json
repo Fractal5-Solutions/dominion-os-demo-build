@@ -1,0 +1,21 @@
+{
+  "generated_at": "2026-03-11T02:22:50.430367",
+  "summary": {
+    "total_relationships": 0,
+    "high_value_relationships": 0,
+    "active_contacts": 0,
+    "data_sources": [
+      "apollo",
+      "gmail",
+      "google_drive",
+      "dropbox"
+    ]
+  },
+  "top_relationships": [],
+  "source_breakdown": {
+    "apollo_companies": 0,
+    "gmail_contacts": 0,
+    "drive_shared": 0,
+    "dropbox_shared": 0
+  }
+}

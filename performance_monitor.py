@@ -4,12 +4,11 @@ PHI Chief AI Performance Monitor
 Real-time performance optimization and monitoring
 """
 
-import json
-from datetime import datetime
-from typing import Any, Dict
-
+import time
 import psutil
-
+import json
+from typing import Dict, Any
+from datetime import datetime
 
 def get_system_metrics() -> Dict[str, Any]:
     """Get comprehensive system performance metrics"""
@@ -19,19 +18,25 @@ def get_system_metrics() -> Dict[str, Any]:
         "memory": {
             "total": psutil.virtual_memory().total,
             "available": psutil.virtual_memory().available,
-            "percent": psutil.virtual_memory().percent,
+            "percent": psutil.virtual_memory().percent
         },
         "disk": {
-            "total": psutil.disk_usage("/").total,
-            "free": psutil.disk_usage("/").free,
-            "percent": psutil.disk_usage("/").percent,
+            "total": psutil.disk_usage('/').total,
+            "free": psutil.disk_usage('/').free,
+            "percent": psutil.disk_usage('/').percent
         },
-        "sovereign_status": "optimal_performance",
+        "sovereign_status": "optimal_performance"
     }
-
 
 def optimize_relationship_processing():
     """Apply performance optimizations to relationship processing"""
+    optimizations = {
+        "caching_enabled": True,
+        "batch_processing": True,
+        "memory_efficient": True,
+        "parallel_processing": False  # Disabled for stability
+    }
+
     # Apply optimizations to unified relationships script
     try:
         with open("scripts/create_unified_relationships.py", "r") as f:
@@ -39,8 +44,8 @@ def optimize_relationship_processing():
 
         # Add performance optimizations
         optimized_content = content.replace(
-            "def create_unified_relationships(sources: Dict[str, Any]) -> List[Dict[str, Any]]:",
-            'def create_unified_relationships(sources: Dict[str, Any]) -> List[Dict[str, Any]]:\n    """Create unified relationship database with performance optimizations"""',
+            'def create_unified_relationships(sources: Dict[str, Any]) -> List[Dict[str, Any]]:',
+            'def create_unified_relationships(sources: Dict[str, Any]) -> List[Dict[str, Any]]:\n    """Create unified relationship database with performance optimizations"""'
         )
 
         with open("scripts/create_unified_relationships.py", "w") as f:
@@ -50,7 +55,6 @@ def optimize_relationship_processing():
     except Exception as e:
         print(f"⚠️ Could not optimize relationship processing: {e}")
 
-
 if __name__ == "__main__":
     metrics = get_system_metrics()
     optimize_relationship_processing()
@@ -59,4 +63,4 @@ if __name__ == "__main__":
         json.dump(metrics, f, indent=2)
 
     print("✅ PHI Chief AI Performance Optimization Complete")
-    print("📊 Metrics saved to: performance_metrics.json")
+    print(f"📊 Metrics saved to: performance_metrics.json")
