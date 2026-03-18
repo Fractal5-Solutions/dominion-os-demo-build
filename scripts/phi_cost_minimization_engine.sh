@@ -42,8 +42,9 @@ analyze_current_costs() {
 
     # Get current service configurations
     echo "Current Production Services:"
-    gcloud run services list --project "$PROJECT2" --format="table(name, spec.template.spec.containers[0].resources.limits.memory, spec.template.spec.containers[0].resources.limits.cpu, status.conditions[0].status)" > "D:/phi-ops/temp/current_services.txt"
-    cat "D:/phi-ops/temp/current_services.txt"
+    # phi chief of staff: Linux path patch for D:/phi-ops/temp/current_services.txt
+    gcloud run services list --project "$PROJECT2" --format="table(name, spec.template.spec.containers[0].resources.limits.memory, spec.template.spec.containers[0].resources.limits.cpu, status.conditions[0].status)" > "/workspaces/dominion-os-demo-build/D/phi-ops/temp/current_services.txt"
+    cat "/workspaces/dominion-os-demo-build/D/phi-ops/temp/current_services.txt"
 
     # Calculate estimated costs
     local total_memory=0
@@ -51,21 +52,22 @@ analyze_current_costs() {
     local active_services=0
 
     while IFS= read -r line; do
-        if [[ $line =~ ([0-9]+)Gi && ([0-9]+) && True ]]; then
-            memory=${BASH_REMATCH[1]}
-            cpu=${BASH_REMATCH[2]}
-            total_memory=$((total_memory + memory))
-            total_cpu=$((total_cpu + cpu))
-            active_services=$((active_services + 1))
-        fi
-    done < "D:/phi-ops/temp/current_services.txt"
+      if [[ $line =~ ([0-9]+)Gi && ([0-9]+) && True ]]; then
+        memory=${BASH_REMATCH[1]}
+        cpu=${BASH_REMATCH[2]}
+        total_memory=$((total_memory + memory))
+        total_cpu=$((total_cpu + cpu))
+        active_services=$((active_services + 1))
+      fi
+    done < "/workspaces/dominion-os-demo-build/D/phi-ops/temp/current_services.txt"
 
     # Rough cost estimation (Cloud Run pricing)
-    local memory_cost=$((total_memory * 30 * 24 * 0.0000025))  # $0.0000025 per GiB-hour
-    local cpu_cost=$((total_cpu * 30 * 24 * 0.000024))       # $0.000024 per vCPU-hour
-    local request_cost=$((active_services * 1000 * 30 * 0.0000004))  # $0.0000004 per request
+    # Use bc for floating-point arithmetic
+    local memory_cost=$(echo "$total_memory * 30 * 24 * 0.0000025" | bc -l)
+    local cpu_cost=$(echo "$total_cpu * 30 * 24 * 0.000024" | bc -l)
+    local request_cost=$(echo "$active_services * 1000 * 30 * 0.0000004" | bc -l)
 
-    local total_estimated_cost=$((memory_cost + cpu_cost + request_cost))
+    local total_estimated_cost=$(echo "$memory_cost + $cpu_cost + $request_cost" | bc -l)
 
     echo -e "${YELLOW}📊 Estimated Monthly Cost: $${total_estimated_cost}${NC}"
     echo -e "${YELLOW}⚡ Active Services: $active_services${NC}"
