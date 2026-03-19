@@ -21,7 +21,10 @@ WHITE='\033[1;37m'
 NC='\033[0m'
 
 # Configuration
-COST_LOG="telemetry/cost_minimization_$(date +%Y%m%d_%H%M%S).log"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TELEMETRY_DIR="$SCRIPT_DIR/telemetry"
+mkdir -p "$TELEMETRY_DIR"
+COST_LOG="$TELEMETRY_DIR/cost_minimization_$(date +%Y%m%d_%H%M%S).log"
 DOCKER_COMPOSE_FILE="docker-compose.yml"
 
 # Logging function

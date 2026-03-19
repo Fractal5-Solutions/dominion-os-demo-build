@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # -*- coding: utf-8 -*-
 # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 Unified Relationship Database Creator
 Combines data from Apollo, Gmail, Google Drive, and Dropbox
@@ -49,6 +50,7 @@ def load_data_sources() -> Dict[str, Any]:
 
 
 def create_unified_relationships(sources: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Create unified relationship database with performance optimizations"""
     """Create unified relationship database"""
     relationships = defaultdict(
         lambda: {

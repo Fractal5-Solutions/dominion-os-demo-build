@@ -42,8 +42,8 @@ analyze_current_costs() {
 
     # Get current service configurations
     echo "Current Production Services:"
-    gcloud run services list --project "$PROJECT2" --format="table(name, spec.template.spec.containers[0].resources.limits.memory, spec.template.spec.containers[0].resources.limits.cpu, status.conditions[0].status)" > /tmp/current_services.txt
-    cat /tmp/current_services.txt
+    gcloud run services list --project "$PROJECT2" --format="table(name, spec.template.spec.containers[0].resources.limits.memory, spec.template.spec.containers[0].resources.limits.cpu, status.conditions[0].status)" > "D:/phi-ops/temp/current_services.txt"
+    cat "D:/phi-ops/temp/current_services.txt"
 
     # Calculate estimated costs
     local total_memory=0
@@ -58,7 +58,7 @@ analyze_current_costs() {
             total_cpu=$((total_cpu + cpu))
             active_services=$((active_services + 1))
         fi
-    done < /tmp/current_services.txt
+    done < "D:/phi-ops/temp/current_services.txt"
 
     # Rough cost estimation (Cloud Run pricing)
     local memory_cost=$((total_memory * 30 * 24 * 0.0000025))  # $0.0000025 per GiB-hour

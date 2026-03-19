@@ -10,7 +10,10 @@
 set -e
 
 # Configuration
-MONITOR_LOG="telemetry/background_completion_monitor_$(date +%Y%m%d_%H%M%S).log"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TELEMETRY_DIR="$SCRIPT_DIR/telemetry"
+mkdir -p "$TELEMETRY_DIR"
+MONITOR_LOG="$TELEMETRY_DIR/background_completion_monitor_$(date +%Y%m%d_%H%M%S).log"
 CHECK_INTERVAL=300  # 5 minutes
 MAX_RUNTIME=$((24 * 3600))  # 24 hours maximum
 
@@ -46,8 +49,8 @@ check_autonomous_completion() {
 
 # Check sovereignty sync status
 check_sovereignty_completion() {
-    if [ -f "/tmp/sovereignty_monitor.log" ]; then
-        if grep -q "SYNC DETECTED\|Sovereignty confirmed" /tmp/sovereignty_monitor.log; then
+    if [ -f "D:/phi-ops/temp/sovereignty_monitor.log" ]; then
+        if grep -q "SYNC DETECTED\|Sovereignty confirmed" "D:/phi-ops/temp/sovereignty_monitor.log"; then
             monitor_log "✅ SOVEREIGNTY SYNC COMPLETED"
             return 0
         else
@@ -91,14 +94,14 @@ generate_status_report() {
 **Report:** $(if [ -f "OVERNIGHT_OPERATIONS_REPORT.md" ]; then echo "Available"; else echo "Pending"; fi)
 
 ### 🔐 Sovereignty Monitoring
-**Status:** $(if [ -f "/tmp/sovereignty_monitor.log" ] && grep -q "SYNC DETECTED\|Sovereignty confirmed" /tmp/sovereignty_monitor.log; then echo "✅ COMPLETED"; else echo "⏳ MONITORING"; fi)
+**Status:** $(if [ -f "D:/phi-ops/temp/sovereignty_monitor.log" ] && grep -q "SYNC DETECTED\|Sovereignty confirmed" "D:/phi-ops/temp/sovereignty_monitor.log"; then echo "✅ COMPLETED"; else echo "⏳ MONITORING"; fi)
 **Last Check:** $(date)
 
 ### 💰 Cost Optimization
-**Status:** $(if [ -f "/tmp/cost_opt.log" ] && grep -q "MISSION ACCOMPLISHED" /tmp/cost_opt.log; then echo "✅ COMPLETED"; else echo "✅ COMPLETED (previous run)"; fi)
+**Status:** $(if [ -f "D:/phi-ops/temp/cost_opt.log" ] && grep -q "MISSION ACCOMPLISHED" "D:/phi-ops/temp/cost_opt.log"; then echo "✅ COMPLETED"; else echo "✅ COMPLETED (previous run)"; fi)
 
 ### 📊 SLO Monitoring
-**Status:** $(if [ -f "/tmp/slo_monitor.log" ] && grep -q "SLO COMPLIANCE REVIEW" /tmp/slo_monitor.log; then echo "✅ COMPLETED"; else echo "✅ COMPLETED (previous run)"; fi)
+**Status:** $(if [ -f "D:/phi-ops/temp/slo_monitor.log" ] && grep -q "SLO COMPLIANCE REVIEW" "D:/phi-ops/temp/slo_monitor.log"; then echo "✅ COMPLETED"; else echo "✅ COMPLETED (previous run)"; fi)
 
 ## System Resources
 \`\`\`
@@ -191,8 +194,8 @@ main() {
 # Run in background
 if [ "$1" = "background" ]; then
     main >> "$MONITOR_LOG" 2>&1 &
-    echo $! > /tmp/ai_completion_monitor.pid
-    echo "PHI Background AI Completion Monitor started (PID: $(cat /tmp/ai_completion_monitor.pid))"
+    echo $! > "D:/phi-ops/temp/ai_completion_monitor.pid"
+    echo "PHI Background AI Completion Monitor started (PID: $(cat D:/phi-ops/temp/ai_completion_monitor.pid))"
 else
     main
 fi
