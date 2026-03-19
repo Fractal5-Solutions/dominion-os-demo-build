@@ -19,6 +19,9 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+
+      - name: Enforce ASCII filename policy
+        run: bash scripts/check_ascii_filenames.sh
       
       - name: Set up Python
         uses: actions/setup-python@v4

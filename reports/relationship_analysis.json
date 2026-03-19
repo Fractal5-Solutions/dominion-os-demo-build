@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-03-09T15:36:34.145144",
+  "generated_at": "2026-03-19T06:15:13.027601",
   "summary": {
-    "total_relationships": 4,
+    "total_relationships": 5,
     "high_value_relationships": 1,
-    "active_contacts": 4,
+    "active_contacts": 5,
     "data_sources": [
       "apollo",
       "gmail",
@@ -13,10 +13,10 @@
   },
   "top_relationships": [
     {
-      "entity_id": "contact_727414",
+      "entity_id": "contact_469628",
       "entity_name": "Mike Johnson",
       "entity_type": "",
-      "email": "",
+      "email": "mike.johnson@cloudtech.dev",
       "domain": "cloudtech.dev",
       "apollo_data": {},
       "gmail_data": {
@@ -94,13 +94,13 @@
       ],
       "tags": [],
       "notes": "",
-      "last_updated": "2026-03-09T15:36:34.144442"
+      "last_updated": "2026-03-19T06:15:13.026021"
     },
     {
-      "entity_id": "contact_2496",
+      "entity_id": "contact_464201",
       "entity_name": "John Doe",
       "entity_type": "",
-      "email": "",
+      "email": "john.doe@techcorp.com",
       "domain": "techcorp.com",
       "apollo_data": {},
       "gmail_data": {
@@ -176,13 +176,13 @@
       ],
       "tags": [],
       "notes": "",
-      "last_updated": "2026-03-09T15:36:34.144428"
+      "last_updated": "2026-03-19T06:15:13.026021"
     },
     {
-      "entity_id": "contact_54090",
+      "entity_id": "contact_608007",
       "entity_name": "Sarah Smith",
       "entity_type": "",
-      "email": "",
+      "email": "sarah.smith@dataflow.io",
       "domain": "dataflow.io",
       "apollo_data": {},
       "gmail_data": {
@@ -241,13 +241,13 @@
       ],
       "tags": [],
       "notes": "",
-      "last_updated": "2026-03-09T15:36:34.144438"
+      "last_updated": "2026-03-19T06:15:13.026021"
     },
     {
-      "entity_id": "contact_11323",
+      "entity_id": "contact_435364",
       "entity_name": "Jane Wilson",
       "entity_type": "",
-      "email": "",
+      "email": "jane.wilson@techstartup.net",
       "domain": "techstartup.net",
       "apollo_data": {},
       "gmail_data": {
@@ -304,12 +304,41 @@
       ],
       "tags": [],
       "notes": "",
-      "last_updated": "2026-03-09T15:36:34.144445"
+      "last_updated": "2026-03-19T06:15:13.026021"
+    },
+    {
+      "entity_id": "contact_849141",
+      "entity_name": "Erica",
+      "entity_type": "",
+      "email": "sacredselfworkshops@gmail.com",
+      "domain": "gmail.com",
+      "apollo_data": {},
+      "gmail_data": {
+        "name": "Erica",
+        "email": "sacredselfworkshops@gmail.com",
+        "interaction_count": 1,
+        "last_contact": "2026-03-19T00:00:00Z",
+        "first_contact": "2026-03-19T00:00:00Z",
+        "threads": [
+          "thread_erica_seed"
+        ]
+      },
+      "drive_data": [],
+      "dropbox_data": [],
+      "relationship_score": 2,
+      "last_interaction": "2026-03-19 00:00:00+00:00",
+      "interaction_count": 1,
+      "data_sources": [
+        "gmail"
+      ],
+      "tags": [],
+      "notes": "",
+      "last_updated": "2026-03-19T06:15:13.026021"
     }
   ],
   "source_breakdown": {
     "apollo_companies": 0,
-    "gmail_contacts": 4,
+    "gmail_contacts": 5,
     "drive_shared": 4,
     "dropbox_shared": 4
   }

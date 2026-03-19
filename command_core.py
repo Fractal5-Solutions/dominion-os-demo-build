@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 import re
@@ -23,10 +24,17 @@ app.config["ENABLE_PROBES"] = os.getenv("COMMAND_CORE_ENABLE_PROBES", "1").lower
     "no",
 }
 
-APP_VERSION = "1.1.0"
+APP_VERSION = os.getenv("APP_VERSION", "0.0.0-dev")
 SERVICE_NAME = os.getenv("SERVICE_NAME", "dominion-os-demo")
 REGION = os.getenv("REGION", os.getenv("GCP_REGION", "us-central1"))
 PROJECT_ID = os.getenv("PROJECT_ID", os.getenv("GCP_PROJECT_ID", "dominion-os-1-0-main"))
+OVERLAY = os.getenv("OVERLAY", "business")
+RELEASE_SHA = os.getenv("RELEASE_SHA", "")
+SOURCE_OF_TRUTH_REPO = os.getenv("SOURCE_OF_TRUTH_REPO", "dominion-command-center")
+SOURCE_OF_TRUTH_SHA = os.getenv("SOURCE_OF_TRUTH_SHA", "")
+SOURCE_OF_TRUTH_VERSION = os.getenv("SOURCE_OF_TRUTH_VERSION", "")
+IMAGE_REF = os.getenv("IMAGE_REF", "")
+RELEASE_REPO = os.getenv("RELEASE_REPO", "dominion-os-demo-build")
 
 LOCAL_SERVICE_TARGETS = (
     {
@@ -215,6 +223,36 @@ def now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def resolve_release_sha() -> str:
+    if RELEASE_SHA:
+        return RELEASE_SHA
+    try:
+        output = subprocess.check_output(
+            ["git", "rev-parse", "--short=12", "HEAD"],
+            cwd=BASE_DIR,
+            text=True,
+            stderr=subprocess.DEVNULL,
+        )
+        return output.strip()
+    except (OSError, subprocess.CalledProcessError):
+        return ""
+
+
+def release_info() -> dict:
+    return {
+        "version": APP_VERSION,
+        "release_sha": resolve_release_sha(),
+        "release_repo": RELEASE_REPO,
+        "overlay": OVERLAY,
+        "image_ref": IMAGE_REF,
+        "source_of_truth": {
+            "repo": SOURCE_OF_TRUTH_REPO,
+            "sha": SOURCE_OF_TRUTH_SHA,
+            "version": SOURCE_OF_TRUTH_VERSION,
+        },
+    }
+
+
 def wants_json_response() -> bool:
     best = request.accept_mimetypes.best_match(["application/json", "text/html"])
     return best == "application/json" and (
@@ -339,7 +377,7 @@ def service_info() -> dict:
     remote_projects = load_remote_projects()
     return {
         "service": SERVICE_NAME,
-        "version": APP_VERSION,
+        **release_info(),
         "timestamp": now_iso(),
         "project_id": PROJECT_ID,
         "region": REGION,
@@ -443,7 +481,7 @@ def health():
         {
             "status": "healthy",
             "service": SERVICE_NAME,
-            "version": APP_VERSION,
+            **release_info(),
             "timestamp": now_iso(),
         }
     )

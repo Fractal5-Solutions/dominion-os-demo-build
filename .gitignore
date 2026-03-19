@@ -42,3 +42,10 @@ temp/
 docker-volumes/
 *.pid
 scripts/telemetry/*.json
+
+# Public demo governance
+# Keep thread-specific activation artifacts and contact dumps out of commits.
+reports/erica_activation_status_*.json
+reports/erica_activation_status_*.md
+reports/erica_outbound_package_*.md
+data/gmail_contacts/*.bak.*

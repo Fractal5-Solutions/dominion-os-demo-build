@@ -8,7 +8,9 @@
     "client_modified": "2024-02-20T10:15:00Z",
     "rev": "a1b2c3d4",
     "content_hash": "abc123def456",
-    "shared_with": ["john.doe@techcorp.com"]
+    "shared_with": [
+      "john.doe@techcorp.com"
+    ]
   },
   {
     "id": "file_002",
@@ -19,7 +21,10 @@
     "client_modified": "2024-02-25T14:30:00Z",
     "rev": "e5f6g7h8",
     "content_hash": "def456ghi789",
-    "shared_with": ["sarah.smith@dataflow.io", "mike.johnson@cloudtech.dev"]
+    "shared_with": [
+      "sarah.smith@dataflow.io",
+      "mike.johnson@cloudtech.dev"
+    ]
   },
   {
     "id": "file_003",
@@ -30,6 +35,8 @@
     "client_modified": "2024-03-01T16:00:00Z",
     "rev": "i9j0k1l2",
     "content_hash": "ghi789jkl012",
-    "shared_with": ["jane.wilson@techstartup.net"]
+    "shared_with": [
+      "jane.wilson@techstartup.net"
+    ]
   }
 ]

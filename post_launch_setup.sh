@@ -46,7 +46,7 @@ for service in "${SERVICES[@]}"; do
   # This is a placeholder for the actual implementation
   echo "   ⚠️  Configure via Cloud Console: Monitoring > Uptime checks"
   echo "      Service: $service"
-  echo "      URL: https://${service}-829831815576.us-central1.run.app/health"
+  echo "      URL: https://${service}-reduwyf2ra-uc.a.run.app/health"
   echo "      Check interval: 5 minutes"
 done
 
