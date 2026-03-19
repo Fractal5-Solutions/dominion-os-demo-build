@@ -1,9 +1,9 @@
 [
   {
-    "entity_id": "contact_294600",
+    "entity_id": "contact_469628",
     "entity_name": "Mike Johnson",
     "entity_type": "",
-    "email": "",
+    "email": "mike.johnson@cloudtech.dev",
     "domain": "cloudtech.dev",
     "apollo_data": {},
     "gmail_data": {
@@ -81,13 +81,13 @@
     ],
     "tags": [],
     "notes": "",
-    "last_updated": "2026-03-02T16:56:39.270648"
+    "last_updated": "2026-03-19T06:15:13.026021"
   },
   {
-    "entity_id": "contact_571150",
+    "entity_id": "contact_464201",
     "entity_name": "John Doe",
     "entity_type": "",
-    "email": "",
+    "email": "john.doe@techcorp.com",
     "domain": "techcorp.com",
     "apollo_data": {},
     "gmail_data": {
@@ -163,13 +163,13 @@
     ],
     "tags": [],
     "notes": "",
-    "last_updated": "2026-03-02T16:56:39.270636"
+    "last_updated": "2026-03-19T06:15:13.026021"
   },
   {
-    "entity_id": "contact_110537",
+    "entity_id": "contact_608007",
     "entity_name": "Sarah Smith",
     "entity_type": "",
-    "email": "",
+    "email": "sarah.smith@dataflow.io",
     "domain": "dataflow.io",
     "apollo_data": {},
     "gmail_data": {
@@ -228,13 +228,13 @@
     ],
     "tags": [],
     "notes": "",
-    "last_updated": "2026-03-02T16:56:39.270644"
+    "last_updated": "2026-03-19T06:15:13.026021"
   },
   {
-    "entity_id": "contact_478904",
+    "entity_id": "contact_435364",
     "entity_name": "Jane Wilson",
     "entity_type": "",
-    "email": "",
+    "email": "jane.wilson@techstartup.net",
     "domain": "techstartup.net",
     "apollo_data": {},
     "gmail_data": {
@@ -291,6 +291,35 @@
     ],
     "tags": [],
     "notes": "",
-    "last_updated": "2026-03-02T16:56:39.270650"
+    "last_updated": "2026-03-19T06:15:13.026021"
+  },
+  {
+    "entity_id": "contact_849141",
+    "entity_name": "Erica",
+    "entity_type": "",
+    "email": "sacredselfworkshops@gmail.com",
+    "domain": "gmail.com",
+    "apollo_data": {},
+    "gmail_data": {
+      "name": "Erica",
+      "email": "sacredselfworkshops@gmail.com",
+      "interaction_count": 1,
+      "last_contact": "2026-03-19T00:00:00Z",
+      "first_contact": "2026-03-19T00:00:00Z",
+      "threads": [
+        "thread_erica_seed"
+      ]
+    },
+    "drive_data": [],
+    "dropbox_data": [],
+    "relationship_score": 2,
+    "last_interaction": "2026-03-19 00:00:00+00:00",
+    "interaction_count": 1,
+    "data_sources": [
+      "gmail"
+    ],
+    "tags": [],
+    "notes": "",
+    "last_updated": "2026-03-19T06:15:13.026021"
   }
 ]

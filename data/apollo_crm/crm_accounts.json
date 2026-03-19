@@ -16,8 +16,8 @@
     "phone": "+1-415-555-0123",
     "founded_year": 2015,
     "description": "Leading software development company specializing in AI and cloud solutions.",
-    "last_updated": "2026-03-02T16:34:12.777359",
-    "data_source": "apollo_api"
+    "last_updated": "2026-03-19T13:15:12Z",
+    "data_source": "apollo_api_snapshot"
   },
   {
     "account_id": "demo_company_002",
@@ -36,8 +36,8 @@
     "phone": "+1-512-555-0456",
     "founded_year": 2018,
     "description": "Advanced data analytics and business intelligence platform.",
-    "last_updated": "2026-03-02T16:34:12.777369",
-    "data_source": "apollo_api"
+    "last_updated": "2026-03-19T13:15:12Z",
+    "data_source": "apollo_api_snapshot"
   },
   {
     "account_id": "demo_company_003",
@@ -56,7 +56,7 @@
     "phone": "+1-206-555-0789",
     "founded_year": 2012,
     "description": "Enterprise cloud solutions and infrastructure management.",
-    "last_updated": "2026-03-02T16:34:12.777374",
-    "data_source": "apollo_api"
+    "last_updated": "2026-03-19T13:15:12Z",
+    "data_source": "apollo_api_snapshot"
   }
 ]

@@ -90,6 +90,7 @@ def create_unified_relationships(sources: Dict[str, Any]) -> List[Dict[str, Any]
     for email, contact in sources["gmail"].items():
         email = email.lower()
         rel = relationships[email]
+        rel["email"] = rel["email"] or email
 
         if not rel["entity_name"]:
             rel["entity_name"] = contact.get("name", "")
@@ -114,6 +115,7 @@ def create_unified_relationships(sources: Dict[str, Any]) -> List[Dict[str, Any]
         for email in doc.get("shared_with", []):
             email = email.lower()
             rel = relationships[email]
+            rel["email"] = rel["email"] or email
             rel["drive_data"].append(doc)
             rel["relationship_score"] += 5  # Points for document sharing
             if "google_drive" not in rel["data_sources"]:
@@ -124,6 +126,7 @@ def create_unified_relationships(sources: Dict[str, Any]) -> List[Dict[str, Any]
         for email in file.get("shared_with", []):
             email = email.lower()
             rel = relationships[email]
+            rel["email"] = rel["email"] or email
             rel["dropbox_data"].append(file)
             rel["relationship_score"] += 3  # Points for file sharing
             if "dropbox" not in rel["data_sources"]:
@@ -190,7 +193,7 @@ def main():
     # Generate report
     generate_relationship_report(relationships, "reports/relationship_analysis.json")
 
-    print(f"✅ Created unified database with {len(relationships)} relationships")
+    print(f"Created unified database with {len(relationships)} relationships")
     print("   Database saved to: data/unified_relationships.json")
     print("   Report saved to: reports/relationship_analysis.json")
 

@@ -22,6 +22,9 @@ def test_root_supports_json_negotiation():
     assert response.status_code == 200
     assert response.is_json
     assert response.json["service"] == "dominion-os-demo"
+    assert response.json["release_repo"] == "dominion-os-demo-build"
+    assert response.json["overlay"] == "business"
+    assert response.json["source_of_truth"]["repo"] == "dominion-command-center"
 
 
 def test_demo_and_store_pages_render():
@@ -62,9 +65,24 @@ def test_status_reports_local_topology_without_live_probes():
     response = client.get("/status")
 
     assert response.status_code == 200
+    assert response.json["release_repo"] == "dominion-os-demo-build"
+    assert response.json["overlay"] == "business"
+    assert response.json["source_of_truth"]["repo"] == "dominion-command-center"
     topology = response.json["topology"]
     assert len(topology["local_services"]) == 3
     assert {
         service["id"] for service in topology["local_services"]
     } == {"command-center-bims", "phi-oauth-server", "phi-askphi-widget"}
     assert set(topology["remote_projects"]) == {"dominion-os-1-0-main", "dominion-core-prod"}
+
+
+def test_health_reports_release_contract():
+    client = build_client()
+    response = client.get("/health")
+
+    assert response.status_code == 200
+    assert response.json["status"] == "healthy"
+    assert response.json["release_repo"] == "dominion-os-demo-build"
+    assert response.json["overlay"] == "business"
+    assert response.json["source_of_truth"]["repo"] == "dominion-command-center"
+    assert "release_sha" in response.json

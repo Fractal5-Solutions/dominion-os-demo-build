@@ -19,9 +19,100 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      id-token: write
+
+    env:
+      GCP_PROJECT_ID: dominion-core-prod
+      GCP_REGION: us-central1
+      SERVICE_NAME: dominion-os-demo
+      IMAGE_REPO: us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/dominion-os-demo
+      RELEASE_MANIFEST_PATH: release-manifest.json
 
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+
+      - name: Capture Release Metadata
+        id: release
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test -f "${RELEASE_MANIFEST_PATH}"
+          python - "${RELEASE_MANIFEST_PATH}" >> "$GITHUB_OUTPUT" <<'PY'
+          import json
+          import os
+          import sys
+          import urllib.request
+
+          manifest_path = sys.argv[1]
+          with open(manifest_path, "r", encoding="utf-8") as f:
+              manifest = json.load(f)
+
+          github_repo = os.environ["GITHUB_REPOSITORY"]
+          github_sha = os.environ["GITHUB_SHA"][:12]
+          owner, name = github_repo.split("/", 1)
+          if name != "dominion-os-demo-build":
+              raise SystemExit(
+                  f"unexpected repo label '{name}'. expected 'dominion-os-demo-build'"
+              )
+          token = os.environ.get("GITHUB_TOKEN", "")
+
+          def github_graphql_release_meta() -> tuple[int, str]:
+              query = {
+                  "query": """
+                  query($owner:String!, $name:String!) {
+                    repository(owner:$owner, name:$name) {
+                      releases { totalCount }
+                      latestRelease { tagName }
+                    }
+                  }
+                  """,
+                  "variables": {"owner": owner, "name": name},
+              }
+              req = urllib.request.Request(
+                  "https://api.github.com/graphql",
+                  data=json.dumps(query).encode("utf-8"),
+                  headers={
+                      "Authorization": f"Bearer {token}",
+                      "Content-Type": "application/json",
+                      "Accept": "application/vnd.github+json",
+                      "User-Agent": "dominion-release-workflow",
+                  },
+                  method="POST",
+              )
+              with urllib.request.urlopen(req, timeout=20) as response:
+                  payload = json.loads(response.read().decode("utf-8"))
+              repo = payload.get("data", {}).get("repository", {})
+              releases = repo.get("releases", {}) or {}
+              latest = repo.get("latestRelease") or {}
+              count = int(releases.get("totalCount", 0))
+              latest_tag = latest.get("tagName", "")
+              return count, latest_tag
+
+          release_count, latest_tag = github_graphql_release_meta()
+          derived_version = latest_tag if latest_tag else f"r{release_count}+{github_sha}"
+
+          source = manifest.get("source_of_truth", {})
+
+          app_version = manifest.get("app_version", "AUTO")
+          if not app_version or app_version == "AUTO":
+              app_version = derived_version
+
+          source_version = source.get("version", "AUTO")
+          if not source_version or source_version == "AUTO":
+              source_version = derived_version
+
+          print(f"app_version={app_version}")
+          print(f"overlay={manifest['overlay']}")
+          print(f"release_repo={name}")
+          print(f"source_repo={source['repo']}")
+          print(f"source_sha={source.get('sha', '')}")
+          print(f"source_version={source_version}")
+          print(f"release_count={release_count}")
+          print(f"latest_release_tag={latest_tag}")
+          PY
+          echo "release_sha=$(git rev-parse --short=12 HEAD)" >> "$GITHUB_OUTPUT"
 
       - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db
 
@@ -37,112 +128,63 @@ jobs:
           printf '%s' "$GCP_ACCESS_TOKEN" > "$TOKEN_FILE"
           echo "token_file=$TOKEN_FILE" >> "$GITHUB_OUTPUT"
 
-      - name: Configure Docker
+      - name: Configure Artifact Registry
         env:
-          DOCKER_USER: ${{ vars.DOCKER_USER }}
-          DOCKER_PAT: ${{ secrets.DOCKER_PAT }}
+          CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ steps.gcp-token.outputs.token_file }}
         run: |
           set -euo pipefail
-          printf '%s' "$DOCKER_PAT" | docker login -u "$DOCKER_USER" --password-stdin
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
 
-      - name: Build and Push Command Core
-        env:
-          DOCKER_USER: ${{ vars.DOCKER_USER }}
+      - name: Build and Push Authoritative Demo Image
         run: |
+          set -euo pipefail
           docker buildx build \
             --push \
             --file Dockerfile.production \
-            --tag docker.io/${DOCKER_USER}/dominion-os-demo:${GITHUB_SHA} \
-            --tag docker.io/${DOCKER_USER}/dominion-os-demo:latest \
+            --tag ${IMAGE_REPO}:${GITHUB_SHA} \
+            --tag ${IMAGE_REPO}:latest \
             .
-
-      - name: Build and Push OAuth Server
-        env:
-          DOCKER_USER: ${{ vars.DOCKER_USER }}
-        run: |
-          docker buildx build \
-            --push \
-            --file oauth_server/Dockerfile \
-            --tag docker.io/${DOCKER_USER}/phi-oauth-server:${GITHUB_SHA} \
-            --tag docker.io/${DOCKER_USER}/phi-oauth-server:latest \
-            oauth_server
-
-      - name: Build and Push AskPHI Widget
-        env:
-          DOCKER_USER: ${{ vars.DOCKER_USER }}
-        run: |
-          docker buildx build \
-            --push \
-            --file widget_service/Dockerfile \
-            --tag docker.io/${DOCKER_USER}/phi-askphi-widget:${GITHUB_SHA} \
-            --tag docker.io/${DOCKER_USER}/phi-askphi-widget:latest \
-            widget_service
 
       - name: Resolve Live Service URLs
         id: urls
         env:
           CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ steps.gcp-token.outputs.token_file }}
         run: |
-          OAUTH_URL="$(gcloud run services describe phi-oauth-server --project dominion-core-prod --region us-central1 --format='value(status.url)')"
-          WIDGET_URL="$(gcloud run services describe phi-askphi-widget --project dominion-core-prod --region us-central1 --format='value(status.url)')"
+          set -euo pipefail
+          OAUTH_URL="$(gcloud run services describe phi-oauth-server --project ${GCP_PROJECT_ID} --region ${GCP_REGION} --format='value(status.url)')"
+          WIDGET_URL="$(gcloud run services describe phi-askphi-widget --project ${GCP_PROJECT_ID} --region ${GCP_REGION} --format='value(status.url)')"
           echo "oauth_url=${OAUTH_URL}" >> "$GITHUB_OUTPUT"
           echo "widget_url=${WIDGET_URL}" >> "$GITHUB_OUTPUT"
 
-      - name: Deploy Command Core
-        env:
-          CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ steps.gcp-token.outputs.token_file }}
-        run: |
-          gcloud run deploy dominion-os-demo \
-            --project dominion-core-prod \
-            --region us-central1 \
-            --image docker.io/${{ vars.DOCKER_USER }}/dominion-os-demo:${GITHUB_SHA} \
-            --allow-unauthenticated \
-            --port 8080 \
-            --service-account dominion-runtime@dominion-core-prod.iam.gserviceaccount.com \
-            --set-env-vars SERVICE_NAME=dominion-os-demo,OAUTH_SERVER_URL=${{ steps.urls.outputs.oauth_url }},ASKPHI_WIDGET_URL=${{ steps.urls.outputs.widget_url }} \
-            --quiet
-
-      - name: Deploy OAuth Server
-        env:
-          CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ steps.gcp-token.outputs.token_file }}
-        run: |
-          JWT_SECRET="$(openssl rand -hex 32)"
-          SESSION_SECRET="$(openssl rand -hex 32)"
-          gcloud run deploy phi-oauth-server \
-            --project dominion-core-prod \
-            --region us-central1 \
-            --image docker.io/${{ vars.DOCKER_USER }}/phi-oauth-server:${GITHUB_SHA} \
-            --allow-unauthenticated \
-            --port 8080 \
-            --service-account dominion-runtime@dominion-core-prod.iam.gserviceaccount.com \
-            --set-secrets GITHUB_CLIENT_ID=github-oauth-client-id:latest,GITHUB_CLIENT_SECRET=github-oauth-client-secret:latest \
-            --set-env-vars JWT_SECRET=${JWT_SECRET},SESSION_SECRET=${SESSION_SECRET},OAUTH_BASE_URL=${{ steps.urls.outputs.oauth_url }},ASKPHI_WIDGET_URL=${{ steps.urls.outputs.widget_url }},AUTHORIZED_GITHUB_ORGS=Fractal5-Solutions,COOKIE_SECURE=1,ENV=production \
-            --quiet
-
-      - name: Deploy AskPHI Widget
-        env:
-          CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ steps.gcp-token.outputs.token_file }}
-        run: |
-          gcloud run deploy phi-askphi-widget \
-            --project dominion-core-prod \
-            --region us-central1 \
-            --image docker.io/${{ vars.DOCKER_USER }}/phi-askphi-widget:${GITHUB_SHA} \
-            --allow-unauthenticated \
-            --port 8080 \
-            --service-account dominion-runtime@dominion-core-prod.iam.gserviceaccount.com \
-            --quiet
-
-      - name: Verify Endpoints
+      - name: Deploy Authoritative Demo Service
         env:
           CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ steps.gcp-token.outputs.token_file }}
         run: |
           set -euo pipefail
-          DOMINION_URL="$(gcloud run services describe dominion-os-demo --project dominion-core-prod --region us-central1 --format='value(status.url)')"
-          OAUTH_URL="$(gcloud run services describe phi-oauth-server --project dominion-core-prod --region us-central1 --format='value(status.url)')"
-          WIDGET_URL="$(gcloud run services describe phi-askphi-widget --project dominion-core-prod --region us-central1 --format='value(status.url)')"
-          curl -fsS "${DOMINION_URL}/health"
-          curl -fsS "${DOMINION_URL}/status"
-          curl -fsS "${OAUTH_URL}/health"
-          curl -fsS "${OAUTH_URL}/ready"
-          curl -fsS "${WIDGET_URL}/health"
-          curl -fsS "${WIDGET_URL}/ready"
+          gcloud run deploy ${SERVICE_NAME} \
+            --project ${GCP_PROJECT_ID} \
+            --region ${GCP_REGION} \
+            --image ${IMAGE_REPO}:${GITHUB_SHA} \
+            --allow-unauthenticated \
+            --port 8080 \
+            --service-account dominion-runtime@dominion-core-prod.iam.gserviceaccount.com \
+            --set-env-vars SERVICE_NAME=${SERVICE_NAME},PROJECT_ID=${GCP_PROJECT_ID},REGION=${GCP_REGION},APP_VERSION=${{ steps.release.outputs.app_version }},OVERLAY=${{ steps.release.outputs.overlay }},RELEASE_SHA=${{ steps.release.outputs.release_sha }},RELEASE_REPO=${{ steps.release.outputs.release_repo }},SOURCE_OF_TRUTH_REPO=${{ steps.release.outputs.source_repo }},SOURCE_OF_TRUTH_SHA=${{ steps.release.outputs.source_sha }},SOURCE_OF_TRUTH_VERSION=${{ steps.release.outputs.source_version }},IMAGE_REF=${IMAGE_REPO}:${GITHUB_SHA},OAUTH_SERVER_URL=${{ steps.urls.outputs.oauth_url }},ASKPHI_WIDGET_URL=${{ steps.urls.outputs.widget_url }} \
+            --quiet
+
+      - name: Verify Live Release Contract
+        env:
+          CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ steps.gcp-token.outputs.token_file }}
+        run: |
+          set -euo pipefail
+          python scripts/verify_cloud_run_release.py \
+            --project ${GCP_PROJECT_ID} \
+            --region ${GCP_REGION} \
+            --service ${SERVICE_NAME} \
+            --expected-image-prefix "${IMAGE_REPO}@" \
+            --expected-version "${{ steps.release.outputs.app_version }}" \
+            --expected-release-repo "${{ steps.release.outputs.release_repo }}" \
+            --expected-overlay "${{ steps.release.outputs.overlay }}" \
+            --expected-release-sha "${{ steps.release.outputs.release_sha }}" \
+            --expected-source-repo "${{ steps.release.outputs.source_repo }}" \
+            --expected-source-sha "${{ steps.release.outputs.source_sha }}" \
+            --expected-source-version "${{ steps.release.outputs.source_version }}"
