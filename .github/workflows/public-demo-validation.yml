@@ -1,0 +1,52 @@
+name: public-demo-validation
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - 'codex/**'
+
+jobs:
+  validate-public-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate required 90s assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          required=(
+            "assets/references/README.md"
+            "assets/references/90s-demo/brief.md"
+            "assets/references/90s-demo/checklist.md"
+            "assets/references/90s-demo/manifest.json"
+          )
+          for f in "${required[@]}"; do
+            [[ -f "$f" ]] || { echo "::error file=$f::missing required reference asset"; exit 1; }
+          done
+          grep -qi "90" assets/references/90s-demo/brief.md
+          grep -q '"duration_seconds"[[:space:]]*:[[:space:]]*90' assets/references/90s-demo/manifest.json
+
+      - name: Validate no runtime source code in public layer
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git ls-files | grep -E '(^|/)(\.venv|\.venv_phi2|backups|scripts|oauth_server|command_center_demo|demo|dominion_demo_test|tests|widget_service|data|monitoring|orchestrator|systemd|store|command-center|commercial|products|grafana-dashboards|expansion)(/|$)' ; then
+            echo "::error::forbidden runtime directories are tracked"
+            exit 1
+          fi
+          if git ls-files | grep -E '\.(py|js|ts|tsx|jsx|go|java|cs|rb|php|sh|ps1)$|(^|/)Dockerfile($|\.)|(^|/)docker-compose.*\.ya?ml$'; then
+            echo "::error::runtime source files are tracked"
+            exit 1
+          fi
+
+      - name: Validate no sensitive secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git grep -n -I -E 'AIza[0-9A-Za-z_-]{35}|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|xox[baprs]-[A-Za-z0-9-]+|-----BEGIN [A-Z ]*PRIVATE KEY-----' -- . ; then
+            echo "::error::secret-like token pattern detected"
+            exit 1
+          fi

@@ -42,3 +42,11 @@ temp/
 docker-volumes/
 *.pid
 scripts/telemetry/*.json
+
+# Public demo cleanup
+.venv/
+.venv_phi2/
+backups/
+__pycache__/
+.pytest_cache/
+

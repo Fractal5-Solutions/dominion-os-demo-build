@@ -1,0 +1,9 @@
+{
+  "name": "dominion-os-90s-demo",
+  "duration_seconds": 90,
+  "asset_type": "reference",
+  "source_of_truth": "dominion-command-center",
+  "contains_source_code": false,
+  "contains_sensitive_data": false,
+  "version": "2026-03-19"
+}
