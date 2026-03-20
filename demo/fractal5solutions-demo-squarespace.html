@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fractal5 Demo</title>
+    <style>
+        :root {
+            --ink: #000000;
+            --bg: #ffffff;
+            --panel: #f5f5f5;
+            --border: #d9d9d9;
+            --muted: #797979;
+            --font-sans: "Manrope", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--ink);
+            font-family: var(--font-sans);
+        }
+
+        .f5-demo {
+            width: min(100%, 1180px);
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .hero {
+            padding: 32px;
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+        }
+
+        .eyebrow {
+            display: inline-block;
+            margin-bottom: 16px;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: var(--bg);
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0 0 12px;
+            font-size: clamp(2.4rem, 6vw, 4.4rem);
+            line-height: 0.94;
+            letter-spacing: -0.04em;
+            max-width: 10ch;
+        }
+
+        .lead {
+            margin: 0;
+            max-width: 58ch;
+            color: var(--muted);
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 22px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 46px;
+            padding: 0 18px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            text-decoration: none;
+            font-weight: 700;
+            transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #000000 0%, #797979 100%);
+            border-color: #000000;
+            color: #ffffff;
+        }
+
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--ink);
+        }
+
+        .btn:hover,
+        .btn:focus-visible {
+            border-color: var(--muted);
+            outline: none;
+        }
+
+        .status-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: var(--bg);
+            color: var(--muted);
+            font-size: 0.88rem;
+        }
+
+        .status-pill::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #000000;
+        }
+
+        .section {
+            margin-top: 20px;
+            padding: 28px;
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            background: var(--panel);
+        }
+
+        .section h2 {
+            margin: 0 0 8px;
+            font-size: 1.5rem;
+            letter-spacing: -0.03em;
+        }
+
+        .section-copy {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.7;
+            max-width: 60ch;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            margin-top: 18px;
+        }
+
+        .card {
+            padding: 18px;
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            background: var(--bg);
+        }
+
+        .card h3 {
+            margin: 0 0 8px;
+            font-size: 1rem;
+        }
+
+        .card p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.65;
+        }
+
+        .code-block {
+            margin-top: 18px;
+            padding: 18px;
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            background: var(--bg);
+        }
+
+        .code-block h3 {
+            margin: 0 0 10px;
+            font-size: 1rem;
+        }
+
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+            color: var(--ink);
+            font-family: "IBM Plex Mono", Consolas, monospace;
+            font-size: 0.92rem;
+            line-height: 1.65;
+        }
+
+        .footer {
+            margin-top: 20px;
+            color: var(--muted);
+            font-size: 0.92rem;
+            text-align: center;
+        }
+
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .f5-demo {
+                padding: 16px;
+            }
+
+            .hero,
+            .section {
+                padding: 20px;
+                border-radius: 22px;
+            }
+
+            h1 {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="f5-demo">
+        <section class="hero">
+            <div class="eyebrow">Gated Demo</div>
+            <h1>Fractal5 demo, built to work.</h1>
+            <p class="lead">
+                A clean, gated sandbox experience for decision makers and operators.
+                Open the demo. Review the store. Check health. Keep the message clear.
+            </p>
+
+            <div class="actions">
+                <a class="btn btn-primary" href="https://www.fractal5solutions.com/demo">Open Demo</a>
+                <a class="btn btn-secondary" href="https://www.fractal5solutions.com/store">Open Store</a>
+                <a class="btn btn-secondary" href="https://www.fractal5solutions.com/demo/healthz">Check Health</a>
+            </div>
+
+            <div class="status-row">
+                <div class="status-pill">Cloud Run</div>
+                <div class="status-pill">IAP gated</div>
+                <div class="status-pill">Sandbox compliant</div>
+                <div class="status-pill">Mobile ready</div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>What this page does</h2>
+            <p class="section-copy">
+                It gives users a direct path to the working demo without forcing them through
+                internal detail. It gives operators a simple route to confirm the service is live.
+            </p>
+
+            <div class="grid">
+                <article class="card">
+                    <h3>Open the demo</h3>
+                    <p>Use the main route to enter the gated experience and verify the user-facing shell loads cleanly.</p>
+                </article>
+                <article class="card">
+                    <h3>Review the store</h3>
+                    <p>Confirm the catalog route is live and aligned with the current offer.</p>
+                </article>
+                <article class="card">
+                    <h3>Check health</h3>
+                    <p>Use the health endpoint for a fast signal after deploy or during review.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Code for users</h2>
+            <p class="section-copy">
+                Small, direct examples. No extra dependencies. No decorative runtime logic.
+            </p>
+
+            <div class="code-block">
+                <h3>Fetch the page</h3>
+                <pre>curl -I https://www.fractal5solutions.com/demo</pre>
+            </div>
+
+            <div class="code-block">
+                <h3>Fetch health</h3>
+                <pre>curl -s https://www.fractal5solutions.com/demo/healthz</pre>
+            </div>
+        </section>
+
+        <div class="footer">
+            Fractal5 Solutions · /demo · Canon Phi sealed five monochrome
+        </div>
+    </div>
+</body>
+</html>

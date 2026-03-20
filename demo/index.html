@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fractal5 Demo | Gated Operator Experience</title>
+    <title>Fractal5 Demo | Gated Sandbox Experience</title>
     <style>
         :root {
             --bg: #0b0d10;
@@ -433,12 +433,11 @@
             <div class="hero-layout">
                 <div>
                     <span class="eyebrow">Gated /demo</span>
-                    <h1>Fractal5 demo surface, built for real users.</h1>
+                    <h1>Fractal5 demo, built to work.</h1>
                     <p class="hero-copy">
-                        This is the public entry point behind Cloud Run and IAP.
-                        It shows the live demo contract, operational state, and the
-                        code-backed surfaces people can actually click: overview,
-                        store, health, and topology.
+                        This is the gated demo surface behind Cloud Run and IAP.
+                        It keeps the message simple: open the demo, open the store,
+                        check health, and verify the live topology.
                     </p>
                     <div class="hero-actions">
                         <a class="btn btn-primary" id="open-command-center" href="#live-state">Review live state</a>
@@ -450,7 +449,7 @@
                 <div class="hero-aside">
                     <div class="signal">
                         <strong>Access pattern</strong>
-                        <div class="value">Users enter through the LB, pass IAP, and land on this demo page.</div>
+                        <div class="value">Users enter through the LB, pass IAP, and land on the demo.</div>
                     </div>
                     <div class="signal">
                         <strong>Current contract</strong>
@@ -458,16 +457,16 @@
                     </div>
                     <div class="signal">
                         <strong>Operator note</strong>
-                        <div class="value">If the page is healthy, the deployment is usually healthy too.</div>
+                        <div class="value">If this page works, the deployment is usually sound.</div>
                     </div>
                 </div>
             </div>
 
             <div class="status-pills">
-                <span class="pill"><span class="dot"></span> Cloud Run ready</span>
+                <span class="pill"><span class="dot"></span> Cloud Run</span>
                 <span class="pill"><span class="dot"></span> IAP gated</span>
-                <span class="pill"><span class="dot"></span> Mobile responsive</span>
-                <span class="pill"><span class="dot"></span> Audit-friendly</span>
+                <span class="pill"><span class="dot"></span> Mobile ready</span>
+                <span class="pill"><span class="dot"></span> Sandbox compliant</span>
             </div>
         </section>
 
@@ -476,8 +475,8 @@
                 <div>
                     <h2>Live state</h2>
                     <p class="section-copy">
-                        These cards are hydrated from the app's demo and topology APIs.
-                        If they are blank, the shell still renders and surfaces the fault.
+                        These cards are hydrated from the demo and topology APIs.
+                        If data is missing, the shell still loads and shows the fault.
                     </p>
                 </div>
                 <div class="section-actions">
@@ -520,12 +519,12 @@
                 <article class="card">
                     <span class="status-chip status-green">Step 2</span>
                     <h3>Review the store</h3>
-                    <p>Use <code>/store</code> to inspect the product catalog and confirm the public commerce surface is reachable.</p>
+                    <p>Use <code>/store</code> to confirm the catalog route is live.</p>
                 </article>
                 <article class="card">
                     <span class="status-chip status-green">Step 3</span>
                     <h3>Check health</h3>
-                    <p>Use <code>/health</code>, <code>/ready</code>, or <code>/healthz</code> when you need a fast operator-grade signal.</p>
+                    <p>Use <code>/health</code>, <code>/ready</code>, or <code>/healthz</code> for a quick signal.</p>
                 </article>
             </div>
         </section>
@@ -535,8 +534,8 @@
                 <div>
                     <h2>Demo commitments</h2>
                     <p class="section-copy">
-                        The runtime contract comes from checked-in JSON so the page stays synchronized
-                        with the repo's actual claims.
+                        The runtime contract comes from checked-in JSON so the page stays aligned
+                        with the repo.
                     </p>
                 </div>
             </div>
@@ -589,8 +588,8 @@ console.log(payload.config.version, payload.pages.demo);</code></pre>
                 <div>
                     <h2>Remote inventory</h2>
                     <p class="section-copy">
-                        The app still exposes telemetry-defined inventories for the two canonical projects,
-                        but the page only claims what the APIs can show.
+                        The app exposes telemetry-defined inventories for the two projects
+                        without overstating runtime health.
                     </p>
                 </div>
             </div>
@@ -719,7 +718,7 @@ console.log(payload.config.version, payload.pages.demo);</code></pre>
             const topologyPayload = await topologyResponse.json();
             const demo = demoPayload.config || {};
             const info = {
-                service: topologyPayload?.local_services?.[0]?.name ? "Fractal5 Demo" : "Fractal5 Demo",
+                service: "Fractal5 Demo",
                 version: demo.version,
                 region: "us-central1",
                 project_id: "732190342674",

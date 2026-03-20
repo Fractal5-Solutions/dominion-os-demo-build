@@ -1,0 +1,221 @@
+<!-- Fractal5 · /demo (Canon Phi v1.0 · Squarespace block · sealed five only) -->
+<section class="f5-demo-page"
+         data-page="demo"
+         data-version="1.0"
+         data-public-sandbox="https://dominion-os-demo-reduwyf2ra-uc.a.run.app"
+         data-contact-lock="https://www.fractal5solutions.com/solutions#contact"
+         role="region"
+         aria-labelledby="f5-demo-title"
+         style="background: transparent;">
+  <style>
+    .f5-demo-page{
+      --phi:1.618; --base:16px;
+      --gap:calc(var(--base)*var(--phi));
+      --pad:calc(var(--base)*var(--phi)*1.1);
+      --wrap:max(62ch, min(92vw, 1120px));
+
+      --ink:#000000;
+      --onink:#ffffff;
+      --muted:#797979;
+      --bg:transparent;
+      --tile:#ffffff;
+      --panel:#f5f5f5;
+      --line:#d9d9d9;
+      --grid:rgba(0,0,0,.06);
+      --focus:#000000;
+      --radius:14px;
+
+      --f5-sans:"Manrope", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+
+      color:var(--ink);
+      font-family:var(--f5-sans);
+      line-height:1.55;
+    }
+
+    .f5-demo-page .wrap{max-width:var(--wrap);margin:0 auto;padding:var(--pad) calc(var(--pad)*.8);}
+    .f5-demo-page .hero{
+      background:linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+      border:1px solid var(--line);
+      border-radius:calc(var(--radius) * 1.4);
+      padding:var(--pad);
+    }
+    .f5-demo-page .eyebrow{font-size:.92rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 .35rem 0;}
+    .f5-demo-page .h1{font-weight:600;font-size:clamp(2rem,1.2rem+2.8vw,3.4rem);line-height:.95;margin:0;max-width:10ch;text-wrap:balance;}
+    .f5-demo-page .lead{font-weight:600;font-size:clamp(1.02rem,.96rem + .28vw,1.16rem);max-width:66ch;margin:.7rem 0 0 0;color:var(--ink);}
+
+    .f5-demo-page .toolbar{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:calc(var(--pad)*.8) 0 0 0;}
+    .f5-demo-page .btn{
+      display:inline-block;
+      text-decoration:none;
+      font-weight:600;
+      padding:.72rem 1rem;
+      border-radius:10px;
+      border:1px solid var(--line);
+      background:var(--ink);
+      color:var(--onink);
+      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+    }
+    .f5-demo-page .btn.ghost{background:transparent;color:var(--ink);}
+    .f5-demo-page .btn:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(0,0,0,.12);}
+    .f5-demo-page a:focus-visible{outline:3px solid var(--focus);outline-offset:2px;}
+
+    .f5-demo-page .status-row{display:flex;flex-wrap:wrap;gap:.5rem;margin:1rem 0 0 0;}
+    .f5-demo-page .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:.45rem;
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:.34rem .7rem;
+      font-size:.92rem;
+      font-weight:600;
+      background:var(--tile);
+      color:var(--ink);
+    }
+    .f5-demo-page .chip::before{
+      content:"";
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:var(--ink);
+      flex:0 0 auto;
+    }
+
+    .f5-demo-page .band{margin-top:calc(var(--pad)*1.05);}
+    .f5-demo-page .band h2{font-weight:600;font-size:clamp(1.35rem,1.05rem + 1vw,1.75rem);margin:0 0 .4rem 0;}
+    .f5-demo-page .kicker{font-size:.92rem;color:var(--muted);margin:0 0 .15rem 0;letter-spacing:.04em;text-transform:uppercase;}
+    .f5-demo-page .section-lead{font-size:.98rem;color:var(--muted);margin:0 0 .85rem 0;max-width:66ch;}
+
+    .f5-demo-page .grid{display:grid;gap:var(--gap);grid-template-columns:repeat(auto-fit, minmax(240px,1fr));}
+    .f5-demo-page .tile{
+      position:relative;
+      isolation:isolate;
+      background:var(--tile);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:calc(var(--pad)*.72);
+      transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+    }
+    .f5-demo-page .tile::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:inherit;
+      pointer-events:none;
+      opacity:.4;
+      background-image:
+        linear-gradient(to right, var(--grid) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+      background-size:20px 20px;
+      mask:linear-gradient(to bottom, rgba(0,0,0,.06), rgba(0,0,0,.2));
+      z-index:0;
+    }
+    .f5-demo-page .tile:hover{
+      transform:translateY(-2px);
+      box-shadow:0 12px 28px rgba(0,0,0,.12);
+      border-color:var(--ink);
+    }
+    .f5-demo-page .tile > *{position:relative;z-index:1;}
+    .f5-demo-page .name{font-weight:600;font-size:1.12rem;margin:.15rem 0 .35rem 0;}
+    .f5-demo-page .desc{font-size:.95rem;color:var(--muted);margin:.2rem 0 0 0;}
+
+    .f5-demo-page .code-card{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:calc(var(--pad)*.72);
+    }
+    .f5-demo-page .code-title{font-weight:600;font-size:1rem;margin:0 0 .45rem 0;}
+    .f5-demo-page pre{
+      margin:0;
+      white-space:pre-wrap;
+      word-break:break-word;
+      font:500 .94rem/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color:var(--ink);
+    }
+
+    .f5-demo-page .foot{
+      margin-top:calc(var(--pad)*1.1);
+      padding-top:calc(var(--pad)*.9);
+      border-top:1px solid var(--line);
+      text-align:center;
+      display:flex;
+      gap:.6rem;
+      justify-content:center;
+      flex-wrap:wrap;
+    }
+    .f5-demo-page .status{margin:.4rem 0 0;font-size:.92rem;color:var(--muted);text-align:center;}
+
+    @media (prefers-color-scheme:dark){
+      .f5-demo-page{ --tile:#000000; --panel:#000000; --line:#d9d9d9; --muted:#797979; --ink:#ffffff; --onink:#000000; --grid:rgba(255,255,255,.08); }
+      .f5-demo-page .hero{ background:linear-gradient(135deg, #797979 0%, #000000 100%); }
+    }
+    @media (prefers-reduced-motion:reduce){ .f5-demo-page *{ transition:none !important; animation:none !important; } }
+  </style>
+
+  <div class="wrap">
+    <header class="hero">
+      <p class="eyebrow">Public GCloud Sandbox</p>
+      <h1 class="h1" id="f5-demo-title">Fractal5 demo, built to work.</h1>
+      <p class="lead">A public GCloud sandbox anyone can open. Review the live demo, verify health, and move to onboarding only when the system proves itself.</p>
+      <div class="toolbar">
+        <a class="btn" href="https://dominion-os-demo-reduwyf2ra-uc.a.run.app" aria-label="Open the Fractal5 public sandbox">Open Public Sandbox</a>
+        <a class="btn ghost" href="https://dominion-os-demo-reduwyf2ra-uc.a.run.app/demo" aria-label="Open the Fractal5 demo route on the public sandbox">Open Demo Route</a>
+        <a class="btn ghost" href="https://dominion-os-demo-reduwyf2ra-uc.a.run.app/health" aria-label="Check the Fractal5 public sandbox health endpoint">Check Health</a>
+      </div>
+      <div class="status-row" aria-label="Demo status">
+        <span class="chip">Cloud Run</span>
+        <span class="chip">Public sandbox</span>
+        <span class="chip">GCloud live</span>
+        <span class="chip">Mobile ready</span>
+      </div>
+    </header>
+
+    <section class="band" aria-label="Demo overview">
+      <h2>What this page does</h2>
+      <p class="section-lead">It gives users a direct path to the public sandbox and gives operators a simple route to confirm the service is live.</p>
+      <div class="grid">
+        <article class="tile" role="listitem" tabindex="0">
+          <p class="kicker">Step 1</p>
+          <h3 class="name">Open the demo</h3>
+          <p class="desc">Open the public sandbox and confirm the live service responds without authentication friction.</p>
+        </article>
+        <article class="tile" role="listitem" tabindex="0">
+          <p class="kicker">Step 2</p>
+          <h3 class="name">Review the store</h3>
+          <p class="desc">Open the demo route and confirm the public experience is reachable from Cloud Run.</p>
+        </article>
+        <article class="tile" role="listitem" tabindex="0">
+          <p class="kicker">Step 3</p>
+          <h3 class="name">Check health</h3>
+          <p class="desc">Use the health endpoint for a fast public signal after deploy or during review.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="band" aria-label="Code for users">
+      <h2>Code for users</h2>
+      <p class="section-lead">Small, direct examples. No decorative runtime logic. No hidden dependencies.</p>
+      <div class="grid">
+        <article class="code-card" role="listitem">
+          <p class="code-title">Fetch the page</p>
+          <pre>curl -I https://dominion-os-demo-reduwyf2ra-uc.a.run.app</pre>
+        </article>
+        <article class="code-card" role="listitem">
+          <p class="code-title">Fetch health</p>
+          <pre>curl -s https://dominion-os-demo-reduwyf2ra-uc.a.run.app/health</pre>
+        </article>
+        <article class="code-card" role="listitem">
+          <p class="code-title">Open demo route</p>
+          <pre>https://dominion-os-demo-reduwyf2ra-uc.a.run.app/demo</pre>
+        </article>
+      </div>
+    </section>
+
+    <div class="foot">
+      <a class="btn" href="https://www.fractal5solutions.com/solutions#contact" aria-label="Contact Fractal5 to start onboarding">Start Cloud Onboarding</a>
+      <a class="btn ghost" href="https://www.fractal5solutions.com/store" aria-label="Browse the Dominion OS store">Browse Dominion OS Store</a>
+    </div>
+    <p class="status">Fractal5 Solutions · /demo · Canon Phi sealed five monochrome</p>
+  </div>
+</section>
