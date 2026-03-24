@@ -13,13 +13,15 @@ import base64
 import hashlib
 import os
 import secrets
+import time
+from threading import Lock
 from datetime import datetime, timedelta, timezone
 from http import HTTPStatus
-from urllib.parse import quote
+from urllib.parse import quote, urlparse
 
 import jwt
 import requests
-from flask import Flask, jsonify, redirect, render_template_string, request, session
+from flask import Flask, g, jsonify, redirect, render_template_string, request, session
 from flask_cors import CORS
 
 REQUEST_TIMEOUT_SECONDS = float(os.getenv("REQUEST_TIMEOUT_SECONDS", "10"))
@@ -42,7 +44,13 @@ PLACEHOLDER_VALUES = {
     "your_client_id_here",
     "your_client_secret_here",
     "change-me",
+    "change_this",
+    "your_jwt_secret_here",
+    "your_session_secret_here",
 }
+
+if SESSION_SECRET in PLACEHOLDER_VALUES:
+    raise RuntimeError("SESSION_SECRET must be provided via secret manager")
 
 app = Flask(__name__)
 app.config.update(
@@ -50,8 +58,14 @@ app.config.update(
     SESSION_COOKIE_SAMESITE="Lax",
     SESSION_COOKIE_SECURE=COOKIE_SECURE,
 )
-app.secret_key = SESSION_SECRET or secrets.token_hex(32)
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+app.secret_key = SESSION_SECRET
+
+_RATE_LIMIT_WINDOW_SECONDS = 60
+_RATE_LIMIT_REFILL_RATE = float(os.getenv("RATE_LIMIT_PER_MINUTE", "60"))
+_RATE_LIMIT_BURST = float(os.getenv("RATE_LIMIT_BURST", "200"))
+_RATE_LIMIT_PATH_PREFIXES = ("/auth", "/chat", "/api/chat")
+_rate_limit_lock = Lock()
+_rate_limit_state: dict[str, tuple[float, float]] = {}
 
 
 def utcnow_iso() -> str:
@@ -70,6 +84,38 @@ def required_config_status() -> dict[str, bool]:
 
 def oauth_ready() -> bool:
     return all(required_config_status().values())
+
+
+def allowed_origins() -> list[str]:
+    origins: set[str] = set()
+    for candidate in (WIDGET_BASE_URL, OAUTH_BASE_URL):
+        if not candidate:
+            continue
+        parsed = urlparse(candidate)
+        if parsed.scheme and parsed.netloc:
+            origins.add(f"{parsed.scheme}://{parsed.netloc}")
+    for explicit in os.getenv("TRUSTED_ORIGINS", "").split(","):
+        explicit = explicit.strip()
+        if explicit:
+            origins.add(explicit)
+    return sorted(origins) or ["https://trusted-demo.example.com"]
+
+
+def _take_rate_limit_token(remote_ip: str) -> bool:
+    now = time.monotonic()
+    with _rate_limit_lock:
+        tokens, last_seen = _rate_limit_state.get(remote_ip, (_RATE_LIMIT_BURST, now))
+        elapsed = max(0.0, now - last_seen)
+        refill = elapsed * (_RATE_LIMIT_REFILL_RATE / _RATE_LIMIT_WINDOW_SECONDS)
+        tokens = min(_RATE_LIMIT_BURST, tokens + refill)
+        if tokens < 1.0:
+            _rate_limit_state[remote_ip] = (tokens, now)
+            return False
+        _rate_limit_state[remote_ip] = (tokens - 1.0, now)
+    return True
+
+
+CORS(app, resources={r"/api/*": {"origins": allowed_origins()}})
 
 
 def callback_url() -> str:
@@ -128,8 +174,30 @@ def add_security_headers(response):
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
     response.headers.setdefault("X-Frame-Options", "DENY")
     response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
-    response.headers.setdefault("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://github.com https://api.github.com; frame-ancestors 'none'; base-uri 'self'")
+    csp_nonce = getattr(g, "csp_nonce", "")
+    response.headers.setdefault(
+        "Content-Security-Policy",
+        (
+            "default-src 'self'; "
+            f"style-src 'self' 'nonce-{csp_nonce}'; "
+            f"script-src 'self' 'nonce-{csp_nonce}'; "
+            "img-src 'self' data:; "
+            "connect-src 'self' https://github.com https://api.github.com; "
+            "frame-ancestors 'none'; base-uri 'self'"
+        ),
+    )
     return response
+
+
+@app.before_request
+def request_guards():
+    g.csp_nonce = secrets.token_urlsafe(16)
+    path = request.path or "/"
+    if any(path.startswith(prefix) for prefix in _RATE_LIMIT_PATH_PREFIXES):
+        remote_ip = request.headers.get("X-Forwarded-For", request.remote_addr or "unknown").split(",")[0].strip()
+        if not _take_rate_limit_token(remote_ip):
+            return jsonify({"error": "rate_limited"}), HTTPStatus.TOO_MANY_REQUESTS
+    return None
 
 
 @app.route("/health")
@@ -158,7 +226,7 @@ def index():
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PHI OAuth</title>
-  <style>
+  <style nonce="{{ csp_nonce }}">
     body { font-family: "IBM Plex Sans", sans-serif; margin: 0; padding: 32px; background: linear-gradient(135deg, #0f0f0f, #5f5f5f); color: #111; }
     .panel { max-width: 720px; margin: 0 auto; background: #fff; border-radius: 24px; padding: 28px; box-shadow: 0 24px 60px rgba(0,0,0,.18); }
     .pill { display: inline-block; padding: 6px 10px; border-radius: 999px; background: #111; color: #fff; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
@@ -182,6 +250,7 @@ def index():
         """,
         payload=payload,
         callback_url=callback_url(),
+        csp_nonce=g.csp_nonce,
     )
 
 
@@ -299,7 +368,7 @@ def chat():
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PHI Chat</title>
-  <style>
+  <style nonce="{{ csp_nonce }}">
     body { font-family: "IBM Plex Sans", sans-serif; background: linear-gradient(135deg, #101010, #707070); margin: 0; padding: 20px; }
     .chat { max-width: 880px; margin: 0 auto; min-height: calc(100vh - 40px); background: #fff; border-radius: 24px; padding: 24px; display: flex; flex-direction: column; }
     .messages { flex: 1; overflow: auto; border: 1px solid #e6e6e6; border-radius: 18px; padding: 16px; margin: 16px 0; }
@@ -323,7 +392,7 @@ def chat():
       <button id="sendButton" type="button">Send</button>
     </div>
   </div>
-  <script>
+  <script nonce="{{ csp_nonce }}">
     const token = {{ token | tojson }};
     const messages = document.getElementById("messages");
     const input = document.getElementById("messageInput");
@@ -361,6 +430,7 @@ def chat():
         """,
         token=token,
         username=username,
+        csp_nonce=g.csp_nonce,
     )
 
 

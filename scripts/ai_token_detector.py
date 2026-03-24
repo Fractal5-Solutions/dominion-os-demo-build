@@ -148,7 +148,8 @@ class AITokenDetector:
                         f"  - {activity['type']} in {activity['repo']} at {activity['time']}"
                     )
         else:
-            report.append(f"❌ {activity_check['status']}: {activity_check['message']}")
+            message = activity_check.get("message", "No GitHub token provided for activity analysis.")
+            report.append(f"❌ {activity_check['status']}: {message}")
 
         return "\n".join(report)
 
@@ -162,7 +163,10 @@ def main():
 
     # Check token activity if token is provided
     token = os.getenv("GITHUB_TOKEN")
-    activity_check = {"status": "NO_TOKEN_PROVIDED"}
+    activity_check = {
+        "status": "NO_TOKEN_PROVIDED",
+        "message": "No GITHUB_TOKEN in environment; skipped activity analysis.",
+    }
 
     if token:
         print("🔍 Checking GitHub activity...")
