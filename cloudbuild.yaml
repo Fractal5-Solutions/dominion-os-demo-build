@@ -1,54 +1,60 @@
 steps:
-  # Step 1: Authenticate Docker
-  - name: 'gcr.io/cloud-builders/gcloud'
-    id: 'auth-docker'
-    entrypoint: 'bash'
+  - name: gcr.io/cloud-builders/gcloud
+    id: auth-docker
+    entrypoint: bash
     args:
-      - '-c'
+      - -c
       - |
-        gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+        gcloud auth configure-docker ${_REGION}-docker.pkg.dev --quiet
 
-  # Step 2: Build Container
-  - name: 'gcr.io/cloud-builders/docker'
-    id: 'build-container'
+  - name: gcr.io/cloud-builders/docker
+    id: build-image
     args:
-      - 'build'
-      - '-f'
-      - '$_DOCKERFILE'
-      - '-t'
-      - 'us-central1-docker.pkg.dev/$PROJECT_ID/dominion-os-repo/$_SERVICE_NAME:latest'
-      - '$_BUILD_CONTEXT'
+      - build
+      - -f
+      - $_DOCKERFILE
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE_NAME}:${_TAG}
+      - $_BUILD_CONTEXT
 
-  # Step 3: Push Container
-  - name: 'gcr.io/cloud-builders/docker'
-    id: 'push-container'
+  - name: gcr.io/cloud-builders/docker
+    id: push-image
     args:
-      - 'push'
-      - 'us-central1-docker.pkg.dev/$PROJECT_ID/dominion-os-repo/$_SERVICE_NAME:latest'
+      - push
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE_NAME}:${_TAG}
 
-  # Step 4: Deploy to Cloud Run
-  - name: 'gcr.io/cloud-builders/gcloud'
-    id: 'deploy-cloud-run'
+  - name: gcr.io/cloud-builders/gcloud
+    id: deploy-cloud-run
     args:
-      - 'run'
-      - 'deploy'
-      - '$_SERVICE_NAME'
-      - '--image'
-      - 'us-central1-docker.pkg.dev/$PROJECT_ID/dominion-os-repo/$_SERVICE_NAME:latest'
-      - '--region'
-      - '$_REGION'
-      - '--platform'
-      - 'managed'
-      - '--port'
+      - run
+      - deploy
+      - $_SERVICE_NAME
+      - --image
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE_NAME}:${_TAG}
+      - --region
+      - $_REGION
+      - --platform
+      - managed
+      - --ingress
+      - internal-and-cloud-load-balancing
+      - --no-allow-unauthenticated
+      - --port
       - '8080'
-      - '--set-env-vars'
-      - 'SERVICE_NAME=$_SERVICE_NAME'
-      - '--allow-unauthenticated'
-      - '--quiet'
+      - --set-env-vars
+      - SERVICE_NAME=$_SERVICE_NAME,PROJECT_ID=$PROJECT_ID,REGION=$_REGION
+      - --quiet
 
-# Substitutions for deployment configuration
 substitutions:
-  _SERVICE_NAME: 'dominion-os-demo'
-  _REGION: 'us-central1'
-  _DOCKERFILE: 'Dockerfile.production'
-  _BUILD_CONTEXT: '.'
+  _SERVICE_NAME: dominion-demo
+  _REGION: us-central1
+  _AR_REPO: dominion-demo-repo
+  _DOCKERFILE: Dockerfile.production
+  _BUILD_CONTEXT: .
+  _TAG: latest
+
+images:
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE_NAME}:${_TAG}
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+timeout: 1200s

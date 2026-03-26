@@ -22,7 +22,7 @@ All required outputs, dependencies, and configurations have been successfully in
 - ✅ `pytest`, `pytest-cov`, `pytest-asyncio` - Testing framework
 - ✅ `black`, `isort`, `ruff`, `mypy`, `pylint` - Code quality tools
 - ✅ `pre-commit` - Git hook framework
-- ✅ `ipython` - Enhanced Python REPL
+- ✅ Optional REPL tooling removed from tracked install manifests to keep the baseline dependency surface smaller and cleaner.
 
 #### Google Cloud Platform:
 - ✅ `google-cloud-core`

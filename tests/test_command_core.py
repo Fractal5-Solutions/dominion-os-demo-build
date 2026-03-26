@@ -34,9 +34,9 @@ def test_demo_and_store_pages_render():
     store_response = client.get("/store")
 
     assert demo_response.status_code == 200
-    assert b"Command-Center Proof" in demo_response.data
+    assert b'data-contract="demo-shell"' in demo_response.data
     assert store_response.status_code == 200
-    assert b"Dominion OS Store" in store_response.data
+    assert b'data-contract="store-shell"' in store_response.data
 
 
 def test_products_api_exposes_repo_inventory():

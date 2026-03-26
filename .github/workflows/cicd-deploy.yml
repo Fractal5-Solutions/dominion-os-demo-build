@@ -1,0 +1,45 @@
+name: Build & Deploy Demo (OIDC)
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: projects/732190342674/locations/global/workloadIdentityPools/fractal5-github-pool/providers/github-provider
+          service_account: dominion-demo-oidc-sa@732190342674.iam.gserviceaccount.com
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v3
+        with:
+          project_id: 732190342674
+          version: ">= 363.0.0"
+
+      - name: Submit Cloud Build
+        run: |
+          REF="${GITHUB_REF##*/}"
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            TAG="${REF}"
+          else
+            TAG="${GITHUB_SHA}"
+          fi
+
+          gcloud builds submit \
+            --project=732190342674 \
+            --config cloudbuild.yaml \
+            --substitutions=_TAG="${TAG}",_REGION=us-central1,_SERVICE_NAME=dominion-demo,_AR_REPO=dominion-demo-repo

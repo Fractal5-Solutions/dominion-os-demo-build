@@ -131,7 +131,7 @@ pip install uvicorn fastapi python-jose
 - uvicorn 0.41.0 - ASGI web server
 - fastapi 0.135.1 - Modern web framework
 - python-jose 3.5.0 - JWT authentication
-- ecdsa 0.19.1 - Cryptographic signatures
+- Active manifests no longer carry `ecdsa`; JWT signing uses the current supported stack.
 - pydantic 2.12.5 - Data validation
 - starlette 0.52.1 - ASGI framework
 

@@ -3,7 +3,7 @@
   "overlay": "business",
   "source_of_truth": {
     "repo": "dominion-command-center",
-    "sha": "",
-    "version": "AUTO"
+    "sha": "ce003b45a156",
+    "version": "ce003b45a156"
   }
 }
