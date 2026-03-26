@@ -94,6 +94,12 @@ jobs:
           derived_version = latest_tag if latest_tag else f"r{release_count}+{github_sha}"
 
           source = manifest.get("source_of_truth", {})
+          source_repo = source.get("repo", "")
+          source_sha = source.get("sha", "")
+          if not source_repo:
+              raise SystemExit("release manifest must declare source_of_truth.repo")
+          if not source_sha:
+              raise SystemExit("release manifest must declare source_of_truth.sha")
 
           app_version = manifest.get("app_version", "AUTO")
           if not app_version or app_version == "AUTO":
@@ -101,13 +107,13 @@ jobs:
 
           source_version = source.get("version", "AUTO")
           if not source_version or source_version == "AUTO":
-              source_version = derived_version
+              source_version = source_sha
 
           print(f"app_version={app_version}")
           print(f"overlay={manifest['overlay']}")
           print(f"release_repo={name}")
-          print(f"source_repo={source['repo']}")
-          print(f"source_sha={source.get('sha', '')}")
+          print(f"source_repo={source_repo}")
+          print(f"source_sha={source_sha}")
           print(f"source_version={source_version}")
           print(f"release_count={release_count}")
           print(f"latest_release_tag={latest_tag}")
@@ -165,7 +171,8 @@ jobs:
             --project ${GCP_PROJECT_ID} \
             --region ${GCP_REGION} \
             --image ${IMAGE_REPO}:${GITHUB_SHA} \
-            --allow-unauthenticated \
+            --ingress internal-and-cloud-load-balancing \
+            --no-allow-unauthenticated \
             --port 8080 \
             --service-account dominion-runtime@dominion-core-prod.iam.gserviceaccount.com \
             --set-env-vars SERVICE_NAME=${SERVICE_NAME},PROJECT_ID=${GCP_PROJECT_ID},REGION=${GCP_REGION},APP_VERSION=${{ steps.release.outputs.app_version }},OVERLAY=${{ steps.release.outputs.overlay }},RELEASE_SHA=${{ steps.release.outputs.release_sha }},RELEASE_REPO=${{ steps.release.outputs.release_repo }},SOURCE_OF_TRUTH_REPO=${{ steps.release.outputs.source_repo }},SOURCE_OF_TRUTH_SHA=${{ steps.release.outputs.source_sha }},SOURCE_OF_TRUTH_VERSION=${{ steps.release.outputs.source_version }},IMAGE_REF=${IMAGE_REPO}:${GITHUB_SHA},OAUTH_SERVER_URL=${{ steps.urls.outputs.oauth_url }},ASKPHI_WIDGET_URL=${{ steps.urls.outputs.widget_url }} \

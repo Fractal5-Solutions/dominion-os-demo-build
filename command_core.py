@@ -83,10 +83,10 @@ LANDING_TEMPLATE = """
         * { box-sizing: border-box; }
         body {
             margin: 0;
-            font-family: "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif;
+            font-family: "Manrope", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
             color: var(--ink);
             background:
-                radial-gradient(circle at top left, rgba(217, 217, 217, 0.9), transparent 35%),
+                radial-gradient(circle at top left, var(--steel), transparent 35%),
                 linear-gradient(135deg, var(--paper), var(--mist));
         }
         main {
@@ -98,10 +98,10 @@ LANDING_TEMPLATE = """
             display: grid;
             gap: 20px;
             padding: 32px;
-            border: 1px solid rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--steel);
             border-radius: 28px;
-            background: rgba(255, 255, 255, 0.88);
-            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.08);
+            background: var(--paper);
+            box-shadow: 0 24px 60px var(--steel);
         }
         .eyebrow {
             display: inline-flex;
@@ -122,7 +122,7 @@ LANDING_TEMPLATE = """
         p {
             margin: 0;
             max-width: 62ch;
-            color: rgba(0, 0, 0, 0.72);
+            color: var(--ash);
             font-size: 1.05rem;
         }
         .actions {
@@ -149,7 +149,7 @@ LANDING_TEMPLATE = """
         .btn-secondary {
             background: transparent;
             color: var(--ink);
-            border: 1px solid rgba(0, 0, 0, 0.16);
+            border: 1px solid var(--steel);
         }
         .grid {
             display: grid;
@@ -160,8 +160,8 @@ LANDING_TEMPLATE = """
         .card {
             padding: 20px;
             border-radius: 22px;
-            background: rgba(255, 255, 255, 0.82);
-            border: 1px solid rgba(0, 0, 0, 0.08);
+            background: var(--paper);
+            border: 1px solid var(--steel);
         }
         .card strong {
             display: block;
@@ -170,7 +170,7 @@ LANDING_TEMPLATE = """
         }
         .meta {
             margin-top: 24px;
-            color: rgba(0, 0, 0, 0.56);
+            color: var(--ash);
             font-size: 0.92rem;
         }
     </style>
