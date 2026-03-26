@@ -5,21 +5,6 @@ PyJWT>=2.8.0
 gunicorn>=22.0.0
 requests>=2.33.0
 
-# Testing
-pytest>=7.4.0
-pytest-cov>=4.1.0
-pytest-asyncio>=0.21.0
-
-# Code Quality & Linting
-black>=23.7.0
-isort>=5.12.0
-ruff>=0.0.284
-mypy>=1.5.0
-pylint>=2.17.0
-
-# Development Tools
-pre-commit>=3.3.3
-
 # Google Cloud Platform
 google-cloud-core>=2.3.3
 google-cloud-storage>=2.10.0
@@ -44,12 +29,6 @@ colorama>=0.4.6
 # Utilities
 python-dotenv>=1.0.0
 pathlib>=1.0.1
-
-# AI/ML Frameworks - Compatible versions
-torch>=2.4.0
-torchvision>=0.19.0
-torchaudio>=2.4.0
-transformers>=4.45.0
 
 # Dependency conflict resolution
 sympy>=1.13.1

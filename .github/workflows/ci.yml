@@ -33,6 +33,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install flake8 pytest black
           find . -name requirements.txt -exec pip install -r {} \;
+          find . -name requirements-dev.txt -exec pip install -r {} \;
       
       - name: Lint with flake8
         run: |
