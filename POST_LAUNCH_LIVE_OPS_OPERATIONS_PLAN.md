@@ -36,7 +36,7 @@ Maximum Sovereign Power Mode engaged with full autonomous capabilities.
 - ✅ 9/10 Critical vulnerabilities resolved
 - ✅ Enterprise-grade authentication active
 - ✅ Branch protection enforced
-- ⚠️ 1 remaining low-priority vulnerability (ecdsa - awaiting upstream fix)
+- Active tracked dependency manifests were remediated on March 26, 2026; no accepted dependency vulnerabilities remain in scope for this repo.
 
 ---
 
