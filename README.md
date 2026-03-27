@@ -26,3 +26,7 @@ Public-facing demo service repository for Dominion OS.
 - `DOMINION_OS_DEPLOYMENT_PROOF.md`
 - `OPTIMAL_DEPLOYMENT_PROOF.md`
 - `PRODUCTION_READINESS_PROOF.md`
+
+## Runbook Notes
+
+- Probe semantics for `/status` and `/api/v1/topology` are documented in `RUNBOOK_STATUS_PROBES.md`.
