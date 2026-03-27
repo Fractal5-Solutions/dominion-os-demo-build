@@ -51,6 +51,13 @@ LOCAL_SERVICE_TARGETS = (
         "url": os.getenv("OAUTH_SERVER_URL", "http://127.0.0.1:8080"),
         "health_paths": ("/health", "/ready"),
     },
+    {
+        "id": "phi-askphi-widget",
+        "name": "PHI AskPHI Widget",
+        "role": "public-safe-chat",
+        "url": os.getenv("ASKPHI_WIDGET_URL", "http://127.0.0.1:8081"),
+        "health_paths": ("/health", "/ready"),
+    },
 )
 
 REMOTE_TELEMETRY_FILES = {
@@ -371,7 +378,7 @@ def load_demo_experience() -> dict:
         "links": {
             "command_center": LOCAL_SERVICE_TARGETS[0]["url"],
             "oauth": LOCAL_SERVICE_TARGETS[1]["url"],
-            "widget": os.getenv("ASKPHI_WIDGET_URL", "http://127.0.0.1:8081"),
+            "widget": LOCAL_SERVICE_TARGETS[2]["url"],
         },
     }
 
