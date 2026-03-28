@@ -2,7 +2,7 @@
 
 ## 📊 DEPLOYMENT STATUS SUMMARY
 
-**Status**: ⚠️ **PARTIALLY DEPLOYED - REQUIRES MANUAL CONFIGURATION**
+**Status**: ⚠️ **REPO READY; REMOTE OAUTH DEPLOYMENT REQUIRES OWNER ACTION**
 **Timestamp**: March 2, 2026
 **Environment**: Production (dominion-core-prod)
 
@@ -23,13 +23,18 @@
 
 ---
 
-## ⚠️ PENDING CONFIGURATION REQUIRED
+## ⚠️ REMAINING BLOCKERS
 
 ### **OAuth Server**
 - **Service Name**: `phi-oauth-server`
 - **URL**: `https://phi-oauth-server-447370233441.us-central1.run.app`
-- **Status**: ❌ **NOT HEALTHY** (Permission Issues)
-- **Issue**: Missing GitHub OAuth secrets and permissions
+- **Status**: ❌ **REMOTE DEPLOYMENT NOT ALIGNED**
+- **Issue**: Remaining work is in environment ownership and deployed-service alignment, not in ambiguous local repo scripts
+
+### **What Changed In The Assessment**
+- The repo-side implementation and readiness reporting are now clear enough to separate local readiness from remote environment problems.
+- The open work is operational: confirm owner access to the target GCP project and reconcile the deployed `phi-oauth-server` revision with the repo implementation.
+- If the deployed service does not expose the repo's expected health/readiness routes, treat that as deployment drift.
 
 ### **Required Actions**
 
@@ -56,7 +61,7 @@ echo -n 'YOUR_GITHUB_CLIENT_SECRET' | gcloud secrets create github-oauth-client-
   --project dominion-core-prod --data-file=-
 ```
 
-#### **3. Grant Permissions**
+#### **3. Confirm Environment Ownership And Grant Permissions**
 ```bash
 # Grant access to Client ID
 gcloud secrets add-iam-policy-binding github-oauth-client-id \
@@ -77,6 +82,13 @@ gcloud run services update phi-oauth-server \
   --project dominion-core-prod \
   --region us-central1
 ```
+
+#### **5. Verify Deployment Alignment**
+```bash
+curl -i https://phi-oauth-server-447370233441.us-central1.run.app/health
+curl -i https://phi-oauth-server-447370233441.us-central1.run.app/ready
+```
+Expected result: the deployed service should expose the same health/readiness contract as the repo implementation. If it does not, the blocker is deployment mismatch.
 
 ---
 
@@ -147,7 +159,7 @@ gcloud run services update phi-oauth-server \
 ### **Current Status**
 - **Infrastructure**: ✅ **READY**
 - **Security**: ✅ **READY**
-- **Authentication**: ⚠️ **REQUIRES CONFIGURATION**
+- **Authentication**: ⚠️ **BLOCKED BY ENVIRONMENT OWNERSHIP / REMOTE DEPLOYMENT MISMATCH**
 - **User Interface**: ✅ **READY**
 
 ### **Estimated Completion Time**
@@ -180,15 +192,17 @@ gcloud run services update phi-oauth-server \
 
 ## 🎯 NEXT STEPS
 
-1. **Complete GitHub OAuth Setup** (Priority: HIGH)
-2. **Test End-to-End Authentication** (Priority: HIGH)
-3. **Configure Monitoring Dashboards** (Priority: MEDIUM)
-4. **Set Up Automated Updates** (Priority: LOW)
+1. **Confirm target environment ownership/access** (Priority: HIGH)
+2. **Redeploy or update `phi-oauth-server` so the remote revision matches repo health/readiness behavior** (Priority: HIGH)
+3. **Complete GitHub OAuth secret and callback configuration in the confirmed environment** (Priority: HIGH)
+4. **Test End-to-End Authentication** (Priority: HIGH)
+5. **Configure Monitoring Dashboards** (Priority: MEDIUM)
+6. **Set Up Automated Updates** (Priority: LOW)
 
-**The PHI Chief AI AskPhi widget infrastructure is deployed and ready. Complete the OAuth configuration to enable secure user authentication!** 🔐🤖
+**Repo-side readiness reporting is improved. The remaining blockers are environment ownership and a remote OAuth deployment mismatch, not ambiguous local scripts.**
 
 ---
 
 *Report Generated: March 2, 2026*
 *Environment: Production*
-*Status: Awaiting OAuth Configuration*
+*Status: Awaiting environment-owner action and remote OAuth deployment alignment*

@@ -9,11 +9,20 @@ import subprocess
 import sys
 import urllib.error
 import urllib.request
+from dataclasses import dataclass
 
 
 PROJECT = os.getenv("GCP_PROJECT", "dominion-core-prod")
 REGION = os.getenv("GCP_REGION", "us-central1")
 SERVICES = ("dominion-os-demo", "phi-oauth-server", "phi-askphi-widget")
+
+
+@dataclass(frozen=True)
+class ProbeTarget:
+    name: str
+    base_url: str
+    path: str
+    required: bool = True
 
 
 def fetch_json(url: str) -> tuple[int | None, dict | None]:
@@ -60,17 +69,38 @@ def verify_service(name: str, base_url: str, path: str) -> bool:
     return bool(code and 200 <= code < 300 and payload and payload.get("status") in {"healthy", "ready"})
 
 
+def verify_local_target(target: ProbeTarget) -> bool:
+    ok = verify_service(target.name, target.base_url, target.path)
+    if not ok and not target.required:
+        print(f"{target.name}: optional local probe did not pass; continuing")
+        return True
+    return ok
+
+
 def main() -> int:
     ok = True
 
     local_targets = [
-        ("command_core", os.getenv("COMMAND_CORE_URL", "http://127.0.0.1:8080"), "/status"),
-        ("oauth_local", os.getenv("OAUTH_SERVER_URL", "http://127.0.0.1:8080"), "/ready"),
-        ("widget_local", os.getenv("ASKPHI_WIDGET_URL", "http://127.0.0.1:8081"), "/ready"),
+        ProbeTarget(
+            "command_center_demo_local",
+            os.getenv("COMMAND_CENTER_URL", "http://127.0.0.1:5000"),
+            "/health",
+            required=False,
+        ),
+        ProbeTarget(
+            "oauth_local",
+            os.getenv("OAUTH_SERVER_URL", "http://127.0.0.1:8080"),
+            "/ready",
+        ),
+        ProbeTarget(
+            "widget_local",
+            os.getenv("ASKPHI_WIDGET_URL", "http://127.0.0.1:8081"),
+            "/ready",
+        ),
     ]
     print("Local verification")
-    for name, base_url, path in local_targets:
-        ok = verify_service(name, base_url, path) and ok
+    for target in local_targets:
+        ok = verify_local_target(target) and ok
 
     print("\nCloud Run verification")
     cloud_ok = True

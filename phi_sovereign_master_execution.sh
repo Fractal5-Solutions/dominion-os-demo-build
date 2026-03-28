@@ -256,33 +256,9 @@ universal_push_engine() {
 # Phase 5: Autonomous Deployment Engine
 autonomous_deployment_engine() {
     phi_command "PHASE 5: AUTONOMOUS DEPLOYMENT ENGINE"
-    sovereign_log "Deploying all systems across Google Cloud and local environments..."
-
-    # Local deployment first
-    sovereign_log "Initiating local deployment sequence..."
-
-    # Deploy Docker services
-    if [ -f "docker-compose.yml" ]; then
-        sovereign_log "Deploying Docker services..."
-        docker-compose up -d
-        METRICS["services_deployed"]=$((METRICS["services_deployed"] + 1))
-    fi
-
-    # Deploy GCP services (if configured)
-    if [ -f "deploy_to_gcp.sh" ]; then
-        sovereign_log "Deploying Google Cloud services..."
-        bash deploy_to_gcp.sh
-        METRICS["services_deployed"]=$((METRICS["services_deployed"] + 1))
-    fi
-
-    # Deploy monitoring stack
-    if [ -d "monitoring" ]; then
-        sovereign_log "Activating monitoring systems..."
-        # Deploy monitoring services
-        METRICS["services_deployed"]=$((METRICS["services_deployed"] + 1))
-    fi
-
-    phi_command "Autonomous deployment completed. ${METRICS["services_deployed"]} service groups deployed."
+    sovereign_log "Public repo deployment authority disabled."
+    sovereign_log "Use /workspaces/dominion-command-center for local, remote, and GCP live operations."
+    phi_command "Autonomous deployment handed off to dominion-command-center."
 }
 
 # Phase 6: Universal Execution Engine

@@ -4,6 +4,10 @@
 # Quick commands for managing MCP services
 # ═══════════════════════════════════════════════════════════════
 
+set -euo pipefail
+
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/runtime_preflight.sh"
+
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -20,6 +24,15 @@ print_header() {
 print_success() { echo -e "${GREEN}✓${NC} $1"; }
 print_error() { echo -e "${RED}✗${NC} $1"; }
 print_info() { echo -e "${BLUE}ℹ${NC} $1"; }
+
+require_docker() {
+    if docker_daemon_available; then
+        return 0
+    fi
+
+    print_docker_runtime_note "MCP container management" >&2
+    exit 0
+}
 
 # Change to project root
 cd "$(dirname "$0")/.." || exit 1
@@ -50,6 +63,7 @@ COMMAND=$1
 case $COMMAND in
     start)
         print_header "Starting MCP Services"
+        require_docker
         docker-compose -f docker-compose-mcp.yml up -d
         print_success "Services started"
         print_info "Run '$0 status' to check service status"
@@ -57,18 +71,21 @@ case $COMMAND in
     
     stop)
         print_header "Stopping MCP Services"
+        require_docker
         docker-compose -f docker-compose-mcp.yml stop
         print_success "Services stopped"
         ;;
     
     restart)
         print_header "Restarting MCP Services"
+        require_docker
         docker-compose -f docker-compose-mcp.yml restart
         print_success "Services restarted"
         ;;
     
     status)
         print_header "MCP Services Status"
+        require_docker
         docker-compose -f docker-compose-mcp.yml ps
         echo ""
         RUNNING=$(docker-compose -f docker-compose-mcp.yml ps | grep -c "Up" || true)
@@ -77,11 +94,13 @@ case $COMMAND in
     
     logs)
         print_header "MCP Services Logs (Press Ctrl+C to exit)"
+        require_docker
         docker-compose -f docker-compose-mcp.yml logs -f
         ;;
     
     logs-tail)
         print_header "MCP Services Logs (Last 50 Lines)"
+        require_docker
         docker-compose -f docker-compose-mcp.yml logs --tail=50
         ;;
     
@@ -108,6 +127,7 @@ case $COMMAND in
     clean)
         print_header "Cleaning Up (Preserving Volumes)"
         print_info "This will stop and remove containers, but keep data volumes"
+        require_docker
         docker-compose -f docker-compose-mcp.yml down
         print_success "Cleanup complete"
         ;;
@@ -117,6 +137,7 @@ case $COMMAND in
         print_info "WARNING: This will delete all data!"
         read -p "Are you sure? (type 'yes' to confirm): " -r
         if [ "$REPLY" = "yes" ]; then
+            require_docker
             docker-compose -f docker-compose-mcp.yml down -v
             docker network rm mcp-network 2>/dev/null || true
             print_success "Complete cleanup done"

@@ -166,11 +166,10 @@ networks:
 EOF
 
     echo -e "${GREEN}✅ Docker Compose file created${NC}"
-    echo -e "${GREEN}💡 Local Development Commands:${NC}"
-    echo "  docker-compose up -d          # Start all services"
-    echo "  docker-compose down           # Stop all services"
-    echo "  docker-compose logs -f        # View logs"
-    echo "  docker system prune -a        # Clean unused resources"
+    echo -e "${GREEN}💡 Local Development Guidance:${NC}"
+    echo "  Local runtime control now lives in dominion-command-center"
+    echo "  Use the private repo live-ops wrappers for start/stop/log workflows"
+    echo "  This public repo may retain demo-serving assets only"
 
     cost_log "Local Docker environment configured"
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -309,13 +308,9 @@ implement_spot_instances() {
     # Implement Cloud Functions for event-driven tasks
     echo "Converting batch/background tasks to Cloud Functions..."
 
-    # Create Cloud Function for cost optimization tasks
-    gcloud functions deploy cost-optimization-trigger \
-      --runtime=python39 \
-      --trigger-http \
-      --allow-unauthenticated \
-      --project="$PROJECT2" \
-      --quiet 2>/dev/null || echo "Cloud Function deployment attempted"
+    # Public repo no longer deploys cloud resources directly.
+    echo -e "${YELLOW}⚠️  Cloud deployment authority moved to dominion-command-center${NC}"
+    echo "Use the private GCP workflow from /workspaces/dominion-command-center"
 
     cost_log "Spot instance strategy evaluated"
     echo -e "${MAGENTA}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"

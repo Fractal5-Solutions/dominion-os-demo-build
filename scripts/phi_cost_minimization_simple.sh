@@ -120,11 +120,10 @@ networks:
 EOF
 
     echo -e "${GREEN}✅ Docker Compose file created${NC}"
-    echo -e "${GREEN}💡 Local Development Commands:${NC}"
-    echo "  docker-compose up -d          # Start all services"
-    echo "  docker-compose down           # Stop all services"
-    echo "  docker-compose logs -f        # View logs"
-    echo "  docker system prune -a        # Clean unused resources"
+    echo -e "${GREEN}💡 Local Development Guidance:${NC}"
+    echo "  Local runtime control now lives in dominion-command-center"
+    echo "  Use the private repo live-ops wrappers for start/stop/log workflows"
+    echo "  This public repo may retain demo-serving assets only"
 
     cost_log "Local Docker environment configured"
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"

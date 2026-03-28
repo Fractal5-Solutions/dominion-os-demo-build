@@ -104,6 +104,18 @@
     "version": "0.2.0",
     "configurations": [
       {
+        "name": "Dominion Command Core",
+        "type": "python",
+        "request": "launch",
+        "program": "${workspaceFolder}/command_core.py",
+        "console": "integratedTerminal",
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "PORT": "5002"
+        },
+        "justMyCode": false
+      },
+      {
         "name": "Python: Current File",
         "type": "python",
         "request": "launch",
@@ -132,6 +144,16 @@
         "group": {
           "kind": "build",
           "isDefault": true
+        }
+      },
+      {
+        "label": "Dominion Command Core: Start",
+        "type": "shell",
+        "command": "cd ${workspaceFolder} && PORT=5002 python3 command_core.py",
+        "isBackground": true,
+        "problemMatcher": [],
+        "runOptions": {
+          "runOn": "folderOpen"
         }
       },
       {

@@ -1,11 +1,8 @@
 #!/bin/bash
-# ═══════════════════════════════════════════════════════════════════
-# PHI COMMAND CENTER - START ALL SYSTEMS
-# ═══════════════════════════════════════════════════════════════════
-# Purpose: Start all Dominion OS systems and services
-# Mode: Comprehensive activation with intelligent process management
-# Generated: March 7, 2026
-# ═══════════════════════════════════════════════════════════════════
+set -euo pipefail
+
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/public_repo_handoff.sh"
+require_command_center_context "local live-ops startup"
 
 # set -e
 
@@ -27,6 +24,9 @@ mkdir -p "$LOG_DIR"
 
 STARTUP_LOG="$LOG_DIR/phi_startup_$(date +%Y%m%d_%H%M%S).log"
 TRACKED_PIDFILES=()
+FAILED_SERVICES=()
+CURRENT_SERVICE_NAME=""
+CURRENT_SERVICE_LOG=""
 
 # Functions
 log() {
@@ -49,6 +49,38 @@ info() {
     echo -e "${BLUE}ℹ️  $1${NC}" | tee -a "$STARTUP_LOG"
 }
 
+record_failure() {
+    local service_name="${1:-unknown-service}"
+
+    for failed in "${FAILED_SERVICES[@]:-}"; do
+        if [ "$failed" = "$service_name" ]; then
+            return 0
+        fi
+    done
+
+    FAILED_SERVICES+=("$service_name")
+}
+
+report_startup_failure() {
+    local exit_code=$?
+    local line_no="${1:-unknown}"
+
+    if [ "$exit_code" -eq 0 ]; then
+        return 0
+    fi
+
+    echo ""
+    error "Startup aborted at line $line_no with exit code $exit_code"
+    if [ -n "$CURRENT_SERVICE_NAME" ]; then
+        error "Last startup action: $CURRENT_SERVICE_NAME"
+    fi
+    if [ -n "$CURRENT_SERVICE_LOG" ] && [ -f "$CURRENT_SERVICE_LOG" ]; then
+        info "Last service log: $CURRENT_SERVICE_LOG"
+        tail -n 10 "$CURRENT_SERVICE_LOG" | sed 's/^/  /'
+    fi
+    info "Startup log: $STARTUP_LOG"
+}
+
 section() {
     echo ""
     echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}" | tee -a "$STARTUP_LOG"
@@ -56,15 +88,75 @@ section() {
     echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}" | tee -a "$STARTUP_LOG"
 }
 
+is_truthy() {
+    case "${1:-}" in
+        1|true|TRUE|yes|YES|on|ON) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+contains_csv_token() {
+    local csv="${1:-}"
+    local token="${2:-}"
+    local normalized=",${csv// /},"
+    [[ "$normalized" == *",$token,"* ]]
+}
+
+start_optional_background_service() {
+    local service_name="$1"
+    local start_cmd="$2"
+    local process_pattern="$3"
+    local pid_file="$4"
+    local log_file="$5"
+
+    if pgrep -f "$process_pattern" > /dev/null 2>&1; then
+        success "$service_name already running"
+        return 0
+    fi
+
+    log "Starting optional service: $service_name..."
+    nohup bash -lc "cd '$SCRIPT_DIR' && $start_cmd" > "$log_file" 2>&1 &
+    local pid=$!
+    echo "$pid" > "$pid_file"
+    TRACKED_PIDFILES+=("$pid_file")
+    sleep 2
+
+    if ps -p "$pid" > /dev/null 2>&1; then
+        success "$service_name started (PID: $pid)"
+    else
+        warning "$service_name did not remain running - check $log_file"
+    fi
+}
+
+gcloud_auth_available() {
+    local project_probe="${GCP_PROJECT_PROBE:-dominion-os-1-0-main}"
+
+    if ! command -v gcloud > /dev/null 2>&1; then
+        return 1
+    fi
+
+    if ! gcloud auth print-access-token > /dev/null 2>&1; then
+        return 1
+    fi
+
+    gcloud run services list --project "$project_probe" --limit 1 --format="value(metadata.name)" > /dev/null 2>&1
+}
+
+trap 'report_startup_failure $LINENO' ERR
+
 start_service() {
     local service_name="$1"
     local service_path="$2"
     local start_cmd="$3"
     local port="$4"
 
+    CURRENT_SERVICE_NAME="$service_name"
+    CURRENT_SERVICE_LOG="$LOG_DIR/${service_name}.log"
+
     log "Starting $service_name..."
 
     if [ ! -f "$service_path" ]; then
+        record_failure "$service_name"
         warning "$service_name not found at $service_path - skipping"
         return 1
     fi
@@ -97,17 +189,20 @@ start_service() {
     while [ $elapsed -lt $timeout ]; do
         if lsof -ti:$port > /dev/null 2>&1; then
             success "$service_name started successfully (PID: $pid, Port: $port)"
+            CURRENT_SERVICE_NAME=""
             return 0
         fi
         sleep 1
-        ((elapsed++))
+        elapsed=$((elapsed + 1))
     done
 
     # Check if process is still alive but port not bound
     if ps -p $pid > /dev/null 2>&1; then
         warning "$service_name started but port $port not ready yet (PID: $pid)"
+        CURRENT_SERVICE_NAME=""
         return 0
     else
+        record_failure "$service_name"
         error "$service_name failed to start - check $LOG_DIR/${service_name}.log"
         [ -f "$LOG_DIR/${service_name}.log" ] && tail -3 "$LOG_DIR/${service_name}.log"
         return 1
@@ -203,11 +298,11 @@ if [ -f "/workspaces/dominion-command-center/billing-service/app.py" ]; then
                   "5001"
 fi
 
-# Demo Application
-if [ -f "/workspaces/dominion-command-center/demo/app.py" ]; then
-    start_service "Demo-Application" \
-                  "/workspaces/dominion-command-center/demo/app.py" \
-                  "FLASK_APP=app.py python3 -m flask run --host 0.0.0.0 --port 5002" \
+# Dominion Command Core (preferred startup over demo app)
+if [ -f "/workspaces/dominion-os-demo-build/command_core.py" ]; then
+    start_service "Dominion-Command-Core" \
+                  "/workspaces/dominion-os-demo-build/command_core.py" \
+                  "cd /workspaces/dominion-os-demo-build && PORT=5002 python3 command_core.py" \
                   "5002"
 fi
 
@@ -278,6 +373,58 @@ if [ -f "$SCRIPT_DIR/phi_cost_minimization_simple.sh" ]; then
     fi
 fi
 
+OPTIONAL_BG_ENABLE="${PHI_ENABLE_OPTIONAL_BACKGROUND:-0}"
+OPTIONAL_BG_SERVICES="${PHI_OPTIONAL_BACKGROUND_SERVICES:-autonomous_overnight,channel_connect,google_workspace}"
+
+if is_truthy "$OPTIONAL_BG_ENABLE"; then
+    info "Optional background services enabled: $OPTIONAL_BG_SERVICES"
+
+    if contains_csv_token "$OPTIONAL_BG_SERVICES" "autonomous_overnight"; then
+        if [ -f "$SCRIPT_DIR/autonomous_overnight.sh" ]; then
+            if gcloud_auth_available; then
+                start_optional_background_service \
+                    "Autonomous Overnight Executor" \
+                    "bash '$SCRIPT_DIR/autonomous_overnight.sh'" \
+                    "autonomous_overnight.sh" \
+                    "$LOG_DIR/autonomous_overnight.pid" \
+                    "$LOG_DIR/autonomous_overnight.log"
+            else
+                warning "Skipping Autonomous Overnight Executor: gcloud authentication unavailable"
+            fi
+        else
+            warning "Optional service script missing: $SCRIPT_DIR/autonomous_overnight.sh"
+        fi
+    fi
+
+    if contains_csv_token "$OPTIONAL_BG_SERVICES" "channel_connect"; then
+        if [ -f "$SCRIPT_DIR/phi_channel_connect.sh" ]; then
+            start_optional_background_service \
+                "Channel Connect SaaS Service" \
+                "bash '$SCRIPT_DIR/phi_channel_connect.sh' start" \
+                "phi_channel_connect.sh" \
+                "$LOG_DIR/channel_connect.pid" \
+                "$LOG_DIR/channel_connect.log"
+        else
+            warning "Optional service script missing: $SCRIPT_DIR/phi_channel_connect.sh"
+        fi
+    fi
+
+    if contains_csv_token "$OPTIONAL_BG_SERVICES" "google_workspace"; then
+        if [ -f "$SCRIPT_DIR/phi_google_workspace.sh" ]; then
+            start_optional_background_service \
+                "Google Workspace Integration" \
+                "bash '$SCRIPT_DIR/phi_google_workspace.sh' start" \
+                "phi_google_workspace.sh" \
+                "$LOG_DIR/google_workspace.pid" \
+                "$LOG_DIR/google_workspace.log"
+        else
+            warning "Optional service script missing: $SCRIPT_DIR/phi_google_workspace.sh"
+        fi
+    fi
+else
+    info "Optional background services disabled (set PHI_ENABLE_OPTIONAL_BACKGROUND=1 to enable)"
+fi
+
 # ═══════════════════════════════════════════════════════════════════
 # PHASE 6: SYSTEM STATUS VERIFICATION
 # ═══════════════════════════════════════════════════════════════════
@@ -294,13 +441,13 @@ for pidfile in "${TRACKED_PIDFILES[@]}"; do
         SERVICE_NAME=$(basename "$pidfile" .pid)
         PID=$(cat "$pidfile")
         if ps -p $PID > /dev/null 2>&1; then
-            PORT=$(lsof -Pan -p $PID -i 2>/dev/null | grep LISTEN | awk '{print $9}' | cut -d: -f2 | head -1)
+            PORT=$(lsof -Pan -p "$PID" -i 2>/dev/null | awk '/LISTEN/ {print $9}' | cut -d: -f2 | head -1 || true)
             if [ -n "$PORT" ]; then
                 echo -e "${GREEN}✓${NC} $SERVICE_NAME (PID: $PID) - Port: $PORT"
             else
                 echo -e "${GREEN}✓${NC} $SERVICE_NAME (PID: $PID)"
             fi
-            ((SERVICE_COUNT++))
+            SERVICE_COUNT=$((SERVICE_COUNT + 1))
         else
             echo -e "${RED}✗${NC} $SERVICE_NAME (not running)"
         fi
@@ -314,6 +461,10 @@ if [ $SERVICE_COUNT -gt 0 ]; then
     success "$SERVICE_COUNT service(s) running successfully"
 else
     warning "No services currently running"
+fi
+
+if [ ${#FAILED_SERVICES[@]} -gt 0 ]; then
+    warning "Services requiring attention: ${FAILED_SERVICES[*]}"
 fi
 
 # ═══════════════════════════════════════════════════════════════════
@@ -331,13 +482,26 @@ echo -e "${CYAN}Log Directory:${NC} $LOG_DIR"
 echo -e "${CYAN}Startup Log:${NC} $STARTUP_LOG"
 echo ""
 
+STATUS_JSON="$SCRIPT_DIR/telemetry/system_status.json"
+cat > "$STATUS_JSON" << EOF
+{
+  "timestamp": "$(date -u '+%Y-%m-%dT%H:%M:%SZ')",
+  "startup_log": "$STARTUP_LOG",
+  "active_services": $SERVICE_COUNT,
+  "failed_services": [$(printf '"%s",' "${FAILED_SERVICES[@]}" | sed 's/,$//')],
+  "generated_by": "phi_start_all_systems.sh"
+}
+EOF
+info "Telemetry snapshot updated: $STATUS_JSON"
+echo ""
+
 if [ $SERVICE_COUNT -gt 0 ]; then
     echo -e "${CYAN}Service URLs:${NC}"
     [ -f "$LOG_DIR/PHI-OAuth-Server.pid" ] && echo "  • OAuth Server: http://localhost:8080"
     [ -f "$LOG_DIR/PHI-AskPHI-Widget.pid" ] && echo "  • AskPHI Widget: http://localhost:8081"
     [ -f "$LOG_DIR/Dominion-Command-Center.pid" ] && echo "  • Command Center: http://localhost:5000"
     [ -f "$LOG_DIR/Billing-Service.pid" ] && echo "  • Billing Service: http://localhost:5001"
-    [ -f "$LOG_DIR/Demo-Application.pid" ] && echo "  • Demo App: http://localhost:5002"
+    [ -f "$LOG_DIR/Dominion-Command-Core.pid" ] && echo "  • Dominion Command Core: http://localhost:5002"
     [ -f "$LOG_DIR/Sidecar-Service.pid" ] && echo "  • Sidecar: http://localhost:5003"
     [ -f "$LOG_DIR/ChatGPT-Gateway.pid" ] && echo "  • ChatGPT Gateway: http://localhost:5004"
     echo ""
@@ -345,12 +509,14 @@ fi
 
 echo -e "${CYAN}Management Commands:${NC}"
 echo "  • View logs: tail -f $LOG_DIR/<service>.log"
-echo "  • Stop all: pkill -f 'python3.*app.py'"
-echo "  • Restart: bash $0"
+echo "  • Stop all: pkill -f 'command_core.py|python3 app.py|uvicorn app.main:app|python3 main.py'"
+echo "  • Restart: /workspaces/dominion-command-center/scripts/live_ops_start.sh"
+echo "  • Verify:  /workspaces/dominion-command-center/scripts/live_ops_verify.sh"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 success "PHI System Startup Complete!"
+info "Command-center startup path is active"
 
 log "═══════════════════════════════════════════════════════════════════"
 log "Startup sequence completed successfully"

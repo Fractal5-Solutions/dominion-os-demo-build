@@ -4,6 +4,8 @@
 
 set -euo pipefail
 
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/runtime_preflight.sh"
+
 # Colors for output
 GREEN='\033[0;32m'
 RED='\033[0;31m'
@@ -18,10 +20,10 @@ echo "════════════════════════�
 echo ""
 
 # Check if Docker is running
-if ! docker info > /dev/null 2>&1; then
-    if ! command -v systemctl > /dev/null 2>&1 && ! command -v service > /dev/null 2>&1; then
-        echo -e "${YELLOW}⚠️  Docker daemon unavailable and no local service manager detected${NC}"
-        echo -e "${YELLOW}⏭️  Skipping MCP Docker health checks in this environment${NC}"
+if ! docker_daemon_available; then
+    if docker_runtime_blocked || ! docker_cli_available; then
+        echo -e "${YELLOW}⚠️  Docker daemon unavailable in this runtime${NC}"
+        echo -e "${YELLOW}⏭️  Skipping MCP Docker health checks${NC}"
         exit 0
     fi
     echo -e "${RED}❌ Docker daemon is not running${NC}"

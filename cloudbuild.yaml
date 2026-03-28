@@ -1,60 +1,10 @@
 steps:
-  - name: gcr.io/cloud-builders/gcloud
-    id: auth-docker
-    entrypoint: bash
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
     args:
       - -c
       - |
-        gcloud auth configure-docker ${_REGION}-docker.pkg.dev --quiet
-
-  - name: gcr.io/cloud-builders/docker
-    id: build-image
-    args:
-      - build
-      - -f
-      - $_DOCKERFILE
-      - -t
-      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE_NAME}:${_TAG}
-      - $_BUILD_CONTEXT
-
-  - name: gcr.io/cloud-builders/docker
-    id: push-image
-    args:
-      - push
-      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE_NAME}:${_TAG}
-
-  - name: gcr.io/cloud-builders/gcloud
-    id: deploy-cloud-run
-    args:
-      - run
-      - deploy
-      - $_SERVICE_NAME
-      - --image
-      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE_NAME}:${_TAG}
-      - --region
-      - $_REGION
-      - --platform
-      - managed
-      - --ingress
-      - internal-and-cloud-load-balancing
-      - --no-allow-unauthenticated
-      - --port
-      - '8080'
-      - --set-env-vars
-      - SERVICE_NAME=$_SERVICE_NAME,PROJECT_ID=$PROJECT_ID,REGION=$_REGION
-      - --quiet
-
-substitutions:
-  _SERVICE_NAME: dominion-demo
-  _REGION: us-central1
-  _AR_REPO: dominion-demo-repo
-  _DOCKERFILE: Dockerfile.production
-  _BUILD_CONTEXT: .
-  _TAG: latest
-
-images:
-  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE_NAME}:${_TAG}
-
-options:
-  logging: CLOUD_LOGGING_ONLY
-timeout: 1200s
+        echo "[PUBLIC REPO HANDOFF]"
+        echo "Cloud Run deployment is controlled from dominion-command-center."
+        echo "Use the private repo workflow: .github/workflows/gcp-cloudrun-deploy.yml"
+        exit 1

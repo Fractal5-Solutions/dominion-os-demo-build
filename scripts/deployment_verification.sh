@@ -19,6 +19,8 @@ GCP_PROJECT_PROD="dominion-core-prod"
 GCP_REGION="us-central1"
 OAUTH_SERVICE_NAME="phi-oauth-server"
 WIDGET_SERVICE_NAME="phi-askphi-widget"
+ENV_OWNERSHIP_BLOCKERS=0
+REMOTE_OAUTH_MISMATCHES=0
 
 # Logging functions
 log() {
@@ -150,6 +152,8 @@ check_environment_deployment() {
     # Set project
     if ! gcloud config set project "$project" --quiet 2>&1; then
         warning "Cannot access $env_name project ($project)"
+        warning "$env_name is blocked by environment ownership/access, not repo-side readiness"
+        ENV_OWNERSHIP_BLOCKERS=$((ENV_OWNERSHIP_BLOCKERS + 1))
         return 1
     fi
 
@@ -160,10 +164,22 @@ check_environment_deployment() {
     if gcloud run services describe "$OAUTH_SERVICE_NAME" --region="$GCP_REGION" --format="value(status.url)" > /dev/null 2>&1; then
         oauth_url=$(gcloud run services describe "$OAUTH_SERVICE_NAME" --region="$GCP_REGION" --format="value(status.url)")
         local health_status=$(gcloud run services describe "$OAUTH_SERVICE_NAME" --region="$GCP_REGION" --format="value(status.conditions[0].status)")
+        local remote_health_code="000"
+        local remote_ready_code="000"
+
+        remote_health_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$oauth_url/health" 2>/dev/null || echo "000")
+        remote_ready_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$oauth_url/ready" 2>/dev/null || echo "000")
+
         if [ "$health_status" = "True" ]; then
             oauth_status="✅ Healthy"
         else
             oauth_status="❌ Unhealthy"
+        fi
+
+        if [ "$remote_health_code" != "200" ] || [ "$remote_ready_code" != "200" ]; then
+            warning "$env_name OAuth service is deployed, but remote /health or /ready does not match the repo implementation"
+            oauth_status="$oauth_status (remote deployment mismatch)"
+            REMOTE_OAUTH_MISMATCHES=$((REMOTE_OAUTH_MISMATCHES + 1))
         fi
     fi
 
@@ -189,7 +205,7 @@ check_environment_deployment() {
     echo "  AskPhi Widget: $widget_status"
     echo "    URL: $widget_url"
 
-    # Return success if both services are healthy
+    # Return success if both services are healthy and the OAuth deployment matches repo health routes
     if [ "$oauth_status" = "✅ Healthy" ] && [ "$widget_status" = "✅ Healthy" ]; then
         return 0
     else
@@ -335,19 +351,28 @@ generate_final_report() {
             error "Production environment deployment incomplete"
         fi
         echo ""
-        warning "Please complete deployment using: ./scripts/gcp_secure_deployment.sh"
+        if [ "$ENV_OWNERSHIP_BLOCKERS" -gt 0 ]; then
+            warning "Environment ownership/access is blocking at least one remote verification target"
+        fi
+        if [ "$REMOTE_OAUTH_MISMATCHES" -gt 0 ]; then
+            warning "At least one remote OAuth deployment does not match the repo's health/readiness implementation"
+        fi
+        warning "Repo-side readiness reporting is improved; remaining blockers are environment ownership and remote OAuth deployment mismatch, not ambiguous local scripts"
+        warning "Use ./scripts/gcp_secure_deployment.sh only after the target environment owner confirms access and deployment alignment"
     fi
 
     echo ""
     header "NEXT STEPS FOR OPERATIONS"
-    echo "1. Configure GitHub OAuth App with production callback URLs"
-    echo "2. Set up monitoring dashboards and alerts"
-    echo "3. Configure domain mapping for custom URLs"
-    echo "4. Enable advanced security features (VPC, IAM, etc.)"
-    echo "5. Set up automated backup and disaster recovery"
-    echo "6. Configure CI/CD pipelines with security gates"
-    echo "7. Establish incident response procedures"
-    echo "8. Conduct regular security audits and penetration testing"
+    echo "1. Confirm ownership/access for each target GCP environment before treating remote failures as repo failures"
+    echo "2. Reconcile the deployed phi-oauth-server revision with the repo implementation, including /health and /ready"
+    echo "3. Configure GitHub OAuth App with the callback URLs exposed by the confirmed deployment"
+    echo "4. Set up monitoring dashboards and alerts"
+    echo "5. Configure domain mapping for custom URLs"
+    echo "6. Enable advanced security features (VPC, IAM, etc.)"
+    echo "7. Set up automated backup and disaster recovery"
+    echo "8. Configure CI/CD pipelines with security gates"
+    echo "9. Establish incident response procedures"
+    echo "10. Conduct regular security audits and penetration testing"
     echo ""
     echo "🔐 REMEMBER: PHI Chief AI maintains complete sovereignty with NHITL operations"
     echo "🤖 AI-powered security and autonomous governance active"

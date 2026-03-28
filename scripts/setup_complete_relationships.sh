@@ -768,62 +768,18 @@ EOF
 deploy_applications() {
     echo -e "${BLUE}[8/8] Deploying applications to Google Cloud...${NC}"
 
-    # Create deployment configuration
+    # Create handoff configuration instead of a public-repo deploy script
     cat > scripts/deploy_relationship_apps.sh << 'EOF'
 #!/bin/bash
-# Deploy Relationship Applications to Google Cloud
-
-echo "☁️  Deploying relationship applications to Google Cloud Run..."
-
-PROJECT_ID="dominion-os-1-0-main"
-REGION="us-central1"
-
-# Deploy CRM Application
-echo "Deploying CRM application..."
-gcloud run deploy dominion-crm \
-  --source . \
-  --platform managed \
-  --region $REGION \
-  --project $PROJECT_ID \
-  --allow-unauthenticated \
-  --set-env-vars "APOLLO_API_KEY=$APOLLO_API_KEY" \
-  --memory 1Gi \
-  --cpu 1 \
-  --max-instances 10
-
-# Deploy BIMS Application
-echo "Deploying BIMS application..."
-gcloud run deploy dominion-bims \
-  --source . \
-  --platform managed \
-  --region $REGION \
-  --project $PROJECT_ID \
-  --allow-unauthenticated \
-  --set-env-vars "GMAIL_API_KEY=$GMAIL_API_KEY,GOOGLE_DRIVE_API_KEY=$GOOGLE_DRIVE_API_KEY" \
-  --memory 2Gi \
-  --cpu 2 \
-  --max-instances 10
-
-# Deploy Relationship API
-echo "Deploying Relationship API..."
-gcloud run deploy dominion-relationships \
-  --source . \
-  --platform managed \
-  --region $REGION \
-  --project $PROJECT_ID \
-  --allow-unauthenticated \
-  --set-env-vars "APOLLO_API_KEY=$APOLLO_API_KEY,GMAIL_API_KEY=$GMAIL_API_KEY" \
-  --memory 1Gi \
-  --cpu 1 \
-  --max-instances 5
-
-echo "✅ Applications deployed successfully!"
+set -euo pipefail
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/public_repo_handoff.sh"
+deny_public_repo_operation "relationship application deployment"
 EOF
 
     chmod +x scripts/deploy_relationship_apps.sh
 
-    echo -e "${GREEN}✅ Application deployment scripts created${NC}"
-    echo "Run: ./scripts/deploy_relationship_apps.sh"
+    echo -e "${GREEN}✅ Internal handoff script created${NC}"
+    echo "Run from private control repo instead of this public repo"
 }
 
 # Function to generate final report

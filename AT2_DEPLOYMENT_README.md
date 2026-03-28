@@ -108,6 +108,42 @@ This will check:
 - ✅ Container health status
 - ✅ GPU acceleration enabled
 
+Expected verification outcomes:
+- `0` exit code when all local and Docker-backed checks pass
+- `0` exit code when local checks pass but Docker inspection is blocked by the current runtime
+- non-zero exit code when any required service is down or unreachable
+
+### Fully Provisioned Verification Checklist
+
+Run this on the target workstation after Docker Desktop Pro is up and the stack has been deployed:
+
+1. Confirm Docker is reachable:
+   ```bash
+   docker info
+   docker compose -f docker-compose.desktop-pro.yml ps
+   ```
+2. Confirm local endpoints respond:
+   ```bash
+   curl -fsS http://localhost:5000 >/dev/null
+   curl -fsS http://localhost:8080/health
+   curl -fsS http://localhost:8081/health
+   curl -fsS http://localhost:9090/-/ready
+   curl -fsS http://localhost:3000/login >/dev/null
+   ```
+3. Confirm data services are reachable:
+   ```bash
+   nc -z localhost 5432
+   nc -z localhost 6379
+   ```
+4. Run the verifier and review the readiness summary:
+   ```bash
+   ./verify-deployment.sh
+   ```
+5. If anything fails, inspect logs before retrying:
+   ```bash
+   docker compose -f docker-compose.desktop-pro.yml logs -f
+   ```
+
 ---
 
 ## 🔧 Service Architecture

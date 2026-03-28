@@ -94,14 +94,14 @@ complete_infrastructure_tasks() {
 
     if [ "$oauth_image_exists" = "no" ]; then
         echo -e "${YELLOW}⚠️  OAuth image missing - build required${NC}"
-        echo "Command: cd oauth_server && gcloud builds submit --tag gcr.io/$PROJECT1/phi-oauth-server ."
+        echo "Resolution: build and deploy from dominion-command-center private workflows"
     else
         echo -e "${GREEN}✓ OAuth image exists${NC}"
     fi
 
     if [ "$widget_image_exists" = "no" ]; then
         echo -e "${YELLOW}⚠️  Widget image missing - build required${NC}"
-        echo "Command: cd widget_service && gcloud builds submit --tag gcr.io/$PROJECT1/phi-askphi-widget ."
+        echo "Resolution: build and deploy from dominion-command-center private workflows"
     else
         echo -e "${GREEN}✓ Widget image exists${NC}"
     fi

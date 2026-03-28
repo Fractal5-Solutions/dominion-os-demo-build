@@ -8,6 +8,11 @@
 
 set -uo pipefail
 
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/public_repo_handoff.sh"
+require_command_center_context "live-ops verification"
+
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/runtime_preflight.sh"
+
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -21,15 +26,17 @@ NC='\033[0m'
 DOCKER_DAEMON_AVAILABLE=false
 DOCKER_CONTROL_AVAILABLE=false
 DOCKER_POINTS_AVAILABLE=20
+DOCKER_RUNTIME_NA=false
 
 if command -v systemctl > /dev/null 2>&1 || command -v service > /dev/null 2>&1; then
     DOCKER_CONTROL_AVAILABLE=true
 fi
 
-if docker info > /dev/null 2>&1; then
+if docker_daemon_available; then
     DOCKER_DAEMON_AVAILABLE=true
-elif ! $DOCKER_CONTROL_AVAILABLE; then
+elif docker_runtime_blocked || ! docker_cli_available; then
     DOCKER_POINTS_AVAILABLE=0
+    DOCKER_RUNTIME_NA=true
 fi
 
 echo -e "${MAGENTA}╔═══════════════════════════════════════════════════════════════════╗${NC}"
@@ -67,26 +74,91 @@ echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━�
 SERVICES_UP=0
 SERVICES_TOTAL=5
 
+service_pid_candidates() {
+    local port=$1
+    local pattern="${2:-}"
+    local pids=""
+
+    pids=$(lsof -ti:"$port" 2>/dev/null | tr '\n' ' ' | xargs 2>/dev/null || true)
+    if [ -z "$pids" ] && [ -n "$pattern" ]; then
+        pids=$(pgrep -f "$pattern" | tr '\n' ' ' | xargs 2>/dev/null || true)
+    fi
+
+    printf '%s' "$pids"
+}
+
+service_running() {
+    local port=$1
+    local url=$2
+    local pattern="${3:-}"
+
+    if curl -s -m 2 -o /dev/null "$url/health" \
+        || curl -s -m 2 -o /dev/null "$url/healthz" \
+        || curl -s -m 2 -o /dev/null "$url/ready" \
+        || curl -s -m 2 -o /dev/null "$url"; then
+        return 0
+    fi
+
+    [ -n "$(service_pid_candidates "$port" "$pattern")" ]
+}
+
+probe_service_state() {
+    local url=$1
+    local health
+    local ready
+
+    health=$(curl -s -m 3 "$url/health" 2>/dev/null || true)
+    if [ -z "$health" ]; then
+        health=$(curl -s -m 3 "$url/healthz" 2>/dev/null || true)
+    fi
+    if [ -z "$health" ]; then
+        echo "running"
+        return 0
+    fi
+
+    ready=$(curl -s -m 3 "$url/ready" 2>/dev/null || true)
+    if printf '%s' "$ready" | grep -q '"ready":[[:space:]]*true'; then
+        echo "ready"
+    elif printf '%s' "$health" | grep -q '"status":[[:space:]]*"ok"\|"status":[[:space:]]*"healthy"\|"status":[[:space:]]*"ready"'; then
+        echo "healthy"
+    elif printf '%s' "$health" | grep -q '"status":[[:space:]]*"not_ready"\|"ready":[[:space:]]*false'; then
+        echo "degraded"
+    else
+        echo "running"
+    fi
+}
+
 check_service() {
     local port=$1
     local name=$2
     local url=$3
-    
-    if lsof -ti:$port > /dev/null 2>&1; then
-        local pid=$(lsof -ti:$port)
+    local pattern="${4:-}"
+
+    if service_running "$port" "$url" "$pattern"; then
+        local pid
+        pid=$(service_pid_candidates "$port" "$pattern")
         echo -e "${GREEN}✓${NC} $name"
         echo -e "  ├─ Port: $port"
-        echo -e "  ├─ PID: $pid"
+        echo -e "  ├─ PID: ${pid:-n/a}"
         echo -e "  ├─ URL: $url"
-        
-        # Try health check if available
-        if curl -s -f "$url/healthz" > /dev/null 2>&1 || curl -s -f "$url" > /dev/null 2>&1; then
-            echo -e "  └─ Status: ${GREEN}HEALTHY${NC}"
-        else
-            echo -e "  └─ Status: ${YELLOW}RUNNING (no health check)${NC}"
-        fi
+
+        case "$(probe_service_state "$url")" in
+            ready)
+                echo -e "  └─ Status: ${GREEN}READY${NC}"
+                SERVICES_UP=$((SERVICES_UP + 1))
+                ;;
+            healthy)
+                echo -e "  └─ Status: ${GREEN}HEALTHY${NC}"
+                SERVICES_UP=$((SERVICES_UP + 1))
+                ;;
+            degraded)
+                echo -e "  └─ Status: ${YELLOW}DEGRADED${NC}"
+                ;;
+            *)
+                echo -e "  └─ Status: ${YELLOW}RUNNING (no health endpoint)${NC}"
+                ;;
+        esac
         echo ""
-        SERVICES_UP=$((SERVICES_UP + 1))
         return 0
     else
         echo -e "${RED}✗${NC} $name - ${YELLOW}NOT RUNNING${NC}"
@@ -95,16 +167,16 @@ check_service() {
     fi
 }
 
-check_service 5000 "Command Center Demo (BIMS)" "http://localhost:5000" || true
-check_service 5001 "Billing Service" "http://localhost:5001" || true
-check_service 8080 "OAuth Server" "http://localhost:8080" || true
-check_service 8081 "AskPHI Widget Service" "http://localhost:8081" || true
+check_service 5000 "Dominion Command Center" "http://localhost:5000" "uvicorn app.main:app|python3 -m uvicorn app.main:app" || true
+check_service 5001 "Billing Service" "http://localhost:5001" "billing-service/app.py|PORT=5001 python3 app.py" || true
+check_service 8080 "OAuth Server" "http://localhost:8080" "oauth_server/app.py|PHI-OAuth-Server" || true
+check_service 8081 "AskPHI Widget Service" "http://localhost:8081" "widget_service/app.py|PHI-AskPHI-Widget" || true
 
 # Check for alternative services
-if lsof -ti:5002 > /dev/null 2>&1; then
-    check_service 5002 "Alternative Demo" "http://localhost:5002" || true
+if service_running 5002 "http://localhost:5002" "command_core.py"; then
+    check_service 5002 "Dominion Command Core" "http://localhost:5002" "command_core.py" || true
 else
-    SERVICES_TOTAL=4  # Adjust total if alt demo not required
+    SERVICES_TOTAL=4  # Adjust total if command core is not required
 fi
 
 echo -e "${CYAN}Summary:${NC} ${GREEN}$SERVICES_UP${NC}/${SERVICES_TOTAL} services operational"
@@ -137,8 +209,11 @@ if $DOCKER_DAEMON_AVAILABLE; then
         echo -e "  ${YELLOW}No containers running${NC}"
     fi
 else
-    if ! $DOCKER_CONTROL_AVAILABLE; then
+    if $DOCKER_RUNTIME_NA; then
         echo -e "${CYAN}i${NC}  Docker Daemon: N/A in this runtime"
+        echo -e "${CYAN}  Docker checks are informational only${NC}"
+    elif ! $DOCKER_CONTROL_AVAILABLE; then
+        echo -e "${CYAN}i${NC}  Docker Daemon: unavailable"
         echo -e "${CYAN}  Docker checks are informational only${NC}"
     else
         echo -e "${YELLOW}⚠${NC}  Docker Daemon: NOT RUNNING"
@@ -193,8 +268,7 @@ check_endpoint() {
     local url=$1
     local name=$2
     
-    # Treat any HTTP response as reachable; this catches services without /health endpoints.
-    if curl -s -m 2 -o /dev/null "$url"; then
+    if curl -s -m 2 -o /dev/null "$url/health" || curl -s -m 2 -o /dev/null "$url/healthz" || curl -s -m 2 -o /dev/null "$url"; then
         echo -e "${GREEN}✓${NC} $name: $url"
         CONNECTIVITY_UP=$((CONNECTIVITY_UP + 1))
         return 0
@@ -215,10 +289,10 @@ echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━�
 echo -e "${CYAN}PYTHON PROCESSES${NC}"
 echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
-PYTHON_PROCS=$(ps aux | grep "python3 app.py" | grep -v grep | wc -l)
+PYTHON_PROCS=$(ps -eo pid,args | grep -E "python(3)? .*app\.py|gunicorn|uvicorn|flask run" | grep -v grep | wc -l)
 echo -e "${CYAN}Active Python Services:${NC} $PYTHON_PROCS"
 echo ""
-ps aux | grep "python3 app.py" | grep -v grep | awk '{printf "  %-8s %-10s %s\n", $2, $11, $12}' | sed '1i\  PID      COMMAND    ARGS'
+ps -eo pid=,args= | grep -E "python(3)? .*app\.py|gunicorn|uvicorn|flask run" | grep -v grep | awk '{printf "  %-8s %s\n", $1, substr($0, index($0,$2))}' | sed '1i\  PID      ARGS'
 echo ""
 
 # Telemetry Check
@@ -236,7 +310,15 @@ if [ -d "$TELEMETRY_DIR" ]; then
     if [ -f "$TELEMETRY_DIR/system_status.json" ]; then
         echo -e "  ├─ System Status: ${GREEN}Available${NC}"
         LAST_UPDATED=$(stat -c %y "$TELEMETRY_DIR/system_status.json" 2>/dev/null | cut -d. -f1 || echo "Unknown")
-        echo -e "  └─ Last Updated: $LAST_UPDATED"
+        LAST_UPDATED_EPOCH=$(stat -c %Y "$TELEMETRY_DIR/system_status.json" 2>/dev/null || echo 0)
+        NOW_EPOCH=$(date +%s)
+        AGE_HOURS=$(( (NOW_EPOCH - LAST_UPDATED_EPOCH) / 3600 ))
+        if [ "$LAST_UPDATED_EPOCH" -gt 0 ] && [ "$AGE_HOURS" -gt 24 ]; then
+            echo -e "  ├─ Last Updated: $LAST_UPDATED"
+            echo -e "  └─ Freshness: ${YELLOW}STALE (${AGE_HOURS}h old)${NC}"
+        else
+            echo -e "  └─ Last Updated: $LAST_UPDATED"
+        fi
     else
         echo -e "  └─ System Status: ${YELLOW}Not found${NC}"
     fi
@@ -307,7 +389,7 @@ echo -e "  ├─ Services: ${SERVICE_POINTS}/40"
 echo -e "  ├─ Resources: ${MEM_PERCENT}% memory available"
 if $DOCKER_DAEMON_AVAILABLE; then
     echo -e "  ├─ Docker: 20/20"
-elif [ "$DOCKER_POINTS_AVAILABLE" -eq 0 ]; then
+elif $DOCKER_RUNTIME_NA || [ "$DOCKER_POINTS_AVAILABLE" -eq 0 ]; then
     echo -e "  ├─ Docker: N/A ${YELLOW}(informational only in this runtime)${NC}"
 else
     echo -e "  ├─ Docker: 0/20 ${YELLOW}(daemon not running)${NC}"

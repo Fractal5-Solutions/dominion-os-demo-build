@@ -434,18 +434,10 @@ jobs:
             --push \
             .
       
-      - name: Deploy to Cloud Run
+      - name: Handoff to internal deployment control
         run: |
-          gcloud run deploy dominion-demo-service \
-            --image=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dominion-artifacts/demo-build:${{ github.sha }} \
-            --region=${{ secrets.GCP_REGION }} \
-            --platform=managed \
-            --min-instances=0 \
-            --max-instances=10 \
-            --cpu=1 \
-            --memory=512Mi \
-            --timeout=60s \
-            --concurrency=80
+          echo "Cloud Run deployment authority has been moved to dominion-command-center"
+          echo "Use the private workflow .github/workflows/gcp-cloudrun-deploy.yml"
       
       # No artifact upload unless failure
       - name: Upload failure logs
