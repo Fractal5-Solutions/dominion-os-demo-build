@@ -333,16 +333,11 @@ section "PHASE 4: LEGACY SYSTEMS"
 
 # Politics Local (Legacy)
 if [ -f "/workspaces/dominion-os-1.0-politics.local-20260305/app.py" ]; then
-    # Activate Politics-Local-Legacy venv and use unique port
-    VENV_POLITICS="/workspaces/dominion-os-1.0-politics.local-20260305/.venv/bin/activate"
-    if [ -f "$VENV_POLITICS" ]; then
-        nohup bash -c "source $VENV_POLITICS 2>/dev/null; python3 app.py" > "$LOG_DIR/Politics-Local-Legacy.log" 2>&1 &
-        pid=$!
-        echo $pid > "$LOG_DIR/Politics-Local-Legacy.pid"
-        TRACKED_PIDFILES+=("$LOG_DIR/Politics-Local-Legacy.pid")
-        success "Politics-Local-Legacy started successfully (PID: $pid, Port: 5005)"
-    else
-        error "Politics-Local-Legacy venv not found - check setup"
+    if ! start_service "Politics-Local-Legacy" \
+                      "/workspaces/dominion-os-1.0-politics.local-20260305/app.py" \
+                      "cd /workspaces/dominion-os-1.0-politics.local-20260305 && PORT=5005 python3 app.py" \
+                      "5005"; then
+        warning "Politics-Local-Legacy unavailable (legacy optional service)"
     fi
 fi
 
