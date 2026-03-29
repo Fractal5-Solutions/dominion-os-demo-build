@@ -252,9 +252,9 @@ if gcloud auth list --filter=status:ACTIVE --format="value(account)" > /dev/null
     info "Scanning dominion-os-1-0-main (DEV/STAGING)..."
     gcloud config set project dominion-os-1-0-main --quiet 2>&1 | grep -v environment || true
     
-    DEV_SERVICES=$(gcloud run services list --format="value(metadata.name)" 2>/dev/null | wc -l)
+    DEV_SERVICES=$(gcloud run services list --format="value(metadata.name)" 2>/dev/null | wc -l || true)
     DEV_SERVICES=${DEV_SERVICES:-0}
-    DEV_READY=$(gcloud run services list --format="value(status.conditions[0].status)" 2>/dev/null | grep -c "True")
+    DEV_READY=$(gcloud run services list --format="value(status.conditions[0].status)" 2>/dev/null | grep -c "True" || true)
     DEV_READY=${DEV_READY:-0}
     
     if [ "$DEV_SERVICES" -gt 0 ]; then
@@ -278,9 +278,9 @@ if gcloud auth list --filter=status:ACTIVE --format="value(account)" > /dev/null
     info "Scanning dominion-core-prod (PRODUCTION)..."
     gcloud config set project dominion-core-prod --quiet 2>&1 | grep -v environment || true
     
-    PROD_SERVICES=$(gcloud run services list --format="value(metadata.name)" 2>/dev/null | wc -l)
+    PROD_SERVICES=$(gcloud run services list --format="value(metadata.name)" 2>/dev/null | wc -l || true)
     PROD_SERVICES=${PROD_SERVICES:-0}
-    PROD_READY=$(gcloud run services list --format="value(status.conditions[0].status)" 2>/dev/null | grep -c "True")
+    PROD_READY=$(gcloud run services list --format="value(status.conditions[0].status)" 2>/dev/null | grep -c "True" || true)
     PROD_READY=${PROD_READY:-0}
     
     if [ "$PROD_SERVICES" -gt 0 ]; then
