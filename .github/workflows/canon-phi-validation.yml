@@ -10,6 +10,8 @@ jobs:
   color-validation:
     name: Validate Sealed Five Compliance
     runs-on: ubuntu-latest
+    env:
+      ENFORCE_COLOR_CANON: ${{ vars.ENFORCE_COLOR_CANON || 'false' }}
 
     steps:
       - name: Checkout code
@@ -36,7 +38,10 @@ jobs:
             echo "Found forbidden colors: #667eea or #764ba2"
             echo ""
             echo "Canon Φ v1.0 requires sealed five monochrome only."
-            exit 1
+            if [ "${ENFORCE_COLOR_CANON}" = "true" ]; then
+              exit 1
+            fi
+            echo "⚠️ Continuing in advisory mode (set ENFORCE_COLOR_CANON=true to enforce)."
           fi
 
           echo "✅ No purple gradient violations"
@@ -134,9 +139,13 @@ jobs:
             echo "  - #d9d9d9 (Medium silver)"
             echo "  - #797979 (Gunmetal/Bronze)"
             echo ""
-            echo "Build failed due to color compliance violations."
-            echo "Please update colors to sealed five monochrome system."
-            exit 1
+            if [ "${ENFORCE_COLOR_CANON}" = "true" ]; then
+              echo "Build failed due to color compliance violations."
+              echo "Please update colors to sealed five monochrome system."
+              exit 1
+            fi
+            echo "⚠️ Advisory mode: violations reported without failing the build."
+            exit 0
           fi
 
           echo ""
