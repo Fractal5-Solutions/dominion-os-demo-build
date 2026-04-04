@@ -130,16 +130,18 @@ jobs:
           GCP_ACCESS_TOKEN: ${{ secrets.GCP_ACCESS_TOKEN }}
         run: |
           set -euo pipefail
+          if [ -z "${GCP_ACCESS_TOKEN}" ]; then
+            echo "GCP_ACCESS_TOKEN secret is not configured" >&2
+            exit 1
+          fi
           TOKEN_FILE="$RUNNER_TEMP/gcp-access-token.txt"
           printf '%s' "$GCP_ACCESS_TOKEN" > "$TOKEN_FILE"
           echo "token_file=$TOKEN_FILE" >> "$GITHUB_OUTPUT"
 
       - name: Configure Artifact Registry
-        env:
-          CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ steps.gcp-token.outputs.token_file }}
         run: |
           set -euo pipefail
-          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          docker login -u oauth2accesstoken --password-stdin https://us-central1-docker.pkg.dev < "${{ steps.gcp-token.outputs.token_file }}"
 
       - name: Verify Public Demo Release Surface
         run: |

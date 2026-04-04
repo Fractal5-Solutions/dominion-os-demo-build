@@ -32,19 +32,24 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install flake8 pytest black
-          find . -name requirements.txt -exec pip install -r {} \;
-          find . -name requirements-dev.txt -exec pip install -r {} \;
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
       
       - name: Lint with flake8
         run: |
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          flake8 . --count --max-complexity=10 --max-line-length=127 --statistics
+          flake8 . --exclude=.git,__pycache__,.venv,.venv*,venv,node_modules,build,dist --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --exclude=.git,__pycache__,.venv,.venv*,venv,node_modules,build,dist --count --max-complexity=10 --max-line-length=127 --statistics
       
       - name: Check formatting with black
-        run: black --check .
+        run: black --check . --exclude '/(\.git|__pycache__|\.venv.*|venv|node_modules|build|dist)/'
       
       - name: Run tests with pytest
-        run: pytest
+        run: |
+          if [ -d tests ]; then
+            pytest -q tests
+          else
+            pytest -q
+          fi
       
       - name: Validate bash scripts
         run: |

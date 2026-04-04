@@ -72,39 +72,58 @@ jobs:
     permissions:
       contents: read
       id-token: write
+    env:
+      GCP_PROJECT_ID: dominion-core-prod
+      GCP_REGION: us-central1
+      SERVICE_NAME: dominion-os-demo
+      IMAGE_REPO: us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/dominion-os-demo
     
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 1
-      
-      - uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2
-        with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-      
-      - uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f # v2
+
+      - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v2
+
+      - name: Prepare Google Access Token
+        id: gcp-token
+        env:
+          GCP_ACCESS_TOKEN: ${{ secrets.GCP_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${GCP_ACCESS_TOKEN}" ]; then
+            echo "GCP_ACCESS_TOKEN secret is not configured" >&2
+            exit 1
+          fi
+          TOKEN_FILE="$RUNNER_TEMP/gcp-access-token.txt"
+          printf '%s' "$GCP_ACCESS_TOKEN" > "$TOKEN_FILE"
+          echo "token_file=$TOKEN_FILE" >> "$GITHUB_OUTPUT"
       
       # Use Docker buildx for layer caching
       - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
       
       - name: Build with cache
+        env:
+          CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ steps.gcp-token.outputs.token_file }}
         run: |
-          gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev
+          docker login -u oauth2accesstoken --password-stdin https://us-central1-docker.pkg.dev < "${{ steps.gcp-token.outputs.token_file }}"
           
           # Build with GitHub Actions cache
           docker buildx build \
             --cache-from type=gha \
             --cache-to type=gha,mode=max \
-            --tag ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dominion-artifacts/demo-build:${{ github.sha }} \
+            --tag ${IMAGE_REPO}:${{ github.sha }} \
             --push \
             .
       
       - name: Deploy to Cloud Run
+        env:
+          CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ steps.gcp-token.outputs.token_file }}
         run: |
-          gcloud run deploy dominion-demo-service \
-            --image=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dominion-artifacts/demo-build:${{ github.sha }} \
-            --region=${{ secrets.GCP_REGION }} \
+          gcloud run deploy ${SERVICE_NAME} \
+            --project=${GCP_PROJECT_ID} \
+            --image=${IMAGE_REPO}:${{ github.sha }} \
+            --region=${GCP_REGION} \
             --platform=managed \
             --min-instances=0 \
             --max-instances=10 \
