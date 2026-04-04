@@ -77,15 +77,41 @@ jobs:
       GCP_REGION: us-central1
       SERVICE_NAME: dominion-os-demo
       IMAGE_REPO: us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/dominion-os-demo
+      DEPLOY_ENABLED: ${{ vars.ENABLE_PROD_DEPLOY || 'false' }}
     
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 1
 
-      - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v2
+      - name: Preflight deploy prerequisites
+        id: preflight
+        shell: bash
+        env:
+          GCP_ACCESS_TOKEN: ${{ secrets.GCP_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          missing=()
+          if [ "${DEPLOY_ENABLED}" != "true" ]; then
+            missing+=("ENABLE_PROD_DEPLOY variable is not true")
+          fi
+          if [ -z "${GCP_ACCESS_TOKEN}" ]; then
+            missing+=("GCP_ACCESS_TOKEN")
+          fi
+
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            printf 'missing=%s\n' "${missing[*]}" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            echo "missing=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - if: steps.preflight.outputs.ready == 'true'
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v2
 
       - name: Prepare Google Access Token
+        if: steps.preflight.outputs.ready == 'true'
         id: gcp-token
         env:
           GCP_ACCESS_TOKEN: ${{ secrets.GCP_ACCESS_TOKEN }}
@@ -100,9 +126,11 @@ jobs:
           echo "token_file=$TOKEN_FILE" >> "$GITHUB_OUTPUT"
       
       # Use Docker buildx for layer caching
-      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+      - if: steps.preflight.outputs.ready == 'true'
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
       
       - name: Build with cache
+        if: steps.preflight.outputs.ready == 'true'
         env:
           CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ steps.gcp-token.outputs.token_file }}
         run: |
@@ -117,6 +145,7 @@ jobs:
             .
       
       - name: Deploy to Cloud Run
+        if: steps.preflight.outputs.ready == 'true'
         env:
           CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ steps.gcp-token.outputs.token_file }}
         run: |
@@ -131,6 +160,11 @@ jobs:
             --memory=512Mi \
             --timeout=60s \
             --concurrency=80
+
+      - name: Skip summary
+        if: steps.preflight.outputs.ready != 'true'
+        run: |
+          echo "Skipping cost-optimized deploy. Missing prerequisites: ${{ steps.preflight.outputs.missing }}"
       
       # No artifact upload unless failure
       - name: Upload failure logs

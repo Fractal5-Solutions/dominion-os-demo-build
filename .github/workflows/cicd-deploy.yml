@@ -15,22 +15,57 @@ permissions:
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
+    env:
+      DEPLOY_ENABLED: ${{ vars.ENABLE_OIDC_DEPLOY || 'false' }}
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID || '732190342674' }}
+      WIF_PROVIDER: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER || secrets.GCP_WIF_PROVIDER }}
+      WIF_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL || secrets.GCP_WIF_SA_EMAIL }}
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
 
+      - name: Preflight deploy prerequisites
+        id: preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          missing=()
+          if [ "${DEPLOY_ENABLED}" != "true" ]; then
+            missing+=("ENABLE_OIDC_DEPLOY variable is not true")
+          fi
+          if [ -z "${WIF_PROVIDER}" ]; then
+            missing+=("GCP_WORKLOAD_IDENTITY_PROVIDER/GCP_WIF_PROVIDER")
+          fi
+          if [ -z "${WIF_SERVICE_ACCOUNT}" ]; then
+            missing+=("GCP_SERVICE_ACCOUNT_EMAIL/GCP_WIF_SA_EMAIL")
+          fi
+          if [ -z "${GCP_PROJECT_ID}" ]; then
+            missing+=("GCP_PROJECT_ID")
+          fi
+
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            printf 'missing=%s\n' "${missing[*]}" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            echo "missing=" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Authenticate to Google Cloud
+        if: steps.preflight.outputs.ready == 'true'
         uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed
         with:
-          workload_identity_provider: projects/732190342674/locations/global/workloadIdentityPools/fractal5-github-pool/providers/github-provider
-          service_account: dominion-demo-oidc-sa@732190342674.iam.gserviceaccount.com
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.WIF_SERVICE_ACCOUNT }}
 
       - name: Set up gcloud
+        if: steps.preflight.outputs.ready == 'true'
         uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db
         with:
-          project_id: 732190342674
+          project_id: ${{ env.GCP_PROJECT_ID }}
           version: ">= 363.0.0"
 
       - name: Submit Cloud Build
+        if: steps.preflight.outputs.ready == 'true'
         run: |
           REF="${GITHUB_REF##*/}"
           if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
@@ -40,6 +75,11 @@ jobs:
           fi
 
           gcloud builds submit \
-            --project=732190342674 \
+            --project=${GCP_PROJECT_ID} \
             --config cloudbuild.yaml \
             --substitutions=_TAG="${TAG}",_REGION=us-central1,_SERVICE_NAME=dominion-demo,_AR_REPO=dominion-demo-repo
+
+      - name: Skip summary
+        if: steps.preflight.outputs.ready != 'true'
+        run: |
+          echo "Skipping OIDC deploy. Missing prerequisites: ${{ steps.preflight.outputs.missing }}"

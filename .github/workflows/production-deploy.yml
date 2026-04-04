@@ -27,11 +27,36 @@ jobs:
       SERVICE_NAME: dominion-os-demo
       IMAGE_REPO: us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/dominion-os-demo
       RELEASE_MANIFEST_PATH: release-manifest.json
+      DEPLOY_ENABLED: ${{ vars.ENABLE_PROD_DEPLOY || 'false' }}
 
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
 
+      - name: Preflight production deploy prerequisites
+        id: preflight
+        shell: bash
+        env:
+          GCP_ACCESS_TOKEN: ${{ secrets.GCP_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          missing=()
+          if [ "${DEPLOY_ENABLED}" != "true" ]; then
+            missing+=("ENABLE_PROD_DEPLOY variable is not true")
+          fi
+          if [ -z "${GCP_ACCESS_TOKEN}" ]; then
+            missing+=("GCP_ACCESS_TOKEN")
+          fi
+
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            printf 'missing=%s\n' "${missing[*]}" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            echo "missing=" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Capture Release Metadata
+        if: steps.preflight.outputs.ready == 'true'
         id: release
         shell: bash
         env:
@@ -120,11 +145,14 @@ jobs:
           PY
           echo "release_sha=$(git rev-parse --short=12 HEAD)" >> "$GITHUB_OUTPUT"
 
-      - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db
+      - if: steps.preflight.outputs.ready == 'true'
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db
 
-      - uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435
+      - if: steps.preflight.outputs.ready == 'true'
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435
 
       - name: Prepare Google Access Token
+        if: steps.preflight.outputs.ready == 'true'
         id: gcp-token
         env:
           GCP_ACCESS_TOKEN: ${{ secrets.GCP_ACCESS_TOKEN }}
@@ -139,16 +167,19 @@ jobs:
           echo "token_file=$TOKEN_FILE" >> "$GITHUB_OUTPUT"
 
       - name: Configure Artifact Registry
+        if: steps.preflight.outputs.ready == 'true'
         run: |
           set -euo pipefail
           docker login -u oauth2accesstoken --password-stdin https://us-central1-docker.pkg.dev < "${{ steps.gcp-token.outputs.token_file }}"
 
       - name: Verify Public Demo Release Surface
+        if: steps.preflight.outputs.ready == 'true'
         run: |
           set -euo pipefail
           python scripts/verify_public_demo_surface.py
 
       - name: Build and Push Authoritative Demo Image
+        if: steps.preflight.outputs.ready == 'true'
         run: |
           set -euo pipefail
           docker buildx build \
@@ -159,6 +190,7 @@ jobs:
             .
 
       - name: Resolve Live Service URLs
+        if: steps.preflight.outputs.ready == 'true'
         id: urls
         env:
           CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ steps.gcp-token.outputs.token_file }}
@@ -170,6 +202,7 @@ jobs:
           echo "widget_url=${WIDGET_URL}" >> "$GITHUB_OUTPUT"
 
       - name: Deploy Authoritative Demo Service
+        if: steps.preflight.outputs.ready == 'true'
         env:
           CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ steps.gcp-token.outputs.token_file }}
         run: |
@@ -186,6 +219,7 @@ jobs:
             --quiet
 
       - name: Verify Live Release Contract
+        if: steps.preflight.outputs.ready == 'true'
         env:
           CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ steps.gcp-token.outputs.token_file }}
         run: |
@@ -202,3 +236,8 @@ jobs:
             --expected-source-repo "${{ steps.release.outputs.source_repo }}" \
             --expected-source-sha "${{ steps.release.outputs.source_sha }}" \
             --expected-source-version "${{ steps.release.outputs.source_version }}"
+
+      - name: Skip summary
+        if: steps.preflight.outputs.ready != 'true'
+        run: |
+          echo "Skipping production deploy. Missing prerequisites: ${{ steps.preflight.outputs.missing }}"
