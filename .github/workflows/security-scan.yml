@@ -11,27 +11,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+      - name: Checkout code
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-      with:
-        fetch-depth: 0
+        with:
+          fetch-depth: 0
 
-    - name: Run TruffleHog OSS
+      - name: Run TruffleHog OSS
         uses: trufflesecurity/trufflehog@afd5336caad0f61da51750ffe39869974b27b0db # main
-      with:
-        path: ./
-        base: main
-        head: HEAD
-        extra_args: --debug --only-verified
+        with:
+          path: ./
+          base: main
+          head: HEAD
+          extra_args: --debug --only-verified
 
-    - name: Run AI Token Detector
-      run: |
-        python scripts/ai_token_detector.py
+      - name: Run AI Token Detector
+        run: |
+          python scripts/ai_token_detector.py
 
-    - name: Upload security report
-      if: always()
-      continue-on-error: true
+      - name: Upload security report
+        if: always()
+        continue-on-error: true
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-      with:
-        name: security-report
-        path: security_report.md
+        with:
+          name: security-report
+          path: security_report.md
