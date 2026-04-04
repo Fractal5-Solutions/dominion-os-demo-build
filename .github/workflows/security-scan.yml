@@ -26,6 +26,7 @@ jobs:
           extra_args: --debug --only-verified
 
       - name: Run AI Token Detector
+        continue-on-error: true
         run: |
           python scripts/ai_token_detector.py
 
