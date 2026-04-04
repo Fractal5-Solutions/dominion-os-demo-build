@@ -49,14 +49,15 @@ LOCAL_SERVICE_TARGETS = (
         "name": "PHI OAuth Server",
         "role": "auth-gateway",
         "url": os.getenv("OAUTH_SERVER_URL", "http://127.0.0.1:8080"),
-        "health_paths": ("/ready", "/health"),
+        "health_paths": ("/health", "/ready"),
     },
     {
         "id": "phi-askphi-widget",
-        "name": "AskPHI Widget",
-        "role": "assistant-ui",
+        "name": "PHI AskPHI Widget",
+        "role": "public-safe-chat",
         "url": os.getenv("ASKPHI_WIDGET_URL", "http://127.0.0.1:8081"),
-        "health_paths": ("/ready", "/health", "/"),
+        # Include all known widget health routes across deployments.
+        "health_paths": ("/health", "/ready", "/healthz"),
     },
 )
 
@@ -260,6 +261,25 @@ def wants_json_response() -> bool:
     )
 
 
+def parse_probe_flags() -> tuple[bool, bool, list[str]]:
+    probe_raw = request.args.get("probe", "").strip().lower()
+    if not probe_raw:
+        return False, False, []
+
+    parts = [part for part in re.split(r"[,\s]+", probe_raw) if part]
+    tokens = set(parts)
+
+    # Backward-compatible shorthand: probe=1|true enables local probes only.
+    if probe_raw in {"1", "true", "yes", "on"}:
+        tokens.add("local")
+    if "all" in tokens:
+        tokens.update({"local", "remote"})
+
+    local_requested = "local" in tokens
+    remote_requested = "remote" in tokens
+    return local_requested, remote_requested, sorted(tokens)
+
+
 def read_json_file(path: Path, default):
     try:
         return json.loads(path.read_text(encoding="utf-8"))
@@ -293,25 +313,39 @@ def probe_service(base_url: str, health_paths: tuple[str, ...], enabled: bool) -
         return {"status": "not_probed", "healthy": None}
 
     last_error = ""
+    last_status_code = None
+    last_checked_url = f"{base_url.rstrip('/')}{health_paths[0]}"
     for health_path in health_paths:
         target = f"{base_url.rstrip('/')}{health_path}"
+        last_checked_url = target
         try:
             response = requests.get(target, timeout=2, allow_redirects=False)
             healthy = 200 <= response.status_code < 400
-            return {
-                "status": "healthy" if healthy else "degraded",
-                "healthy": healthy,
-                "checked_url": target,
-                "status_code": response.status_code,
-            }
+            if healthy:
+                return {
+                    "status": "healthy",
+                    "healthy": True,
+                    "checked_url": target,
+                    "status_code": response.status_code,
+                }
+            last_status_code = response.status_code
+            last_error = f"HTTP {response.status_code}"
         except requests.RequestException as exc:
             last_error = str(exc)
+
+    if last_status_code is not None:
+        return {
+            "status": "degraded",
+            "healthy": False,
+            "checked_url": last_checked_url,
+            "status_code": last_status_code,
+        }
 
     return {
         "status": "unreachable",
         "healthy": False,
-        "checked_url": f"{base_url.rstrip('/')}{health_paths[0]}",
-        "error": "Connection failed",
+        "checked_url": last_checked_url,
+        "error": last_error or "Connection failed",
     }
 
 
@@ -489,11 +523,21 @@ def health():
 
 @app.route("/status")
 def status():
-    local_probe = app.config.get("ENABLE_PROBES", True) and not app.testing
-    remote_probe = request.args.get("probe", "").lower() in {"remote", "all", "1", "true"}
+    local_requested, remote_requested, tokens = parse_probe_flags()
+    local_probe = (
+        app.config.get("ENABLE_PROBES", True)
+        and not app.testing
+        and local_requested
+    )
+    remote_probe = remote_requested
     return jsonify(
         {
             **service_info(),
+            "probe": {
+                "tokens": tokens,
+                "local_enabled": bool(local_probe),
+                "remote_enabled": bool(remote_probe),
+            },
             "inventory": {
                 "product_count": len(load_products()),
                 "tutorial_count": len(load_demo_experience()["tutorials"]),
@@ -543,8 +587,13 @@ def demo_experience_api():
 
 @app.route("/api/v1/topology")
 def topology_api():
-    local_probe = app.config.get("ENABLE_PROBES", True) and not app.testing
-    remote_probe = request.args.get("probe", "").lower() in {"remote", "all", "1", "true"}
+    local_requested, remote_requested, _tokens = parse_probe_flags()
+    local_probe = (
+        app.config.get("ENABLE_PROBES", True)
+        and not app.testing
+        and local_requested
+    )
+    remote_probe = remote_requested
     return jsonify(build_topology(local_probe=local_probe, remote_probe=remote_probe))
 
 

@@ -141,6 +141,11 @@ jobs:
           set -euo pipefail
           gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
 
+      - name: Verify Public Demo Release Surface
+        run: |
+          set -euo pipefail
+          python scripts/verify_public_demo_surface.py
+
       - name: Build and Push Authoritative Demo Image
         run: |
           set -euo pipefail
