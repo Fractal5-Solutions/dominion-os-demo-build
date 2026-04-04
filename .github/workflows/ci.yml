@@ -63,7 +63,14 @@ jobs:
       
       - name: Validate docker-compose
         run: |
-          docker-compose -f docker-compose-mcp.yml config > /dev/null
+          if command -v docker-compose >/dev/null 2>&1; then
+            docker-compose -f docker-compose-mcp.yml config > /dev/null
+          elif docker compose version >/dev/null 2>&1; then
+            docker compose -f docker-compose-mcp.yml config > /dev/null
+          else
+            echo "Docker Compose is unavailable on this runner; skipping validation."
+            exit 0
+          fi
           echo "✅ docker-compose-mcp.yml is valid"
   
   security-scan:

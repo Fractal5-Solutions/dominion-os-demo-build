@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# -*- coding: utf-8 -*-
-# -*- coding: utf-8 -*-
-# -*- coding: utf-8 -*-
 """
 PHI Chief AI - Token Detection and Protection System
 Monitors for unauthorized token usage and potential compromises
@@ -148,7 +145,8 @@ class AITokenDetector:
                         f"  - {activity['type']} in {activity['repo']} at {activity['time']}"
                     )
         else:
-            report.append(f"❌ {activity_check['status']}: {activity_check['message']}")
+            message = activity_check.get("message", "No activity message provided")
+            report.append(f"❌ {activity_check.get('status', 'UNKNOWN')}: {message}")
 
         return "\n".join(report)
 
@@ -178,7 +176,10 @@ def main():
     print("📋 Security report saved to security_report.md")
 
     # Alert if critical issues found
-    if findings or (activity_check["status"] not in ["OK", "NO_TOKEN_PROVIDED"] and "error" in activity_check.get("message", "").lower()):
+    if findings or (
+        activity_check.get("status") not in ["OK", "NO_TOKEN_PROVIDED"]
+        and "error" in activity_check.get("message", "").lower()
+    ):
         print("🚨 SECURITY ALERT: Issues detected!")
         return 1
 
