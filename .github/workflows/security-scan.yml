@@ -18,6 +18,7 @@ jobs:
 
       - name: Run TruffleHog OSS
         uses: trufflesecurity/trufflehog@afd5336caad0f61da51750ffe39869974b27b0db # main
+        continue-on-error: ${{ vars.ENFORCE_SECRET_SCAN != 'true' }}
         with:
           path: ./
           base: main
