@@ -56,7 +56,8 @@ LOCAL_SERVICE_TARGETS = (
         "name": "PHI AskPHI Widget",
         "role": "public-safe-chat",
         "url": os.getenv("ASKPHI_WIDGET_URL", "http://127.0.0.1:8081"),
-        "health_paths": ("/health", "/ready"),
+        # Include all known widget health routes across deployments.
+        "health_paths": ("/health", "/ready", "/healthz"),
     },
 )
 

@@ -1,7 +1,7 @@
 # Multi-stage production-hardened Dockerfile for Dominion OS
 # Optimized for security, performance, and minimal attack surface
 
-# Stage 1: Build dependencies
+# Stage 1: Build dependencies and the public runtime payload
 FROM python:3.12-slim AS builder
 
 WORKDIR /build
@@ -17,6 +17,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements-prod.txt .
 RUN pip install --no-cache-dir --user --upgrade pip setuptools wheel && \
     pip install --no-cache-dir --user -r requirements-prod.txt
+
+# Build a strict public runtime payload and strip plain Python source.
+RUN mkdir -p /runtime/scripts/telemetry /runtime/demo /runtime/store /runtime/products
+COPY command_core.py /runtime/
+COPY demo /runtime/demo
+COPY store /runtime/store
+COPY products /runtime/products
+COPY scripts/telemetry/config_project1.txt /runtime/scripts/telemetry/config_project1.txt
+COPY scripts/telemetry/config_project2.txt /runtime/scripts/telemetry/config_project2.txt
+COPY scripts/telemetry/services_project1.txt /runtime/scripts/telemetry/services_project1.txt
+COPY scripts/telemetry/services_project2.txt /runtime/scripts/telemetry/services_project2.txt
+RUN python -m compileall -b /runtime/command_core.py && rm /runtime/command_core.py
 
 # Stage 2: Production runtime
 FROM python:3.12-slim AS production
@@ -37,8 +49,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy Python dependencies from builder
 COPY --from=builder /root/.local /home/dominion/.local
 
-# Copy application code
-COPY --chown=dominion:dominion . /app/
+# Copy the public runtime payload only.
+COPY --from=builder --chown=dominion:dominion /runtime/ /app/
 
 # Set Python path
 ENV PATH=/home/dominion/.local/bin:$PATH
@@ -60,7 +72,8 @@ USER dominion
 # Expose port (will be set by Cloud Run)
 EXPOSE 8080
 
-# Use gunicorn for production with optimal settings
+# Use gunicorn for production with optimal settings.
+# The runtime payload carries compiled bytecode plus public static assets only.
 CMD exec gunicorn --bind :${PORT:-8080} \
     --workers 4 \
     --threads 2 \
