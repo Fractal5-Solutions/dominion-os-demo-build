@@ -62,6 +62,7 @@ draw_service_status() {
     local services=(
         "OAuth Server:8080"
         "Widget Service:8081"
+        "Java Live Ops Site:8090"
         "Command Center:5000"
         "Billing Service:5001"
         "Alt Demo:5002"

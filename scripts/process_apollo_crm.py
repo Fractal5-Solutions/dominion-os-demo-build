@@ -3,6 +3,7 @@
 # -*- coding: utf-8 -*-
 # -*- coding: utf-8 -*-
 # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 Apollo CRM Data Processor
 Processes raw Apollo account data into CRM-compatible format

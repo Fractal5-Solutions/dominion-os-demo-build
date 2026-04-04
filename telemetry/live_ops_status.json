@@ -1,19 +1,19 @@
 {
-  "timestamp": "2026-03-18T23:52:20+00:00",
-  "live_ops_score": "100.00",
+  "timestamp": "2026-04-01T22:18:53+00:00",
+  "live_ops_score": "27.00",
   "services": {
     "web": {
-      "healthy": 7,
-      "total": 7,
-      "status": "PERFECT"
+      "healthy": 1,
+      "total": 8,
+      "status": "DEGRADED"
     },
     "background": {
-      "healthy": 3,
+      "healthy": 2,
       "total": 3,
-      "status": "PERFECT"
+      "status": "DEGRADED"
     }
   },
-  "system_resources": {"cpu": {"usage": 1.8, "status": "HEALTHY"}, "memory": {"usage": 5.65, "status": "HEALTHY"}, "disk": {"usage": 50, "status": "HEALTHY"}},
+  "system_resources": {"cpu": {"usage": 3.6, "status": "HEALTHY"}, "memory": {"usage": 13.48, "status": "HEALTHY"}, "disk": {"usage": 50, "status": "HEALTHY"}},
   "sovereign_mode": "MAXIMUM_ACTIVE",
   "authority_level": "9/9"
 }

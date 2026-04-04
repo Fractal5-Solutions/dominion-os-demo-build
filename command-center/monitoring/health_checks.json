@@ -10,6 +10,13 @@
         "expected_status": 200
       },
       {
+        "name": "java_live_ops_site",
+        "type": "http",
+        "url": "http://localhost:8090/ready",
+        "timeout_seconds": 5,
+        "expected_status": 200
+      },
+      {
         "name": "database_connectivity",
         "type": "tcp",
         "host": "localhost",

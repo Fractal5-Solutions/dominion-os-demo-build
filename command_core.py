@@ -24,7 +24,7 @@ app.config["ENABLE_PROBES"] = os.getenv("COMMAND_CORE_ENABLE_PROBES", "1").lower
     "no",
 }
 
-APP_VERSION = os.getenv("APP_VERSION", "0.0.0-dev")
+APP_VERSION = os.getenv("APP_VERSION", "1.2.0")
 SERVICE_NAME = os.getenv("SERVICE_NAME", "dominion-os-demo")
 REGION = os.getenv("REGION", os.getenv("GCP_REGION", "us-central1"))
 PROJECT_ID = os.getenv("PROJECT_ID", os.getenv("GCP_PROJECT_ID", "dominion-os-1-0-main"))
@@ -58,6 +58,13 @@ LOCAL_SERVICE_TARGETS = (
         "url": os.getenv("ASKPHI_WIDGET_URL", "http://127.0.0.1:8081"),
         # Include all known widget health routes across deployments.
         "health_paths": ("/health", "/ready", "/healthz"),
+    },
+    {
+        "id": "dominion-java-live-ops-site",
+        "name": "Dominion Java Live Ops Site",
+        "role": "sovereign-live-ops-java",
+        "url": os.getenv("JAVA_SITE_URL", "http://127.0.0.1:8090"),
+        "health_paths": ("/ready", "/health", "/healthz"),
     },
 )
 
@@ -367,6 +374,8 @@ def load_products() -> list[dict]:
 
 
 def load_demo_experience() -> dict:
+    local_urls = {service["id"]: service["url"] for service in LOCAL_SERVICE_TARGETS}
+
     config = read_json_file(BASE_DIR / "demo" / "config.json", {})
     accessibility = read_json_file(BASE_DIR / "demo" / "components" / "accessibility.json", {})
     tutorials = read_json_file(BASE_DIR / "demo" / "components" / "tutorials.json", {})
@@ -377,9 +386,13 @@ def load_demo_experience() -> dict:
         "tutorials": tutorials.get("interactive_tutorials", {}),
         "performance": performance.get("performance_optimization", {}),
         "links": {
-            "command_center": LOCAL_SERVICE_TARGETS[0]["url"],
-            "oauth": LOCAL_SERVICE_TARGETS[1]["url"],
-            "widget": LOCAL_SERVICE_TARGETS[2]["url"],
+            "command_center": local_urls.get("command-center-bims", "http://127.0.0.1:5000"),
+            "oauth": local_urls.get("phi-oauth-server", "http://127.0.0.1:8080"),
+            "widget": local_urls.get("phi-askphi-widget", "http://127.0.0.1:8081"),
+            "java_live_ops": local_urls.get(
+                "dominion-java-live-ops-site",
+                "http://127.0.0.1:8090",
+            ),
         },
     }
 

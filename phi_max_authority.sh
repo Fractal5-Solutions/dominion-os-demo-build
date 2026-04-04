@@ -2,6 +2,45 @@
 # PHI MAXIMUM AUTHORITY: FULL PERMISSIONS RESOLUTION
 # Complete token repair using all available authority sources
 
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/scripts/runtime_preflight.sh"
+
+github_login_for_token() {
+    local token="${1:-}"
+    local response=""
+
+    if [ -z "$token" ]; then
+        echo "FAILED"
+        return 0
+    fi
+
+    export_github_no_proxy
+    github_governor_reserve_request_slot
+    response="$(
+        curl \
+            --silent \
+            --show-error \
+            --location \
+            --connect-timeout 5 \
+            --max-time 20 \
+            -H "Authorization: Bearer ${token}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "${GITHUB_API_URL:-https://api.github.com}/user"
+    )" || {
+        echo "FAILED"
+        return 0
+    }
+
+    if command -v jq >/dev/null 2>&1; then
+        echo "$response" | jq -r '.login // "FAILED"' 2>/dev/null
+    else
+        echo "$response" | sed -n 's/.*"login"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -n 1
+    fi
+}
+
 echo "=== PHI MAXIMUM AUTHORITY: FULL PERMISSIONS RESOLUTION ==="
 echo "🎯 MISSION: Solve all token issues with maximum authority"
 echo "🎯 TARGET: ~59 commits sovereign deployment"
@@ -9,7 +48,7 @@ echo "🎯 AUTHORITY: FULL PERMISSIONS ACTIVATION"
 echo ""
 
 # Accept token as argument
-if [ -n "$1" ]; then
+if [ "${1:-}" != "" ]; then
     echo "✅ Using provided sovereign token"
     AUTH_TOKEN="$1"
     AUTH_METHOD="SOVEREIGN_TOKEN_ARG"
@@ -19,8 +58,8 @@ else
     echo "🔍 ANALYZING AVAILABLE AUTHORITY SOURCES..."
 
     # Test authority sources (silent verification)
-    USER_GH=$(curl -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" https://api.github.com/user -s 2>/dev/null | jq -r '.login' 2>/dev/null || echo "FAILED")
-    USER_CS=$(curl -H "Authorization: token $GITHUB_CODESPACE_TOKEN" -H "Accept: application/vnd.github.v3+json" https://api.github.com/user -s 2>/dev/null | jq -r '.login' 2>/dev/null || echo "FAILED")
+    USER_GH="$(github_login_for_token "${GITHUB_TOKEN:-}")"
+    USER_CS="$(github_login_for_token "${GITHUB_CODESPACE_TOKEN:-}")"
 
     echo "🎯 PHI AUTHORITY STRATEGY ACTIVATION..."
 

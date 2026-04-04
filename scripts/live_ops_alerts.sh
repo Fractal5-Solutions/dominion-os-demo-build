@@ -114,7 +114,7 @@ auto_recovery_actions() {
     local recovery_needed=false
 
     # Check each service
-    for port in 8080 8081 5000 5001 5002 5003 5004; do
+    for port in 8080 8081 8090 5000 5001 5002 5003 5004; do
         if ! lsof -i :$port | grep -q LISTEN; then
             alert "WARNING" "Service on port $port not responding, attempting restart"
             recovery_needed=true
@@ -127,6 +127,10 @@ auto_recovery_actions() {
                     ;;
                 8081)
                     # Widget service restart
+                    bash scripts/phi_start_all_systems.sh &
+                    ;;
+                8090)
+                    # Java live ops restart
                     bash scripts/phi_start_all_systems.sh &
                     ;;
                 5000)

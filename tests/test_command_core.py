@@ -69,10 +69,15 @@ def test_status_reports_local_topology_without_live_probes():
     assert response.json["overlay"] == "business"
     assert response.json["source_of_truth"]["repo"] == "dominion-command-center"
     topology = response.json["topology"]
-    assert len(topology["local_services"]) == 3
+    assert len(topology["local_services"]) == 4
     assert {
         service["id"] for service in topology["local_services"]
-    } == {"command-center-bims", "phi-oauth-server", "phi-askphi-widget"}
+    } == {
+        "command-center-bims",
+        "phi-oauth-server",
+        "phi-askphi-widget",
+        "dominion-java-live-ops-site",
+    }
     assert set(topology["remote_projects"]) == {"dominion-os-1-0-main", "dominion-core-prod"}
 
 

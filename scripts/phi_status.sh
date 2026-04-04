@@ -53,19 +53,25 @@ probe_service() {
     local health
     local ready
 
-    health=$(curl -s -m 3 "$url/health" 2>/dev/null || true)
+    ready=$(curl -s -m 3 "$url/ready" 2>/dev/null || true)
+    if printf '%s' "$ready" | grep -q '"ready":[[:space:]]*true'; then
+        echo "ready"
+        return 0
+    elif [ -n "$ready" ] && printf '%s' "$ready" | grep -q '"status":[[:space:]]*"not_ready"\|"ready":[[:space:]]*false'; then
+        echo "degraded"
+        return 0
+    fi
+
+    health=$(curl -fsS -m 3 "$url/health" 2>/dev/null || true)
     if [ -z "$health" ]; then
-        health=$(curl -s -m 3 "$url/healthz" 2>/dev/null || true)
+        health=$(curl -fsS -m 3 "$url/healthz" 2>/dev/null || true)
     fi
     if [ -z "$health" ]; then
         echo "running"
         return 0
     fi
 
-    ready=$(curl -s -m 3 "$url/ready" 2>/dev/null || true)
-    if printf '%s' "$ready" | grep -q '"ready":[[:space:]]*true'; then
-        echo "ready"
-    elif printf '%s' "$health" | grep -q '"status":[[:space:]]*"ok"\|"status":[[:space:]]*"healthy"\|"status":[[:space:]]*"ready"'; then
+    if printf '%s' "$health" | grep -q '"status":[[:space:]]*"ok"\|"status":[[:space:]]*"healthy"\|"status":[[:space:]]*"ready"'; then
         echo "healthy"
     elif printf '%s' "$health" | grep -q '"status":[[:space:]]*"not_ready"\|"ready":[[:space:]]*false'; then
         echo "degraded"
@@ -197,6 +203,7 @@ check_service 5001 "Billing Service" "http://localhost:5001" "billing-service/ap
 check_service 5002 "Dominion Command Core" "http://localhost:5002" "command_core.py" && ACTIVE=$((ACTIVE + 1))
 check_service 8080 "OAuth Server" "http://localhost:8080" "oauth_server/app.py|PHI-OAuth-Server" && ACTIVE=$((ACTIVE + 1))
 check_service 8081 "AskPHI Widget Service" "http://localhost:8081" "widget_service/app.py|PHI-AskPHI-Widget" && ACTIVE=$((ACTIVE + 1))
+check_service 8090 "Dominion Java Live Ops Site" "http://localhost:8090" "JavaLiveOpsSite|java_live_ops_site.sh" && ACTIVE=$((ACTIVE + 1))
 
 echo -e "${CYAN}━━━ BACKGROUND SERVICES ━━━${NC}"
 echo ""
@@ -226,7 +233,7 @@ echo "Commands:"
 echo "  • Start all:  /workspaces/dominion-command-center/scripts/live_ops_start.sh"
 echo "  • Status:     /workspaces/dominion-command-center/scripts/live_ops_status.sh"
 echo "  • Verify:     /workspaces/dominion-command-center/scripts/live_ops_verify.sh"
-echo "  • Stop all:   pkill -f 'python3.*app.py'"
+echo "  • Stop all:   pkill -f 'python3.*app.py|JavaLiveOpsSite'"
 echo "  • View logs:  tail -f logs/<service>.log"
 echo "  • This status: bash /workspaces/dominion-command-center/scripts/live_ops_status.sh"
 echo ""

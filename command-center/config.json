@@ -7,13 +7,15 @@
       "ai_powered_insights": true,
       "automated_optimization": true,
       "sovereign_security": true,
-      "performance_tracking": true
+      "performance_tracking": true,
+      "java_live_ops_site": true
     },
     "endpoints": {
       "health_check": "/health",
       "metrics": "/metrics",
       "dashboard": "/dashboard",
-      "api": "/api/v1"
+      "api": "/api/v1",
+      "java_live_ops_site": "http://localhost:8090"
     },
     "optimization_settings": {
       "response_time_target_ms": 100,

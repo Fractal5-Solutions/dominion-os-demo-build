@@ -22,6 +22,7 @@ NC='\033[0m'
 SERVICES=(
     "oauth:8080"
     "widget:8081"
+    "java_live_ops_site:8090"
     "command_center:5000"
     "billing:5001"
     "alt_demo:5002"

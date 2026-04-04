@@ -8,6 +8,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/runtime_preflight.sh"
 LOG_FILE="${SCRIPT_DIR}/telemetry/github_cost_optimization_$(date +%Y%m%d_%H%M%S).log"
 REPORT_FILE="${SCRIPT_DIR}/GITHUB_COST_OPTIMIZATION_REPORT.md"
 
@@ -142,7 +143,7 @@ cleanup_artifacts() {
     info "Fetching artifact list..."
     
     # List and count artifacts older than 30 days
-    ARTIFACT_COUNT=$(gh api repos/:owner/:repo/actions/artifacts --paginate \
+    ARTIFACT_COUNT=$(github_gh_api repos/:owner/:repo/actions/artifacts --paginate \
         --jq '.artifacts | length' 2>/dev/null || echo "0")
     
     if [ "$ARTIFACT_COUNT" -gt 0 ]; then
@@ -151,11 +152,11 @@ cleanup_artifacts() {
         # Delete artifacts older than 30 days
         CUTOFF_DATE=$(date -d '30 days ago' +%Y-%m-%d 2>/dev/null || date -v-30d +%Y-%m-%d)
         
-        gh api repos/:owner/:repo/actions/artifacts --paginate \
+        github_gh_api repos/:owner/:repo/actions/artifacts --paginate \
             --jq ".artifacts[] | select(.created_at < \"${CUTOFF_DATE}\") | .id" \
             2>/dev/null | while read -r artifact_id; do
             info "Deleting old artifact: $artifact_id"
-            gh api --method DELETE "repos/:owner/:repo/actions/artifacts/${artifact_id}" 2>/dev/null || true
+            github_gh_api --method DELETE "repos/:owner/:repo/actions/artifacts/${artifact_id}" 2>/dev/null || true
         done
         
         log "Artifact cleanup complete"
@@ -183,11 +184,11 @@ cleanup_workflow_runs() {
     info "Fetching workflow runs..."
     
     # Delete workflow runs older than 90 days
-    gh api repos/:owner/:repo/actions/runs --paginate \
+    github_gh_api repos/:owner/:repo/actions/runs --paginate \
         --jq '.workflow_runs[] | select(.created_at < (now - 7776000 | strftime("%Y-%m-%dT%H:%M:%SZ"))) | .id' \
         2>/dev/null | while read -r run_id; do
         info "Deleting old workflow run: $run_id"
-        gh api --method DELETE "repos/:owner/:repo/actions/runs/${run_id}" 2>/dev/null || true
+        github_gh_api --method DELETE "repos/:owner/:repo/actions/runs/${run_id}" 2>/dev/null || true
     done
     
     log "Workflow run cleanup complete"
@@ -297,7 +298,7 @@ EOF
     
     # Calculate current usage estimate
     if command -v gh &> /dev/null && gh auth status &> /dev/null; then
-        RECENT_RUNS=$(gh api repos/:owner/:repo/actions/runs \
+        RECENT_RUNS=$(github_gh_api repos/:owner/:repo/actions/runs \
             --jq '.workflow_runs | length' 2>/dev/null || echo "0")
         
         if [ "$RECENT_RUNS" -gt 0 ]; then
@@ -473,7 +474,7 @@ if ! command -v gh &> /dev/null; then
 fi
 
 # Fetch usage data
-gh api /repos/:owner/:repo/actions/billing/usage > "$REPORT_FILE"
+github_gh_api /repos/:owner/:repo/actions/billing/usage > "$REPORT_FILE"
 
 # Parse and alert if costs are high
 TOTAL_MINUTES=$(jq '.total_minutes_used' "$REPORT_FILE")

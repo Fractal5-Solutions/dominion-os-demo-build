@@ -2,6 +2,11 @@
 # GitHub Actions cost monitoring script
 # Run daily via cron: 0 0 * * * /path/to/monitor_github_costs.sh
 
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/runtime_preflight.sh"
+
 REPORT_FILE="/tmp/github_actions_usage_$(date +%Y%m%d).json"
 
 if ! command -v gh &> /dev/null; then
@@ -10,7 +15,7 @@ if ! command -v gh &> /dev/null; then
 fi
 
 # Fetch usage data
-gh api /repos/:owner/:repo/actions/billing/usage > "$REPORT_FILE"
+github_gh_api /repos/:owner/:repo/actions/billing/usage > "$REPORT_FILE"
 
 # Parse and alert if costs are high
 TOTAL_MINUTES=$(jq '.total_minutes_used' "$REPORT_FILE")

@@ -25,7 +25,8 @@
           "mcp-server",
           "sovereign-autopilot",
           "ai-improvement-engine",
-          "monitoring-stack"
+          "monitoring-stack",
+          "java-live-ops-site"
         ]
       },
       {

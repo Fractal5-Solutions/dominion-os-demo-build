@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """Local and optional Cloud Run verification for Dominion OS auth surfaces."""
 
 from __future__ import annotations
@@ -96,6 +97,12 @@ def main() -> int:
             "widget_local",
             os.getenv("ASKPHI_WIDGET_URL", "http://127.0.0.1:8081"),
             "/ready",
+        ),
+        ProbeTarget(
+            "java_live_ops_local",
+            os.getenv("JAVA_SITE_URL", "http://127.0.0.1:8090"),
+            "/ready",
+            required=False,
         ),
     ]
     print("Local verification")

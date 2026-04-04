@@ -24,6 +24,18 @@ services:
       - ./widget_service:/app
     restart: unless-stopped
 
+  dominion-java-live-ops-site:
+    build:
+      context: .
+      dockerfile: java-site/Dockerfile
+    ports:
+      - "8090:8090"
+    environment:
+      - PORT=8090
+      - JAVA_SITE_PORT=8090
+      - SOVEREIGNTY_LEVEL=9/9
+    restart: unless-stopped
+
   # Database (Local SQLite/PostgreSQL)
   phi-database:
     image: postgres:15-alpine

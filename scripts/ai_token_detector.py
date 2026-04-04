@@ -7,6 +7,7 @@ Monitors for unauthorized token usage and potential compromises
 
 import os
 import re
+import time
 from datetime import datetime
 from typing import Dict, List
 
@@ -27,6 +28,56 @@ class AITokenDetector:
             r"xoxb-[0-9]{10,12}-[0-9]{10,12}-[A-Za-z0-9]{24}",
             r"sk-[A-Za-z0-9]{48}",
         ]
+        self.github_api_url = os.getenv("GITHUB_API_URL", "https://api.github.com").rstrip("/")
+        self.github_timeout_seconds = float(os.getenv("GITHUB_TIMEOUT_SECONDS", "15"))
+        self.github_min_interval_seconds = float(
+            os.getenv("GITHUB_GOVERNOR_MIN_INTERVAL_SECONDS", "2.0")
+        )
+        self._last_github_request_at = 0.0
+
+    def _governed_github_get(self, path: str, headers: Dict[str, str]) -> requests.Response:
+        """Issue a paced GitHub request with retry/backoff."""
+        url = f"{self.github_api_url}{path}"
+        attempts = 3
+        last_error = None
+
+        for attempt in range(1, attempts + 1):
+            elapsed = time.monotonic() - self._last_github_request_at
+            if elapsed < self.github_min_interval_seconds:
+                time.sleep(self.github_min_interval_seconds - elapsed)
+
+            response = requests.get(
+                url,
+                headers=headers,
+                timeout=self.github_timeout_seconds,
+            )
+            self._last_github_request_at = time.monotonic()
+
+            if response.status_code in (429,):
+                retry_after = int(response.headers.get("Retry-After", "5"))
+                time.sleep(max(retry_after, 1))
+                last_error = RuntimeError(f"GitHub API throttled request to {path}")
+                continue
+
+            if response.status_code == 403 and response.headers.get("X-RateLimit-Remaining") == "0":
+                reset_at = int(response.headers.get("X-RateLimit-Reset", "0") or "0")
+                sleep_for = max(reset_at - int(time.time()), 1)
+                time.sleep(min(sleep_for, 60))
+                last_error = RuntimeError(f"GitHub API rate limit exhausted for {path}")
+                continue
+
+            if response.status_code >= 500:
+                time.sleep(attempt)
+                last_error = RuntimeError(
+                    f"GitHub API server error {response.status_code} for {path}"
+                )
+                continue
+
+            return response
+
+        if last_error is not None:
+            raise last_error
+        raise RuntimeError(f"GitHub API request failed for {path}")
 
     def scan_repository(self, repo_path: str) -> List[Dict]:
         """Scan repository for potential token exposures"""
@@ -69,8 +120,12 @@ class AITokenDetector:
     def check_github_activity(self, token: str) -> Dict:
         """Check recent GitHub activity for suspicious patterns"""
         try:
-            headers = {"Authorization": f"token {token}"}
-            response = requests.get("https://api.github.com/user", headers=headers)
+            headers = {
+                "Authorization": f"token {token}",
+                "Accept": "application/vnd.github+json",
+                "X-GitHub-Api-Version": "2022-11-28",
+            }
+            response = self._governed_github_get("/user", headers=headers)
 
             if response.status_code == 401:
                 return {"status": "INVALID_TOKEN", "message": "Token is invalid or expired"}
@@ -86,8 +141,8 @@ class AITokenDetector:
                 }
 
             # Check recent activity
-            activity_response = requests.get(
-                f"https://api.github.com/users/{username}/events", headers=headers
+            activity_response = self._governed_github_get(
+                f"/users/{username}/events", headers=headers
             )
 
             if activity_response.status_code == 200:

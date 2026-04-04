@@ -10,6 +10,7 @@ import hashlib
 import base64
 import requests
 import os
+import time
 from datetime import datetime, timedelta
 import jwt
 
@@ -23,6 +24,51 @@ app.secret_key = secrets.token_hex(32)
 GITHUB_CLIENT_ID = os.getenv('GITHUB_CLIENT_ID', 'your_client_id_here')
 GITHUB_CLIENT_SECRET = os.getenv('GITHUB_CLIENT_SECRET', 'your_client_secret_here')
 JWT_SECRET = secrets.token_hex(32)
+REQUEST_TIMEOUT_SECONDS = int(os.getenv('REQUEST_TIMEOUT_SECONDS', '15'))
+GITHUB_RETRY_ATTEMPTS = int(os.getenv('GITHUB_RETRY_ATTEMPTS', '3'))
+GITHUB_RETRY_BACKOFF_SECONDS = float(os.getenv('GITHUB_RETRY_BACKOFF_SECONDS', '1'))
+GITHUB_MIN_INTERVAL_SECONDS = float(os.getenv('GITHUB_MIN_INTERVAL_SECONDS', '0.5'))
+LAST_GITHUB_REQUEST_AT = 0.0
+
+
+def github_headers(access_token: str):
+    return {
+        'Authorization': f'token {access_token}',
+        'Accept': 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+    }
+
+
+def github_request(method, url, **kwargs):
+    global LAST_GITHUB_REQUEST_AT
+
+    timeout = kwargs.pop('timeout', REQUEST_TIMEOUT_SECONDS)
+
+    for attempt in range(1, GITHUB_RETRY_ATTEMPTS + 1):
+        elapsed = time.monotonic() - LAST_GITHUB_REQUEST_AT
+        if elapsed < GITHUB_MIN_INTERVAL_SECONDS:
+            time.sleep(GITHUB_MIN_INTERVAL_SECONDS - elapsed)
+
+        response = requests.request(method, url, timeout=timeout, **kwargs)
+        LAST_GITHUB_REQUEST_AT = time.monotonic()
+
+        if response.status_code == 429:
+            retry_after = int(response.headers.get('Retry-After', '1') or '1')
+            time.sleep(max(retry_after, 1))
+            continue
+
+        if response.status_code == 403 and response.headers.get('X-RateLimit-Remaining') == '0':
+            reset_at = int(response.headers.get('X-RateLimit-Reset', '0') or '0')
+            time.sleep(min(max(reset_at - int(time.time()), 1), 60))
+            continue
+
+        if response.status_code >= 500 and attempt < GITHUB_RETRY_ATTEMPTS:
+            time.sleep(GITHUB_RETRY_BACKOFF_SECONDS * attempt)
+            continue
+
+        return response
+
+    raise requests.RequestException(f'GitHub request failed after {GITHUB_RETRY_ATTEMPTS} attempts')
 
 # PKCE Helper Functions
 def generate_code_verifier():
@@ -214,7 +260,8 @@ def github_callback():
 
     try:
         # Exchange code for access token
-        token_response = requests.post(
+        token_response = github_request(
+            'POST',
             'https://github.com/login/oauth/access_token',
             headers={
                 'Accept': 'application/json',
@@ -226,7 +273,7 @@ def github_callback():
                 'code': code,
                 'redirect_uri': f"{request.host_url}auth/callback",
                 'code_verifier': code_verifier
-            }
+            },
         )
 
         token_data = token_response.json()
@@ -237,9 +284,10 @@ def github_callback():
         access_token = token_data['access_token']
 
         # Get user info
-        user_response = requests.get(
+        user_response = github_request(
+            'GET',
             'https://api.github.com/user',
-            headers={'Authorization': f'token {access_token}'}
+            headers=github_headers(access_token),
         )
 
         if user_response.status_code != 200:
@@ -248,9 +296,10 @@ def github_callback():
         user_data = user_response.json()
 
         # Check if user is authorized (Fractal5 Solutions organization)
-        org_response = requests.get(
+        org_response = github_request(
+            'GET',
             'https://api.github.com/user/orgs',
-            headers={'Authorization': f'token {access_token}'}
+            headers=github_headers(access_token),
         )
 
         authorized_orgs = ['Fractal5-Solutions']

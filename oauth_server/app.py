@@ -13,29 +13,56 @@ import base64
 import hashlib
 import os
 import secrets
+import time
 from datetime import datetime, timedelta, timezone
 from http import HTTPStatus
+from pathlib import Path
 from urllib.parse import quote
 
 import jwt
 import requests
+from dotenv import load_dotenv
 from flask import Flask, jsonify, redirect, render_template_string, request, session
 from flask_cors import CORS
 
-REQUEST_TIMEOUT_SECONDS = float(os.getenv("REQUEST_TIMEOUT_SECONDS", "10"))
+APP_DIR = Path(__file__).resolve().parent
+for env_file in (APP_DIR / ".env", APP_DIR.parent / ".env", APP_DIR.parent / ".env.desktop-pro"):
+    if env_file.exists():
+        load_dotenv(env_file, override=False)
+
+
+def env_first(*names: str, default: str = "") -> str:
+    for name in names:
+        value = os.getenv(name)
+        if value and value.strip():
+            return value.strip()
+    return default
+
+
+def env_truthy(name: str, default: bool) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.lower() not in {"0", "false", "no", "off"}
+
+
+ENVIRONMENT = env_first("ENV", "FLASK_ENV", default="production")
+REQUEST_TIMEOUT_SECONDS = float(env_first("REQUEST_TIMEOUT_SECONDS", default="10"))
+GITHUB_RETRY_ATTEMPTS = int(env_first("GITHUB_RETRY_ATTEMPTS", default="3"))
+GITHUB_RETRY_BACKOFF_SECONDS = float(env_first("GITHUB_RETRY_BACKOFF_SECONDS", default="1"))
+GITHUB_MIN_INTERVAL_SECONDS = float(env_first("GITHUB_MIN_INTERVAL_SECONDS", default="0.5"))
 AUTHORIZED_ORGS = tuple(
     org.strip()
-    for org in os.getenv("AUTHORIZED_GITHUB_ORGS", "Fractal5-Solutions").split(",")
+    for org in env_first("AUTHORIZED_GITHUB_ORGS", default="Fractal5-Solutions").split(",")
     if org.strip()
 )
-GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID", "").strip()
-GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET", "").strip()
-JWT_SECRET = os.getenv("JWT_SECRET", "").strip()
-SESSION_SECRET = os.getenv("SESSION_SECRET", "").strip()
-OAUTH_BASE_URL = os.getenv("OAUTH_BASE_URL", "").rstrip("/")
-WIDGET_BASE_URL = os.getenv("ASKPHI_WIDGET_URL", "").rstrip("/")
-COOKIE_SECURE = os.getenv("COOKIE_SECURE", "1").lower() not in {"0", "false", "no"}
-ENVIRONMENT = os.getenv("ENV", os.getenv("FLASK_ENV", "production"))
+GITHUB_CLIENT_ID = env_first("GITHUB_CLIENT_ID", "OAUTH_CLIENT_ID")
+GITHUB_CLIENT_SECRET = env_first("GITHUB_CLIENT_SECRET", "OAUTH_CLIENT_SECRET")
+JWT_SECRET = env_first("JWT_SECRET", "JWT_SECRET_KEY", "SECRET_KEY")
+SESSION_SECRET = env_first("SESSION_SECRET", "FLASK_SECRET_KEY", "SECRET_KEY")
+OAUTH_BASE_URL = env_first("OAUTH_BASE_URL").rstrip("/")
+WIDGET_BASE_URL = env_first("ASKPHI_WIDGET_URL").rstrip("/")
+COOKIE_SECURE = env_truthy("COOKIE_SECURE", default=bool(OAUTH_BASE_URL.startswith("https://")))
 
 PLACEHOLDER_VALUES = {
     "",
@@ -52,6 +79,7 @@ app.config.update(
 )
 app.secret_key = SESSION_SECRET or secrets.token_hex(32)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
+_last_github_request_at = 0.0
 
 
 def utcnow_iso() -> str:
@@ -89,6 +117,43 @@ def github_headers(access_token: str) -> dict[str, str]:
         "Authorization": f"Bearer {access_token}",
         "X-GitHub-Api-Version": "2022-11-28",
     }
+
+
+def github_request(method: str, url: str, **kwargs) -> requests.Response:
+    global _last_github_request_at
+
+    timeout = kwargs.pop("timeout", REQUEST_TIMEOUT_SECONDS)
+    last_error: requests.RequestException | None = None
+
+    for attempt in range(1, GITHUB_RETRY_ATTEMPTS + 1):
+        elapsed = time.monotonic() - _last_github_request_at
+        if elapsed < GITHUB_MIN_INTERVAL_SECONDS:
+            time.sleep(GITHUB_MIN_INTERVAL_SECONDS - elapsed)
+
+        response = requests.request(method, url, timeout=timeout, **kwargs)
+        _last_github_request_at = time.monotonic()
+
+        if response.status_code == HTTPStatus.TOO_MANY_REQUESTS:
+            retry_after = int(response.headers.get("Retry-After", "1") or "1")
+            time.sleep(max(retry_after, 1))
+            continue
+
+        if response.status_code == HTTPStatus.FORBIDDEN and response.headers.get("X-RateLimit-Remaining") == "0":
+            reset_at = int(response.headers.get("X-RateLimit-Reset", "0") or "0")
+            delay = max(reset_at - int(time.time()), 1)
+            time.sleep(min(delay, 60))
+            continue
+
+        if response.status_code >= HTTPStatus.INTERNAL_SERVER_ERROR and attempt < GITHUB_RETRY_ATTEMPTS:
+            time.sleep(GITHUB_RETRY_BACKOFF_SECONDS * attempt)
+            continue
+
+        return response
+
+    if last_error is not None:
+        raise last_error
+
+    raise requests.RequestException(f"GitHub request failed after {GITHUB_RETRY_ATTEMPTS} attempts")
 
 
 def generate_code_verifier() -> str:
@@ -224,7 +289,8 @@ def github_callback():
         return redirect("/?error=missing_oauth_context")
 
     try:
-        token_response = requests.post(
+        token_response = github_request(
+            "POST",
             "https://github.com/login/oauth/access_token",
             headers={"Accept": "application/json"},
             data={
@@ -234,7 +300,6 @@ def github_callback():
                 "redirect_uri": callback_url(),
                 "code_verifier": code_verifier,
             },
-            timeout=REQUEST_TIMEOUT_SECONDS,
         )
         token_response.raise_for_status()
         token_data = token_response.json()
@@ -242,18 +307,18 @@ def github_callback():
         if not access_token:
             return redirect("/?error=token_exchange_failed")
 
-        user_response = requests.get(
+        user_response = github_request(
+            "GET",
             "https://api.github.com/user",
             headers=github_headers(access_token),
-            timeout=REQUEST_TIMEOUT_SECONDS,
         )
         user_response.raise_for_status()
         user_data = user_response.json()
 
-        org_response = requests.get(
+        org_response = github_request(
+            "GET",
             "https://api.github.com/user/orgs",
             headers=github_headers(access_token),
-            timeout=REQUEST_TIMEOUT_SECONDS,
         )
         org_response.raise_for_status()
         user_orgs = [org["login"] for org in org_response.json()]

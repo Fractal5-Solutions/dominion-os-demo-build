@@ -110,6 +110,21 @@ for server in "${!MCP_SERVERS[@]}"; do
 done
 
 echo ""
+
+echo "🐙 GITHUB API STATUS"
+echo "───────────────────────────────────────────────────────────────"
+if [ -n "${GITHUB_TOKEN:-}" ]; then
+    if github_api_preflight "${GITHUB_API_URL:-https://api.github.com}"; then
+        echo -e "${GREEN}✅${NC} GitHub API reachable via ${GITHUB_API_URL:-https://api.github.com}"
+        echo -e "${GREEN}✅${NC} NO_PROXY includes GitHub hosts"
+    else
+        echo -e "${RED}❌${NC} GitHub API preflight failed"
+    fi
+else
+    echo -e "${YELLOW}⚠️${NC}  GITHUB_TOKEN not set; skipping authenticated GitHub API preflight"
+fi
+echo ""
+
 echo "───────────────────────────────────────────────────────────────"
 echo "Health Score: $HEALTHY_COUNT/$TOTAL_COUNT servers operational"
 

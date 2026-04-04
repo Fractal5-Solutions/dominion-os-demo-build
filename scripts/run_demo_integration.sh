@@ -74,7 +74,7 @@ cat > data/apollo_crm/accounts_raw.json << 'EOF'
 EOF
 
 # Process Apollo data
-python3 scripts/process_apollo_crm.py data/apollo_crm/accounts_raw.json data/apollo_crm/crm_accounts.json
+python3 process_apollo_crm.py data/apollo_crm/accounts_raw.json data/apollo_crm/crm_accounts.json
 
 echo "✅ Sample Apollo CRM data created"
 echo ""

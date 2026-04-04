@@ -20,6 +20,7 @@ NC='\033[0m'
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORKSPACE_ROOT="$(dirname "$SCRIPT_DIR")"
 LOG_DIR="$SCRIPT_DIR/logs"
+DETACHED_EXEC_SCRIPT="$SCRIPT_DIR/detached_exec.sh"
 mkdir -p "$LOG_DIR"
 
 STARTUP_LOG="$LOG_DIR/phi_startup_$(date +%Y%m%d_%H%M%S).log"
@@ -47,6 +48,20 @@ error() {
 
 info() {
     echo -e "${BLUE}ℹ️  $1${NC}" | tee -a "$STARTUP_LOG"
+}
+
+load_env_file() {
+    local env_file="$1"
+
+    if [ ! -f "$env_file" ]; then
+        return 0
+    fi
+
+    set -a
+    # shellcheck disable=SC1090
+    source "$env_file"
+    set +a
+    info "Loaded env file: $env_file"
 }
 
 record_failure() {
@@ -115,9 +130,8 @@ start_optional_background_service() {
     fi
 
     log "Starting optional service: $service_name..."
-    nohup bash -lc "cd '$SCRIPT_DIR' && $start_cmd" > "$log_file" 2>&1 &
-    local pid=$!
-    echo "$pid" > "$pid_file"
+    local pid
+    pid=$(bash "$DETACHED_EXEC_SCRIPT" "$pid_file" "$log_file" "cd '$SCRIPT_DIR' && $start_cmd")
     TRACKED_PIDFILES+=("$pid_file")
     sleep 2
 
@@ -178,10 +192,10 @@ start_service() {
     else
         VENV_ACTIVATE="$SCRIPT_DIR/.venv/bin/activate"
     fi
-    nohup bash -c "source $VENV_ACTIVATE 2>/dev/null; $start_cmd" > "$LOG_DIR/${service_name}.log" 2>&1 &
-    local pid=$!
-    echo $pid > "$LOG_DIR/${service_name}.pid"
-    TRACKED_PIDFILES+=("$LOG_DIR/${service_name}.pid")
+    local pid_file="$LOG_DIR/${service_name}.pid"
+    local pid
+    pid=$(bash "$DETACHED_EXEC_SCRIPT" "$pid_file" "$LOG_DIR/${service_name}.log" "source '$VENV_ACTIVATE' 2>/dev/null; $start_cmd")
+    TRACKED_PIDFILES+=("$pid_file")
 
     # Wait for service to start (with timeout)
     local timeout=10
@@ -256,6 +270,20 @@ for dir in "$LOG_DIR" "$SCRIPT_DIR/data" "$SCRIPT_DIR/exports" "$SCRIPT_DIR/tele
 done
 success "Directory structure verified"
 
+load_env_file "$WORKSPACE_ROOT/.env"
+load_env_file "$WORKSPACE_ROOT/.env.desktop-pro"
+load_env_file "$SCRIPT_DIR/.env"
+
+export GITHUB_CLIENT_ID="${GITHUB_CLIENT_ID:-${OAUTH_CLIENT_ID:-}}"
+export GITHUB_CLIENT_SECRET="${GITHUB_CLIENT_SECRET:-${OAUTH_CLIENT_SECRET:-}}"
+export JWT_SECRET="${JWT_SECRET:-${JWT_SECRET_KEY:-${SECRET_KEY:-}}}"
+export SESSION_SECRET="${SESSION_SECRET:-${FLASK_SECRET_KEY:-${SECRET_KEY:-}}}"
+export AUTHORIZED_GITHUB_ORGS="${AUTHORIZED_GITHUB_ORGS:-Fractal5-Solutions}"
+export OAUTH_BASE_URL="${OAUTH_BASE_URL:-http://127.0.0.1:8080}"
+export ASKPHI_WIDGET_URL="${ASKPHI_WIDGET_URL:-http://127.0.0.1:8081}"
+export COOKIE_SECURE="${COOKIE_SECURE:-0}"
+info "Applied local OAuth defaults for live ops"
+
 # ═══════════════════════════════════════════════════════════════════
 # PHASE 2: CORE SERVICES STARTUP
 # ═══════════════════════════════════════════════════════════════════
@@ -306,6 +334,21 @@ if [ -f "/workspaces/dominion-os-demo-build/command_core.py" ]; then
                   "5002"
 fi
 
+# Java Live Ops Site
+if [ -f "/workspaces/dominion-os-demo-build/scripts/java_live_ops_site.sh" ]; then
+    CURRENT_SERVICE_NAME="Dominion-Java-LiveOps-Site"
+    CURRENT_SERVICE_LOG="$LOG_DIR/Java-LiveOps-Site.log"
+    log "Starting Dominion-Java-LiveOps-Site..."
+    if bash "/workspaces/dominion-os-demo-build/scripts/java_live_ops_site.sh" start; then
+        [ -f "$LOG_DIR/Java-LiveOps-Site.pid" ] && TRACKED_PIDFILES+=("$LOG_DIR/Java-LiveOps-Site.pid")
+        success "Dominion-Java-LiveOps-Site started successfully (Port: 8090)"
+        CURRENT_SERVICE_NAME=""
+    else
+        record_failure "Dominion-Java-LiveOps-Site"
+        warning "Dominion-Java-LiveOps-Site failed to start - check $LOG_DIR/Java-LiveOps-Site.log"
+    fi
+fi
+
 # Sidecar Service
 if [ -f "/workspaces/dominion-command-center/sidecar/app.py" ]; then
     start_service "Sidecar-Service" \
@@ -349,8 +392,7 @@ section "PHASE 5: MONITORING & BACKGROUND SERVICES"
 # Start background monitoring
 if [ -f "$SCRIPT_DIR/phi_background_completion_monitor.sh" ]; then
     log "Starting background completion monitor..."
-    nohup bash "$SCRIPT_DIR/phi_background_completion_monitor.sh" > "$LOG_DIR/background_monitor.log" 2>&1 &
-    echo $! > "$LOG_DIR/background_monitor.pid"
+    bash "$DETACHED_EXEC_SCRIPT" "$LOG_DIR/background_monitor.pid" "$LOG_DIR/background_monitor.log" "bash '$SCRIPT_DIR/phi_background_completion_monitor.sh'" >/dev/null
     TRACKED_PIDFILES+=("$LOG_DIR/background_monitor.pid")
     success "Background completion monitor started"
 fi
@@ -359,8 +401,7 @@ fi
 if [ -f "$SCRIPT_DIR/phi_cost_minimization_simple.sh" ]; then
     if ! pgrep -f "phi_cost_minimization" > /dev/null; then
         log "Starting cost minimization engine..."
-        nohup bash "$SCRIPT_DIR/phi_cost_minimization_simple.sh" > "$LOG_DIR/cost_minimization.log" 2>&1 &
-        echo $! > "$LOG_DIR/cost_minimization.pid"
+        bash "$DETACHED_EXEC_SCRIPT" "$LOG_DIR/cost_minimization.pid" "$LOG_DIR/cost_minimization.log" "bash '$SCRIPT_DIR/phi_cost_minimization_simple.sh'" >/dev/null
         TRACKED_PIDFILES+=("$LOG_DIR/cost_minimization.pid")
         success "Cost minimization engine started"
     else
@@ -497,6 +538,7 @@ if [ $SERVICE_COUNT -gt 0 ]; then
     [ -f "$LOG_DIR/Dominion-Command-Center.pid" ] && echo "  • Command Center: http://localhost:5000"
     [ -f "$LOG_DIR/Billing-Service.pid" ] && echo "  • Billing Service: http://localhost:5001"
     [ -f "$LOG_DIR/Dominion-Command-Core.pid" ] && echo "  • Dominion Command Core: http://localhost:5002"
+    [ -f "$LOG_DIR/Java-LiveOps-Site.pid" ] && echo "  • Dominion Java Live Ops Site: http://localhost:8090"
     [ -f "$LOG_DIR/Sidecar-Service.pid" ] && echo "  • Sidecar: http://localhost:5003"
     [ -f "$LOG_DIR/ChatGPT-Gateway.pid" ] && echo "  • ChatGPT Gateway: http://localhost:5004"
     echo ""
@@ -504,7 +546,7 @@ fi
 
 echo -e "${CYAN}Management Commands:${NC}"
 echo "  • View logs: tail -f $LOG_DIR/<service>.log"
-echo "  • Stop all: pkill -f 'command_core.py|python3 app.py|uvicorn app.main:app|python3 main.py'"
+echo "  • Stop all: pkill -f 'command_core.py|python3 app.py|uvicorn app.main:app|python3 main.py|JavaLiveOpsSite'"
 echo "  • Restart: /workspaces/dominion-command-center/scripts/live_ops_start.sh"
 echo "  • Verify:  /workspaces/dominion-command-center/scripts/live_ops_verify.sh"
 echo ""
