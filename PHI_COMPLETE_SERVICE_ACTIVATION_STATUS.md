@@ -1,6 +1,8 @@
 # ✅ PHI SERVICE ACTIVATION - COMPLETE STATUS
+> Archival note: this report is a historical status snapshot. For current live-ops control, use `/workspaces/dominion-command-center/scripts/live_ops_start.sh`, `/workspaces/dominion-command-center/scripts/live_ops_status.sh`, and `/workspaces/dominion-command-center/scripts/live_ops_verify.sh`.
+
 **Completed**: March 9, 2026 14:03 UTC  
-**Authority**: PHI Sovereign AI Level 9/9  
+**Authority**: PHI Sovereign AI Level 13/13  
 **Mission Status**: 10/10 Services Operational (100%)
 
 ---
@@ -237,7 +239,7 @@ tail -f /workspaces/dominion-os-demo-build/scripts/logs/overnight_executor.log
 - ✅ 3/3 Background Services: OPERATIONAL (100%)
 - ✅ Cost Optimization: ACTIVE (75% savings)
 - ✅ System Resources: OPTIMAL (88% memory free)
-- ✅ PHI Sovereign Level: 9/9 (Maximum Autonomy)
+- ✅ PHI Sovereign Level: 13/13 (Maximum Autonomy)
 
 **Live Ops Score**: **95/100** (Excellent)
 

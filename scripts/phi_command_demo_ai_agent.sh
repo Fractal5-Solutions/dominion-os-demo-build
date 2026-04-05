@@ -742,7 +742,7 @@ setup_real_time_monitoring() {
 </head>
 <body>
     <header class="header">
-        <div class="sovereign-badge">🔒 Maximum Sovereign Power: 9/9</div>
+        <div class="sovereign-badge">🔒 Maximum Sovereign Power: 13/13</div>
         <h1>Dominion OS Command Center</h1>
         <p>Real-time Sovereign Infrastructure Monitoring</p>
     </header>

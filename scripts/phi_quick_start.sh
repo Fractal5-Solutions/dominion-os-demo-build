@@ -2,6 +2,14 @@
 # ═══════════════════════════════════════════════════════════════════
 # PHI SYSTEMS - QUICK START
 # ═══════════════════════════════════════════════════════════════════
+#
+# LEGACY NOTE:
+# This script is retained for archival compatibility and still contains
+# Windows-specific historical paths. Use the command-center owned live-ops
+# entrypoint instead:
+#   /workspaces/dominion-command-center/scripts/live_ops_start.sh
+# Public repo compatibility wrapper:
+#   /workspaces/dominion-os-demo-build/scripts/start_all_systems.sh
 
 set -e
 

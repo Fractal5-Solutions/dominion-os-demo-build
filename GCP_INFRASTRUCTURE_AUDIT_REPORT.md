@@ -1,4 +1,6 @@
 # GCP Infrastructure Audit Report
+> Archival note: command references here may describe historical repo-local workflows. Current live-ops startup is owned by `/workspaces/dominion-command-center/scripts/live_ops_start.sh`.
+
 **PHI Sovereign Autopilot - Complete Infrastructure Discovery**
 
 **Audit Date:** March 1, 2026

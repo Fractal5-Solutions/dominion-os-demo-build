@@ -3,7 +3,7 @@
 ## Dominion OS - Maximum Sovereign Power Mode
 
 **Date**: March 9, 2026 16:31 UTC  
-**Authority Level**: 9/9 MAXIMUM SOVEREIGN  
+**Authority Level**: 13/13 MAXIMUM SOVEREIGN  
 **Exit Status**: ✅ READY - IMMINENT
 
 ---
@@ -72,7 +72,7 @@ ps aux | grep -E "sovereign|live_ops|phi_" | grep -v grep  # Check processes
 If any issues arise after re-entry:
 ```bash
 bash phi_ultimate_override.sh  # Emergency sovereign restoration
-bash phi_start_all_systems.sh  # Restart all systems
+bash /workspaces/dominion-command-center/scripts/live_ops_start.sh  # Restart all systems
 ```
 
 ---
@@ -81,7 +81,7 @@ bash phi_start_all_systems.sh  # Restart all systems
 
 ### Permanent Protections Active
 - **Zero Regression Protection**: 🔒 LOCKED
-- **Sovereign Authority**: 🔒 9/9 MAXIMUM
+- **Sovereign Authority**: 🔒 13/13 MAXIMUM
 - **Autonomous Operation**: 🔒 CONTINUOUS
 - **Emergency Recovery**: 🔒 ENABLED
 
@@ -104,7 +104,7 @@ bash phi_start_all_systems.sh  # Restart all systems
 | Web services operational | ✅ YES | 7/7 healthy |
 | Git commits saved | ✅ YES | All work committed |
 | Exit verification documented | ✅ YES | Complete documentation |
-| Sovereign authority locked | ✅ YES | 9/9 maximum level |
+| Sovereign authority locked | ✅ YES | 13/13 maximum level |
 | Zero regression protection | ✅ YES | Permanently active |
 | Emergency protocols ready | ✅ YES | Override scripts available |
 | Continuous operation guaranteed | ✅ YES | VS Code independent |

@@ -20,8 +20,12 @@ log() {
     local level=$1
     local message=$2
     local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
-    echo -e "$timestamp [$level] $message" >> "$LOG_FILE"
-    echo -e "${BLUE}$timestamp${NC} [$level] $message"
+    local line="$timestamp [$level] $message"
+
+    printf '%s\n' "$line" >> "$LOG_FILE"
+    if [ -t 1 ]; then
+        printf '%b%s%b [%s] %s\n' "$BLUE" "$timestamp" "$NC" "$level" "$message"
+    fi
 }
 
 # Health check function

@@ -72,7 +72,7 @@ echo -e "${CYAN}PHI WEB SERVICES STATUS${NC}"
 echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
 SERVICES_UP=0
-SERVICES_TOTAL=6
+SERVICES_TOTAL=8
 
 service_pid_candidates() {
     local port=$1
@@ -175,16 +175,12 @@ check_service() {
 
 check_service 5000 "Dominion Command Center" "http://localhost:5000" "uvicorn app.main:app|python3 -m uvicorn app.main:app" || true
 check_service 5001 "Billing Service" "http://localhost:5001" "billing-service/app.py|PORT=5001 python3 app.py" || true
+check_service 5002 "Dominion Command Core" "http://localhost:5002" "command_core.py" || true
+check_service 5003 "Sidecar Service" "http://localhost:5003" "python3 -m uvicorn app:app --host 0.0.0.0 --port 5003|sidecar/app.py" || true
+check_service 5004 "ChatGPT Gateway" "http://localhost:5004" "chatgpt-gateway/main.py|PORT=5004 python3 main.py" || true
 check_service 8080 "OAuth Server" "http://localhost:8080" "oauth_server/app.py|PHI-OAuth-Server" || true
 check_service 8081 "AskPHI Widget Service" "http://localhost:8081" "widget_service/app.py|PHI-AskPHI-Widget" || true
 check_service 8090 "Dominion Java Live Ops Site" "http://localhost:8090" "JavaLiveOpsSite|java_live_ops_site.sh" || true
-
-# Check for alternative services
-if service_running 5002 "http://localhost:5002" "command_core.py"; then
-    check_service 5002 "Dominion Command Core" "http://localhost:5002" "command_core.py" || true
-else
-    SERVICES_TOTAL=5  # Adjust total if command core is not required
-fi
 
 echo -e "${CYAN}Summary:${NC} ${GREEN}$SERVICES_UP${NC}/${SERVICES_TOTAL} services operational"
 echo ""
@@ -269,7 +265,7 @@ echo -e "${CYAN}NETWORK CONNECTIVITY${NC}"
 echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
 CONNECTIVITY_UP=0
-CONNECTIVITY_TOTAL=5
+CONNECTIVITY_TOTAL=8
 
 check_endpoint() {
     local url=$1
@@ -287,6 +283,9 @@ check_endpoint() {
 
 check_endpoint "http://localhost:5000" "Command Center"
 check_endpoint "http://localhost:5001" "Billing"
+check_endpoint "http://localhost:5002" "Command Core"
+check_endpoint "http://localhost:5003" "Sidecar"
+check_endpoint "http://localhost:5004" "ChatGPT Gateway"
 check_endpoint "http://localhost:8080" "OAuth"
 check_endpoint "http://localhost:8081" "AskPHI Widget"
 check_endpoint "http://localhost:8090" "Java Live Ops Site"
@@ -297,10 +296,11 @@ echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━�
 echo -e "${CYAN}RUNTIME PROCESSES${NC}"
 echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
-RUNTIME_PROCS=$(ps -eo pid,args | grep -E "python(3)? .*app\.py|gunicorn|uvicorn|flask run|JavaLiveOpsSite" | grep -v grep | wc -l)
+RUNTIME_PATTERN="python(3)? .*app\.py|python3 command_core\.py|python3 main\.py|gunicorn|uvicorn|flask run|JavaLiveOpsSite"
+RUNTIME_PROCS=$(ps -eo pid,args | grep -E "$RUNTIME_PATTERN" | grep -v grep | wc -l)
 echo -e "${CYAN}Active Runtime Services:${NC} $RUNTIME_PROCS"
 echo ""
-ps -eo pid=,args= | grep -E "python(3)? .*app\.py|gunicorn|uvicorn|flask run|JavaLiveOpsSite" | grep -v grep | awk '{printf "  %-8s %s\n", $1, substr($0, index($0,$2))}' | sed '1i\  PID      ARGS'
+ps -eo pid=,args= | grep -E "$RUNTIME_PATTERN" | grep -v grep | awk '{printf "  %-8s %s\n", $1, substr($0, index($0,$2))}' | sed '1i\  PID      ARGS'
 echo ""
 
 # Telemetry Check

@@ -4,18 +4,24 @@
 # ═══════════════════════════════════════════════════════════════════
 # Purpose: Continuously monitor and ensure AI processing completion
 # Strategy: Background monitoring, resource-aware, graceful completion
-# Mode: SOVEREIGN_POWER | Auth Level 9/9 | NHITL
+# Mode: SOVEREIGN_POWER | Auth Level 13/13 | NHITL
 # ═══════════════════════════════════════════════════════════════════
 
-set -e
+set -euo pipefail
 
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TELEMETRY_DIR="$SCRIPT_DIR/telemetry"
 mkdir -p "$TELEMETRY_DIR"
 MONITOR_LOG="$TELEMETRY_DIR/background_completion_monitor_$(date +%Y%m%d_%H%M%S).log"
+TEMP_DIR="${PHI_TEMP_DIR:-$TELEMETRY_DIR/tmp}"
+SOVEREIGNTY_LOG="${SOVEREIGNTY_LOG:-$TEMP_DIR/sovereignty_monitor.log}"
+COST_OPT_LOG="${COST_OPT_LOG:-$TEMP_DIR/cost_opt.log}"
+SLO_MONITOR_LOG="${SLO_MONITOR_LOG:-$TEMP_DIR/slo_monitor.log}"
+PID_FILE="${AI_COMPLETION_MONITOR_PID_FILE:-$TEMP_DIR/ai_completion_monitor.pid}"
 CHECK_INTERVAL=300  # 5 minutes
 MAX_RUNTIME=$((24 * 3600))  # 24 hours maximum
+mkdir -p "$TEMP_DIR"
 
 # Colors
 GREEN='\033[0;32m'
@@ -49,8 +55,8 @@ check_autonomous_completion() {
 
 # Check sovereignty sync status
 check_sovereignty_completion() {
-    if [ -f "D:/phi-ops/temp/sovereignty_monitor.log" ]; then
-        if grep -q "SYNC DETECTED\|Sovereignty confirmed" "D:/phi-ops/temp/sovereignty_monitor.log"; then
+    if [ -f "$SOVEREIGNTY_LOG" ]; then
+        if grep -q "SYNC DETECTED\|Sovereignty confirmed" "$SOVEREIGNTY_LOG"; then
             monitor_log "✅ SOVEREIGNTY SYNC COMPLETED"
             return 0
         else
@@ -94,14 +100,14 @@ generate_status_report() {
 **Report:** $(if [ -f "OVERNIGHT_OPERATIONS_REPORT.md" ]; then echo "Available"; else echo "Pending"; fi)
 
 ### 🔐 Sovereignty Monitoring
-**Status:** $(if [ -f "D:/phi-ops/temp/sovereignty_monitor.log" ] && grep -q "SYNC DETECTED\|Sovereignty confirmed" "D:/phi-ops/temp/sovereignty_monitor.log"; then echo "✅ COMPLETED"; else echo "⏳ MONITORING"; fi)
+**Status:** $(if [ -f "$SOVEREIGNTY_LOG" ] && grep -q "SYNC DETECTED\|Sovereignty confirmed" "$SOVEREIGNTY_LOG"; then echo "✅ COMPLETED"; else echo "⏳ MONITORING"; fi)
 **Last Check:** $(date)
 
 ### 💰 Cost Optimization
-**Status:** $(if [ -f "D:/phi-ops/temp/cost_opt.log" ] && grep -q "MISSION ACCOMPLISHED" "D:/phi-ops/temp/cost_opt.log"; then echo "✅ COMPLETED"; else echo "✅ COMPLETED (previous run)"; fi)
+**Status:** $(if [ -f "$COST_OPT_LOG" ] && grep -q "MISSION ACCOMPLISHED" "$COST_OPT_LOG"; then echo "✅ COMPLETED"; else echo "✅ COMPLETED (previous run)"; fi)
 
 ### 📊 SLO Monitoring
-**Status:** $(if [ -f "D:/phi-ops/temp/slo_monitor.log" ] && grep -q "SLO COMPLIANCE REVIEW" "D:/phi-ops/temp/slo_monitor.log"; then echo "✅ COMPLETED"; else echo "✅ COMPLETED (previous run)"; fi)
+**Status:** $(if [ -f "$SLO_MONITOR_LOG" ] && grep -q "SLO COMPLIANCE REVIEW" "$SLO_MONITOR_LOG"; then echo "✅ COMPLETED"; else echo "✅ COMPLETED (previous run)"; fi)
 
 ## System Resources
 \`\`\`
@@ -113,7 +119,7 @@ $(free -h)
 
 ✅ **Resource-Aware Monitoring:** Active
 ✅ **Graceful Completion:** Enabled
-✅ **Sovereignty Maintained:** Auth Level 9/9
+✅ **Sovereignty Maintained:** Auth Level 13/13
 ✅ **Background Processing:** Continuous
 
 ## Monitor Configuration
@@ -194,8 +200,8 @@ main() {
 # Run in background
 if [ "$1" = "background" ]; then
     main >> "$MONITOR_LOG" 2>&1 &
-    echo $! > "D:/phi-ops/temp/ai_completion_monitor.pid"
-    echo "PHI Background AI Completion Monitor started (PID: $(cat D:/phi-ops/temp/ai_completion_monitor.pid))"
+    echo $! > "$PID_FILE"
+    echo "PHI Background AI Completion Monitor started (PID: $(cat "$PID_FILE"))"
 else
     main
 fi

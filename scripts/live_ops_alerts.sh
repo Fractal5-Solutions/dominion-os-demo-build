@@ -41,6 +41,16 @@ alert() {
     esac
 }
 
+restart_live_ops() {
+    local command_center_start="/workspaces/dominion-command-center/scripts/live_ops_start.sh"
+
+    if [ -x "$command_center_start" ]; then
+        bash "$command_center_start" &
+    else
+        bash scripts/start_all_systems.sh &
+    fi
+}
+
 check_service_alerts() {
     if [ ! -f "$STATUS_FILE" ]; then
         alert "WARNING" "Status file not found: $STATUS_FILE"
@@ -123,23 +133,23 @@ auto_recovery_actions() {
             case $port in
                 8080)
                     # OAuth server restart
-                    bash scripts/phi_start_all_systems.sh &
+                    restart_live_ops
                     ;;
                 8081)
                     # Widget service restart
-                    bash scripts/phi_start_all_systems.sh &
+                    restart_live_ops
                     ;;
                 8090)
                     # Java live ops restart
-                    bash scripts/phi_start_all_systems.sh &
+                    restart_live_ops
                     ;;
                 5000)
                     # Command center restart
-                    bash scripts/phi_start_all_systems.sh &
+                    restart_live_ops
                     ;;
                 5001|5002|5003|5004)
                     # Other services restart
-                    bash scripts/phi_start_all_systems.sh &
+                    restart_live_ops
                     ;;
             esac
         fi

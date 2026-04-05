@@ -201,6 +201,8 @@ ACTIVE=0
 check_service 5000 "Dominion Command Center" "http://localhost:5000" "uvicorn app.main:app|python3 -m uvicorn app.main:app" && ACTIVE=$((ACTIVE + 1))
 check_service 5001 "Billing Service" "http://localhost:5001" "billing-service/app.py|PORT=5001 python3 app.py" && ACTIVE=$((ACTIVE + 1))
 check_service 5002 "Dominion Command Core" "http://localhost:5002" "command_core.py" && ACTIVE=$((ACTIVE + 1))
+check_service 5003 "Sidecar Service" "http://localhost:5003" "python3 -m uvicorn app:app --host 0.0.0.0 --port 5003|sidecar/app.py" && ACTIVE=$((ACTIVE + 1))
+check_service 5004 "ChatGPT Gateway" "http://localhost:5004" "chatgpt-gateway/main.py|PORT=5004 python3 main.py" && ACTIVE=$((ACTIVE + 1))
 check_service 8080 "OAuth Server" "http://localhost:8080" "oauth_server/app.py|PHI-OAuth-Server" && ACTIVE=$((ACTIVE + 1))
 check_service 8081 "AskPHI Widget Service" "http://localhost:8081" "widget_service/app.py|PHI-AskPHI-Widget" && ACTIVE=$((ACTIVE + 1))
 check_service 8090 "Dominion Java Live Ops Site" "http://localhost:8090" "JavaLiveOpsSite|java_live_ops_site.sh" && ACTIVE=$((ACTIVE + 1))

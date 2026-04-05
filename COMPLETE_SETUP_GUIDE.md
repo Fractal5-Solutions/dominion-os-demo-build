@@ -115,7 +115,7 @@ gcloud services enable accesscontextmanager.googleapis.com --project dominion-co
 ### **8. Final Health Check** ⏳
 ```bash
 # Verify all systems are operational
-./scripts/start_all_systems.sh
+bash /workspaces/dominion-command-center/scripts/live_ops_verify.sh
 ```
 
 ---

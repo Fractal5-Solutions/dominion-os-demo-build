@@ -3,7 +3,7 @@
 # ============================================================================
 # Optimized for at2 workstation with AMD Ryzen 5 7600X + NVIDIA RTX 4070
 # Docker Desktop Pro: Resource limits, GPU acceleration, optimal networking
-# PHI Sovereign Authority Level: 9/9
+# PHI Sovereign Authority Level: 13/13
 # ============================================================================
 
 version: '3.8'
@@ -45,7 +45,7 @@ services:
     environment:
       - PHI_MODE=SOVEREIGN_MAX
       - AUTHORITY_LEVEL=9
-      - SOVEREIGNTY_LEVEL=9/9
+      - SOVEREIGNTY_LEVEL=13/13
       - PROJECT_ID=dominion-core-prod
       - SERVICE_NAME=dominion-os-demo
       - PORT=5000
@@ -86,7 +86,7 @@ services:
     environment:
       - PHI_MODE=SOVEREIGN_AUTH
       - AUTHORITY_LEVEL=9
-      - SOVEREIGNTY_LEVEL=9/9
+      - SOVEREIGNTY_LEVEL=13/13
     volumes:
       - ./oauth_server:/app:ro
       - oauth-data:/app/data
@@ -108,7 +108,7 @@ services:
     environment:
       - PHI_MODE=WIDGET_SOVEREIGN
       - AUTHORITY_LEVEL=9
-      - SOVEREIGNTY_LEVEL=9/9
+      - SOVEREIGNTY_LEVEL=13/13
     volumes:
       - ./widget_service:/app:ro
       - widget-data:/app/data
@@ -281,6 +281,6 @@ networks:
 
 # ============================================================================
 # END OF CONFIGURATION
-# Sovereign Authority: 9/9 | Optimal Performance: Guaranteed
+# Sovereign Authority: 13/13 | Optimal Performance: Guaranteed
 # AMD Ryzen 5 7600X (6 cores) + NVIDIA RTX 4070 (CUDA enabled)
 # ============================================================================

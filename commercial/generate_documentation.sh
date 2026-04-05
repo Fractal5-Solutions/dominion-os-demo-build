@@ -73,7 +73,7 @@ INSTALL_EOF
 
 3. Run local deployment:
    ```bash
-   ./scripts/phi_start_all_systems.sh
+   bash /workspaces/dominion-command-center/scripts/live_ops_start.sh
    ```
 
 4. Access local command center:

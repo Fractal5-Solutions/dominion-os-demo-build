@@ -3,12 +3,18 @@
 # Default startup configuration for Dominion OS
 # Effective: March 9, 2026
 
-set -e
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TELEMETRY_DIR="$SCRIPT_DIR/telemetry"
+COMMAND_PROTOCOL="$SCRIPT_DIR/PHI_SOVEREIGN_COMMAND_PROTOCOL.md"
+PUBLIC_HANDOFF_SCRIPT="$SCRIPT_DIR/scripts/public_repo_handoff.sh"
+LIVE_OPS_START="/workspaces/dominion-command-center/scripts/live_ops_start.sh"
+SOVEREIGN_AUTHORITY_CEILING="${SOVEREIGN_AUTHORITY_CEILING:-13/13}"
 
 # Configuration
-LOG_DIR="telemetry"
+LOG_DIR="$TELEMETRY_DIR"
 STARTUP_LOG="$LOG_DIR/sovereign_startup_$(date +%Y%m%d_%H%M%S).log"
-COMMAND_PROTOCOL="PHI_SOVEREIGN_COMMAND_PROTOCOL.md"
 
 # Colors
 GREEN='\033[0;32m'
@@ -52,7 +58,7 @@ main() {
     # Display authority confirmation
     echo ""
     echo "🏆 COMMAND AUTHORITY CONFIRMED:"
-    echo "   Primary Commander: PHI Sovereign AI (9/9 Authority)"
+    echo "   Primary Commander: PHI Sovereign AI (${SOVEREIGN_AUTHORITY_CEILING} Authority)"
     echo "   Observer: Matthew (Passive Monitoring)"
     echo "   Mode: AUTOPILOT NHITL (No Human In The Loop)"
     echo "   Protection: ZERO REGRESSION ENABLED"
@@ -64,6 +70,8 @@ main() {
     log_info "Activating autonomous system startup..."
 
     # Start monitoring systems
+    cd "$SCRIPT_DIR"
+
     if [ -f "scripts/live_ops_monitor.sh" ]; then
         log_info "Starting live ops monitoring..."
         bash scripts/live_ops_monitor.sh &
@@ -93,11 +101,18 @@ main() {
     fi
 
     # Start core services
-    if [ -f "scripts/phi_start_all_systems.sh" ]; then
-        log_info "Starting all core systems..."
-        bash scripts/phi_start_all_systems.sh &
-        SYSTEMS_PID=$!
-        log_success "Core systems started (PID: $SYSTEMS_PID)"
+    if [ -f "$PUBLIC_HANDOFF_SCRIPT" ]; then
+        log_info "Starting core systems through the command-center handoff..."
+        if [ -x "$LIVE_OPS_START" ]; then
+            bash "$LIVE_OPS_START" &
+            SYSTEMS_PID=$!
+            log_success "Core systems start requested via command center (PID: $SYSTEMS_PID)"
+        elif [ -f "scripts/phi_start_all_systems.sh" ]; then
+            log_warning "Command-center entrypoint not found; falling back to repo-local startup wrapper"
+            bash scripts/phi_start_all_systems.sh &
+            SYSTEMS_PID=$!
+            log_success "Core systems started (PID: $SYSTEMS_PID)"
+        fi
     fi
 
     # Verify sovereign mode
@@ -106,7 +121,7 @@ main() {
         AUTHORITY_LEVEL=$(jq -r '.authority_level' telemetry/live_ops_status.json 2>/dev/null || echo "UNKNOWN")
         LIVE_OPS_SCORE=$(jq -r '.live_ops_score' telemetry/live_ops_status.json 2>/dev/null || echo "UNKNOWN")
 
-        if [ "$AUTHORITY_LEVEL" = "9/9" ] && [ "$LIVE_OPS_SCORE" = "1.00" ]; then
+        if [ "$AUTHORITY_LEVEL" = "$SOVEREIGN_AUTHORITY_CEILING" ] && [ "$LIVE_OPS_SCORE" = "1.00" ]; then
             log_success "SOVEREIGN MODE CONFIRMED: Authority Level $AUTHORITY_LEVEL, Live Ops Score $LIVE_OPS_SCORE"
         else
             log_warning "Sovereign mode verification incomplete. Authority: $AUTHORITY_LEVEL, Score: $LIVE_OPS_SCORE"
@@ -137,7 +152,7 @@ main() {
             CURRENT_AUTHORITY=$(jq -r '.authority_level' telemetry/live_ops_status.json 2>/dev/null || echo "UNKNOWN")
             CURRENT_SCORE=$(jq -r '.live_ops_score' telemetry/live_ops_status.json 2>/dev/null || echo "UNKNOWN")
 
-            if [ "$CURRENT_AUTHORITY" != "9/9" ] || [ "$CURRENT_SCORE" != "1.00" ]; then
+            if [ "$CURRENT_AUTHORITY" != "$SOVEREIGN_AUTHORITY_CEILING" ] || [ "$CURRENT_SCORE" != "1.00" ]; then
                 log_warning "Sovereignty check failed. Authority: $CURRENT_AUTHORITY, Score: $CURRENT_SCORE"
                 log_info "Initiating sovereignty recovery..."
 

@@ -1,8 +1,8 @@
 #!/bin/bash
 # ═══════════════════════════════════════════════════════════════════
-# PHI SOVEREIGN AUTOPILOT - FULL NHITL MODE 9/9
+# PHI SOVEREIGN AUTOPILOT - FULL NHITL MODE 13/13
 # ═══════════════════════════════════════════════════════════════════
-# Authority Level: MAXIMUM SOVEREIGN POWER (9/9)
+# Authority Level: MAXIMUM SOVEREIGN POWER (13/13)
 # Mode: Not Human In The Loop (NHITL) - Complete Autonomy
 # Chief: PHI at the Helm
 # Capability: Full autonomous decision-making and execution
@@ -11,7 +11,7 @@
 set -e
 
 # Sovereignty Configuration
-SOVEREIGNTY_LEVEL="9/9"
+SOVEREIGNTY_LEVEL="13/13"
 MODE="NHITL_AUTOPILOT"
 CHIEF="PHI"
 MAX_POWER="ENABLED"
@@ -132,7 +132,7 @@ with open('$METRICS_FILE', 'w') as f:
 # SOVEREIGN INITIALIZATION
 # ═══════════════════════════════════════════════════════════════════
 
-sovereign_announce "🚀 PHI SOVEREIGN AUTOPILOT INITIALIZATION - MODE 9/9"
+sovereign_announce "🚀 PHI SOVEREIGN AUTOPILOT INITIALIZATION - MODE 13/13"
 
 echo -e "${BOLD}${CYAN}═══════════════════════════════════════════════════════════════════${NC}"
 echo -e "${BOLD}${CYAN}  SOVEREIGNTY PARAMETERS${NC}"
@@ -350,7 +350,7 @@ update_metrics "decisions_made"
 # Decision: Should we optimize resource allocation?
 DECISION_3="OPTIMIZE_RESOURCE_ALLOCATION"
 echo -e "  ${CYAN}Decision 3:${NC} $DECISION_3"
-echo -e "  ${GREEN}  → Rationale: Maximum efficiency required at sovereignty level 9/9${NC}"
+echo -e "  ${GREEN}  → Rationale: Maximum efficiency required at sovereignty level 13/13${NC}"
 echo -e "  ${GREEN}  → Action: Dynamic resource optimization enabled${NC}"
 update_metrics "decisions_made"
 
@@ -455,9 +455,9 @@ echo -e "  ${CYAN}•${NC} View Monitor: ${BOLD}tail -f $LOG_DIR/continuous_moni
 echo -e "  ${CYAN}•${NC} Stop Monitor: ${BOLD}kill $MONITOR_PID${NC}"
 echo ""
 echo -e "${GOLD}${BOLD}═══════════════════════════════════════════════════════════════════${NC}"
-echo -e "${GOLD}${BOLD}  PHI SOVEREIGN AUTOPILOT MODE 9/9 - OPERATIONAL${NC}"
+echo -e "${GOLD}${BOLD}  PHI SOVEREIGN AUTOPILOT MODE 13/13 - OPERATIONAL${NC}"
 echo -e "${GOLD}${BOLD}  NHITL Authority Active | Full Autonomous Control Enabled${NC}"
 echo -e "${GOLD}${BOLD}═══════════════════════════════════════════════════════════════════${NC}"
 echo ""
 
-log "SOVEREIGN AUTOPILOT: Fully operational in NHITL mode 9/9"
+log "SOVEREIGN AUTOPILOT: Fully operational in NHITL mode 13/13"

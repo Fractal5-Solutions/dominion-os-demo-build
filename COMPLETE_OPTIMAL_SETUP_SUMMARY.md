@@ -185,7 +185,7 @@ User → AskPhi Widget → GitHub OAuth → Organization Check → JWT Token →
 
 ### **Health Verification**
 ```bash
-./scripts/start_all_systems.sh       # System health check
+bash /workspaces/dominion-command-center/scripts/live_ops_verify.sh
 ```
 
 ---

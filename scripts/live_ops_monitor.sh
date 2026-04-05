@@ -246,7 +246,7 @@ generate_status_report() {
   },
   "system_resources": $resources,
   "sovereign_mode": "MAXIMUM_ACTIVE",
-  "authority_level": "9/9"
+  "authority_level": "13/13"
 }
 EOF
 

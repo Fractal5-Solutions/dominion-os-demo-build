@@ -407,13 +407,13 @@ Disk:   126G total, 69G available (55% free)
 ### Manual Commands
 ```bash
 # Start all systems
-bash scripts/phi_start_all_systems.sh
+bash /workspaces/dominion-command-center/scripts/live_ops_start.sh
 
 # Check complete status
-bash scripts/phi_complete_status.sh
+bash /workspaces/dominion-command-center/scripts/live_ops_status.sh
 
 # Verify live ops
-bash scripts/phi_live_ops_verification.sh
+bash /workspaces/dominion-command-center/scripts/live_ops_verify.sh
 
 # Sync optimally
 bash scripts/phi_intelligent_sync.sh

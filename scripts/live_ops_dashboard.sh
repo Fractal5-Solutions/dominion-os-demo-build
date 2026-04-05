@@ -220,7 +220,7 @@ draw_sovereign_status() {
     echo -e "${CYAN}👑 SOVEREIGN STATUS${NC}"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-    local authority_level=$(jq -r '.authority_level' "$STATUS_FILE" 2>/dev/null || echo "9/9")
+    local authority_level=$(jq -r '.authority_level' "$STATUS_FILE" 2>/dev/null || echo "13/13")
     local sovereign_mode=$(jq -r '.sovereign_mode' "$STATUS_FILE" 2>/dev/null || echo "MAXIMUM_ACTIVE")
 
     echo -e "🎯 Authority Level: ${GREEN}$authority_level${NC}"

@@ -111,6 +111,7 @@ check_critical_issues() {
 
 emergency_restart() {
     log "Starting emergency restart procedure"
+    local command_center_start="/workspaces/dominion-command-center/scripts/live_ops_start.sh"
 
     # Kill any existing processes that might be hanging
     pkill -f "phi_start_all_systems" || true
@@ -119,7 +120,11 @@ emergency_restart() {
 
     # Restart all systems
     log "Restarting all services"
-    bash scripts/phi_start_all_systems.sh &
+    if [ -x "$command_center_start" ]; then
+        bash "$command_center_start" &
+    else
+        bash scripts/start_all_systems.sh &
+    fi
     sleep 5
 
     # Restart background services

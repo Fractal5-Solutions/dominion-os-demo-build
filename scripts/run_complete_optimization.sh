@@ -146,7 +146,7 @@ run_final_health_check() {
 
     log "Performing comprehensive system health check..."
 
-    # Run the start_all_systems script for health verification
+    # Run the startup wrapper for health verification
     if ./scripts/start_all_systems.sh > /dev/null 2>&1; then
         success "System health check passed"
     else

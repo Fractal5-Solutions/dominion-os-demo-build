@@ -147,14 +147,19 @@
         }
       },
       {
-        "label": "Dominion Command Core: Start",
+        "label": "PHI Live Ops: Start",
         "type": "shell",
-        "command": "cd ${workspaceFolder} && PORT=5002 python3 command_core.py",
-        "isBackground": true,
+        "command": "bash /workspaces/dominion-command-center/scripts/live_ops_start.sh",
         "problemMatcher": [],
         "runOptions": {
           "runOn": "folderOpen"
         }
+      },
+      {
+        "label": "PHI Live Ops: Verify",
+        "type": "shell",
+        "command": "bash /workspaces/dominion-command-center/scripts/live_ops_verify.sh",
+        "problemMatcher": []
       },
       {
         "label": "Sovereign Autopilot: Status",

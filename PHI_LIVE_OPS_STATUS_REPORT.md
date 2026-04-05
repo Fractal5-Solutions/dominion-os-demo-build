@@ -191,14 +191,13 @@ All processes running under Python 3.12 virtual environment.
 ### Start/Stop Services
 ```bash
 # Start all services
-cd /workspaces/dominion-os-demo-build/scripts
-bash phi_quick_start.sh
+bash /workspaces/dominion-command-center/scripts/live_ops_start.sh
 
 # Check status
-bash phi_status.sh
+bash /workspaces/dominion-command-center/scripts/live_ops_status.sh
 
 # Complete status with Docker info
-bash phi_complete_status.sh
+bash /workspaces/dominion-command-center/scripts/live_ops_verify.sh
 
 # Stop all services
 pkill -f 'python3.*app.py'

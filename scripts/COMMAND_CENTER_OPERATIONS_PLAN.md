@@ -1,4 +1,5 @@
 # 🎯 PHI Command Center - System Activation & Operations Plan
+> Archival note: this plan includes historical startup names. Current supported live-ops entrypoints are `/workspaces/dominion-command-center/scripts/live_ops_start.sh`, `/workspaces/dominion-command-center/scripts/live_ops_status.sh`, and `/workspaces/dominion-command-center/scripts/live_ops_verify.sh`.
 
 **Generated:** March 1, 2026
 **Target Platform:** Google Cloud Platform
