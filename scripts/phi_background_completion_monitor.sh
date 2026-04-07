@@ -198,7 +198,7 @@ main() {
 }
 
 # Run in background
-if [ "$1" = "background" ]; then
+if [ "${1:-}" = "background" ]; then
     main >> "$MONITOR_LOG" 2>&1 &
     echo $! > "$PID_FILE"
     echo "PHI Background AI Completion Monitor started (PID: $(cat "$PID_FILE"))"
