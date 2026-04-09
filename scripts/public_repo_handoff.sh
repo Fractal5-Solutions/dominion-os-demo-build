@@ -19,7 +19,7 @@ is_command_center_context() {
 
 print_handoff() {
     local requested_action="${1:-live operations}"
-    local primary_local_root="${PRIMARY_LOCAL_ROOT:-D:/phi-ops}"
+    local primary_local_root="${PRIMARY_LOCAL_ROOT:-D:/dominion-command-center}"
     local complementary_codespace="${COMPLEMENTARY_CODESPACE:-bookish-umbrella}"
     local matthew_client_host="${MATTHEW_CLIENT_HOST:-laptop-e2139tsl}"
     cat <<EOF

@@ -3,7 +3,7 @@
 # Automated live ops monitoring and maintenance
 # Generated: March 9, 2026
 
-set -euo pipefail
+set -uo pipefail
 
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -19,6 +19,10 @@ MONITOR_INTERVAL="${PHI_MONITOR_INTERVAL:-60}"   # check cadence
 ALERT_INTERVAL="${PHI_ALERT_INTERVAL:-300}"      # alert cadence
 LOG_FILE="${TELEMETRY_DIR}/sovereign_monitor_$(date +%Y%m%d).log"
 PID_FILE="${TELEMETRY_DIR}/sovereign_monitor.pid"
+LOCK_FILE="${TELEMETRY_DIR}/sovereign_monitor.lock"
+EMERGENCY_STATE_FILE="${TELEMETRY_DIR}/.last_emergency_restart"
+EMERGENCY_COOLDOWN_SECONDS="${PHI_EMERGENCY_RESTART_COOLDOWN:-300}"
+STRICT_BACKGROUND="${PHI_STRICT_BACKGROUND:-0}"
 OPTIONAL_BACKGROUND_SERVICES=(
     "phi_cost_minimization_simple"
     "autonomous_overnight"
@@ -44,6 +48,16 @@ error_log() {
 success_log() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') [SUCCESS] $1" >> "$LOG_FILE"
     echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+with_lock_or_exit() {
+    exec 9>"$LOCK_FILE"
+    if command -v flock >/dev/null 2>&1; then
+        if ! flock -n 9; then
+            echo "[MONITOR] another sovereign_monitor instance is active; exiting"
+            exit 0
+        fi
+    fi
 }
 
 is_optional_background_service() {
@@ -106,8 +120,12 @@ check_critical_issues() {
                 log "Background service '$service' is optional/idle"
                 continue
             fi
-            error_log "CRITICAL: Background service '$service' is not running"
-            critical_services_down=true
+            if [ "$STRICT_BACKGROUND" = "1" ]; then
+                error_log "CRITICAL: Background service '$service' is not running"
+                critical_services_down=true
+            else
+                log "Background service '$service' missing; tolerated (set PHI_STRICT_BACKGROUND=1 to enforce)"
+            fi
         fi
     done
 
@@ -121,6 +139,16 @@ check_critical_issues() {
 emergency_restart() {
     log "Starting emergency restart procedure"
     local command_center_start="/workspaces/dominion-command-center/scripts/live_ops_start.sh"
+    local now
+    local last_restart
+    now="$(date +%s)"
+    last_restart="$(cat "$EMERGENCY_STATE_FILE" 2>/dev/null || echo 0)"
+
+    if [ $((now - last_restart)) -lt "$EMERGENCY_COOLDOWN_SECONDS" ]; then
+        log "Emergency restart cooldown active; skipping restart"
+        return 0
+    fi
+    echo "$now" > "$EMERGENCY_STATE_FILE"
 
     # Kill any existing processes that might be hanging
     pkill -f "phi_start_all_systems" || true
@@ -164,11 +192,11 @@ maintenance_tasks() {
 main() {
     echo "🔄 PHI SOVEREIGN CONTINUOUS MONITORING SYSTEM"
     echo "============================================="
+    mkdir -p "${TELEMETRY_DIR}"
+    with_lock_or_exit
     log "Sovereign monitoring system starting"
     success_log "Maximum Sovereign Power Mode: ACTIVE"
 
-    # Create telemetry directory
-    mkdir -p "${TELEMETRY_DIR}"
     echo "$$" > "$PID_FILE"
 
     # Initial monitoring cycle

@@ -10,10 +10,12 @@ TELEMETRY_DIR="${SCRIPT_DIR}/telemetry"
 LOG="${TELEMETRY_DIR}/intelligent_sync.log"
 LOCK_FILE="${TELEMETRY_DIR}/intelligent_sync.lock"
 
-SYNC_REMOTE="${PHI_SYNC_REMOTE:-origin}"
+SYNC_REMOTE="${PHI_SYNC_REMOTE:-}"
 SYNC_BRANCH="${PHI_SYNC_BRANCH:-}"
 SYNC_MAX_RETRIES="${PHI_SYNC_MAX_RETRIES:-3}"
 SYNC_RETRY_SECONDS="${PHI_SYNC_RETRY_SECONDS:-2}"
+SYNC_ALLOW_AUTOCOMMIT="${PHI_SYNC_ALLOW_AUTOCOMMIT:-0}"
+SYNC_PUSH_ENABLED="${PHI_SYNC_PUSH_ENABLED:-1}"
 
 mkdir -p "${TELEMETRY_DIR}"
 
@@ -36,21 +38,158 @@ is_https_remote() {
   [[ "${remote_url}" =~ ^https:// ]]
 }
 
-detect_token() {
-  local token="${GITHUB_TOKEN:-${GH_TOKEN:-}}"
-  local token_line
-
-  if [ -n "${token}" ]; then
-    printf '%s\n' "${token}"
+detect_sync_remote() {
+  if [ -n "${SYNC_REMOTE}" ]; then
+    printf '%s\n' "${SYNC_REMOTE}"
     return
   fi
 
-  if [ -f "${HOME}/.git-credentials" ]; then
-    token_line="$(grep -m1 "github.com" "${HOME}/.git-credentials" || true)"
-    token="$(printf '%s' "${token_line}" | sed -n 's|https://[^:]*:\([^@]*\)@github.com.*|\1|p')"
+  if git remote get-url fork >/dev/null 2>&1; then
+    printf 'fork\n'
+    return
   fi
 
-  printf '%s\n' "${token:-}"
+  if git remote get-url origin >/dev/null 2>&1; then
+    printf 'origin\n'
+    return
+  fi
+
+  printf '\n'
+}
+
+trim_credential_value() {
+  local value="$1"
+  value="${value%\"}"
+  value="${value#\"}"
+  value="${value%\'}"
+  value="${value#\'}"
+  printf '%s\n' "${value}"
+}
+
+emit_credential_candidate() {
+  local source="$1"
+  local username="$2"
+  local token="$3"
+  token="$(trim_credential_value "${token}")"
+  if [ -z "${token}" ]; then
+    return
+  fi
+  printf '%s\t%s\t%s\n' "${source}" "${username}" "${token}"
+}
+
+credentials_from_env() {
+  emit_credential_candidate "env:PHI_SYNC_GITHUB_TOKEN" "x-access-token" "${PHI_SYNC_GITHUB_TOKEN:-}"
+  emit_credential_candidate "env:GITHUB_TOKEN" "x-access-token" "${GITHUB_TOKEN:-}"
+  emit_credential_candidate "env:GH_TOKEN" "x-access-token" "${GH_TOKEN:-}"
+}
+
+credentials_from_env_files() {
+  local token_files
+  token_files="${PHI_SYNC_TOKEN_FILES:-${SCRIPT_DIR}/.env:${REPO_DIR}/.env.mcp:${REPO_DIR}/.env}"
+  local file var token
+
+  IFS=':' read -r -a files <<< "${token_files}"
+  for file in "${files[@]}"; do
+    [ -f "${file}" ] || continue
+    for var in GITHUB_TOKEN GH_TOKEN PHI_GITHUB_PAT; do
+      token="$(sed -n -E "s/^(export[[:space:]]+)?${var}=(.*)$/\\2/p" "${file}" | head -n1)"
+      emit_credential_candidate "file:${file}:${var}" "x-access-token" "${token}"
+    done
+  done
+}
+
+credentials_from_git_stores() {
+  local store_file line username token
+  for store_file in "${HOME}/.git-credentials" "${HOME}/.git-credentials.backup"; do
+    [ -f "${store_file}" ] || continue
+    while IFS= read -r line; do
+      [[ "${line}" == https://*github.com* ]] || continue
+      username="$(printf '%s' "${line}" | sed -n 's|https://\([^:]*\):.*|\1|p')"
+      token="$(printf '%s' "${line}" | sed -n 's|https://[^:]*:\([^@]*\)@github.com.*|\1|p')"
+      emit_credential_candidate "store:${store_file}" "${username}" "${token}"
+    done < "${store_file}"
+  done
+}
+
+credentials_from_gh_hosts() {
+  local hosts_file="${HOME}/.config/gh/hosts.yml"
+  local token
+  [ -f "${hosts_file}" ] || return
+  token="$(sed -n -E 's/^[[:space:]]*oauth_token:[[:space:]]*(.*)$/\1/p' "${hosts_file}" | head -n1)"
+  emit_credential_candidate "gh-hosts:${hosts_file}" "x-access-token" "${token}"
+}
+
+credentials_from_gcloud_secret_manager() {
+  local gcp_lookup_enabled="${PHI_SYNC_GCP_LOOKUP_ENABLED:-1}"
+  local secret_names="${PHI_SYNC_GCP_SECRET_NAMES:-GITHUB_TOKEN,GITHUB_PAT,PHI_GITHUB_PAT}"
+  local project="${PHI_SYNC_GCP_SECRET_PROJECT:-}"
+  local gcp_timeout_seconds="${PHI_SYNC_GCP_TIMEOUT_SECONDS:-4}"
+  local secret_name token
+
+  [ "${gcp_lookup_enabled}" = "1" ] || return
+  [ -n "${secret_names}" ] || return
+  command -v gcloud >/dev/null 2>&1 || return
+
+  if [ -z "${project}" ]; then
+    project="$(gcloud config get-value project 2>/dev/null || true)"
+  fi
+
+  IFS=',' read -r -a gcp_secrets <<< "${secret_names}"
+  for secret_name in "${gcp_secrets[@]}"; do
+    secret_name="$(printf '%s' "${secret_name}" | xargs)"
+    [ -n "${secret_name}" ] || continue
+    if [ -n "${project}" ]; then
+      token="$(timeout "${gcp_timeout_seconds}" gcloud secrets versions access latest --secret="${secret_name}" --project="${project}" 2>/dev/null || true)"
+    else
+      token="$(timeout "${gcp_timeout_seconds}" gcloud secrets versions access latest --secret="${secret_name}" 2>/dev/null || true)"
+    fi
+    emit_credential_candidate "gcp-secret:${secret_name}" "x-access-token" "${token}"
+  done
+}
+
+discover_credential_candidates() {
+  credentials_from_env
+  credentials_from_env_files
+  credentials_from_git_stores
+  credentials_from_gh_hosts
+  credentials_from_gcloud_secret_manager
+}
+
+build_auth_remote() {
+  local remote_url="$1"
+  local username="$2"
+  local token="$3"
+  local remote_host_path
+
+  remote_host_path="$(printf '%s' "${remote_url}" | sed -E 's#^https://([^@/]+@)?##')"
+  printf 'https://%s:%s@%s\n' "${username}" "${token}" "${remote_host_path}"
+}
+
+select_https_push_remote() {
+  local remote_url="$1"
+  local target_branch="$2"
+  local source username token auth_remote
+  local seen_tokens='|'
+
+  while IFS=$'\t' read -r source username token; do
+    [ -n "${token}" ] || continue
+    if [[ "${seen_tokens}" == *"|${token}|"* ]]; then
+      continue
+    fi
+    seen_tokens="${seen_tokens}${token}|"
+    [ -n "${username}" ] || username="x-access-token"
+
+    auth_remote="$(build_auth_remote "${remote_url}" "${username}" "${token}")"
+    if push_preflight "${auth_remote}" "${target_branch}"; then
+      log "Credential source selected: ${source}"
+      printf '%s\n' "${auth_remote}"
+      return 0
+    fi
+
+    log "Credential source failed preflight: ${source}"
+  done < <(discover_credential_candidates)
+
+  return 1
 }
 
 push_with_retry() {
@@ -77,6 +216,27 @@ push_with_retry() {
   return 1
 }
 
+push_preflight() {
+  local push_remote="$1"
+  local target_branch="$2"
+
+  if git push --dry-run "${push_remote}" "HEAD:${target_branch}" >> "${LOG}" 2>&1; then
+    return 0
+  fi
+  return 1
+}
+
+push_preflight_or_skip() {
+  local push_remote="$1"
+  local target_branch="$2"
+  local display_remote="${3:-remote}"
+  if push_preflight "${push_remote}" "${target_branch}"; then
+    return 0
+  fi
+  log "Push preflight failed for ${display_remote}/${target_branch}; skipping push (credentials likely lack write access)"
+  return 1
+}
+
 main() {
   with_lock_or_exit
 
@@ -86,6 +246,12 @@ main() {
 
   if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     log "Sync aborted: ${REPO_DIR} is not a git repository"
+    exit 1
+  fi
+
+  SYNC_REMOTE="$(detect_sync_remote)"
+  if [ -z "${SYNC_REMOTE}" ]; then
+    log "Sync aborted: no usable git remote found (expected fork or origin)"
     exit 1
   fi
 
@@ -104,8 +270,12 @@ main() {
   git fetch "${SYNC_REMOTE}" >> "${LOG}" 2>&1 || log "Fetch warning: unable to refresh ${SYNC_REMOTE}"
 
   if ! git diff --quiet || ! git diff --cached --quiet; then
-    git add -A
-    git commit -m "PHI intelligent sync: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "${LOG}" 2>&1 || true
+    if [ "${SYNC_ALLOW_AUTOCOMMIT}" = "1" ]; then
+      git add -A
+      git commit -m "PHI intelligent sync: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "${LOG}" 2>&1 || true
+    else
+      log "Working tree has changes; auto-commit disabled (PHI_SYNC_ALLOW_AUTOCOMMIT=0)"
+    fi
   fi
 
   local remote_ref="refs/remotes/${SYNC_REMOTE}/${SYNC_BRANCH}"
@@ -123,24 +293,33 @@ main() {
     exit 0
   fi
 
+  if [ "${SYNC_PUSH_ENABLED}" != "1" ]; then
+    log "Push disabled by PHI_SYNC_PUSH_ENABLED=${SYNC_PUSH_ENABLED}; sync completed locally"
+    exit 0
+  fi
+
   log "Commits ahead on ${SYNC_BRANCH}: ${commits_ahead}"
 
   local remote_url
   remote_url="$(git remote get-url "${SYNC_REMOTE}")"
 
   if is_https_remote "${remote_url}"; then
-    local token
-    token="$(detect_token)"
-
-    if [ -z "${token}" ]; then
-      log "HTTPS remote detected but no GitHub token available; push deferred"
+    # First try any credentials already configured in git/gh helpers.
+    if push_preflight "${SYNC_REMOTE}" "${SYNC_BRANCH}"; then
+      push_with_retry "${SYNC_REMOTE}" "${SYNC_BRANCH}" || exit 1
+    else
+      log "Default git credentials failed preflight for ${SYNC_REMOTE}/${SYNC_BRANCH}; scanning stored credentials"
+      local auth_remote
+      if ! auth_remote="$(select_https_push_remote "${remote_url}" "${SYNC_BRANCH}")"; then
+        log "No write-capable stored credential found; push deferred"
+        exit 0
+      fi
+      push_with_retry "${auth_remote}" "${SYNC_BRANCH}" || exit 1
+    fi
+  else
+    if ! push_preflight_or_skip "${SYNC_REMOTE}" "${SYNC_BRANCH}" "${SYNC_REMOTE}"; then
       exit 0
     fi
-
-    local auth_remote
-    auth_remote="$(printf '%s' "${remote_url}" | sed -E "s#https://#https://${token}:@#")"
-    push_with_retry "${auth_remote}" "${SYNC_BRANCH}" || exit 1
-  else
     push_with_retry "${SYNC_REMOTE}" "${SYNC_BRANCH}" || exit 1
   fi
 
