@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 Run a full ecosystem refresh/rebuild/verification cycle and publish a final status bundle.
 """

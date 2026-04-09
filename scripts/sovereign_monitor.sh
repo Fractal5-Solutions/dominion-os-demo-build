@@ -3,13 +3,22 @@
 # Automated live ops monitoring and maintenance
 # Generated: March 9, 2026
 
-set -e
+set -euo pipefail
 
 # Configuration
-MONITOR_INTERVAL=60  # Check every minute
-ALERT_INTERVAL=300   # Alert check every 5 minutes
-LOG_FILE="telemetry/sovereign_monitor_$(date +%Y%m%d).log"
-PID_FILE="telemetry/sovereign_monitor.pid"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TELEMETRY_DIR="${SCRIPT_DIR}/telemetry"
+AUTOTUNE_ENV="${TELEMETRY_DIR}/local_ops_profile.env"
+
+if [ -f "$AUTOTUNE_ENV" ]; then
+    # shellcheck disable=SC1090
+    source "$AUTOTUNE_ENV"
+fi
+
+MONITOR_INTERVAL="${PHI_MONITOR_INTERVAL:-60}"   # check cadence
+ALERT_INTERVAL="${PHI_ALERT_INTERVAL:-300}"      # alert cadence
+LOG_FILE="${TELEMETRY_DIR}/sovereign_monitor_$(date +%Y%m%d).log"
+PID_FILE="${TELEMETRY_DIR}/sovereign_monitor.pid"
 OPTIONAL_BACKGROUND_SERVICES=(
     "phi_cost_minimization_simple"
     "autonomous_overnight"
@@ -52,7 +61,7 @@ run_monitoring_cycle() {
     log "Starting monitoring cycle"
 
     # Run health monitoring
-    if bash scripts/live_ops_monitor.sh >> "$LOG_FILE" 2>&1; then
+    if bash "$SCRIPT_DIR/live_ops_monitor.sh" >> "$LOG_FILE" 2>&1; then
         success_log "Health monitoring completed successfully"
     else
         error_log "Health monitoring failed"
@@ -60,16 +69,16 @@ run_monitoring_cycle() {
 
     # Run alerts check (every 5 minutes)
     local current_time=$(date +%s)
-    local last_alert_check=$(cat telemetry/.last_alert_check 2>/dev/null || echo "0")
+    local last_alert_check=$(cat "${TELEMETRY_DIR}/.last_alert_check" 2>/dev/null || echo "0")
 
     if [ $((current_time - last_alert_check)) -ge $ALERT_INTERVAL ]; then
         log "Running alert system check"
-        if bash scripts/live_ops_alerts.sh >> "$LOG_FILE" 2>&1; then
+        if bash "$SCRIPT_DIR/live_ops_alerts.sh" >> "$LOG_FILE" 2>&1; then
             success_log "Alert system check completed"
         else
             error_log "Alert system check failed"
         fi
-        echo "$current_time" > telemetry/.last_alert_check
+        echo "$current_time" > "${TELEMETRY_DIR}/.last_alert_check"
     fi
 
     # Check for critical issues requiring immediate action
@@ -123,13 +132,13 @@ emergency_restart() {
     if [ -x "$command_center_start" ]; then
         bash "$command_center_start" &
     else
-        bash scripts/start_all_systems.sh &
+        bash "$SCRIPT_DIR/start_all_systems.sh" &
     fi
     sleep 5
 
     # Restart background services
     log "Restarting background services"
-    bash scripts/phi_background_completion_monitor.sh &
+    bash "$SCRIPT_DIR/phi_background_completion_monitor.sh" &
 
     success_log "Emergency restart completed"
 }
@@ -137,16 +146,16 @@ emergency_restart() {
 maintenance_tasks() {
     # Run maintenance tasks hourly
     local current_hour=$(date +%H)
-    local last_maintenance=$(cat telemetry/.last_maintenance 2>/dev/null || echo "99")
+    local last_maintenance=$(cat "${TELEMETRY_DIR}/.last_maintenance" 2>/dev/null || echo "99")
 
     if [ "$current_hour" != "$last_maintenance" ]; then
         log "Running hourly maintenance tasks"
 
         # Clean up old log files (keep last 7 days)
-        find telemetry/ -name "*.log" -mtime +7 -delete 2>/dev/null || true
+        find "${TELEMETRY_DIR}/" -name "*.log" -mtime +7 -delete 2>/dev/null || true
 
         # Update maintenance timestamp
-        echo "$current_hour" > telemetry/.last_maintenance
+        echo "$current_hour" > "${TELEMETRY_DIR}/.last_maintenance"
 
         success_log "Maintenance tasks completed"
     fi
@@ -159,7 +168,7 @@ main() {
     success_log "Maximum Sovereign Power Mode: ACTIVE"
 
     # Create telemetry directory
-    mkdir -p telemetry
+    mkdir -p "${TELEMETRY_DIR}"
     echo "$$" > "$PID_FILE"
 
     # Initial monitoring cycle
@@ -169,7 +178,7 @@ main() {
     while true; do
         run_monitoring_cycle
         maintenance_tasks
-        sleep $MONITOR_INTERVAL
+        sleep "$MONITOR_INTERVAL"
     done
 }
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 PHI Chief AI - Token Detection and Protection System
 Monitors for unauthorized token usage and potential compromises

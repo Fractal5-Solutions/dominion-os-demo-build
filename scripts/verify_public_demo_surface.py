@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """Verify the public demo runtime payload is restricted to approved assets."""
 
 from __future__ import annotations

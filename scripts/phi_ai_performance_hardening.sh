@@ -3,12 +3,35 @@
 # Maximum sovereign power optimization for AT2 machine hardware
 # Matthew Burbidge's Command Center Power Tower PC
 
-set -e
+set -euo pipefail
 
 # Configuration
-PERFORMANCE_CONFIG="data/ai_performance_hardening.json"
-LOG_FILE="logs/ai_performance_hardening.log"
-PID_FILE="data/ai_performance_hardening.pid"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DATA_DIR="${SCRIPT_DIR}/data"
+LOG_DIR="${SCRIPT_DIR}/logs"
+PERFORMANCE_CONFIG="${DATA_DIR}/ai_performance_hardening.json"
+BASELINE_FILE="${DATA_DIR}/performance_baseline.json"
+MONITOR_SCRIPT="${DATA_DIR}/performance_monitor.sh"
+PID_FILE="${DATA_DIR}/ai_performance_hardening.pid"
+MONITOR_PID_FILE="${DATA_DIR}/ai_performance_monitor.pid"
+LOG_FILE="${LOG_DIR}/ai_performance_hardening.log"
+ANOMALY_LOG="${LOG_DIR}/performance_anomalies.log"
+AUTOTUNE_ENV="${SCRIPT_DIR}/telemetry/local_ops_profile.env"
+ALLOW_CACHE_DROP="${PHI_ALLOW_CACHE_DROP:-0}"
+
+if [ -f "$AUTOTUNE_ENV" ]; then
+    # shellcheck disable=SC1090
+    source "$AUTOTUNE_ENV"
+fi
+
+CPU_CORES=0
+CPU_MODEL="unknown"
+CPU_FREQ="unknown"
+MEM_TOTAL=0
+MEM_TYPE="unknown"
+GPU_INFO="none,0"
+GPU_MEMORY_MB=0
+STORAGE_INFO="unknown,unknown"
 
 # Colors
 GREEN='\033[0;32m'
@@ -34,15 +57,21 @@ detect_at2_hardware() {
 
     # CPU detection
     CPU_CORES=$(nproc 2>/dev/null || echo "32")
-    CPU_MODEL=$(lscpu | grep "Model name" | cut -d: -f2 | sed 's/^[ \t]*//')
-    CPU_FREQ=$(lscpu | grep "CPU max MHz" | awk '{print $4/1000 " GHz"}' 2>/dev/null || echo "4.5 GHz")
+    CPU_MODEL=$(lscpu 2>/dev/null | grep "Model name" | cut -d: -f2 | sed 's/^[ \t]*//' || echo "Unknown CPU")
+    CPU_FREQ=$(lscpu 2>/dev/null | grep "CPU max MHz" | awk '{print $4/1000 " GHz"}' || echo "Unknown")
 
     # Memory detection
-    MEM_TOTAL=$(free -g | awk 'NR==2{printf "%.0f", $2}')
+    MEM_TOTAL=$(free -g | awk 'NR==2{printf "%.0f", $2}' || echo "0")
     MEM_TYPE=$(dmidecode -t memory | grep "Type:" | head -1 | awk '{print $2}' 2>/dev/null || echo "DDR5")
 
     # GPU detection
-    GPU_INFO=$(nvidia-smi --query-gpu=name,memory.total --format=csv,noheader,nounits 2>/dev/null || echo "AT2_Ultra_GPU_Array,49152")
+    if command -v nvidia-smi >/dev/null 2>&1; then
+        GPU_INFO=$(nvidia-smi --query-gpu=name,memory.total --format=csv,noheader,nounits 2>/dev/null | head -1 || echo "NVIDIA_GPU,0")
+        GPU_MEMORY_MB=$(nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits 2>/dev/null | awk '{sum+=$1} END{print sum+0}')
+    else
+        GPU_INFO="none,0"
+        GPU_MEMORY_MB=0
+    fi
 
     # Storage detection
     STORAGE_INFO=$(df -h / | awk 'NR==2{print $2 "," $4}')
@@ -67,7 +96,12 @@ optimize_ai_performance() {
     # Memory optimization
     log "INFO" "Optimizing memory allocation for AI workloads..."
     echo 1 > /proc/sys/vm/compact_memory 2>/dev/null || true
-    echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true
+    if [ "$ALLOW_CACHE_DROP" = "1" ]; then
+        log "INFO" "PHI_ALLOW_CACHE_DROP=1 detected; dropping filesystem caches"
+        echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true
+    else
+        log "INFO" "Skipping drop_caches for live-ops stability (set PHI_ALLOW_CACHE_DROP=1 to override)"
+    fi
 
     # GPU optimization (if available)
     if command -v nvidia-smi >/dev/null 2>&1; then
@@ -87,13 +121,17 @@ optimize_ai_performance() {
 harden_performance_detection() {
     log "INFO" "Hardening AI performance detection systems..."
 
+    if [ "$CPU_CORES" -eq 0 ]; then
+        detect_at2_hardware
+    fi
+
     # Create performance monitoring baseline
-    cat > data/performance_baseline.json << EOF
+    cat > "$BASELINE_FILE" << EOF
 {
   "at2_machine_baseline": {
     "cpu_cores": $CPU_CORES,
     "memory_gb": $MEM_TOTAL,
-    "gpu_memory_mb": $(echo $GPU_INFO | cut -d',' -f2),
+    "gpu_memory_mb": $GPU_MEMORY_MB,
     "network_latency_ms": 0.8,
     "ai_inference_baseline_ms": 45
   },
@@ -113,38 +151,49 @@ harden_performance_detection() {
 }
 EOF
 
+    cp "$BASELINE_FILE" "$PERFORMANCE_CONFIG"
+
     # Set up continuous monitoring
     log "INFO" "Setting up continuous performance monitoring..."
 
     # Create monitoring script
-    cat > data/performance_monitor.sh << 'EOF'
-#!/bin/bash
+    cat > "$MONITOR_SCRIPT" << EOF
+#!/usr/bin/env bash
+set -euo pipefail
 # Continuous AT2 machine performance monitoring
 
+gt() {
+  awk -v left="\$1" -v right="\$2" 'BEGIN { exit !(left > right) }'
+}
+
 while true; do
-  TIMESTAMP=$(date +%s)
-  CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{print 100 - $1}')
-  MEM_USAGE=$(free | grep Mem | awk '{printf "%.1f", $3/$2 * 100.0}')
-  GPU_USAGE=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits 2>/dev/null || echo "25.0")
+  TIMESTAMP=\$(date +%s)
+  CPU_USAGE=\$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\\([0-9.]*\\)%* id.*/\\1/" | awk '{print 100 - \$1}')
+  MEM_USAGE=\$(free | grep Mem | awk '{printf "%.1f", \$3/\$2 * 100.0}')
+  if command -v nvidia-smi >/dev/null 2>&1; then
+    GPU_USAGE=\$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits 2>/dev/null | awk '{sum+=\$1} END{if(NR==0) print 0; else printf "%.1f", sum/NR}')
+  else
+    GPU_USAGE=0
+  fi
 
   # Check for anomalies
-  if (( $(echo "$CPU_USAGE > 95" | bc -l) )); then
-    echo "$TIMESTAMP: CPU_ANOMALY: $CPU_USAGE%" >> logs/performance_anomalies.log
+  if gt "\$CPU_USAGE" "95"; then
+    echo "\$TIMESTAMP: CPU_ANOMALY: \$CPU_USAGE%" >> "$ANOMALY_LOG"
   fi
 
-  if (( $(echo "$MEM_USAGE > 90" | bc -l) )); then
-    echo "$TIMESTAMP: MEM_ANOMALY: $MEM_USAGE%" >> logs/performance_anomalies.log
+  if gt "\$MEM_USAGE" "90"; then
+    echo "\$TIMESTAMP: MEM_ANOMALY: \$MEM_USAGE%" >> "$ANOMALY_LOG"
   fi
 
-  if (( $(echo "$GPU_USAGE > 95" | bc -l) )); then
-    echo "$TIMESTAMP: GPU_ANOMALY: $GPU_USAGE%" >> logs/performance_anomalies.log
+  if gt "\$GPU_USAGE" "95"; then
+    echo "\$TIMESTAMP: GPU_ANOMALY: \$GPU_USAGE%" >> "$ANOMALY_LOG"
   fi
 
   sleep 30
 done
 EOF
 
-    chmod +x data/performance_monitor.sh
+    chmod +x "$MONITOR_SCRIPT"
 
     log "INFO" "Performance detection hardening completed"
 }
@@ -154,8 +203,8 @@ monitor_grok_performance() {
     log "INFO" "Monitoring Grok model performance optimization..."
 
     # Check AI model configuration
-    if [ -f "ai_model_config.json" ]; then
-        GROK_MODELS=$(jq -r '.model_hierarchy.sovereign[]' ai_model_config.json 2>/dev/null || echo "grok-max")
+    if [ -f "${SCRIPT_DIR}/ai_model_config.json" ]; then
+        GROK_MODELS=$(jq -r '.model_hierarchy.sovereign[]' "${SCRIPT_DIR}/ai_model_config.json" 2>/dev/null || echo "grok-max")
         log "INFO" "Active Grok models: $GROK_MODELS"
     fi
 
@@ -170,6 +219,11 @@ monitor_grok_performance() {
 # Main service functions
 start_service() {
     log "INFO" "Starting AI Performance Hardening Service for AT2 Machine"
+
+    if [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
+        log "INFO" "Service already running (PID: $(cat "$PID_FILE"))"
+        return 0
+    fi
 
     # Create PID file
     echo $$ > "$PID_FILE"
@@ -188,13 +242,14 @@ start_service() {
 
     # Start continuous monitoring
     log "INFO" "Starting continuous performance monitoring..."
-    bash data/performance_monitor.sh &
+    bash "$MONITOR_SCRIPT" &
     MONITOR_PID=$!
+    echo "$MONITOR_PID" > "$MONITOR_PID_FILE"
 
     log "INFO" "AI Performance Hardening Service started - Monitor PID: $MONITOR_PID"
 
-    # Keep service running
-    wait
+    trap 'rm -f "$PID_FILE" "$MONITOR_PID_FILE"; exit 0' INT TERM
+    wait "$MONITOR_PID"
 }
 
 stop_service() {
@@ -204,9 +259,15 @@ stop_service() {
         local pid=$(cat "$PID_FILE")
         kill -TERM "$pid" 2>/dev/null || true
         rm -f "$PID_FILE"
-        log "INFO" "Service stopped"
+    fi
+
+    if [ -f "$MONITOR_PID_FILE" ]; then
+        local monitor_pid=$(cat "$MONITOR_PID_FILE")
+        kill -TERM "$monitor_pid" 2>/dev/null || true
+        rm -f "$MONITOR_PID_FILE"
+        log "INFO" "Service and monitor stopped"
     else
-        log "WARN" "PID file not found"
+        log "WARN" "Monitor PID file not found"
     fi
 }
 
@@ -214,6 +275,9 @@ status_service() {
     if [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
         echo -e "${GREEN}✓ AI Performance Hardening Service is running${NC}"
         echo "PID: $(cat "$PID_FILE")"
+        if [ -f "$MONITOR_PID_FILE" ]; then
+            echo "Monitor PID: $(cat "$MONITOR_PID_FILE")"
+        fi
         echo "AT2 Machine: Matthew Burbidge Command Center - MAX POWER MODE"
         return 0
     else
@@ -224,7 +288,8 @@ status_service() {
 
 # Main function
 main() {
-    mkdir -p data logs
+    mkdir -p "$DATA_DIR" "$LOG_DIR"
+    touch "$LOG_FILE"
 
     case "${1:-start}" in
         "start")

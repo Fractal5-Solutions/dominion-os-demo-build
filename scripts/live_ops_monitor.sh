@@ -3,13 +3,29 @@
 # Continuous health monitoring and alerting for all services
 # Generated: March 9, 2026
 
-set -e
+set -euo pipefail
 
 # Configuration
-LOG_DIR="telemetry"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOG_DIR="${SCRIPT_DIR}/telemetry"
 HEALTH_LOG="$LOG_DIR/live_ops_health_$(date +%Y%m%d).log"
 ALERT_LOG="$LOG_DIR/live_ops_alerts_$(date +%Y%m%d).log"
 STATUS_FILE="$LOG_DIR/live_ops_status.json"
+AUTOTUNE_ENV="$LOG_DIR/local_ops_profile.env"
+
+if [ -f "$AUTOTUNE_ENV" ]; then
+    # shellcheck disable=SC1090
+    source "$AUTOTUNE_ENV"
+fi
+
+MAX_MEMORY_PERCENT="${PHI_MAX_MEMORY_PERCENT:-85}"
+MAX_DISK_PERCENT="${PHI_MAX_DISK_PERCENT:-90}"
+
+case "${PHI_AUTOTUNE_PROFILE:-balanced}" in
+    ceiling|high) CPU_WARN_PERCENT=90 ;;
+    balanced) CPU_WARN_PERCENT=85 ;;
+    *) CPU_WARN_PERCENT=80 ;;
+esac
 
 # Colors for output
 RED='\033[0;31m'
@@ -58,6 +74,14 @@ log_error() {
 log_success() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') [SUCCESS] $1" >> "$HEALTH_LOG"
     echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+float_gt() {
+    awk -v left="$1" -v right="$2" 'BEGIN { exit !(left > right) }'
+}
+
+float_gte() {
+    awk -v left="$1" -v right="$2" 'BEGIN { exit !(left >= right) }'
 }
 
 check_service_health() {
@@ -140,23 +164,23 @@ check_system_resources() {
     # CPU usage
     local cpu_usage=$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{print 100 - $1}')
     local cpu_status="HEALTHY"
-    if (( $(echo "$cpu_usage > 80" | bc -l) )); then
+    if float_gt "$cpu_usage" "$CPU_WARN_PERCENT"; then
         cpu_status="HIGH"
     fi
 
     # Memory usage
     local mem_usage=$(free | grep Mem | awk '{printf "%.2f", $3/$2 * 100.0}')
     local mem_status="HEALTHY"
-    if (( $(echo "$mem_usage > 85" | bc -l) )); then
+    if float_gt "$mem_usage" "$MAX_MEMORY_PERCENT"; then
         mem_status="HIGH"
     fi
 
     # Disk usage
     local disk_usage=$(df / | tail -1 | awk '{print $5}' | sed 's/%//')
     local disk_status="HEALTHY"
-    if [ "$disk_usage" -gt 90 ]; then
+    if [ "$disk_usage" -gt "$MAX_DISK_PERCENT" ]; then
         disk_status="CRITICAL"
-    elif [ "$disk_usage" -gt 80 ]; then
+    elif [ "$disk_usage" -gt $((MAX_DISK_PERCENT - 10)) ]; then
         disk_status="HIGH"
     fi
 
@@ -167,7 +191,7 @@ log_system_resources() {
     # CPU usage
     local cpu_usage=$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{print 100 - $1}')
     local cpu_status="HEALTHY"
-    if (( $(echo "$cpu_usage > 80" | bc -l) )); then
+    if float_gt "$cpu_usage" "$CPU_WARN_PERCENT"; then
         cpu_status="HIGH"
         log_warn "CPU usage: ${cpu_usage}% (HIGH)"
     else
@@ -177,7 +201,7 @@ log_system_resources() {
     # Memory usage
     local mem_usage=$(free | grep Mem | awk '{printf "%.2f", $3/$2 * 100.0}')
     local mem_status="HEALTHY"
-    if (( $(echo "$mem_usage > 85" | bc -l) )); then
+    if float_gt "$mem_usage" "$MAX_MEMORY_PERCENT"; then
         mem_status="HIGH"
         log_warn "Memory usage: ${mem_usage}% (HIGH)"
     else
@@ -187,10 +211,10 @@ log_system_resources() {
     # Disk usage
     local disk_usage=$(df / | tail -1 | awk '{print $5}' | sed 's/%//')
     local disk_status="HEALTHY"
-    if [ "$disk_usage" -gt 90 ]; then
+    if [ "$disk_usage" -gt "$MAX_DISK_PERCENT" ]; then
         disk_status="CRITICAL"
         log_error "Disk usage: ${disk_usage}% (CRITICAL)"
-    elif [ "$disk_usage" -gt 80 ]; then
+    elif [ "$disk_usage" -gt $((MAX_DISK_PERCENT - 10)) ]; then
         disk_status="HIGH"
         log_warn "Disk usage: ${disk_usage}% (HIGH)"
     else
@@ -262,9 +286,9 @@ main() {
 
     # Check overall health
     local live_ops_score=$(jq -r '.live_ops_score' "$STATUS_FILE" 2>/dev/null || echo "0")
-    if (( $(echo "$live_ops_score >= 95" | bc -l) )); then
+    if float_gte "$live_ops_score" "95"; then
         log_success "LIVE OPS SCORE: ${live_ops_score} - PERFECT (95%+)"
-    elif (( $(echo "$live_ops_score >= 80" | bc -l) )); then
+    elif float_gte "$live_ops_score" "80"; then
         log_success "LIVE OPS SCORE: ${live_ops_score} - GOOD (80-94%)"
     else
         log_error "LIVE OPS SCORE: ${live_ops_score} - DEGRADED (<80%)"

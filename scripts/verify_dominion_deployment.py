@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """Local and optional Cloud Run verification for Dominion OS auth surfaces."""
 
 from __future__ import annotations

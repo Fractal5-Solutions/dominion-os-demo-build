@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """Generate a per-SKU activation tracker CSV from the repo manifest."""
 
 from __future__ import annotations

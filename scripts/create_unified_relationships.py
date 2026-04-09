@@ -4,6 +4,7 @@
 # -*- coding: utf-8 -*-
 # -*- coding: utf-8 -*-
 # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 Unified Relationship Database Creator
 Combines data from Apollo, Gmail, Google Drive, and Dropbox

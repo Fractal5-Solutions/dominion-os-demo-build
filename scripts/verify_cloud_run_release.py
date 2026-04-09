@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """Verify live Cloud Run release metadata against the expected repo state."""
 
 from __future__ import annotations
