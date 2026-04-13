@@ -59,6 +59,10 @@ detect_sync_remote() {
 
 trim_credential_value() {
   local value="$1"
+  # Normalize carriage returns/newlines from env files and secret stores.
+  value="$(printf '%s' "${value}" | tr -d '\r' | tr -d '\n')"
+  # Trim leading/trailing whitespace.
+  value="$(printf '%s' "${value}" | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//')"
   value="${value%\"}"
   value="${value#\"}"
   value="${value%\'}"
@@ -121,7 +125,7 @@ credentials_from_gh_hosts() {
 
 credentials_from_gcloud_secret_manager() {
   local gcp_lookup_enabled="${PHI_SYNC_GCP_LOOKUP_ENABLED:-1}"
-  local secret_names="${PHI_SYNC_GCP_SECRET_NAMES:-GITHUB_TOKEN,GITHUB_PAT,PHI_GITHUB_PAT}"
+  local secret_names="${PHI_SYNC_GCP_SECRET_NAMES:-GITHUB_TOKEN,GITHUB_PAT,PHI_GITHUB_PAT,github-pat,dominion-github-github-oauthtoken-57a2ca}"
   local project="${PHI_SYNC_GCP_SECRET_PROJECT:-}"
   local gcp_timeout_seconds="${PHI_SYNC_GCP_TIMEOUT_SECONDS:-4}"
   local secret_name token
@@ -160,9 +164,15 @@ build_auth_remote() {
   local username="$2"
   local token="$3"
   local remote_host_path
+  local token_encoded
 
   remote_host_path="$(printf '%s' "${remote_url}" | sed -E 's#^https://([^@/]+@)?##')"
-  printf 'https://%s:%s@%s\n' "${username}" "${token}" "${remote_host_path}"
+  token_encoded="$(
+    python3 -c 'import sys, urllib.parse; print(urllib.parse.quote(sys.argv[1], safe=""))' "${token}" \
+      2>/dev/null || true
+  )"
+  [ -n "${token_encoded}" ] || token_encoded="${token}"
+  printf 'https://%s:%s@%s\n' "${username}" "${token_encoded}" "${remote_host_path}"
 }
 
 select_https_push_remote() {
