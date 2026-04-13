@@ -16,7 +16,25 @@ from dataclasses import dataclass
 
 PROJECT = os.getenv("GCP_PROJECT", "dominion-core-prod")
 REGION = os.getenv("GCP_REGION", "us-central1")
-SERVICES = ("dominion-os-demo", "phi-oauth-server", "phi-askphi-widget")
+
+
+@dataclass(frozen=True)
+class CloudTarget:
+    service: str
+    path: str
+    required: bool = True
+
+
+CLOUD_TARGETS: tuple[CloudTarget, ...] = (
+    CloudTarget("dominion-api", "/health", True),
+    CloudTarget("dominion-ui", "/health", True),
+    CloudTarget("dominion-identity", "/health", True),
+    CloudTarget("dominion-worker", "/health", True),
+    # Legacy/optional auth surfaces kept for backward compatibility.
+    CloudTarget("dominion-os-demo", "/status", False),
+    CloudTarget("phi-oauth-server", "/ready", False),
+    CloudTarget("phi-askphi-widget", "/ready", False),
+)
 
 
 @dataclass(frozen=True)
@@ -68,7 +86,12 @@ def verify_service(name: str, base_url: str, path: str) -> bool:
     print(f"{name}: {base_url}{path} -> {code}")
     if payload is not None:
         print(json.dumps(payload, indent=2))
-    return bool(code and 200 <= code < 300 and payload and payload.get("status") in {"healthy", "ready"})
+    return bool(
+        code
+        and 200 <= code < 300
+        and payload
+        and payload.get("status") in {"healthy", "ready", "ok"}
+    )
 
 
 def verify_local_target(target: ProbeTarget) -> bool:
@@ -113,15 +136,21 @@ def main() -> int:
     print("\nCloud Run verification")
     cloud_ok = True
     discovered = False
-    for service in SERVICES:
-        url = cloud_run_url(service)
+    for target in CLOUD_TARGETS:
+        url = cloud_run_url(target.service)
         if not url:
-            print(f"{service}: unavailable from gcloud")
-            cloud_ok = False
+            if target.required:
+                print(f"{target.service}: unavailable from gcloud (required)")
+                cloud_ok = False
+            else:
+                print(f"{target.service}: unavailable from gcloud (optional)")
             continue
         discovered = True
-        path = "/status" if service == "dominion-os-demo" else "/ready"
-        cloud_ok = verify_service(service, url, path) and cloud_ok
+        service_ok = verify_service(target.service, url, target.path)
+        if target.required:
+            cloud_ok = service_ok and cloud_ok
+        elif not service_ok:
+            print(f"{target.service}: optional cloud probe did not pass; continuing")
 
     if discovered:
         ok = ok and cloud_ok
