@@ -54,3 +54,5 @@ data/gmail_contacts/*.bak.*
 scripts/data/*_rate_limit
 scripts/telemetry/.last_alert_check
 scripts/telemetry/.last_intelligent_sync
+scripts/telemetry/.last_maintenance
+scripts/telemetry/.last_emergency_restart
