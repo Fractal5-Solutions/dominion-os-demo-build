@@ -9,12 +9,15 @@ import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 import re
+from threading import Lock
+from typing import Any
 from urllib.parse import urlparse
 
 import requests
 from flask import Flask, abort, jsonify, render_template_string, request, send_from_directory
 
 BASE_DIR = Path(__file__).resolve().parent
+BRAND_DIR = BASE_DIR / "brand"
 
 app = Flask(__name__)
 app.config["JSON_SORT_KEYS"] = False
@@ -35,6 +38,18 @@ SOURCE_OF_TRUTH_SHA = os.getenv("SOURCE_OF_TRUTH_SHA", "")
 SOURCE_OF_TRUTH_VERSION = os.getenv("SOURCE_OF_TRUTH_VERSION", "")
 IMAGE_REF = os.getenv("IMAGE_REF", "")
 RELEASE_REPO = os.getenv("RELEASE_REPO", "dominion-os-demo-build")
+
+
+def parse_timeout_seconds() -> float:
+    raw = os.getenv("COMMAND_CORE_PROBE_TIMEOUT_SECONDS", "2")
+    try:
+        parsed = float(raw)
+    except ValueError:
+        return 2.0
+    return parsed if parsed > 0 else 2.0
+
+
+PROBE_TIMEOUT_SECONDS = parse_timeout_seconds()
 
 LOCAL_SERVICE_TARGETS = (
     {
@@ -64,6 +79,12 @@ REMOTE_TELEMETRY_FILES = {
     "dominion-os-1-0-main": BASE_DIR / "scripts" / "telemetry" / "services_project1.txt",
     "dominion-core-prod": BASE_DIR / "scripts" / "telemetry" / "services_project2.txt",
 }
+
+_CACHE_LOCK = Lock()
+_JSON_CACHE: dict[Path, tuple[int, Any]] = {}
+_TEXT_LINES_CACHE: dict[Path, tuple[int, list[str]]] = {}
+_PROBE_SESSION = requests.Session()
+_RELEASE_SHA_CACHE: str | None = None
 
 LANDING_TEMPLATE = """
 <!DOCTYPE html>
@@ -224,8 +245,11 @@ def now_iso() -> str:
 
 
 def resolve_release_sha() -> str:
+    global _RELEASE_SHA_CACHE
     if RELEASE_SHA:
         return RELEASE_SHA
+    if _RELEASE_SHA_CACHE is not None:
+        return _RELEASE_SHA_CACHE
     try:
         output = subprocess.check_output(
             ["git", "rev-parse", "--short=12", "HEAD"],
@@ -233,9 +257,11 @@ def resolve_release_sha() -> str:
             text=True,
             stderr=subprocess.DEVNULL,
         )
-        return output.strip()
+        _RELEASE_SHA_CACHE = output.strip()
+        return _RELEASE_SHA_CACHE
     except (OSError, subprocess.CalledProcessError):
-        return ""
+        _RELEASE_SHA_CACHE = ""
+        return _RELEASE_SHA_CACHE
 
 
 def release_info() -> dict:
@@ -262,11 +288,42 @@ def wants_json_response() -> bool:
 
 def read_json_file(path: Path, default):
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        mtime_ns = path.stat().st_mtime_ns
     except FileNotFoundError:
         return default
-    except json.JSONDecodeError:
+
+    with _CACHE_LOCK:
+        cached = _JSON_CACHE.get(path)
+    if cached and cached[0] == mtime_ns:
+        return cached[1]
+
+    try:
+        parsed = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
         return default
+    with _CACHE_LOCK:
+        _JSON_CACHE[path] = (mtime_ns, parsed)
+    return parsed
+
+
+def read_text_lines(path: Path) -> list[str]:
+    try:
+        mtime_ns = path.stat().st_mtime_ns
+    except FileNotFoundError:
+        return []
+
+    with _CACHE_LOCK:
+        cached = _TEXT_LINES_CACHE.get(path)
+    if cached and cached[0] == mtime_ns:
+        return cached[1]
+
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return []
+    with _CACHE_LOCK:
+        _TEXT_LINES_CACHE[path] = (mtime_ns, lines)
+    return lines
 
 
 def is_safe_slug(value: str) -> bool:
@@ -296,7 +353,9 @@ def probe_service(base_url: str, health_paths: tuple[str, ...], enabled: bool) -
     for health_path in health_paths:
         target = f"{base_url.rstrip('/')}{health_path}"
         try:
-            response = requests.get(target, timeout=2, allow_redirects=False)
+            response = _PROBE_SESSION.get(
+                target, timeout=PROBE_TIMEOUT_SECONDS, allow_redirects=False
+            )
             healthy = 200 <= response.status_code < 400
             return {
                 "status": "healthy" if healthy else "degraded",
@@ -312,6 +371,7 @@ def probe_service(base_url: str, health_paths: tuple[str, ...], enabled: bool) -
         "healthy": False,
         "checked_url": f"{base_url.rstrip('/')}{health_paths[0]}",
         "error": "Connection failed",
+        "last_error": last_error,
     }
 
 
@@ -321,6 +381,9 @@ def load_products() -> list[dict]:
         payload = read_json_file(product_file, {})
         if not payload:
             continue
+        if not isinstance(payload, dict):
+            continue
+        payload = dict(payload)
         slug = product_file.parent.name
         payload["slug"] = slug
         payload["spec_path"] = f"/api/products/{slug}"
@@ -354,12 +417,10 @@ def load_remote_projects() -> dict:
     remote_projects: dict[str, dict] = {}
     for project_id, telemetry_file in REMOTE_TELEMETRY_FILES.items():
         services = []
-        try:
-            lines = telemetry_file.read_text(encoding="utf-8").splitlines()
-        except FileNotFoundError:
-            lines = []
+        lines = read_text_lines(telemetry_file)
+        start_index = 1 if lines and "url" in lines[0].lower() else 0
 
-        for line in lines[1:]:
+        for line in lines[start_index:]:
             stripped = line.strip()
             if not stripped:
                 continue
@@ -513,6 +574,15 @@ def store_page():
     return send_static_page("store")
 
 
+@app.route("/brand/<asset>")
+def brand_asset(asset: str):
+    if not is_safe_slug(asset):
+        abort(400)
+    if Path(asset).suffix not in {".css", ".json"}:
+        abort(404)
+    return send_from_directory(str(BRAND_DIR), asset)
+
+
 @app.route("/api/products")
 @app.route("/api/v1/products")
 def products_api():
@@ -526,8 +596,9 @@ def product_detail(slug: str):
         abort(400)
     product_file = BASE_DIR / "products" / slug / "product.json"
     payload = read_json_file(product_file, None)
-    if payload is None:
+    if payload is None or not isinstance(payload, dict):
         abort(404)
+    payload = dict(payload)
     payload["slug"] = slug
     payload["spec_path"] = f"/api/products/{slug}"
     return jsonify(payload)

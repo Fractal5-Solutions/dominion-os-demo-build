@@ -1,0 +1,11 @@
+{
+  "brand": "Fractal5 Solutions Inc.",
+  "product_family": "Fractal5 Software / Dominion ecosystem",
+  "default_mode": "light",
+  "dark_mode": "prefers-color-scheme",
+  "token_files": [
+    "brand/fractal5-software.tokens.light.css",
+    "brand/fractal5-software.tokens.dark.css"
+  ],
+  "compliance_version": "2026-04-08"
+}

@@ -4,19 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fractal5 Demo | Gated Operator Experience</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23005ea2'/%3E%3Ctext x='50' y='62' text-anchor='middle' font-size='52' fill='white' font-family='Arial'%3EF5%3C/text%3E%3C/svg%3E">
+    <link rel="stylesheet" href="/brand/fractal5-software.tokens.light.css">
+    <link rel="stylesheet" href="/brand/fractal5-software.tokens.dark.css">
     <style>
         :root {
-            --bg: #0b0d10;
-            --panel: rgba(16, 18, 22, 0.86);
-            --panel-strong: rgba(22, 25, 31, 0.96);
-            --text: #f4f7fb;
-            --muted: rgba(244, 247, 251, 0.72);
-            --soft: rgba(244, 247, 251, 0.1);
-            --line: rgba(244, 247, 251, 0.12);
-            --accent: #d8b46a;
-            --accent-2: #78d1c5;
-            --danger: #ff7a7a;
-            --shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+            --bg: var(--f5-bg, #f4f6f8);
+            --panel: color-mix(in srgb, var(--f5-surface, #ffffff) 86%, transparent);
+            --panel-strong: var(--f5-surface, #ffffff);
+            --text: var(--f5-text, #111a21);
+            --muted: color-mix(in srgb, var(--f5-muted, #4d5b67) 86%, transparent);
+            --soft: color-mix(in srgb, var(--f5-line, #cfd8df) 30%, transparent);
+            --line: color-mix(in srgb, var(--f5-line, #cfd8df) 76%, transparent);
+            --accent: var(--f5-accent, #005ea2);
+            --accent-2: var(--f5-accent-2, #1f7a8c);
+            --danger: var(--f5-danger, #b42318);
+            --shadow: var(--f5-shadow, 0 16px 40px rgba(8, 23, 38, 0.12));
         }
 
         * { box-sizing: border-box; }
@@ -29,9 +32,9 @@
             margin: 0;
             color: var(--text);
             background:
-                radial-gradient(circle at 15% 10%, rgba(216, 180, 106, 0.15), transparent 24%),
-                radial-gradient(circle at 85% 0%, rgba(120, 209, 197, 0.18), transparent 22%),
-                linear-gradient(160deg, #060708 0%, #0b0d10 42%, #10141a 100%);
+                radial-gradient(circle at 15% 10%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 24%),
+                radial-gradient(circle at 85% 0%, color-mix(in srgb, var(--accent-2) 18%, transparent), transparent 22%),
+                linear-gradient(160deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 72%, #ffffff 28%) 100%);
             font-family: "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif;
         }
 
@@ -41,8 +44,8 @@
             inset: 0;
             pointer-events: none;
             background-image:
-                linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+                linear-gradient(color-mix(in srgb, var(--f5-line, #cfd8df) 35%, transparent) 1px, transparent 1px),
+                linear-gradient(90deg, color-mix(in srgb, var(--f5-line, #cfd8df) 35%, transparent) 1px, transparent 1px);
             background-size: 42px 42px;
             mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.7), transparent 90%);
         }
@@ -135,6 +138,11 @@
 
         .btn:hover {
             transform: translateY(-1px);
+        }
+
+        :focus-visible {
+            outline: 3px solid var(--f5-focus, #005ea2);
+            outline-offset: 2px;
         }
 
         .btn-primary {
@@ -259,9 +267,9 @@
             gap: 12px;
             padding: 18px;
             border-radius: 22px;
-            background: rgba(10, 12, 16, 0.72);
+            background: var(--panel-strong);
             border: 1px solid var(--line);
-            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
+            box-shadow: var(--shadow);
         }
 
         .card h3 {
@@ -353,9 +361,9 @@
             padding: 16px;
             overflow: auto;
             border-radius: 18px;
-            background: #050608;
+            background: var(--panel);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            color: #e9eef5;
+            color: var(--text);
             line-height: 1.6;
             font-size: 0.9rem;
         }
@@ -425,6 +433,14 @@
                 max-width: 100%;
             }
         }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation: none !important;
+                transition: none !important;
+                scroll-behavior: auto !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -486,14 +502,14 @@
                 </div>
             </div>
 
-            <div class="grid-4" id="metric-grid">
+            <div class="grid-4" id="metric-grid" aria-live="polite">
                 <div class="skeleton"></div>
                 <div class="skeleton"></div>
                 <div class="skeleton"></div>
                 <div class="skeleton"></div>
             </div>
 
-            <div class="grid-3" id="service-grid" style="margin-top: 16px;">
+            <div class="grid-3" id="service-grid" style="margin-top: 16px;" aria-live="polite">
                 <div class="skeleton"></div>
                 <div class="skeleton"></div>
                 <div class="skeleton"></div>
@@ -541,7 +557,7 @@
                 </div>
             </div>
 
-            <div class="grid-3" id="commitment-grid">
+            <div class="grid-3" id="commitment-grid" aria-live="polite">
                 <div class="skeleton"></div>
                 <div class="skeleton"></div>
                 <div class="skeleton"></div>
@@ -595,14 +611,14 @@ console.log(payload.config.version, payload.pages.demo);</code></pre>
                 </div>
             </div>
 
-            <div class="grid-2" id="remote-grid">
+            <div class="grid-2" id="remote-grid" aria-live="polite">
                 <div class="skeleton"></div>
                 <div class="skeleton"></div>
             </div>
         </section>
 
         <div class="footer">
-            Built for Fractal5 Solutions · route <code>/demo</code> · backed by Cloud Run + IAP + Artifact Registry
+            Built for Fractal5 Solutions Inc. · route <code>/demo</code> · backed by Cloud Run + IAP + Artifact Registry
         </div>
     </main>
 
@@ -616,12 +632,33 @@ console.log(payload.config.version, payload.pages.demo);</code></pre>
             return key.replace(/_/g, " ").replace(/\b\w/g, (match) => match.toUpperCase());
         }
 
+        function escapeHtml(value) {
+            return String(value)
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll("\"", "&quot;")
+                .replaceAll("'", "&#39;");
+        }
+
+        function safeUrl(url) {
+            try {
+                const candidate = new URL(url, window.location.origin);
+                if (candidate.protocol === "http:" || candidate.protocol === "https:") {
+                    return candidate.href;
+                }
+            } catch (error) {
+                return "";
+            }
+            return "";
+        }
+
         function createCard(title, body, meta = "") {
             return `
                 <article class="card">
-                    <h3>${title}</h3>
+                    <h3>${escapeHtml(title)}</h3>
                     <div>${body}</div>
-                    ${meta ? `<p class="mini-note">${meta}</p>` : ""}
+                    ${meta ? `<p class="mini-note">${escapeHtml(meta)}</p>` : ""}
                 </article>
             `;
         }
@@ -640,9 +677,9 @@ console.log(payload.config.version, payload.pages.demo);</code></pre>
 
             metricGrid.innerHTML = cards.map((card) => `
                 <article class="card metric">
-                    <span class="label">${card.label}</span>
-                    <span class="value">${card.value}</span>
-                    <span class="sub">${card.sub}</span>
+                    <span class="label">${escapeHtml(card.label)}</span>
+                    <span class="value">${escapeHtml(card.value)}</span>
+                    <span class="sub">${escapeHtml(card.sub)}</span>
                 </article>
             `).join("");
         }
@@ -650,18 +687,19 @@ console.log(payload.config.version, payload.pages.demo);</code></pre>
         function renderServices(services) {
             serviceGrid.innerHTML = services.map((service) => {
                 const probe = service.probe || {};
+                const safeServiceUrl = safeUrl(service.url);
                 const rows = [
-                    ["Role", titleize(service.role || "unknown")],
+                    ["Role", escapeHtml(titleize(service.role || "unknown"))],
                     ["Port", service.port ?? "n/a"],
-                    ["URL", `<a href="${service.url}" target="_blank" rel="noreferrer">${service.url}</a>`],
-                    ["Check", probe.checked_url ? `<code>${probe.checked_url}</code>` : "not probed"]
-                ].map(([label, value]) => `<li><span class="muted">${label}</span><span>${value}</span></li>`).join("");
+                    ["URL", safeServiceUrl ? `<a href="${safeServiceUrl}" target="_blank" rel="noreferrer">${escapeHtml(service.url)}</a>` : escapeHtml(service.url || "n/a")],
+                    ["Check", probe.checked_url ? `<code>${escapeHtml(probe.checked_url)}</code>` : "not probed"]
+                ].map(([label, value]) => `<li><span class="muted">${escapeHtml(label)}</span><span>${value}</span></li>`).join("");
 
                 const healthy = Boolean(probe.healthy);
                 const label = probe.status ? probe.status.replace(/_/g, " ") : "unknown";
 
                 return createCard(
-                    service.name,
+                    service.name || "Unknown service",
                     `<span class="${statusClass(healthy)}">${label}</span><ul class="data-list">${rows}</ul>`,
                     probe.status_code ? `HTTP ${probe.status_code}` : (probe.error || "no probe response")
                 );
@@ -676,17 +714,17 @@ console.log(payload.config.version, payload.pages.demo);</code></pre>
             commitmentGrid.innerHTML = [
                 createCard(
                     "Performance budget",
-                    `<ul class="data-list">${Object.entries(targets).map(([key, value]) => `<li><span class="muted">${titleize(key)}</span><span>${value}</span></li>`).join("")}</ul>`,
+                    `<ul class="data-list">${Object.entries(targets).map(([key, value]) => `<li><span class="muted">${escapeHtml(titleize(key))}</span><span>${escapeHtml(value)}</span></li>`).join("")}</ul>`,
                     "Measured against the repo's checked-in targets"
                 ),
                 createCard(
                     "Accessibility",
-                    `<ul class="data-list">${Object.entries(accessibility).map(([key, value]) => `<li><span class="muted">${titleize(key)}</span><span>${value}</span></li>`).join("")}</ul>`,
+                    `<ul class="data-list">${Object.entries(accessibility).map(([key, value]) => `<li><span class="muted">${escapeHtml(titleize(key))}</span><span>${escapeHtml(value)}</span></li>`).join("")}</ul>`,
                     "The page should work with keyboard and screen readers"
                 ),
                 createCard(
                     "Feature set",
-                    `<ul class="data-list">${Object.entries(features).map(([key, value]) => `<li><span class="muted">${titleize(key)}</span><span>${value ? "enabled" : "disabled"}</span></li>`).join("")}</ul>`,
+                    `<ul class="data-list">${Object.entries(features).map(([key, value]) => `<li><span class="muted">${escapeHtml(titleize(key))}</span><span>${value ? "enabled" : "disabled"}</span></li>`).join("")}</ul>`,
                     "Only features claimed by the config are presented"
                 )
             ].join("");
@@ -696,8 +734,11 @@ console.log(payload.config.version, payload.pages.demo);</code></pre>
             remoteGrid.innerHTML = Object.entries(projects).map(([projectId, payload]) => {
                 const services = (payload.services || []).slice(0, 4).map((service) => `
                     <li>
-                        <span class="muted">${service.name}</span>
-                        <span><a href="${service.url}" target="_blank" rel="noreferrer">open</a></span>
+                        <span class="muted">${escapeHtml(service.name || "service")}</span>
+                        <span>${(() => {
+                            const href = safeUrl(service.url);
+                            return href ? `<a href="${href}" target="_blank" rel="noreferrer">open</a>` : "unavailable";
+                        })()}</span>
                     </li>
                 `).join("");
 
@@ -710,35 +751,23 @@ console.log(payload.config.version, payload.pages.demo);</code></pre>
         }
 
         async function boot() {
-            const [demoResponse, topologyResponse] = await Promise.all([
+            const [demoResponse, statusResponse] = await Promise.all([
                 fetch("/api/demo/experience"),
-                fetch("/api/v1/topology")
+                fetch("/status")
             ]);
 
             const demoPayload = await demoResponse.json();
-            const topologyPayload = await topologyResponse.json();
+            const statusPayload = await statusResponse.json();
             const demo = demoPayload.config || {};
-            const info = {
-                service: topologyPayload?.local_services?.[0]?.name ? "Fractal5 Demo" : "Fractal5 Demo",
-                version: demo.version,
-                region: "us-central1",
-                project_id: "732190342674",
-                release_repo: "dominion-os-demo-build",
-                routes: {
-                    demo: "/demo",
-                    store: "/store",
-                    health: "/health",
-                    healthz: "/healthz",
-                    status: "/status"
-                }
-            };
+            const info = statusPayload || {};
+            const topology = statusPayload?.topology || {};
 
             renderMetrics(info, demo);
-            renderServices(topologyPayload.local_services || []);
+            renderServices(topology.local_services || []);
             renderCommitments(demo);
-            renderRemoteProjects(topologyPayload.remote_projects || {});
+            renderRemoteProjects(topology.remote_projects || {});
 
-            const commandCenter = (topologyPayload.local_services || []).find((service) => service.id === "command-center-bims");
+            const commandCenter = (topology.local_services || []).find((service) => service.id === "command-center-bims");
             if (commandCenter) {
                 document.getElementById("open-command-center").href = commandCenter.url;
             }

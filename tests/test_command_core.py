@@ -34,7 +34,7 @@ def test_demo_and_store_pages_render():
     store_response = client.get("/store")
 
     assert demo_response.status_code == 200
-    assert b"Command-Center Proof" in demo_response.data
+    assert b"Fractal5 Demo | Gated Operator Experience" in demo_response.data
     assert store_response.status_code == 200
     assert b"Dominion OS Store" in store_response.data
 
@@ -86,3 +86,10 @@ def test_health_reports_release_contract():
     assert response.json["overlay"] == "business"
     assert response.json["source_of_truth"]["repo"] == "dominion-command-center"
     assert "release_sha" in response.json
+
+
+def test_brand_assets_are_served():
+    client = build_client()
+    response = client.get("/brand/fractal5-software.tokens.light.css")
+    assert response.status_code == 200
+    assert b"--f5-bg" in response.data

@@ -1,0 +1,17 @@
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark;
+        --f5-bg: #0b0f14;
+        --f5-surface: #10161d;
+        --f5-surface-2: #17202a;
+        --f5-text: #f3f8fc;
+        --f5-muted: #b2c0cb;
+        --f5-line: #2d3c4a;
+        --f5-accent: #78b8ff;
+        --f5-accent-2: #7bd5c8;
+        --f5-good: #7bd5c8;
+        --f5-danger: #ff9b9b;
+        --f5-shadow: 0 18px 48px rgba(0, 0, 0, 0.5);
+        --f5-focus: #78b8ff;
+    }
+}
