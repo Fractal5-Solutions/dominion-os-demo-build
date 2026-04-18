@@ -1,0 +1,5 @@
+# Approved public surfaces for dominion-demo-build.
+# One Cloud Run service name per line.
+phi-oauth-server
+phi-askphi-widget
+dominion-demo-service

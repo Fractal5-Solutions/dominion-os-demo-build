@@ -1,0 +1,74 @@
+name: cloudrun-private-gate
+
+on:
+  push:
+    branches: [ "main" ]
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+    inputs:
+      project_id:
+        description: "GCP project ID (optional; falls back to secrets)"
+        required: false
+        default: ""
+      region:
+        description: "Cloud Run region"
+        required: false
+        default: "us-central1"
+      allow_public_services:
+        description: "Optional comma-separated temporary allowlist"
+        required: false
+        default: ""
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  enforce-private:
+    runs-on: ubuntu-latest
+    env:
+      GCP_PROJECT_ID: ${{ github.event.inputs.project_id || secrets.GCP_DEV_PROJECT_ID || secrets.GCP_PROJECT_ID }}
+      GCP_REGION: ${{ github.event.inputs.region || 'us-central1' }}
+      ALLOW_PUBLIC_SERVICES: ${{ github.event.inputs.allow_public_services || '' }}
+      WIF_PROVIDER: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER || secrets.GCP_WIF_PROVIDER }}
+      WIF_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL || secrets.GCP_WIF_SA_EMAIL }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+
+      - name: Preflight secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          missing=()
+          [[ -n "${GCP_PROJECT_ID}" ]] || missing+=("GCP_DEV_PROJECT_ID/GCP_PROJECT_ID")
+          [[ -n "${WIF_PROVIDER}" ]] || missing+=("GCP_WORKLOAD_IDENTITY_PROVIDER/GCP_WIF_PROVIDER")
+          [[ -n "${WIF_SERVICE_ACCOUNT}" ]] || missing+=("GCP_SERVICE_ACCOUNT_EMAIL/GCP_WIF_SA_EMAIL")
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "Missing required secrets: ${missing[*]}" >&2
+            exit 2
+          fi
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.WIF_SERVICE_ACCOUNT }}
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
+          version: ">= 363.0.0"
+
+      - name: Enforce Cloud Run private invoker policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/check_cloudrun_public_invoker.py \
+            --project "${GCP_PROJECT_ID}" \
+            --region "${GCP_REGION}" \
+            --allowlist-file ".github/cloudrun-public-allowlist.txt" \
+            --allow-public-services "${ALLOW_PUBLIC_SERVICES}"

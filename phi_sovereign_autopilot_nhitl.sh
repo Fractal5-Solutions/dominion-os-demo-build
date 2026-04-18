@@ -296,8 +296,11 @@ monitor_autonomous() {
         # Auto-optimization if needed
         if [ "$total_score" -lt "$OPTIMIZATION_THRESHOLD" ] && [ "$consecutive_failures" -ge 2 ]; then
             log_warning "Score below optimization threshold - initiating auto-recovery..."
-            attempt_service_recovery "system" "$consecutive_failures"
-            run_optimization
+            # Keep NHITL monitor alive even when individual recovery attempts fail.
+            if ! attempt_service_recovery "system" "$consecutive_failures"; then
+                log_warning "Auto-recovery attempt failed; continuing monitor loop."
+            fi
+            run_optimization || log_warning "Optimization step failed; continuing monitor loop."
             consecutive_failures=0
         fi
         
