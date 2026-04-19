@@ -1,5 +1,9 @@
 name: Optimized Docker Build
 
+permissions:
+  contents: read
+
+
 # This is a reusable workflow for cost-effective Docker builds
 on:
   workflow_call:
@@ -31,3 +35,4 @@ jobs:
           cache-from: type=gha  # GitHub Actions cache
           cache-to: type=gha,mode=max
           tags: ${{ inputs.image-name }}:latest
+
