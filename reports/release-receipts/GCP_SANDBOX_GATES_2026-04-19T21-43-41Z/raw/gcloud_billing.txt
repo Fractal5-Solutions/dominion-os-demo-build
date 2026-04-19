@@ -1,0 +1,7 @@
+{
+  "billingAccountName": "billingAccounts/01D4E4-6B2BB9-06A851",
+  "billingEnabled": true,
+  "name": "projects/dominion-marketplace-prod/billingInfo",
+  "projectId": "dominion-marketplace-prod"
+}
+

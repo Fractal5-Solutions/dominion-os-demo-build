@@ -1,0 +1,268 @@
+[
+  {
+    "buildArtifacts": [
+      {
+        "image": "dominion-bootstrap",
+        "tag": "us-central1-docker.pkg.dev/dominion-marketplace-prod/dominion-os/dominion-bootstrap@sha256:a1ca9900c36e6dc3c2bb3ec71683842f328c3c5c4586af51aec68e8936fdec29"
+      }
+    ],
+    "condition": {
+      "dockerVersionSupportedCondition": {
+        "maintenanceModeTime": "2027-03-26T12:00:00Z",
+        "status": true,
+        "supportExpirationTime": "2027-05-25T12:00:00Z",
+        "toolVersionSupportState": "TOOL_VERSION_SUPPORT_STATE_SUPPORTED"
+      },
+      "helmVersionSupportedCondition": {
+        "maintenanceModeTime": "2027-03-12T12:00:00Z",
+        "status": true,
+        "supportExpirationTime": "2027-05-11T12:00:00Z",
+        "toolVersionSupportState": "TOOL_VERSION_SUPPORT_STATE_SUPPORTED"
+      },
+      "kptVersionSupportedCondition": {
+        "maintenanceModeTime": "2027-02-18T12:00:00Z",
+        "status": true,
+        "supportExpirationTime": "2027-04-19T12:00:00Z",
+        "toolVersionSupportState": "TOOL_VERSION_SUPPORT_STATE_SUPPORTED"
+      },
+      "kubectlVersionSupportedCondition": {
+        "maintenanceModeTime": "2027-03-19T12:00:00Z",
+        "status": true,
+        "supportExpirationTime": "2027-05-18T12:00:00Z",
+        "toolVersionSupportState": "TOOL_VERSION_SUPPORT_STATE_SUPPORTED"
+      },
+      "kustomizeVersionSupportedCondition": {
+        "maintenanceModeTime": "2027-02-10T12:00:00Z",
+        "status": true,
+        "supportExpirationTime": "2027-04-11T12:00:00Z",
+        "toolVersionSupportState": "TOOL_VERSION_SUPPORT_STATE_SUPPORTED"
+      },
+      "releaseReadyCondition": {
+        "status": true
+      },
+      "skaffoldSupportedCondition": {
+        "maintenanceModeTime": "2027-03-26T12:00:00Z",
+        "skaffoldSupportState": "SKAFFOLD_SUPPORT_STATE_SUPPORTED",
+        "status": true,
+        "supportExpirationTime": "2027-05-25T12:00:00Z"
+      },
+      "skaffoldVersionSupportedCondition": {
+        "maintenanceModeTime": "2027-03-26T12:00:00Z",
+        "status": true,
+        "supportExpirationTime": "2027-05-25T12:00:00Z",
+        "toolVersionSupportState": "TOOL_VERSION_SUPPORT_STATE_SUPPORTED"
+      }
+    },
+    "createTime": "2026-04-19T15:02:54.309318Z",
+    "deliveryPipelineSnapshot": {
+      "createTime": "2026-04-19T11:38:33.934840Z",
+      "description": "Cloud Run pipeline for Dominion OS (dev -> stage -> prod-marketplace)",
+      "etag": "9852f3aefce5f4be",
+      "name": "projects/44278986722/locations/us-central1/deliveryPipelines/dominion-os-pipeline",
+      "serialPipeline": {
+        "stages": [
+          {
+            "profiles": [
+              "dev"
+            ],
+            "targetId": "dev"
+          },
+          {
+            "profiles": [
+              "stage"
+            ],
+            "targetId": "stage"
+          },
+          {
+            "profiles": [
+              "prod"
+            ],
+            "targetId": "prod-marketplace"
+          }
+        ]
+      },
+      "uid": "21f86b3e46544cf684803eb8ff57b54b",
+      "updateTime": "2026-04-19T11:56:27.147149Z"
+    },
+    "etag": "577e1944cf15a099",
+    "name": "projects/dominion-marketplace-prod/locations/us-central1/deliveryPipelines/dominion-os-pipeline/releases/rel-20260419-075830-prod-marketplace",
+    "renderEndTime": "2026-04-19T15:03:15.343121Z",
+    "renderStartTime": "2026-04-19T15:02:54.998441975Z",
+    "renderState": "SUCCEEDED",
+    "skaffoldConfigPath": "./skaffold.yaml",
+    "skaffoldConfigUri": "gs://21f86b3e46544cf684803eb8ff57b54b_clouddeploy/source/1776610796.735787-cb4bb491d9a44505b4034c893945c5f0.tgz",
+    "skaffoldVersion": "2.18.2",
+    "targetArtifacts": {
+      "dev": {
+        "artifactUri": "gs://us-central1.deploy-artifacts.dominion-marketplace-prod.appspot.com/dominion-os-pipeline-21f86b3e46544cf684803eb8ff57b54b/rel-20260419-075830-prod-marketplace/dev",
+        "manifestPath": "stable/manifest.yaml",
+        "phaseArtifacts": {
+          "stable": {
+            "manifestPath": "stable/manifest.yaml",
+            "skaffoldConfigPath": "stable/skaffold.yaml"
+          }
+        },
+        "skaffoldConfigPath": "stable/skaffold.yaml"
+      },
+      "prod-marketplace": {
+        "artifactUri": "gs://us-central1.deploy-artifacts.dominion-marketplace-prod.appspot.com/dominion-os-pipeline-21f86b3e46544cf684803eb8ff57b54b/rel-20260419-075830-prod-marketplace/prod-marketplace",
+        "manifestPath": "stable/manifest.yaml",
+        "phaseArtifacts": {
+          "stable": {
+            "manifestPath": "stable/manifest.yaml",
+            "skaffoldConfigPath": "stable/skaffold.yaml"
+          }
+        },
+        "skaffoldConfigPath": "stable/skaffold.yaml"
+      },
+      "stage": {
+        "artifactUri": "gs://us-central1.deploy-artifacts.dominion-marketplace-prod.appspot.com/dominion-os-pipeline-21f86b3e46544cf684803eb8ff57b54b/rel-20260419-075830-prod-marketplace/stage",
+        "manifestPath": "stable/manifest.yaml",
+        "phaseArtifacts": {
+          "stable": {
+            "manifestPath": "stable/manifest.yaml",
+            "skaffoldConfigPath": "stable/skaffold.yaml"
+          }
+        },
+        "skaffoldConfigPath": "stable/skaffold.yaml"
+      }
+    },
+    "targetRenders": {
+      "dev": {
+        "metadata": {
+          "cloudRun": {
+            "revision": "projects/44278986722/locations/us-central1/services/dominion-bootstrap/revisions/dominion-bootstrap-mo5wax5e",
+            "service": "projects/44278986722/locations/us-central1/services/dominion-bootstrap"
+          }
+        },
+        "renderingBuild": "projects/44278986722/locations/us-central1/builds/44f38714-7338-455a-bc13-6aadad962054",
+        "renderingState": "SUCCEEDED"
+      },
+      "prod-marketplace": {
+        "metadata": {
+          "cloudRun": {
+            "revision": "projects/44278986722/locations/us-central1/services/dominion-bootstrap/revisions/dominion-bootstrap-mo5wax5e",
+            "service": "projects/44278986722/locations/us-central1/services/dominion-bootstrap"
+          }
+        },
+        "renderingBuild": "projects/44278986722/locations/us-central1/builds/7fb121bd-6a9f-4901-9f5c-24b146e04e51",
+        "renderingState": "SUCCEEDED"
+      },
+      "stage": {
+        "metadata": {
+          "cloudRun": {
+            "revision": "projects/44278986722/locations/us-central1/services/dominion-bootstrap/revisions/dominion-bootstrap-mo5wax5e",
+            "service": "projects/44278986722/locations/us-central1/services/dominion-bootstrap"
+          }
+        },
+        "renderingBuild": "projects/44278986722/locations/us-central1/builds/b686e344-674f-47a0-aa3a-4a9edb478d27",
+        "renderingState": "SUCCEEDED"
+      }
+    },
+    "targetSnapshots": [
+      {
+        "createTime": "2026-04-19T11:42:52.586252Z",
+        "description": "Cloud Run target dev for dominion-marketplace-prod",
+        "etag": "8787010863d83eae",
+        "executionConfigs": [
+          {
+            "artifactStorage": "gs://us-central1.deploy-artifacts.dominion-marketplace-prod.appspot.com",
+            "defaultPool": {
+              "artifactStorage": "gs://us-central1.deploy-artifacts.dominion-marketplace-prod.appspot.com",
+              "serviceAccount": "44278986722-compute@developer.gserviceaccount.com"
+            },
+            "executionTimeout": "3600s",
+            "serviceAccount": "44278986722-compute@developer.gserviceaccount.com",
+            "usages": [
+              "RENDER",
+              "DEPLOY",
+              "VERIFY",
+              "PREDEPLOY",
+              "POSTDEPLOY",
+              "ANALYSIS"
+            ]
+          }
+        ],
+        "name": "projects/44278986722/locations/us-central1/targets/dev",
+        "run": {
+          "location": "projects/44278986722/locations/us-central1"
+        },
+        "targetId": "dev",
+        "uid": "82637681ae1e4b45a0b0828787b3547a",
+        "updateTime": "2026-04-19T12:13:08.166836Z"
+      },
+      {
+        "createTime": "2026-04-19T11:44:20.170396Z",
+        "description": "Cloud Run target stage for dominion-marketplace-prod",
+        "etag": "b99df8f5d2ea6dfe",
+        "executionConfigs": [
+          {
+            "artifactStorage": "gs://us-central1.deploy-artifacts.dominion-marketplace-prod.appspot.com",
+            "defaultPool": {
+              "artifactStorage": "gs://us-central1.deploy-artifacts.dominion-marketplace-prod.appspot.com",
+              "serviceAccount": "44278986722-compute@developer.gserviceaccount.com"
+            },
+            "executionTimeout": "3600s",
+            "serviceAccount": "44278986722-compute@developer.gserviceaccount.com",
+            "usages": [
+              "RENDER",
+              "DEPLOY",
+              "VERIFY",
+              "PREDEPLOY",
+              "POSTDEPLOY",
+              "ANALYSIS"
+            ]
+          }
+        ],
+        "name": "projects/44278986722/locations/us-central1/targets/stage",
+        "run": {
+          "location": "projects/44278986722/locations/us-central1"
+        },
+        "targetId": "stage",
+        "uid": "bd5e80fba96b420a91d7fc2474a7ef8e",
+        "updateTime": "2026-04-19T12:16:11.834564Z"
+      },
+      {
+        "createTime": "2026-04-19T11:45:46.599266Z",
+        "description": "Cloud Run target prod-marketplace for dominion-marketplace-prod",
+        "etag": "da3efe52423362be",
+        "executionConfigs": [
+          {
+            "artifactStorage": "gs://us-central1.deploy-artifacts.dominion-marketplace-prod.appspot.com",
+            "defaultPool": {
+              "artifactStorage": "gs://us-central1.deploy-artifacts.dominion-marketplace-prod.appspot.com",
+              "serviceAccount": "44278986722-compute@developer.gserviceaccount.com"
+            },
+            "executionTimeout": "3600s",
+            "serviceAccount": "44278986722-compute@developer.gserviceaccount.com",
+            "usages": [
+              "RENDER",
+              "DEPLOY",
+              "VERIFY",
+              "PREDEPLOY",
+              "POSTDEPLOY",
+              "ANALYSIS"
+            ]
+          }
+        ],
+        "name": "projects/44278986722/locations/us-central1/targets/prod-marketplace",
+        "run": {
+          "location": "projects/44278986722/locations/us-central1"
+        },
+        "targetId": "prod-marketplace",
+        "uid": "bc6038ad6b0f4591a53b8d34440ded46",
+        "updateTime": "2026-04-19T12:19:16.589371Z"
+      }
+    ],
+    "toolVersions": {
+      "docker": "29.3.1",
+      "helm": "4.1.3",
+      "kpt": "1.0.0-beta.61",
+      "kubectl": "1.35.3",
+      "kustomize": "5.8.1",
+      "skaffold": "2.18.2"
+    },
+    "uid": "2d663072b66248479b9bd805001ec423"
+  }
+]
+
