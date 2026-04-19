@@ -154,7 +154,9 @@ $ingress = ""
 $image = ""
 $runtimeSa = ""
 $minScale = 0
-$maxScale = 0
+$templateMaxScale = 0
+$serviceMaxScale = 0
+$effectiveMaxScale = 0
 $cpuThrottle = ""
 if ($runSvc.ok -and $runObj) {
     foreach ($c in @($runObj.status.conditions)) {
@@ -171,7 +173,12 @@ if ($runSvc.ok -and $runObj) {
     $image = [string]$runObj.spec.template.spec.containers[0].image
     $runtimeSa = [string]$runObj.spec.template.spec.serviceAccountName
     [void][int]::TryParse([string]$runObj.spec.template.metadata.annotations."autoscaling.knative.dev/minScale", [ref]$minScale)
-    [void][int]::TryParse([string]$runObj.spec.template.metadata.annotations."autoscaling.knative.dev/maxScale", [ref]$maxScale)
+    $templateMaxParsed = [int]::TryParse([string]$runObj.spec.template.metadata.annotations."autoscaling.knative.dev/maxScale", [ref]$templateMaxScale)
+    $serviceMaxParsed = [int]::TryParse([string]$runObj.metadata.annotations."run.googleapis.com/maxScale", [ref]$serviceMaxScale)
+    $maxCandidates = New-Object System.Collections.Generic.List[int]
+    if ($templateMaxParsed -and $templateMaxScale -gt 0) { $maxCandidates.Add($templateMaxScale) | Out-Null }
+    if ($serviceMaxParsed -and $serviceMaxScale -gt 0) { $maxCandidates.Add($serviceMaxScale) | Out-Null }
+    if ($maxCandidates.Count -gt 0) { $effectiveMaxScale = ($maxCandidates | Measure-Object -Minimum).Minimum }
     $cpuThrottle = [string]$runObj.spec.template.metadata.annotations."run.googleapis.com/cpu-throttling"
 }
 AddCheck $checks "M07" "Cloud Run service Ready=True" $ready ("ready={0}" -f $ready) @{ latest_ready_revision = $latestRev; raw = $runSvc.raw }
@@ -193,14 +200,16 @@ if (
         }
     }
 }
-AddCheck $checks "M09" "Private exposure posture" ((-not $publicInvoker) -and $ingress -ne "all") ("public_invoker={0} ingress={1}" -f $publicInvoker, $ingress) @{ raw = $iam.raw }
+$privateIngressValues = @("internal", "internal-and-cloud-load-balancing")
+$ingressIsPrivate = $privateIngressValues -contains $ingress
+AddCheck $checks "M09" "Private exposure posture" ((-not $publicInvoker) -and $ingressIsPrivate) ("public_invoker={0} ingress={1} ingress_private={2}" -f $publicInvoker, $ingress, $ingressIsPrivate) @{ raw = $iam.raw }
 
 $saEmail = $runtimeSa
 if ($runtimeSa -and $runtimeSa -notmatch "@") { $saEmail = "$runtimeSa@$MarketplaceProject.iam.gserviceaccount.com" }
 $sa = RunCmd "gcloud_runtime_sa" "gcloud" @("iam", "service-accounts", "describe", $saEmail, "--project=$MarketplaceProject", "--format=json")
 AddCheck $checks "M10" "Runtime service account exists" $sa.ok ("service_account={0}" -f $saEmail) @{ raw = $sa.raw }
 AddCheck $checks "M11" "Image digest pinned" ($image -match "@sha256:[a-f0-9]{64}$") ("digest_pinned={0}" -f ($image -match "@sha256:[a-f0-9]{64}$")) @{ image = $image; raw = $runSvc.raw }
-AddCheck $checks "M12" "Ceiling performance profile active" ($minScale -ge 1 -and $maxScale -ge 100 -and $cpuThrottle -eq "false") ("minScale={0} maxScale={1} cpu_throttling={2}" -f $minScale, $maxScale, $cpuThrottle) @{ raw = $runSvc.raw }
+AddCheck $checks "M12" "Ceiling performance profile active" ($minScale -ge 1 -and $effectiveMaxScale -ge 100 -and $cpuThrottle -eq "false") ("minScale={0} template_maxScale={1} service_maxScale={2} effective_maxScale={3} cpu_throttling={4}" -f $minScale, $templateMaxScale, $serviceMaxScale, $effectiveMaxScale, $cpuThrottle) @{ raw = $runSvc.raw }
 
 # D01..D08
 $repo = RunCmd "gh_repo_demo_build" "gh" @("repo", "view", "Fractal5-Solutions/dominion-os-demo-build", "--json", "nameWithOwner,url,visibility,isPrivate,defaultBranchRef")
@@ -223,12 +232,24 @@ AddCheck $checks "D04" "Public /store responds 200" ($storeCode.text -eq "200") 
 $healthPass = ($healthCodeWww.text -eq "200") -or ($healthCodeCanonical.text -in @("200", "302"))
 AddCheck $checks "D05" "Demo health endpoint is reachable (www=200 or canonical runtime 200/302)" $healthPass ("www_status={0} canonical_status={1}" -f $healthCodeWww.text, $healthCodeCanonical.text) @{ raw_www = $healthCodeWww.raw; raw_canonical = $healthCodeCanonical.raw }
 
-$storeHtml = (Invoke-WebRequest -UseBasicParsing "https://www.fractal5solutions.com/store").Content
-$links = [regex]::Matches($storeHtml, "https?://[^`"'\s<>]+") | ForEach-Object { $_.Value } | Sort-Object -Unique
+$storeFetchRaw = Join-Path $rawDir "store_html_fetch.txt"
+$storeFetchOk = $true
+$storeHtml = ""
+try {
+    $storeHtml = (Invoke-WebRequest -UseBasicParsing -ErrorAction Stop "https://www.fractal5solutions.com/store").Content
+    $storeHtml | Set-Content -Path $storeFetchRaw -Encoding UTF8
+} catch {
+    $storeFetchOk = $false
+    ($_ | Out-String).Trim() | Set-Content -Path $storeFetchRaw -Encoding UTF8
+}
+$links = @()
+if ($storeFetchOk -and -not [string]::IsNullOrWhiteSpace($storeHtml)) {
+    $links = [regex]::Matches($storeHtml, "https?://[^`"'\s<>]+") | ForEach-Object { $_.Value } | Sort-Object -Unique
+}
 $downloadLinks = @($links | Where-Object { $_ -match "github\.com/.*/dominion-os-demo-build|\.zip(\?|$)|download" })
 ($downloadLinks -join "`r`n") | Set-Content -Path (Join-Path $rawDir "store_download_links.txt") -Encoding UTF8
 $downloadSurfacePass = ($downloadLinks.Count -gt 0) -or ($zipCode.text -eq "200")
-AddCheck $checks "D06" "Public demo download surface is reachable" $downloadSurfacePass ("store_links={0} zip_status={1}" -f $downloadLinks.Count, $zipCode.text) @{ links = $downloadLinks; zip_status = $zipCode.text; zip_raw = $zipCode.raw }
+AddCheck $checks "D06" "Public demo download surface is reachable" $downloadSurfacePass ("store_fetch_ok={0} store_links={1} zip_status={2}" -f $storeFetchOk, $downloadLinks.Count, $zipCode.text) @{ links = $downloadLinks; zip_status = $zipCode.text; zip_raw = $zipCode.raw; store_fetch_ok = $storeFetchOk; store_fetch_raw = $storeFetchRaw }
 
 $payload = RunCmd "verify_public_demo_surface" "python" @((Join-Path $repoRoot "scripts\verify_public_demo_surface.py"))
 $payloadObj = TryJson $payload.text
