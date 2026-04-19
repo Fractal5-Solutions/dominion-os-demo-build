@@ -1,0 +1,11 @@
+artifactregistry.googleapis.com
+cloudbuild.googleapis.com
+cloudcommerceprocurement.googleapis.com
+clouddeploy.googleapis.com
+compute.googleapis.com
+iam.googleapis.com
+run.googleapis.com
+secretmanager.googleapis.com
+servicecontrol.googleapis.com
+serviceusage.googleapis.com
+

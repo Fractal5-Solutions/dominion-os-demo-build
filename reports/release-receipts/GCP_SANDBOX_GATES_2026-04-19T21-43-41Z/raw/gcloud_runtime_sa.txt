@@ -1,0 +1,10 @@
+{
+  "displayName": "Dominion Runtime",
+  "email": "dominion-runtime@dominion-marketplace-prod.iam.gserviceaccount.com",
+  "etag": "MDEwMjE5MjA=",
+  "name": "projects/dominion-marketplace-prod/serviceAccounts/dominion-runtime@dominion-marketplace-prod.iam.gserviceaccount.com",
+  "oauth2ClientId": "114263708825038576450",
+  "projectId": "dominion-marketplace-prod",
+  "uniqueId": "114263708825038576450"
+}
+

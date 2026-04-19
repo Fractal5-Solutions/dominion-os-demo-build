@@ -1,0 +1,1548 @@
+[
+  {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Service",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "557.0.0",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/ingress-status": "all",
+        "run.googleapis.com/maxScale": "20",
+        "run.googleapis.com/operation-id": "1d88a3df-28f3-4197-97fa-f9310e4e0f65",
+        "run.googleapis.com/urls": "[\"https://ai-chief-of-staff-994450700597.us-central1.run.app\"]",
+        "serving.knative.dev/creator": "matthewburbidge@fractal5solutions.com",
+        "serving.knative.dev/lastModifier": "matthewburbidge@fractal5solutions.com"
+      },
+      "creationTimestamp": "2026-02-18T21:34:05.531301Z",
+      "generation": 1,
+      "labels": {
+        "cloud.googleapis.com/location": "us-central1"
+      },
+      "name": "ai-chief-of-staff",
+      "namespace": "994450700597",
+      "resourceVersion": "AAZLH/KQ+BU",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/994450700597/services/ai-chief-of-staff",
+      "uid": "5fd5e28e-faf7-4421-90f7-93b27e2ce1d3"
+    },
+    "spec": {
+      "template": {
+        "metadata": {
+          "annotations": {
+            "run.googleapis.com/client-name": "gcloud",
+            "run.googleapis.com/client-version": "557.0.0",
+            "run.googleapis.com/startup-cpu-boost": "true"
+          },
+          "labels": {
+            "client.knative.dev/nonce": "syhsmvpphx",
+            "run.googleapis.com/startupProbeType": "Default"
+          }
+        },
+        "spec": {
+          "containerConcurrency": 80,
+          "containers": [
+            {
+              "image": "us-central1-docker.pkg.dev/f5-demo-sandbox/dominion/ai-chief-of-staff:dev",
+              "ports": [
+                {
+                  "containerPort": 8080,
+                  "name": "http1"
+                }
+              ],
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              },
+              "startupProbe": {
+                "failureThreshold": 1,
+                "periodSeconds": 240,
+                "tcpSocket": {
+                  "port": 8080
+                },
+                "timeoutSeconds": 240
+              }
+            }
+          ],
+          "serviceAccountName": "994450700597-compute@developer.gserviceaccount.com",
+          "timeoutSeconds": 300
+        }
+      },
+      "traffic": [
+        {
+          "latestRevision": true,
+          "percent": 100
+        }
+      ]
+    },
+    "status": {
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-02-18T21:34:05.830328Z",
+          "message": "Image 'us-central1-docker.pkg.dev/f5-demo-sandbox/dominion/ai-chief-of-staff:dev' not found.",
+          "reason": "RevisionFailed",
+          "status": "False",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2026-02-18T21:34:05.778042Z",
+          "message": "Image 'us-central1-docker.pkg.dev/f5-demo-sandbox/dominion/ai-chief-of-staff:dev' not found.",
+          "status": "False",
+          "type": "ConfigurationsReady"
+        },
+        {
+          "lastTransitionTime": "2026-02-18T21:34:05.830328Z",
+          "message": "Image 'us-central1-docker.pkg.dev/f5-demo-sandbox/dominion/ai-chief-of-staff:dev' not found.",
+          "reason": "RevisionFailed",
+          "status": "False",
+          "type": "RoutesReady"
+        }
+      ],
+      "latestCreatedRevisionName": "ai-chief-of-staff-00001-22k",
+      "observedGeneration": 1
+    }
+  },
+  {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Service",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "554.0.0",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/ingress-status": "all",
+        "run.googleapis.com/maxScale": "20",
+        "run.googleapis.com/operation-id": "b059f3f8-b7ad-4fcc-b6e4-3ec06e46d5f0",
+        "run.googleapis.com/urls": "[\"https://dominion-ai-gateway-994450700597.us-central1.run.app\",\"https://dominion-ai-gateway-4izuhhnukq-uc.a.run.app\"]",
+        "serving.knative.dev/creator": "matthewburbidge@fractal5solutions.com",
+        "serving.knative.dev/lastModifier": "matthewburbidge@fractal5solutions.com"
+      },
+      "creationTimestamp": "2026-01-03T23:32:33.054298Z",
+      "generation": 23,
+      "labels": {
+        "cloud.googleapis.com/location": "us-central1"
+      },
+      "name": "dominion-ai-gateway",
+      "namespace": "994450700597",
+      "resourceVersion": "AAZKbSVTOOY",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/994450700597/services/dominion-ai-gateway",
+      "uid": "d77fb17d-47df-4119-821c-19b465b0a011"
+    },
+    "spec": {
+      "template": {
+        "metadata": {
+          "annotations": {
+            "autoscaling.knative.dev/maxScale": "10",
+            "autoscaling.knative.dev/minScale": "1",
+            "run.googleapis.com/client-name": "gcloud",
+            "run.googleapis.com/client-version": "554.0.0",
+            "run.googleapis.com/cpu-throttling": "false",
+            "run.googleapis.com/execution-environment": "gen2",
+            "run.googleapis.com/startup-cpu-boost": "true"
+          },
+          "labels": {
+            "client.knative.dev/nonce": "ngpsbpkxxm",
+            "run.googleapis.com/startupProbeType": "Default"
+          }
+        },
+        "spec": {
+          "containerConcurrency": 10,
+          "containers": [
+            {
+              "env": [
+                {
+                  "name": "DOMINION_GATEWAY_API_KEY",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "DOMINION_GATEWAY_API_KEY"
+                    }
+                  }
+                },
+                {
+                  "name": "DOMINION_SOVEREIGN_MODE",
+                  "value": "true"
+                }
+              ],
+              "image": "us-central1-docker.pkg.dev/f5-demo-sandbox/dominion/gateway:latest",
+              "ports": [
+                {
+                  "containerPort": 8080,
+                  "name": "http1"
+                }
+              ],
+              "resources": {
+                "limits": {
+                  "cpu": "1",
+                  "memory": "1Gi"
+                }
+              },
+              "startupProbe": {
+                "failureThreshold": 1,
+                "periodSeconds": 240,
+                "tcpSocket": {
+                  "port": 8080
+                },
+                "timeoutSeconds": 240
+              }
+            }
+          ],
+          "serviceAccountName": "gateway-sa@f5-demo-sandbox.iam.gserviceaccount.com",
+          "timeoutSeconds": 60
+        }
+      },
+      "traffic": [
+        {
+          "latestRevision": true,
+          "percent": 100
+        }
+      ]
+    },
+    "status": {
+      "address": {
+        "url": "https://dominion-ai-gateway-4izuhhnukq-uc.a.run.app"
+      },
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-02-10T00:14:58.365670Z",
+          "status": "True",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2026-02-10T00:13:18.971030Z",
+          "status": "True",
+          "type": "ConfigurationsReady"
+        },
+        {
+          "lastTransitionTime": "2026-02-10T00:14:58.334074Z",
+          "status": "True",
+          "type": "RoutesReady"
+        }
+      ],
+      "latestCreatedRevisionName": "dominion-ai-gateway-00023-9hq",
+      "latestReadyRevisionName": "dominion-ai-gateway-00023-9hq",
+      "observedGeneration": 23,
+      "traffic": [
+        {
+          "latestRevision": true,
+          "percent": 100,
+          "revisionName": "dominion-ai-gateway-00023-9hq"
+        }
+      ],
+      "url": "https://dominion-ai-gateway-4izuhhnukq-uc.a.run.app"
+    }
+  },
+  {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Service",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "553.0.0",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/ingress-status": "all",
+        "run.googleapis.com/maxScale": "20",
+        "run.googleapis.com/operation-id": "5d8a4a9d-36d2-405f-9376-031155fa3ecb",
+        "run.googleapis.com/urls": "[\"https://dominion-api-994450700597.us-central1.run.app\",\"https://dominion-api-4izuhhnukq-uc.a.run.app\"]",
+        "serving.knative.dev/creator": "matthewburbidge@fractal5solutions.com",
+        "serving.knative.dev/lastModifier": "matthewburbidge@fractal5solutions.com"
+      },
+      "creationTimestamp": "2025-12-20T22:37:56.787406Z",
+      "generation": 10,
+      "labels": {
+        "cloud.googleapis.com/location": "us-central1"
+      },
+      "name": "dominion-api",
+      "namespace": "994450700597",
+      "resourceVersion": "AAZJP9Dqgag",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/994450700597/services/dominion-api",
+      "uid": "b579420c-47bb-4bc4-a28e-9d3aadc0c41c"
+    },
+    "spec": {
+      "template": {
+        "metadata": {
+          "annotations": {
+            "autoscaling.knative.dev/maxScale": "20",
+            "autoscaling.knative.dev/minScale": "1",
+            "run.googleapis.com/client-name": "gcloud",
+            "run.googleapis.com/client-version": "553.0.0",
+            "run.googleapis.com/startup-cpu-boost": "true"
+          },
+          "labels": {
+            "client.knative.dev/nonce": "tdrbzazrmu",
+            "run.googleapis.com/startupProbeType": "Default"
+          }
+        },
+        "spec": {
+          "containerConcurrency": 80,
+          "containers": [
+            {
+              "env": [
+                {
+                  "name": "DOMINION_SECRET_KEY",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "DOMINION_SECRET_KEY"
+                    }
+                  }
+                },
+                {
+                  "name": "DOMINION_APP_KEY",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "DOMINION_APP_KEY"
+                    }
+                  }
+                },
+                {
+                  "name": "DOMINION_GATEWAY_REQUIRE_API_KEY",
+                  "value": "true"
+                },
+                {
+                  "name": "OTEL_EXPORTER_OTLP_ENDPOINT"
+                }
+              ],
+              "image": "us-central1-docker.pkg.dev/f5-demo-sandbox/dominion/gateway:latest",
+              "ports": [
+                {
+                  "containerPort": 8082,
+                  "name": "http1"
+                }
+              ],
+              "resources": {
+                "limits": {
+                  "cpu": "1",
+                  "memory": "1024Mi"
+                }
+              },
+              "startupProbe": {
+                "failureThreshold": 1,
+                "periodSeconds": 240,
+                "tcpSocket": {
+                  "port": 8082
+                },
+                "timeoutSeconds": 240
+              }
+            }
+          ],
+          "serviceAccountName": "994450700597-compute@developer.gserviceaccount.com",
+          "timeoutSeconds": 300
+        }
+      },
+      "traffic": [
+        {
+          "latestRevision": true,
+          "percent": 100
+        }
+      ]
+    },
+    "status": {
+      "address": {
+        "url": "https://dominion-api-4izuhhnukq-uc.a.run.app"
+      },
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-01-26T00:44:57.060776Z",
+          "status": "True",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2026-01-26T00:44:48.305932Z",
+          "status": "True",
+          "type": "ConfigurationsReady"
+        },
+        {
+          "lastTransitionTime": "2026-01-26T00:44:57.023086Z",
+          "status": "True",
+          "type": "RoutesReady"
+        }
+      ],
+      "latestCreatedRevisionName": "dominion-api-00010-t4g",
+      "latestReadyRevisionName": "dominion-api-00010-t4g",
+      "observedGeneration": 10,
+      "traffic": [
+        {
+          "latestRevision": true,
+          "percent": 100,
+          "revisionName": "dominion-api-00010-t4g"
+        }
+      ],
+      "url": "https://dominion-api-4izuhhnukq-uc.a.run.app"
+    }
+  },
+  {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Service",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/build-enable-automatic-updates": "false",
+        "run.googleapis.com/build-id": "07d889f2-12c9-4cd8-a24c-a23ee488c527",
+        "run.googleapis.com/build-name": "projects/994450700597/locations/global/builds/07d889f2-12c9-4cd8-a24c-a23ee488c527",
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "553.0.0",
+        "run.googleapis.com/enable-automatic-updates": "false",
+        "run.googleapis.com/image-uri": "us-central1-docker.pkg.dev/f5-demo-sandbox/cloud-run-source-deploy/dominion-demo",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/ingress-status": "all",
+        "run.googleapis.com/operation-id": "1d97f6ac-90d6-42cd-96a5-a102b48cfa53",
+        "run.googleapis.com/urls": "[\"https://dominion-demo-994450700597.us-central1.run.app\",\"https://dominion-demo-4izuhhnukq-uc.a.run.app\"]",
+        "serving.knative.dev/creator": "matthewburbidge@fractal5solutions.com",
+        "serving.knative.dev/lastModifier": "matthewburbidge@fractal5solutions.com"
+      },
+      "creationTimestamp": "2025-08-26T18:20:01.623239Z",
+      "generation": 41,
+      "labels": {
+        "cloud.googleapis.com/location": "us-central1"
+      },
+      "name": "dominion-demo",
+      "namespace": "994450700597",
+      "resourceVersion": "AAZJFuOvYI4",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/994450700597/services/dominion-demo",
+      "uid": "d9b7f4d5-38aa-49c3-af37-4503b27a5ef1"
+    },
+    "spec": {
+      "template": {
+        "metadata": {
+          "annotations": {
+            "autoscaling.knative.dev/maxScale": "10",
+            "run.googleapis.com/client-name": "gcloud",
+            "run.googleapis.com/client-version": "553.0.0",
+            "run.googleapis.com/cpu-throttling": "false",
+            "run.googleapis.com/execution-environment": "gen2",
+            "run.googleapis.com/startup-cpu-boost": "true"
+          },
+          "labels": {
+            "client.knative.dev/nonce": "eoxqwrttdy",
+            "run.googleapis.com/startupProbeType": "Default"
+          }
+        },
+        "spec": {
+          "containerConcurrency": 40,
+          "containers": [
+            {
+              "env": [
+                {
+                  "name": "DOMINION_SOVEREIGN_MODE",
+                  "value": "MAXIMUM"
+                },
+                {
+                  "name": "DOMINION_AI_ORCHESTRATION",
+                  "value": "ENABLED"
+                },
+                {
+                  "name": "GUNICORN_WORKERS",
+                  "value": "2"
+                },
+                {
+                  "name": "GUNICORN_TIMEOUT",
+                  "value": "60"
+                },
+                {
+                  "name": "DEMO_ENABLE_OTEL",
+                  "value": "false"
+                },
+                {
+                  "name": "DEMO_STATUS_CACHE_TTL",
+                  "value": "2.0"
+                },
+                {
+                  "name": "DEMO_ARTIFACTS_DIR",
+                  "value": "/app/data"
+                },
+                {
+                  "name": "SECRET_KEY",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "2",
+                      "name": "SECRET_KEY"
+                    }
+                  }
+                },
+                {
+                  "name": "DOMINION_SECRET_KEY",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "2",
+                      "name": "DOMINION_SECRET_KEY"
+                    }
+                  }
+                },
+                {
+                  "name": "DOMINION_ENCRYPTION_KEY",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "DOMINION_ENCRYPTION_KEY"
+                    }
+                  }
+                },
+                {
+                  "name": "DOMINION_ENCRYPTION_PASSWORD",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "2",
+                      "name": "DOMINION_ENCRYPTION_PASSWORD"
+                    }
+                  }
+                },
+                {
+                  "name": "DOMINION_ENCRYPTION_SALT",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "2",
+                      "name": "DOMINION_ENCRYPTION_SALT"
+                    }
+                  }
+                }
+              ],
+              "image": "gcr.io/f5-demo-sandbox/dominion-demo@sha256:7ef10fe458dcc44d3e61b60fdb40487d3912bb37307f44c303afcc8240732c29",
+              "ports": [
+                {
+                  "containerPort": 8080,
+                  "name": "http1"
+                }
+              ],
+              "resources": {
+                "limits": {
+                  "cpu": "1",
+                  "memory": "1Gi"
+                }
+              },
+              "startupProbe": {
+                "failureThreshold": 1,
+                "periodSeconds": 240,
+                "tcpSocket": {
+                  "port": 8080
+                },
+                "timeoutSeconds": 240
+              }
+            }
+          ],
+          "serviceAccountName": "dominion-runtime@f5-demo-sandbox.iam.gserviceaccount.com",
+          "timeoutSeconds": 300
+        }
+      },
+      "traffic": [
+        {
+          "latestRevision": true,
+          "percent": 100
+        }
+      ]
+    },
+    "status": {
+      "address": {
+        "url": "https://dominion-demo-4izuhhnukq-uc.a.run.app"
+      },
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-01-23T23:55:18.293646Z",
+          "status": "True",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2026-01-23T23:55:07.985976Z",
+          "status": "True",
+          "type": "ConfigurationsReady"
+        },
+        {
+          "lastTransitionTime": "2026-01-23T23:55:18.235178Z",
+          "status": "True",
+          "type": "RoutesReady"
+        }
+      ],
+      "latestCreatedRevisionName": "dominion-demo-00040-2f8",
+      "latestReadyRevisionName": "dominion-demo-00040-2f8",
+      "observedGeneration": 41,
+      "traffic": [
+        {
+          "latestRevision": true,
+          "percent": 100,
+          "revisionName": "dominion-demo-00040-2f8"
+        }
+      ],
+      "url": "https://dominion-demo-4izuhhnukq-uc.a.run.app"
+    }
+  },
+  {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Service",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "554.0.0",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/ingress-status": "all",
+        "run.googleapis.com/maxScale": "20",
+        "run.googleapis.com/operation-id": "a3a400c2-0eac-4875-8992-5d4dbb0b9d76",
+        "run.googleapis.com/urls": "[\"https://dominion-gateway-994450700597.us-central1.run.app\",\"https://dominion-gateway-4izuhhnukq-uc.a.run.app\"]",
+        "serving.knative.dev/creator": "matthewburbidge@fractal5solutions.com",
+        "serving.knative.dev/lastModifier": "matthewburbidge@fractal5solutions.com"
+      },
+      "creationTimestamp": "2026-02-02T12:46:00.200088Z",
+      "generation": 2,
+      "labels": {
+        "cloud.googleapis.com/location": "us-central1"
+      },
+      "name": "dominion-gateway",
+      "namespace": "994450700597",
+      "resourceVersion": "AAZJ1rqJHC8",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/994450700597/services/dominion-gateway",
+      "uid": "4460a78d-e480-408a-a9c9-6ea285608d6d"
+    },
+    "spec": {
+      "template": {
+        "metadata": {
+          "annotations": {
+            "autoscaling.knative.dev/maxScale": "10",
+            "run.googleapis.com/client-name": "gcloud",
+            "run.googleapis.com/client-version": "554.0.0",
+            "run.googleapis.com/startup-cpu-boost": "true"
+          },
+          "labels": {
+            "client.knative.dev/nonce": "oziqofpqir",
+            "run.googleapis.com/startupProbeType": "Default"
+          }
+        },
+        "spec": {
+          "containerConcurrency": 80,
+          "containers": [
+            {
+              "env": [
+                {
+                  "name": "DOMINION_SOVEREIGN_MODE",
+                  "value": "true"
+                },
+                {
+                  "name": "DOMINION_ENCRYPT_API_KEYS",
+                  "value": "true"
+                },
+                {
+                  "name": "DOMINION_ENCRYPTION_KEY",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dominion-encryption-key"
+                    }
+                  }
+                }
+              ],
+              "image": "us-central1-docker.pkg.dev/f5-demo-sandbox/dominion/gateway:latest",
+              "ports": [
+                {
+                  "containerPort": 8082,
+                  "name": "http1"
+                }
+              ],
+              "resources": {
+                "limits": {
+                  "cpu": "1",
+                  "memory": "1Gi"
+                }
+              },
+              "startupProbe": {
+                "failureThreshold": 1,
+                "periodSeconds": 240,
+                "tcpSocket": {
+                  "port": 8082
+                },
+                "timeoutSeconds": 240
+              }
+            }
+          ],
+          "serviceAccountName": "dominion-sovereign-sa@f5-demo-sandbox.iam.gserviceaccount.com",
+          "timeoutSeconds": 300
+        }
+      },
+      "traffic": [
+        {
+          "latestRevision": true,
+          "percent": 100
+        }
+      ]
+    },
+    "status": {
+      "address": {
+        "url": "https://dominion-gateway-4izuhhnukq-uc.a.run.app"
+      },
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-02-02T12:47:41.640751Z",
+          "status": "True",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2026-02-02T12:47:23.617574Z",
+          "status": "True",
+          "type": "ConfigurationsReady"
+        },
+        {
+          "lastTransitionTime": "2026-02-02T12:47:41.614549Z",
+          "status": "True",
+          "type": "RoutesReady"
+        }
+      ],
+      "latestCreatedRevisionName": "dominion-gateway-00002-ggj",
+      "latestReadyRevisionName": "dominion-gateway-00002-ggj",
+      "observedGeneration": 2,
+      "traffic": [
+        {
+          "latestRevision": true,
+          "percent": 100,
+          "revisionName": "dominion-gateway-00002-ggj"
+        }
+      ],
+      "url": "https://dominion-gateway-4izuhhnukq-uc.a.run.app"
+    }
+  },
+  {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Service",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "553.0.0",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/ingress-status": "all",
+        "run.googleapis.com/operation-id": "026c7f26-75e6-44d5-9769-27e662b509b0",
+        "run.googleapis.com/urls": "[\"https://dominion-harvesting-994450700597.us-central1.run.app\",\"https://dominion-harvesting-4izuhhnukq-uc.a.run.app\"]",
+        "serving.knative.dev/creator": "matthewburbidge@fractal5solutions.com",
+        "serving.knative.dev/lastModifier": "matthewburbidge@fractal5solutions.com"
+      },
+      "creationTimestamp": "2025-10-26T23:33:02.541259Z",
+      "generation": 60,
+      "labels": {
+        "cloud.googleapis.com/location": "us-central1"
+      },
+      "name": "dominion-harvesting",
+      "namespace": "994450700597",
+      "resourceVersion": "AAZJFwBuXrU",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/994450700597/services/dominion-harvesting",
+      "uid": "187031ef-142e-4478-b7ac-ede357747ba4"
+    },
+    "spec": {
+      "template": {
+        "metadata": {
+          "annotations": {
+            "autoscaling.knative.dev/maxScale": "10",
+            "run.googleapis.com/client-name": "gcloud",
+            "run.googleapis.com/client-version": "553.0.0",
+            "run.googleapis.com/cpu-throttling": "false",
+            "run.googleapis.com/execution-environment": "gen2",
+            "run.googleapis.com/startup-cpu-boost": "true"
+          },
+          "labels": {
+            "client.knative.dev/nonce": "hhsfvmyrdw",
+            "run.googleapis.com/startupProbeType": "Default"
+          }
+        },
+        "spec": {
+          "containerConcurrency": 40,
+          "containers": [
+            {
+              "env": [
+                {
+                  "name": "DOMINION_WRITE_DIR",
+                  "value": "/tmp/dominion"
+                },
+                {
+                  "name": "SECRET_KEY",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "2",
+                      "name": "SECRET_KEY"
+                    }
+                  }
+                },
+                {
+                  "name": "DOMINION_SECRET_KEY",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "DOMINION_SECRET_KEY"
+                    }
+                  }
+                },
+                {
+                  "name": "DOMINION_ENCRYPTION_KEY",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "2",
+                      "name": "DOMINION_ENCRYPTION_KEY"
+                    }
+                  }
+                },
+                {
+                  "name": "DOMINION_ENCRYPTION_PASSWORD",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "2",
+                      "name": "DOMINION_ENCRYPTION_PASSWORD"
+                    }
+                  }
+                },
+                {
+                  "name": "DOMINION_ENCRYPTION_SALT",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "2",
+                      "name": "DOMINION_ENCRYPTION_SALT"
+                    }
+                  }
+                },
+                {
+                  "name": "DOMINION_APP_KEY",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "DOMINION_APP_KEY"
+                    }
+                  }
+                }
+              ],
+              "image": "gcr.io/f5-demo-sandbox/dominion-harvesting@sha256:cbbb3fa1d86b2a43c6adf2b696ffb6035fe91397280d3ba2147cb6b51c72899c",
+              "ports": [
+                {
+                  "containerPort": 8080,
+                  "name": "http1"
+                }
+              ],
+              "resources": {
+                "limits": {
+                  "cpu": "1",
+                  "memory": "1Gi"
+                }
+              },
+              "startupProbe": {
+                "failureThreshold": 1,
+                "periodSeconds": 240,
+                "tcpSocket": {
+                  "port": 8080
+                },
+                "timeoutSeconds": 240
+              }
+            }
+          ],
+          "serviceAccountName": "dominion-runtime@f5-demo-sandbox.iam.gserviceaccount.com",
+          "timeoutSeconds": 300
+        }
+      },
+      "traffic": [
+        {
+          "percent": 100,
+          "revisionName": "dominion-harvesting-00020-c7n"
+        }
+      ]
+    },
+    "status": {
+      "address": {
+        "url": "https://dominion-harvesting-4izuhhnukq-uc.a.run.app"
+      },
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-01-24T00:03:20.504319Z",
+          "status": "True",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2026-01-24T00:03:20.533026Z",
+          "reason": "Retired",
+          "status": "True",
+          "type": "ConfigurationsReady"
+        },
+        {
+          "lastTransitionTime": "2025-12-19T17:12:38.125386Z",
+          "status": "True",
+          "type": "RoutesReady"
+        }
+      ],
+      "latestCreatedRevisionName": "dominion-harvesting-00035-wx8",
+      "latestReadyRevisionName": "dominion-harvesting-00020-c7n",
+      "observedGeneration": 60,
+      "traffic": [
+        {
+          "percent": 100,
+          "revisionName": "dominion-harvesting-00020-c7n"
+        }
+      ],
+      "url": "https://dominion-harvesting-4izuhhnukq-uc.a.run.app"
+    }
+  },
+  {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Service",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "549.0.1",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/ingress-status": "all",
+        "run.googleapis.com/maxScale": "20",
+        "run.googleapis.com/operation-id": "505ee800-da88-4f57-9935-993d50fd5f45",
+        "run.googleapis.com/urls": "[\"https://dominion-os-994450700597.us-central1.run.app\",\"https://dominion-os-4izuhhnukq-uc.a.run.app\"]",
+        "serving.knative.dev/creator": "matthewburbidge@fractal5solutions.com",
+        "serving.knative.dev/lastModifier": "matthewburbidge@fractal5solutions.com"
+      },
+      "creationTimestamp": "2025-12-20T22:37:12.478837Z",
+      "generation": 9,
+      "labels": {
+        "cloud.googleapis.com/location": "us-central1"
+      },
+      "name": "dominion-os",
+      "namespace": "994450700597",
+      "resourceVersion": "AAZGaz7Ml6w",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/994450700597/services/dominion-os",
+      "uid": "67e5f9af-2781-4562-b9e2-b6dfdff4e2cc"
+    },
+    "spec": {
+      "template": {
+        "metadata": {
+          "annotations": {
+            "autoscaling.knative.dev/maxScale": "20",
+            "autoscaling.knative.dev/minScale": "1",
+            "run.googleapis.com/client-name": "gcloud",
+            "run.googleapis.com/client-version": "549.0.1",
+            "run.googleapis.com/startup-cpu-boost": "true"
+          },
+          "labels": {
+            "client.knative.dev/nonce": "tgkjtwpzif",
+            "run.googleapis.com/startupProbeType": "Default"
+          }
+        },
+        "spec": {
+          "containerConcurrency": 80,
+          "containers": [
+            {
+              "env": [
+                {
+                  "name": "DOMINION_SECRET_KEY",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "DOMINION_SECRET_KEY"
+                    }
+                  }
+                },
+                {
+                  "name": "DOMINION_ENCRYPTION_KEY",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "DOMINION_ENCRYPTION_KEY"
+                    }
+                  }
+                },
+                {
+                  "name": "SECRET_KEY",
+                  "value": "${SECRET_KEY}"
+                },
+                {
+                  "name": "DOMINION_APP_KEY",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "DOMINION_APP_KEY"
+                    }
+                  }
+                }
+              ],
+              "image": "us-central1-docker.pkg.dev/f5-demo-sandbox/dominion/dominion-os-1-0:latest",
+              "ports": [
+                {
+                  "containerPort": 8080,
+                  "name": "http1"
+                }
+              ],
+              "resources": {
+                "limits": {
+                  "cpu": "1",
+                  "memory": "512Mi"
+                }
+              },
+              "startupProbe": {
+                "failureThreshold": 1,
+                "periodSeconds": 240,
+                "tcpSocket": {
+                  "port": 8080
+                },
+                "timeoutSeconds": 240
+              }
+            }
+          ],
+          "serviceAccountName": "994450700597-compute@developer.gserviceaccount.com",
+          "timeoutSeconds": 300
+        }
+      },
+      "traffic": [
+        {
+          "latestRevision": true,
+          "percent": 100
+        }
+      ]
+    },
+    "status": {
+      "address": {
+        "url": "https://dominion-os-4izuhhnukq-uc.a.run.app"
+      },
+      "conditions": [
+        {
+          "lastTransitionTime": "2025-12-21T00:18:09.304492Z",
+          "status": "True",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2025-12-21T00:17:56.564148Z",
+          "status": "True",
+          "type": "ConfigurationsReady"
+        },
+        {
+          "lastTransitionTime": "2025-12-21T00:18:09.266808Z",
+          "status": "True",
+          "type": "RoutesReady"
+        }
+      ],
+      "latestCreatedRevisionName": "dominion-os-00009-wjd",
+      "latestReadyRevisionName": "dominion-os-00009-wjd",
+      "observedGeneration": 9,
+      "traffic": [
+        {
+          "latestRevision": true,
+          "percent": 100,
+          "revisionName": "dominion-os-00009-wjd"
+        }
+      ],
+      "url": "https://dominion-os-4izuhhnukq-uc.a.run.app"
+    }
+  },
+  {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Service",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "554.0.0",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/ingress-status": "all",
+        "run.googleapis.com/operation-id": "6d821ce7-2d4b-455e-a359-de64265f5778",
+        "run.googleapis.com/urls": "[\"https://dominion-os-1-0-994450700597.us-central1.run.app\",\"https://dominion-os-1-0-4izuhhnukq-uc.a.run.app\"]",
+        "serving.knative.dev/creator": "matthewburbidge@fractal5solutions.com",
+        "serving.knative.dev/lastModifier": "matthewburbidge@fractal5solutions.com"
+      },
+      "creationTimestamp": "2025-08-27T00:23:22.426104Z",
+      "generation": 20,
+      "labels": {
+        "cloud.googleapis.com/location": "us-central1"
+      },
+      "name": "dominion-os-1-0",
+      "namespace": "994450700597",
+      "resourceVersion": "AAZKZujK7+U",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/994450700597/services/dominion-os-1-0",
+      "uid": "e6dd8ff0-3513-48c7-95b3-c7978c92db3e"
+    },
+    "spec": {
+      "template": {
+        "metadata": {
+          "annotations": {
+            "autoscaling.knative.dev/maxScale": "10",
+            "run.googleapis.com/client-name": "gcloud",
+            "run.googleapis.com/client-version": "554.0.0",
+            "run.googleapis.com/cpu-throttling": "false",
+            "run.googleapis.com/execution-environment": "gen2",
+            "run.googleapis.com/startup-cpu-boost": "true"
+          },
+          "labels": {
+            "client.knative.dev/nonce": "fqajbpgasj",
+            "run.googleapis.com/startupProbeType": "Default"
+          }
+        },
+        "spec": {
+          "containerConcurrency": 40,
+          "containers": [
+            {
+              "env": [
+                {
+                  "name": "AI_GATEWAY_PROVIDER",
+                  "value": "grok"
+                },
+                {
+                  "name": "AI_GATEWAY_MODEL",
+                  "value": "grok-3"
+                },
+                {
+                  "name": "GROK_API_KEY",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "grok-api-key"
+                    }
+                  }
+                }
+              ],
+              "image": "gcr.io/f5-demo-sandbox/dominion-os-1-0@sha256:6f8a5edbd83c4b6ac863305edd6922c5f29687e93ed93d1a2a88a9701da78e70",
+              "ports": [
+                {
+                  "containerPort": 8080,
+                  "name": "http1"
+                }
+              ],
+              "resources": {
+                "limits": {
+                  "cpu": "1",
+                  "memory": "1Gi"
+                }
+              },
+              "startupProbe": {
+                "failureThreshold": 1,
+                "periodSeconds": 240,
+                "tcpSocket": {
+                  "port": 8080
+                },
+                "timeoutSeconds": 240
+              }
+            }
+          ],
+          "serviceAccountName": "dominion-runtime@f5-demo-sandbox.iam.gserviceaccount.com",
+          "timeoutSeconds": 300
+        }
+      },
+      "traffic": [
+        {
+          "latestRevision": true,
+          "percent": 100
+        }
+      ]
+    },
+    "status": {
+      "address": {
+        "url": "https://dominion-os-1-0-4izuhhnukq-uc.a.run.app"
+      },
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-02-09T16:48:32.997349Z",
+          "status": "True",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2026-02-09T16:48:31.002127Z",
+          "status": "True",
+          "type": "ConfigurationsReady"
+        },
+        {
+          "lastTransitionTime": "2026-02-09T16:48:32.963317Z",
+          "status": "True",
+          "type": "RoutesReady"
+        }
+      ],
+      "latestCreatedRevisionName": "dominion-os-1-0-00020-8dn",
+      "latestReadyRevisionName": "dominion-os-1-0-00020-8dn",
+      "observedGeneration": 20,
+      "traffic": [
+        {
+          "latestRevision": true,
+          "percent": 100,
+          "revisionName": "dominion-os-1-0-00020-8dn"
+        }
+      ],
+      "url": "https://dominion-os-1-0-4izuhhnukq-uc.a.run.app"
+    }
+  },
+  {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Service",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "554.0.0",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/ingress-status": "all",
+        "run.googleapis.com/maxScale": "20",
+        "run.googleapis.com/operation-id": "d9f889eb-86e8-4d4e-bb96-16b954771455",
+        "run.googleapis.com/urls": "[\"https://dominion-phi-ui-994450700597.us-central1.run.app\",\"https://dominion-phi-ui-4izuhhnukq-uc.a.run.app\"]",
+        "serving.knative.dev/creator": "matthewburbidge@fractal5solutions.com",
+        "serving.knative.dev/lastModifier": "matthewburbidge@fractal5solutions.com"
+      },
+      "creationTimestamp": "2026-01-03T23:42:06.259344Z",
+      "generation": 22,
+      "labels": {
+        "cloud.googleapis.com/location": "us-central1"
+      },
+      "name": "dominion-phi-ui",
+      "namespace": "994450700597",
+      "resourceVersion": "AAZKbLtreME",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/994450700597/services/dominion-phi-ui",
+      "uid": "c9259444-d946-461b-b981-36e6e9638778"
+    },
+    "spec": {
+      "template": {
+        "metadata": {
+          "annotations": {
+            "autoscaling.knative.dev/maxScale": "10",
+            "autoscaling.knative.dev/minScale": "1",
+            "run.googleapis.com/client-name": "gcloud",
+            "run.googleapis.com/client-version": "554.0.0",
+            "run.googleapis.com/cpu-throttling": "false",
+            "run.googleapis.com/execution-environment": "gen2",
+            "run.googleapis.com/startup-cpu-boost": "true"
+          },
+          "labels": {
+            "client.knative.dev/nonce": "wtvaukluew",
+            "run.googleapis.com/startupProbeType": "Default"
+          }
+        },
+        "spec": {
+          "containerConcurrency": 10,
+          "containers": [
+            {
+              "env": [
+                {
+                  "name": "DOMINION_ENCRYPTION_KEY",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dominion-encryption-key"
+                    }
+                  }
+                },
+                {
+                  "name": "GROK_API_KEY",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dominion-grok-key"
+                    }
+                  }
+                },
+                {
+                  "name": "AI_GATEWAY_URL",
+                  "value": "https://dominion-ai-gateway-4izuhhnukq-uc.a.run.app"
+                },
+                {
+                  "name": "ENV",
+                  "value": "production"
+                }
+              ],
+              "image": "us-central1-docker.pkg.dev/f5-demo-sandbox/dominion/phi-ui@sha256:c77698c090312e914e81a3c6b9658294877e029f3a51fc451d47b1ca2fb94001",
+              "ports": [
+                {
+                  "containerPort": 8080,
+                  "name": "http1"
+                }
+              ],
+              "resources": {
+                "limits": {
+                  "cpu": "1",
+                  "memory": "1Gi"
+                }
+              },
+              "startupProbe": {
+                "failureThreshold": 1,
+                "periodSeconds": 240,
+                "tcpSocket": {
+                  "port": 8080
+                },
+                "timeoutSeconds": 240
+              }
+            }
+          ],
+          "serviceAccountName": "phi-ui-sa@f5-demo-sandbox.iam.gserviceaccount.com",
+          "timeoutSeconds": 60
+        }
+      },
+      "traffic": [
+        {
+          "latestRevision": true,
+          "percent": 100
+        }
+      ]
+    },
+    "status": {
+      "address": {
+        "url": "https://dominion-phi-ui-4izuhhnukq-uc.a.run.app"
+      },
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-02-09T23:45:21.569985Z",
+          "status": "True",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2026-02-09T23:45:15.476798Z",
+          "status": "True",
+          "type": "ConfigurationsReady"
+        },
+        {
+          "lastTransitionTime": "2026-02-09T23:45:21.539051Z",
+          "status": "True",
+          "type": "RoutesReady"
+        }
+      ],
+      "latestCreatedRevisionName": "dominion-phi-ui-00021-8mb",
+      "latestReadyRevisionName": "dominion-phi-ui-00021-8mb",
+      "observedGeneration": 22,
+      "traffic": [
+        {
+          "latestRevision": true,
+          "percent": 100,
+          "revisionName": "dominion-phi-ui-00021-8mb"
+        }
+      ],
+      "url": "https://dominion-phi-ui-4izuhhnukq-uc.a.run.app"
+    }
+  },
+  {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Service",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "553.0.0",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/ingress-status": "all",
+        "run.googleapis.com/maxScale": "20",
+        "run.googleapis.com/operation-id": "1e9bc825-7883-4769-8cb9-b6cfc5682d25",
+        "run.googleapis.com/urls": "[\"https://dominion-ui-994450700597.us-central1.run.app\",\"https://dominion-ui-4izuhhnukq-uc.a.run.app\"]",
+        "serving.knative.dev/creator": "matthewburbidge@fractal5solutions.com",
+        "serving.knative.dev/lastModifier": "matthewburbidge@fractal5solutions.com"
+      },
+      "creationTimestamp": "2026-01-26T00:45:08.905563Z",
+      "generation": 2,
+      "labels": {
+        "cloud.googleapis.com/location": "us-central1"
+      },
+      "name": "dominion-ui",
+      "namespace": "994450700597",
+      "resourceVersion": "AAZJQA5nMso",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/994450700597/services/dominion-ui",
+      "uid": "e57d7a2c-58df-4329-b596-7543fe7b187c"
+    },
+    "spec": {
+      "template": {
+        "metadata": {
+          "annotations": {
+            "autoscaling.knative.dev/maxScale": "20",
+            "run.googleapis.com/client-name": "gcloud",
+            "run.googleapis.com/client-version": "553.0.0",
+            "run.googleapis.com/startup-cpu-boost": "true"
+          },
+          "labels": {
+            "client.knative.dev/nonce": "qllkxyqsns",
+            "run.googleapis.com/startupProbeType": "Default"
+          }
+        },
+        "spec": {
+          "containerConcurrency": 80,
+          "containers": [
+            {
+              "env": [
+                {
+                  "name": "AI_GATEWAY_URL",
+                  "value": "https://dominion-api-4izuhhnukq-uc.a.run.app"
+                }
+              ],
+              "image": "us-central1-docker.pkg.dev/f5-demo-sandbox/dominion/phi-ui:latest",
+              "ports": [
+                {
+                  "containerPort": 8080,
+                  "name": "http1"
+                }
+              ],
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              },
+              "startupProbe": {
+                "failureThreshold": 1,
+                "periodSeconds": 240,
+                "tcpSocket": {
+                  "port": 8080
+                },
+                "timeoutSeconds": 240
+              }
+            }
+          ],
+          "serviceAccountName": "994450700597-compute@developer.gserviceaccount.com",
+          "timeoutSeconds": 300
+        }
+      },
+      "traffic": [
+        {
+          "latestRevision": true,
+          "percent": 100
+        }
+      ]
+    },
+    "status": {
+      "address": {
+        "url": "https://dominion-ui-4izuhhnukq-uc.a.run.app"
+      },
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-01-26T01:02:08.642762Z",
+          "status": "True",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2026-01-26T01:00:08.861512Z",
+          "status": "True",
+          "type": "ConfigurationsReady"
+        },
+        {
+          "lastTransitionTime": "2026-01-26T01:02:08.599449Z",
+          "status": "True",
+          "type": "RoutesReady"
+        }
+      ],
+      "latestCreatedRevisionName": "dominion-ui-00002-np7",
+      "latestReadyRevisionName": "dominion-ui-00002-np7",
+      "observedGeneration": 2,
+      "traffic": [
+        {
+          "latestRevision": true,
+          "percent": 100,
+          "revisionName": "dominion-ui-00002-np7"
+        }
+      ],
+      "url": "https://dominion-ui-4izuhhnukq-uc.a.run.app"
+    }
+  },
+  {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Service",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "561.0.0",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/ingress-status": "all",
+        "run.googleapis.com/maxScale": "20",
+        "run.googleapis.com/operation-id": "d31772d3-80e7-4d47-b5f3-7711f0b69bf9",
+        "run.googleapis.com/urls": "[\"https://situation-sidecar-994450700597.us-central1.run.app\",\"https://situation-sidecar-4izuhhnukq-uc.a.run.app\"]",
+        "serving.knative.dev/creator": "matthewburbidge@fractal5solutions.com",
+        "serving.knative.dev/lastModifier": "matthewburbidge@fractal5solutions.com"
+      },
+      "creationTimestamp": "2026-03-19T13:14:41.041416Z",
+      "generation": 4,
+      "labels": {
+        "cloud.googleapis.com/location": "us-central1"
+      },
+      "name": "situation-sidecar",
+      "namespace": "994450700597",
+      "resourceVersion": "AAZNYHIyL/U",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/994450700597/services/situation-sidecar",
+      "uid": "39866fd1-d72d-4ab1-a2c9-c8b92443afa7"
+    },
+    "spec": {
+      "template": {
+        "metadata": {
+          "annotations": {
+            "autoscaling.knative.dev/maxScale": "20",
+            "autoscaling.knative.dev/minScale": "0",
+            "run.googleapis.com/client-name": "gcloud",
+            "run.googleapis.com/client-version": "561.0.0",
+            "run.googleapis.com/sessionAffinity": "false"
+          },
+          "labels": {
+            "client.knative.dev/nonce": "fabctlhyag",
+            "run.googleapis.com/startupProbeType": "Default"
+          }
+        },
+        "spec": {
+          "containerConcurrency": 80,
+          "containers": [
+            {
+              "env": [
+                {
+                  "name": "ENV",
+                  "value": "staging"
+                },
+                {
+                  "name": "SIDECAR_ISS",
+                  "value": "dominion-operator"
+                },
+                {
+                  "name": "SIDECAR_AUD",
+                  "value": "sidecar"
+                },
+                {
+                  "name": "SIDECAR_PUBKEY",
+                  "value": "-----BEGIN PUBLIC KEY-----\\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtL+18ar4ERQ5KA7tuTcI\\nxPrve09F2+wcGURHlIzxXOg6s/zOWWbwSaCfMJPNW8uIR8+TpC65jCzgOOXycNeZ\\nd5eJj/+20W6lvMcZUb5diZDjHeFRYqaJVavBPyacOevGjYcD+HBmvFWG1Xi9ox6w\\nrU7QBQAXpKKKQ8Ub/uxHaTql/rZA1ox8WiBrP8i4XOy/AdZFuC++XIPWvOW9+6Id\\nWR7sArAkZsR3hsJAWYTXlLTvvdUEfSGN1/5Pv+dGk83XyLJsb2t5qB53COPmKodY\\nbfGayfxiBdxgWjuVdybKI67D47ZSSC22xVyTzfccHgmzVitlNozSVYwxwbOcxJ9i\\nnwIDAQAB\\n-----END PUBLIC KEY-----\\n"
+                },
+                {
+                  "name": "SIDECAR_KILL_SWITCH_PATH",
+                  "value": "/app/scripts/kill_switch.sh"
+                }
+              ],
+              "image": "us-central1-docker.pkg.dev/f5-demo-sandbox/dominion-images/situation-sidecar:staging",
+              "ports": [
+                {
+                  "containerPort": 8080,
+                  "name": "http1"
+                }
+              ],
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "256Mi"
+                }
+              },
+              "startupProbe": {
+                "failureThreshold": 1,
+                "periodSeconds": 240,
+                "tcpSocket": {
+                  "port": 8080
+                },
+                "timeoutSeconds": 240
+              }
+            }
+          ],
+          "serviceAccountName": "verifier-ci-sa@f5-demo-sandbox.iam.gserviceaccount.com",
+          "timeoutSeconds": 300
+        }
+      },
+      "traffic": [
+        {
+          "latestRevision": true,
+          "percent": 100
+        }
+      ]
+    },
+    "status": {
+      "address": {
+        "url": "https://situation-sidecar-4izuhhnukq-uc.a.run.app"
+      },
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-03-19T13:21:28.354805Z",
+          "status": "True",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2026-03-19T13:21:21.383944Z",
+          "status": "True",
+          "type": "ConfigurationsReady"
+        },
+        {
+          "lastTransitionTime": "2026-03-19T13:21:28.327747Z",
+          "status": "True",
+          "type": "RoutesReady"
+        }
+      ],
+      "latestCreatedRevisionName": "situation-sidecar-00003-dmv",
+      "latestReadyRevisionName": "situation-sidecar-00003-dmv",
+      "observedGeneration": 4,
+      "traffic": [
+        {
+          "latestRevision": true,
+          "percent": 100,
+          "revisionName": "situation-sidecar-00003-dmv"
+        }
+      ],
+      "url": "https://situation-sidecar-4izuhhnukq-uc.a.run.app"
+    }
+  }
+]
+
