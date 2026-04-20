@@ -112,7 +112,7 @@ def github_callback():
     # Check for errors
     if error:
         logger.error("OAuth error: %s", sanitize_log_value(error))
-        return redirect(f"/?error={quote(safe_error_token(error))}")
+        return redirect("/?error=oauth_error")
 
     # Verify state
     expected_state = session.get("state")

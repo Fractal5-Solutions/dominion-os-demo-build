@@ -222,7 +222,7 @@ def github_auth():
 def github_callback():
     error = request.args.get("error")
     if error:
-        return redirect(f"/?error={quote(safe_error_token(error))}")
+        return redirect("/?error=oauth_error")
 
     if not verify_state(session.get("state"), request.args.get("state")):
         return redirect("/?error=invalid_state")
