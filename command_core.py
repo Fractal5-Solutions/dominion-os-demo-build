@@ -297,7 +297,9 @@ def is_safe_slug(value: str) -> bool:
         return False
     if "/" in value or "\\" in value:
         return False
-    return re.fullmatch(r"[A-Za-z0-9_-]+", value) is not None
+    if value.startswith(".") or value.endswith(".") or ".." in value:
+        return False
+    return re.fullmatch(r"[A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+)*", value) is not None
 
 
 def url_port(url: str) -> int | None:
