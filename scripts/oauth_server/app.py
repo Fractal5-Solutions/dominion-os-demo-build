@@ -97,8 +97,8 @@ if os.getenv("ENV", "development") == "production":
 @app.before_request
 def enforce_https():
     if not request.is_secure and os.getenv("ENV", "development") == "production":
-        relative_target = request.full_path if request.query_string else request.path
-        return redirect(relative_target, code=307)
+        logger.warning("Blocked insecure request path=%s", sanitize_log_value(request.path))
+        return jsonify({"error": "https_required"}), 403
 
 
 # Add logging to authentication events
