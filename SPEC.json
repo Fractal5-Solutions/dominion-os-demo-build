@@ -1,0 +1,57 @@
+{
+  "specVersion": "1.0.0",
+  "generatedFrom": "manual-contract",
+  "services": [
+    {
+      "name": "command-core",
+      "entrypoint": "command_core.py",
+      "basePath": "/",
+      "healthEndpoints": ["/health", "/healthz", "/ready", "/_ah/health"],
+      "apiEndpoints": [
+        { "method": "GET", "path": "/status" },
+        { "method": "GET", "path": "/api/products" },
+        { "method": "GET", "path": "/api/v1/products" },
+        { "method": "GET", "path": "/api/products/{slug}" },
+        { "method": "GET", "path": "/api/demo/experience" },
+        { "method": "GET", "path": "/api/v1/demo/experience" },
+        { "method": "GET", "path": "/api/v1/topology" }
+      ]
+    },
+    {
+      "name": "widget-service",
+      "entrypoint": "widget_service/app.py",
+      "basePath": "/",
+      "healthEndpoints": ["/health", "/ready"],
+      "apiEndpoints": [
+        { "method": "GET", "path": "/api/bootstrap" },
+        { "method": "POST", "path": "/api/chat" }
+      ]
+    },
+    {
+      "name": "oauth-server",
+      "entrypoint": "oauth_server/app.py",
+      "basePath": "/",
+      "healthEndpoints": ["/health", "/ready"],
+      "apiEndpoints": [
+        { "method": "GET", "path": "/auth/github" },
+        { "method": "GET", "path": "/auth/callback" },
+        { "method": "POST", "path": "/api/chat" }
+      ]
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "product",
+      "source": "products/*/spec.json",
+      "requiredFields": ["slug", "name"]
+    },
+    {
+      "name": "health",
+      "requiredFields": ["status", "service", "release"]
+    },
+    {
+      "name": "topology",
+      "requiredFields": ["version", "services", "generated_at"]
+    }
+  ]
+}
