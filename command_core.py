@@ -574,14 +574,17 @@ def product_detail(slug: str):
     # Accept repo slugs like dominion-os-1.0-gcloud while blocking traversal.
     if not is_safe_slug(slug):
         abort(400)
-    products_root = (BASE_DIR / "products").resolve()
-    product_file = (products_root / slug / "product.json").resolve()
-    try:
-        product_file.relative_to(products_root)
-    except ValueError:
+    products_root = os.path.abspath(os.path.join(BASE_DIR, "products"))
+    product_file = os.path.abspath(
+        os.path.normpath(os.path.join(products_root, slug, "product.json"))
+    )
+    if not product_file.startswith(products_root + os.sep):
         abort(400)
-    payload = read_json_file(product_file, None)
-    if payload is None:
+    try:
+        payload = json.loads(Path(product_file).read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        abort(404)
+    except json.JSONDecodeError:
         abort(404)
     payload["slug"] = slug
     payload["spec_path"] = f"/api/products/{slug}"
