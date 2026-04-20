@@ -16,7 +16,6 @@ import requests
 from flask import Flask, abort, jsonify, render_template_string, request, send_from_directory
 
 BASE_DIR = Path(__file__).resolve().parent
-BASE_DIR_RESOLVED = BASE_DIR.resolve()
 
 logger = logging.getLogger("dominion-command-core")
 
@@ -286,24 +285,21 @@ def parse_probe_flags() -> tuple[bool, bool, list[str]]:
 
 def read_json_file(path: Path, default):
     try:
-        candidate = path.resolve()
-        candidate.relative_to(BASE_DIR_RESOLVED)
-        return json.loads(candidate.read_text(encoding="utf-8"))
+        return json.loads(path.read_text(encoding="utf-8"))
     except FileNotFoundError:
         return default
     except json.JSONDecodeError:
-        return default
-    except ValueError:
-        logger.warning("Blocked unsafe JSON path outside base directory")
         return default
 
 
 def is_safe_slug(value: str) -> bool:
     if not value:
         return False
-    if value.startswith(".") or ".." in value or "/" in value or "\\" in value:
+    if "/" in value or "\\" in value:
         return False
-    return re.fullmatch(r"[A-Za-z0-9._-]+", value) is not None
+    if value.startswith(".") or value.endswith(".") or ".." in value:
+        return False
+    return re.fullmatch(r"[A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+)*", value) is not None
 
 
 def url_port(url: str) -> int | None:
@@ -578,13 +574,10 @@ def product_detail(slug: str):
     # Accept repo slugs like dominion-os-1.0-gcloud while blocking traversal.
     if not is_safe_slug(slug):
         abort(400)
-    product_file = BASE_DIR / "products" / slug / "product.json"
-    payload = read_json_file(product_file, None)
-    if payload is None:
-        abort(404)
-    payload["slug"] = slug
-    payload["spec_path"] = f"/api/products/{slug}"
-    return jsonify(payload)
+    for product in load_products():
+        if product.get("slug") == slug:
+            return jsonify(product)
+    abort(404)
 
 
 @app.route("/api/demo/experience")
