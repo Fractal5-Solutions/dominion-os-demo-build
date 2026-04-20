@@ -1,33 +1,49 @@
 # Dominion OS Demo Build
 
-Public-facing demo service repository for Dominion OS.
+![Demo](https://img.shields.io/badge/Demo-Ready-brightgreen)
+[![Dominion OS](https://img.shields.io/badge/Depends%20on-dominion--os--1.0-blue)](https://github.com/Fractal5-Solutions/dominion-os-1.0)
+![Cloud Run](https://img.shields.io/badge/Deployed-Google%20Cloud%20Run-4285F4?logo=googlecloud&logoColor=white)
+![License](https://img.shields.io/badge/license-Commercial-blue)
 
-## Purpose
+This repo demonstrates consuming the sibling [`dominion-os-1.0`](https://github.com/Fractal5-Solutions/dominion-os-1.0) toy kernel to:
 
-- Hosts demo UX and supporting demo APIs.
-- Demonstrates `dominion-command-center` capabilities in a marketable SaaS presentation.
-- Focuses on business overlays only for this stream.
+- Build a JSON image
+- Run a demo and save outputs to `dist/`
 
-## Core Demo Capabilities
+Quickstart
 
-- Dominion OS Core and top feature walkthroughs.
-- Google Cloud SaaS integration surface for demo scenarios.
-- Shapefile mapping workflows for geo/business visualization.
-- Google API integrations for broader cloud-universe demonstrations.
+- Build: `python demo_build.py build`
+- Run demo: `python demo_build.py run`
+- Tests: `python -m unittest`
 
-## Governance
+Authoritative Local Live Ops Bridge
 
-- This repo is serving-only and non-authoritative.
-- Control plane and source-of-truth runtime authority remains in `dominion-command-center`.
-- Demo content in this repo is intended for public presentation use.
-- Production demo packaging must remain public-safe: no secrets, no tokens, no CRM/contact dumps, and no plain-source runtime payload in the final demo image.
+- `dominion-command-center` is the apex control plane for local live ops in this workspace.
+- This repo provides the downstream PHI bridge and health surface that command-center drives.
+- Start via command-center: `bash /workspaces/dominion-command-center/scripts/live_ops_start.sh`
+- Stop via command-center: `bash /workspaces/dominion-command-center/scripts/live_ops_stop.sh`
+- Status via command-center: `bash /workspaces/dominion-command-center/scripts/live_ops_status.sh`
+- Verify via command-center: `bash /workspaces/dominion-command-center/scripts/live_ops_verify.sh`
+- Demo-build bridge entrypoints:
+  - `scripts/phi_start_all_systems.sh`
+  - `scripts/phi_stop_all_systems.sh`
+  - `scripts/phi_status.sh`
+  - `scripts/phi_live_ops_verification.sh`
 
-## Proof Artifacts
+Command Core (full experience)
 
-- `DOMINION_OS_DEPLOYMENT_PROOF.md`
-- `OPTIMAL_DEPLOYMENT_PROOF.md`
-- `PRODUCTION_READINESS_PROOF.md`
+- Run interactive dashboard (small scale):
+    - `python demo_build.py command-core --duration 120 --scale small`
+- Headless, generate artifacts only:
+    - `python demo_build.py command-core --duration 100 --scale medium --no-ui`
+- Artifacts are written to `dist/command_core/` as `events.log`, `session.json`, and `summary.txt`.
 
-## Runbook Notes
+Autopilot (NHITL)
 
-- Probe semantics for `/status` and `/api/v1/topology` are documented in `RUNBOOK_STATUS_PROBES.md`.
+- Single automated run at large scale:
+    - `python demo_build.py autopilot --scale large --duration 300`
+- Multiple back-to-back runs with interval:
+    - `python demo_build.py autopilot --scale medium --duration 120 --runs 3 --interval-ms 500`
+- Output: flight summaries saved under `dist/command_core/flight_*.json`.
+
+Note: This demo imports `dominion_os` from the sibling path `../dominion-os-1.0` without installing it. This keeps it network-free.
