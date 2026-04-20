@@ -1,5 +1,9 @@
 name: Canon Φ v1.0 Color Compliance
 
+permissions:
+  contents: read
+
+
 on:
   push:
     branches: [ main, develop ]
@@ -161,3 +165,4 @@ jobs:
           echo "Sealed Five Monochrome System Verified"
           echo "Fractal5 Solutions Inc."
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+

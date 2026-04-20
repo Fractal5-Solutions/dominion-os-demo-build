@@ -1,5 +1,9 @@
 name: Security Scan
 
+permissions:
+  contents: read
+
+
 on:
   push:
     branches: [ main ]
@@ -37,3 +41,4 @@ jobs:
         with:
           name: security-report
           path: security_report.md
+

@@ -1,5 +1,9 @@
 name: PHI Automation Monitor
 
+permissions:
+  contents: read
+
+
 on:
   schedule:
     - cron: '*/15 * * * *' # every 15 minutes
@@ -38,3 +42,4 @@ jobs:
           path: |
             scripts/telemetry/*.log
             logs/*.log
+

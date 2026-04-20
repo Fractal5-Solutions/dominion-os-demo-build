@@ -1,5 +1,9 @@
 name: PHI Status Report
 
+permissions:
+  contents: read
+
+
 on:
   workflow_dispatch: {}
   push:
@@ -24,3 +28,4 @@ jobs:
           path: |
             logs/*.log
             scripts/*.log
+

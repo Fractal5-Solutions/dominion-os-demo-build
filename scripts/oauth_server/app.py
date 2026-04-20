@@ -7,8 +7,10 @@ import base64
 import hashlib
 import logging
 import os
+import re
 import secrets
 from datetime import datetime, timedelta
+from urllib.parse import quote
 
 import jwt
 import requests
@@ -31,6 +33,8 @@ app.secret_key = secrets.token_hex(32)
 GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID", "your_client_id_here")
 GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET", "your_client_secret_here")
 JWT_SECRET = secrets.token_hex(32)
+
+SAFE_ERROR_RE = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
 
 
 # PKCE Helper Functions
@@ -61,6 +65,19 @@ def verify_state(expected_state, received_state):
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("PHIChiefAI-OAuth")
 
+
+def sanitize_log_value(value):
+    if value is None:
+        return ""
+    return str(value).replace("\r", "\\r").replace("\n", "\\n")
+
+
+def safe_error_token(value, default="oauth_error"):
+    token = (value or "").strip()
+    if SAFE_ERROR_RE.fullmatch(token):
+        return token
+    return default
+
 # Rate limiter
 if Limiter and get_remote_address:
     limiter = Limiter(app, key_func=get_remote_address, default_limits=["100 per hour"])
@@ -80,7 +97,8 @@ if os.getenv("ENV", "development") == "production":
 @app.before_request
 def enforce_https():
     if not request.is_secure and os.getenv("ENV", "development") == "production":
-        return redirect(request.url.replace("http://", "https://"))
+        relative_target = request.full_path if request.query_string else request.path
+        return redirect(relative_target, code=307)
 
 
 # Add logging to authentication events
@@ -93,8 +111,8 @@ def github_callback():
 
     # Check for errors
     if error:
-        logger.error("OAuth error: %s", error)
-        return redirect("/?error=%s" % error)
+        logger.error("OAuth error: %s", sanitize_log_value(error))
+        return redirect(f"/?error={quote(safe_error_token(error))}")
 
     # Verify state
     expected_state = session.get("state")
@@ -163,7 +181,8 @@ def github_callback():
         )
 
         if not any(org in authorized_orgs for org in user_orgs):
-            logger.warning("Unauthorized organization: %s", user_orgs)
+            safe_orgs = [sanitize_log_value(org) for org in user_orgs]
+            logger.warning("Unauthorized organization: %s", ",".join(safe_orgs))
             return redirect("/?error=unauthorized_organization")
 
         # Generate JWT token for PHI Chief AI

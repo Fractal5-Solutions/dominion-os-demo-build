@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import subprocess
 from datetime import datetime, timezone
@@ -15,6 +16,9 @@ import requests
 from flask import Flask, abort, jsonify, render_template_string, request, send_from_directory
 
 BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR_RESOLVED = BASE_DIR.resolve()
+
+logger = logging.getLogger("dominion-command-core")
 
 app = Flask(__name__)
 app.config["JSON_SORT_KEYS"] = False
@@ -282,10 +286,15 @@ def parse_probe_flags() -> tuple[bool, bool, list[str]]:
 
 def read_json_file(path: Path, default):
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        candidate = path.resolve()
+        candidate.relative_to(BASE_DIR_RESOLVED)
+        return json.loads(candidate.read_text(encoding="utf-8"))
     except FileNotFoundError:
         return default
     except json.JSONDecodeError:
+        return default
+    except ValueError:
+        logger.warning("Blocked unsafe JSON path outside base directory")
         return default
 
 
@@ -330,8 +339,9 @@ def probe_service(base_url: str, health_paths: tuple[str, ...], enabled: bool) -
                 }
             last_status_code = response.status_code
             last_error = f"HTTP {response.status_code}"
-        except requests.RequestException as exc:
-            last_error = str(exc)
+        except requests.RequestException:
+            # Avoid exposing internal network exception details in API responses.
+            last_error = "request_failed"
 
     if last_status_code is not None:
         return {
