@@ -27,7 +27,7 @@ click>=8.1.6
 colorama>=0.4.6
 
 # Utilities
-python-dotenv>=1.0.0
+python-dotenv>=1.2.2
 pathlib>=1.0.1
 
 # Dependency conflict resolution
