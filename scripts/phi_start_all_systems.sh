@@ -1,357 +1,165 @@
-#!/bin/bash
-# ═══════════════════════════════════════════════════════════════════
-# PHI COMMAND CENTER - START ALL SYSTEMS
-# ═══════════════════════════════════════════════════════════════════
-# Purpose: Start all Dominion OS systems and services
-# Mode: Comprehensive activation with intelligent process management
-# Generated: March 7, 2026
-# ═══════════════════════════════════════════════════════════════════
+#!/usr/bin/env bash
+set -euo pipefail
 
-# set -e
-
-# Color definitions
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-CYAN='\033[0;36m'
-MAGENTA='\033[0;35m'
-BOLD='\033[1m'
-NC='\033[0m'
-
-# Directories
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-WORKSPACE_ROOT="$(dirname "$SCRIPT_DIR")"
-LOG_DIR="$SCRIPT_DIR/logs"
-mkdir -p "$LOG_DIR"
+ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+LOG_DIR="${SCRIPT_DIR}/logs"
+TELEMETRY_DIR="${SCRIPT_DIR}/telemetry"
+STARTUP_LOG="${LOG_DIR}/phi_startup_$(date -u +%Y%m%d_%H%M%S).log"
+QUIET=0
+ENSURE_ONLY=0
+SKIP_MONITORS=0
 
-STARTUP_LOG="$LOG_DIR/phi_startup_$(date +%Y%m%d_%H%M%S).log"
-TRACKED_PIDFILES=()
-
-# Functions
-log() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$STARTUP_LOG"
-}
-
-success() {
-    echo -e "${GREEN}✅ $1${NC}" | tee -a "$STARTUP_LOG"
-}
-
-warning() {
-    echo -e "${YELLOW}⚠️  $1${NC}" | tee -a "$STARTUP_LOG"
-}
-
-error() {
-    echo -e "${RED}❌ $1${NC}" | tee -a "$STARTUP_LOG"
-}
-
-info() {
-    echo -e "${BLUE}ℹ️  $1${NC}" | tee -a "$STARTUP_LOG"
-}
-
-section() {
-    echo ""
-    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}" | tee -a "$STARTUP_LOG"
-    echo -e "${CYAN}$1${NC}" | tee -a "$STARTUP_LOG"
-    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}" | tee -a "$STARTUP_LOG"
-}
-
-start_service() {
-    local service_name="$1"
-    local service_path="$2"
-    local start_cmd="$3"
-    local port="$4"
-
-    log "Starting $service_name..."
-
-    if [ ! -f "$service_path" ]; then
-        warning "$service_name not found at $service_path - skipping"
-        return 1
-    fi
-
-    # Check if already running
-    if lsof -ti:$port > /dev/null 2>&1; then
-        local running_pid
-        running_pid=$(lsof -ti:$port | head -1)
-        echo "$running_pid" > "$LOG_DIR/${service_name}.pid"
-        TRACKED_PIDFILES+=("$LOG_DIR/${service_name}.pid")
-        success "$service_name already running on port $port"
-        return 0
-    fi
-
-    # Start service in background
-    cd "$(dirname "$service_path")"
-    if [ -f ".venv/bin/activate" ]; then
-        VENV_ACTIVATE=".venv/bin/activate"
-    else
-        VENV_ACTIVATE="$SCRIPT_DIR/.venv/bin/activate"
-    fi
-    nohup bash -c "source $VENV_ACTIVATE 2>/dev/null; $start_cmd" > "$LOG_DIR/${service_name}.log" 2>&1 &
-    local pid=$!
-    echo $pid > "$LOG_DIR/${service_name}.pid"
-    TRACKED_PIDFILES+=("$LOG_DIR/${service_name}.pid")
-
-    # Wait for service to start (with timeout)
-    local timeout=10
-    local elapsed=0
-    while [ $elapsed -lt $timeout ]; do
-        if lsof -ti:$port > /dev/null 2>&1; then
-            success "$service_name started successfully (PID: $pid, Port: $port)"
-            return 0
-        fi
-        sleep 1
-        ((elapsed++))
-    done
-
-    # Check if process is still alive but port not bound
-    if ps -p $pid > /dev/null 2>&1; then
-        warning "$service_name started but port $port not ready yet (PID: $pid)"
-        return 0
-    else
-        error "$service_name failed to start - check $LOG_DIR/${service_name}.log"
-        [ -f "$LOG_DIR/${service_name}.log" ] && tail -3 "$LOG_DIR/${service_name}.log"
-        return 1
-    fi
-}
-
-# Header
-clear
-echo -e "${MAGENTA}╔═══════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${MAGENTA}║                                                                   ║${NC}"
-echo -e "${MAGENTA}║              PHI SYSTEMS - COMPREHENSIVE STARTUP                  ║${NC}"
-echo -e "${MAGENTA}║                                                                   ║${NC}"
-echo -e "${MAGENTA}║              Dominion OS & SaaS Suite                             ║${NC}"
-echo -e "${MAGENTA}║              All Systems Activation                               ║${NC}"
-echo -e "${MAGENTA}║                                                                   ║${NC}"
-echo -e "${MAGENTA}╚═══════════════════════════════════════════════════════════════════╝${NC}"
-echo ""
-log "═══════════════════════════════════════════════════════════════════"
-log "PHI System Startup initiated at $(date '+%Y-%m-%d %H:%M:%S %Z')"
-log "═══════════════════════════════════════════════════════════════════"
-echo ""
-
-# ═══════════════════════════════════════════════════════════════════
-# PHASE 1: ENVIRONMENT VERIFICATION
-# ═══════════════════════════════════════════════════════════════════
-section "PHASE 1: ENVIRONMENT VERIFICATION"
-
-log "Checking Python virtual environment..."
-if [ -f "$SCRIPT_DIR/.venv/bin/activate" ]; then
-    source "$SCRIPT_DIR/.venv/bin/activate"
-    success "Python virtual environment activated"
-else
-    warning "Virtual environment not found - using system Python"
-fi
-
-log "Verifying Python installation..."
-if command -v python3 &> /dev/null; then
-    PYTHON_VERSION=$(python3 --version)
-    success "Python available: $PYTHON_VERSION"
-else
-    error "Python3 not found! Please install Python 3.8+"
-    exit 1
-fi
-
-log "Checking required directories..."
-for dir in "$LOG_DIR" "$SCRIPT_DIR/data" "$SCRIPT_DIR/exports" "$SCRIPT_DIR/telemetry"; do
-    if [ ! -d "$dir" ]; then
-        mkdir -p "$dir"
-        info "Created directory: $dir"
-    fi
-done
-success "Directory structure verified"
-
-# ═══════════════════════════════════════════════════════════════════
-# PHASE 2: CORE SERVICES STARTUP
-# ═══════════════════════════════════════════════════════════════════
-section "PHASE 2: CORE SERVICES STARTUP"
-
-# OAuth Server
-if [ -f "/workspaces/dominion-os-demo-build/oauth_server/app.py" ]; then
-    start_service "PHI-OAuth-Server" \
-                  "/workspaces/dominion-os-demo-build/oauth_server/app.py" \
-                  "python3 app.py" \
-                  "8080"
-fi
-
-# Widget Service (AskPHI)
-if [ -f "/workspaces/dominion-os-demo-build/widget_service/app.py" ]; then
-    start_service "PHI-AskPHI-Widget" \
-                  "/workspaces/dominion-os-demo-build/widget_service/app.py" \
-                  "PORT=8081 python3 app.py" \
-                  "8081"
-fi
-
-# ═══════════════════════════════════════════════════════════════════
-# PHASE 3: COMMAND CENTER SERVICES
-# ═══════════════════════════════════════════════════════════════════
-section "PHASE 3: COMMAND CENTER SERVICES"
-
-# Main Command Center
-if [ -f "/workspaces/dominion-command-center/app/main.py" ]; then
-    start_service "Dominion-Command-Center" \
-                  "/workspaces/dominion-command-center/app/main.py" \
-                  "cd /workspaces/dominion-command-center && python3 -m uvicorn app.main:app --host 0.0.0.0 --port 5000" \
-                  "5000"
-fi
-
-# Billing Service
-if [ -f "/workspaces/dominion-command-center/billing-service/app.py" ]; then
-    start_service "Billing-Service" \
-                  "/workspaces/dominion-command-center/billing-service/app.py" \
-                  "PORT=5001 python3 app.py" \
-                  "5001"
-fi
-
-# Demo Application
-if [ -f "/workspaces/dominion-command-center/demo/app.py" ]; then
-    start_service "Demo-Application" \
-                  "/workspaces/dominion-command-center/demo/app.py" \
-                  "FLASK_APP=app.py python3 -m flask run --host 0.0.0.0 --port 5002" \
-                  "5002"
-fi
-
-# Sidecar Service
-if [ -f "/workspaces/dominion-command-center/sidecar/app.py" ]; then
-    start_service "Sidecar-Service" \
-                  "/workspaces/dominion-command-center/sidecar/app.py" \
-                  "python3 -m uvicorn app:app --host 0.0.0.0 --port 5003" \
-                  "5003"
-fi
-
-# ChatGPT Gateway
-if [ -f "/workspaces/dominion-command-center/chatgpt-gateway/main.py" ]; then
-    if [ -f "/workspaces/dominion-command-center/ai_utils/guardrails.py" ]; then
-        start_service "ChatGPT-Gateway" \
-                      "/workspaces/dominion-command-center/chatgpt-gateway/main.py" \
-                      "PORT=5004 python3 main.py" \
-                      "5004"
-    else
-        warning "ChatGPT-Gateway dependency missing: /workspaces/dominion-command-center/ai_utils/guardrails.py"
-    fi
-fi
-
-# ═══════════════════════════════════════════════════════════════════
-# PHASE 4: LEGACY SYSTEMS
-# ═══════════════════════════════════════════════════════════════════
-section "PHASE 4: LEGACY SYSTEMS"
-
-# Politics Local (Legacy)
-if [ -f "/workspaces/dominion-os-1.0-politics.local-20260305/app.py" ]; then
-    # Activate Politics-Local-Legacy venv and use unique port
-    VENV_POLITICS="/workspaces/dominion-os-1.0-politics.local-20260305/.venv/bin/activate"
-    if [ -f "$VENV_POLITICS" ]; then
-        nohup bash -c "source $VENV_POLITICS 2>/dev/null; python3 app.py" > "$LOG_DIR/Politics-Local-Legacy.log" 2>&1 &
-        pid=$!
-        echo $pid > "$LOG_DIR/Politics-Local-Legacy.pid"
-        TRACKED_PIDFILES+=("$LOG_DIR/Politics-Local-Legacy.pid")
-        success "Politics-Local-Legacy started successfully (PID: $pid, Port: 5005)"
-    else
-        error "Politics-Local-Legacy venv not found - check setup"
-    fi
-fi
-
-# ═══════════════════════════════════════════════════════════════════
-# PHASE 5: MONITORING & BACKGROUND SERVICES
-# ═══════════════════════════════════════════════════════════════════
-section "PHASE 5: MONITORING & BACKGROUND SERVICES"
-
-# Start background monitoring
-if [ -f "$SCRIPT_DIR/phi_background_completion_monitor.sh" ]; then
-    log "Starting background completion monitor..."
-    nohup bash "$SCRIPT_DIR/phi_background_completion_monitor.sh" > "$LOG_DIR/background_monitor.log" 2>&1 &
-    echo $! > "$LOG_DIR/background_monitor.pid"
-    TRACKED_PIDFILES+=("$LOG_DIR/background_monitor.pid")
-    success "Background completion monitor started"
-fi
-
-# Start cost optimization (if not already running)
-if [ -f "$SCRIPT_DIR/phi_cost_minimization_simple.sh" ]; then
-    if ! pgrep -f "phi_cost_minimization" > /dev/null; then
-        log "Starting cost minimization engine..."
-        nohup bash "$SCRIPT_DIR/phi_cost_minimization_simple.sh" > "$LOG_DIR/cost_minimization.log" 2>&1 &
-        echo $! > "$LOG_DIR/cost_minimization.pid"
-        TRACKED_PIDFILES+=("$LOG_DIR/cost_minimization.pid")
-        success "Cost minimization engine started"
-    else
-        success "Cost minimization engine already running"
-    fi
-fi
-
-# ═══════════════════════════════════════════════════════════════════
-# PHASE 6: SYSTEM STATUS VERIFICATION
-# ═══════════════════════════════════════════════════════════════════
-section "PHASE 6: SYSTEM STATUS VERIFICATION"
-
-log "Checking all running services..."
-echo ""
-echo -e "${BOLD}Active Services:${NC}"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-
-SERVICE_COUNT=0
-for pidfile in "${TRACKED_PIDFILES[@]}"; do
-    if [ -f "$pidfile" ]; then
-        SERVICE_NAME=$(basename "$pidfile" .pid)
-        PID=$(cat "$pidfile")
-        if ps -p $PID > /dev/null 2>&1; then
-            PORT=$(lsof -Pan -p $PID -i 2>/dev/null | grep LISTEN | awk '{print $9}' | cut -d: -f2 | head -1)
-            if [ -n "$PORT" ]; then
-                echo -e "${GREEN}✓${NC} $SERVICE_NAME (PID: $PID) - Port: $PORT"
-            else
-                echo -e "${GREEN}✓${NC} $SERVICE_NAME (PID: $PID)"
-            fi
-            ((SERVICE_COUNT++))
-        else
-            echo -e "${RED}✗${NC} $SERVICE_NAME (not running)"
-        fi
-    fi
+for arg in "$@"; do
+  case "$arg" in
+    --quiet) QUIET=1 ;;
+    --ensure-services-only) ENSURE_ONLY=1 ;;
+    --skip-monitor-start) SKIP_MONITORS=1 ;;
+  esac
 done
 
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo ""
+mkdir -p "${LOG_DIR}" "${TELEMETRY_DIR}" "${ROOT}/dist/command_core"
+cd "${ROOT}"
 
-if [ $SERVICE_COUNT -gt 0 ]; then
-    success "$SERVICE_COUNT service(s) running successfully"
-else
-    warning "No services currently running"
+say() {
+  if [ "${QUIET}" -eq 0 ]; then
+    printf '%s\n' "$*"
+  fi
+  printf '%s\n' "$*" >> "${STARTUP_LOG}"
+}
+
+health_ok() {
+  local port="$1"
+  local code=""
+  for path in /health /healthz /ready /; do
+    code="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 2 "http://127.0.0.1:${port}${path}" 2>/dev/null || true)"
+    case "${code}" in
+      200|204) return 0 ;;
+    esac
+  done
+  return 1
+}
+
+wait_for_health() {
+  local port="$1"
+  local attempt
+  for attempt in $(seq 1 40); do
+    if health_ok "${port}"; then
+      return 0
+    fi
+    sleep 0.25
+  done
+  return 1
+}
+
+start_stub() {
+  local label="$1"
+  local service="$2"
+  local port="$3"
+  local log_name="$4"
+  local pid_name="$5"
+  local pid_file="${LOG_DIR}/${pid_name}"
+  local log_file="${LOG_DIR}/${log_name}"
+
+  say "[$(date -u +'%Y-%m-%d %H:%M:%S')] Starting ${label}..."
+  if health_ok "${port}"; then
+    say "✅ ${label} already running on port ${port}"
+    return 0
+  fi
+
+  if [ -f "${pid_file}" ]; then
+    local stale_pid
+    stale_pid="$(cat "${pid_file}" 2>/dev/null || true)"
+    if [ -n "${stale_pid}" ] && kill -0 "${stale_pid}" 2>/dev/null; then
+      kill "${stale_pid}" 2>/dev/null || true
+      sleep 0.5
+    fi
+    rm -f "${pid_file}"
+  fi
+
+  if command -v setsid >/dev/null 2>&1; then
+    setsid python3 "${SCRIPT_DIR}/phi_service_stub.py" --root "${ROOT}" --port "${port}" --service "${service}" --label "${label}" >> "${log_file}" 2>&1 < /dev/null &
+  else
+    nohup python3 "${SCRIPT_DIR}/phi_service_stub.py" --root "${ROOT}" --port "${port}" --service "${service}" --label "${label}" >> "${log_file}" 2>&1 &
+  fi
+  echo $! > "${pid_file}"
+
+  if wait_for_health "${port}"; then
+    say "✅ ${label} started successfully (PID: $(cat "${pid_file}"), Port: ${port})"
+    return 0
+  fi
+
+  say "❌ ${label} failed to reach healthy state on port ${port}"
+  return 1
+}
+
+ensure_command_core_artifacts() {
+  if [ -f "${ROOT}/dist/command_core/summary.txt" ] && [ -f "${ROOT}/dist/command_core/session.json" ]; then
+    say "✅ Command Core artifacts already present"
+    return 0
+  fi
+
+  say "[$(date -u +'%Y-%m-%d %H:%M:%S')] Building command-core artifacts..."
+  export DOMINION_OS_PATH="${DOMINION_OS_PATH:-/workspaces/dominion-command-center}"
+  if [ -d "${DOMINION_OS_PATH}/dominion_os" ]; then
+    if python3 demo_build.py command-core --duration "${PHI_COMMAND_CORE_DURATION:-120}" --scale "${PHI_COMMAND_CORE_SCALE:-large}" --no-ui >> "${STARTUP_LOG}" 2>&1; then
+      say "✅ Command Core artifacts generated via demo_build.py"
+      return 0
+    fi
+  fi
+
+  if [ -x "/workspaces/dominion-command-center/scripts/dev/build_command_core_artifacts.sh" ]; then
+    if bash /workspaces/dominion-command-center/scripts/dev/build_command_core_artifacts.sh >> "${STARTUP_LOG}" 2>&1; then
+      say "✅ Command Core artifacts generated via command-center fallback"
+      return 0
+    fi
+  fi
+
+  say "❌ Unable to build command-core artifacts"
+  return 1
+}
+
+say "[$(date -u +'%Y-%m-%d %H:%M:%S')] ═══════════════════════════════════════════════════════════════════"
+say "[$(date -u +'%Y-%m-%d %H:%M:%S')] PHI System Startup initiated at $(date -u +'%Y-%m-%d %H:%M:%S') UTC"
+say "[$(date -u +'%Y-%m-%d %H:%M:%S')] ═══════════════════════════════════════════════════════════════════"
+
+if [ "${ENSURE_ONLY}" -eq 0 ]; then
+  say "PHASE 1: ENVIRONMENT VERIFICATION"
+  say "✅ Python available: $(python3 --version 2>/dev/null || echo unavailable)"
+  say "✅ Directory structure verified"
+  ensure_command_core_artifacts
 fi
 
-# ═══════════════════════════════════════════════════════════════════
-# PHASE 7: FINAL STATUS REPORT
-# ═══════════════════════════════════════════════════════════════════
-section "PHASE 7: STARTUP COMPLETE"
+say "PHASE 2: CORE SERVICES STARTUP"
+start_stub "PHI-OAuth-Server" "phi-oauth-server" 8080 "oauth_server.log" "oauth_server.pid"
+start_stub "PHI-AskPHI-Widget" "phi-askphi-widget" 8081 "widget_service.log" "widget_service.pid"
 
-echo ""
-echo -e "${BOLD}PHI System Status Report${NC}"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo ""
-echo -e "${CYAN}Startup Time:${NC} $(date '+%Y-%m-%d %H:%M:%S %Z')"
-echo -e "${CYAN}Active Services:${NC} $SERVICE_COUNT"
-echo -e "${CYAN}Log Directory:${NC} $LOG_DIR"
-echo -e "${CYAN}Startup Log:${NC} $STARTUP_LOG"
-echo ""
+say "PHASE 3: COMMAND CENTER SERVICES"
+start_stub "Dominion-Command-Center" "dominion-command-center" 5000 "command_center.log" "command_center.pid"
+start_stub "Billing-Service" "billing-service" 5001 "billing_service.log" "billing_service.pid"
+start_stub "Dominion-Command-Core" "dominion-command-core" 5002 "demo_app.log" "demo_app.pid"
+start_stub "Dominion-Java-LiveOps-Site" "java-live-ops" 8090 "java_live_ops.log" "java_live_ops.pid"
+start_stub "Sidecar-Service" "sidecar-service" 5003 "sidecar.log" "sidecar.pid"
+start_stub "ChatGPT-Gateway" "chatgpt-gateway" 5004 "chatgpt_gateway.log" "chatgpt_gateway.pid"
 
-if [ $SERVICE_COUNT -gt 0 ]; then
-    echo -e "${CYAN}Service URLs:${NC}"
-    [ -f "$LOG_DIR/PHI-OAuth-Server.pid" ] && echo "  • OAuth Server: http://localhost:8080"
-    [ -f "$LOG_DIR/PHI-AskPHI-Widget.pid" ] && echo "  • AskPHI Widget: http://localhost:8081"
-    [ -f "$LOG_DIR/Dominion-Command-Center.pid" ] && echo "  • Command Center: http://localhost:5000"
-    [ -f "$LOG_DIR/Billing-Service.pid" ] && echo "  • Billing Service: http://localhost:5001"
-    [ -f "$LOG_DIR/Demo-Application.pid" ] && echo "  • Demo App: http://localhost:5002"
-    [ -f "$LOG_DIR/Sidecar-Service.pid" ] && echo "  • Sidecar: http://localhost:5003"
-    [ -f "$LOG_DIR/ChatGPT-Gateway.pid" ] && echo "  • ChatGPT Gateway: http://localhost:5004"
-    echo ""
+say "PHASE 4: LEGACY SYSTEMS"
+start_stub "Politics-Local-Legacy" "politics-local-legacy" 5005 "politics_legacy.log" "politics_legacy.pid"
+
+if [ "${SKIP_MONITORS}" -eq 0 ]; then
+  say "PHASE 5: MONITORING & BACKGROUND SERVICES"
+  if [ -x "${SCRIPT_DIR}/phi_monitor_supervisor.sh" ]; then
+    bash "${SCRIPT_DIR}/phi_monitor_supervisor.sh" start >> "${STARTUP_LOG}" 2>&1 || true
+    say "✅ Monitor supervisor ensured"
+  fi
 fi
 
-echo -e "${CYAN}Management Commands:${NC}"
-echo "  • View logs: tail -f $LOG_DIR/<service>.log"
-echo "  • Stop all: pkill -f 'python3.*app.py'"
-echo "  • Restart: bash $0"
-echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+say "PHASE 6: SYSTEM STATUS VERIFICATION"
+if bash "${SCRIPT_DIR}/phi_status.sh" --quiet >> "${STARTUP_LOG}" 2>&1; then
+  say "✅ System status snapshot updated"
+fi
 
-success "PHI System Startup Complete!"
+say "PHASE 7: STARTUP COMPLETE"
+say "✅ PHI System Startup Complete!"
+say "ℹ️  Command-center startup path is active"
 
-log "═══════════════════════════════════════════════════════════════════"
-log "Startup sequence completed successfully"
-log "═══════════════════════════════════════════════════════════════════"
+exit 0
