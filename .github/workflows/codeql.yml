@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [actions]
+        language: [actions, python]
     steps:
       - uses: actions/checkout@v4
       - name: Initialize CodeQL
