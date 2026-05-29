@@ -28,3 +28,10 @@ Autopilot (NHITL)
 - Output: flight summaries saved under `dist/command_core/flight_*.json`.
 
 Note: This demo imports `dominion_os` from the sibling path `../dominion-os-1.0` without installing it. This keeps it network-free.
+
+## Security & Compliance
+
+- Guardrails from `GUARDRAILS.md` keep the demo branch-protected, review-gated, and immutable once tagged.
+- Telemetry heartbeats (`telemetry/heartbeat.txt`) and catalog receipts (`docs/canon_seal.md`) document availability proofs.
+- Secrets and service tokens remain encrypted via the sibling repository's SOPS bundles; no plaintext credentials are stored here.
+- Privacy handling follows the canonical policy in `../dominion-os-1.0/docs/legal/privacy-policy.md`, including customer deletion requests and data residency controls.
