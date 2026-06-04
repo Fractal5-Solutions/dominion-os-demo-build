@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "bluewave.public.live.v1",
+  "generatedAt": "2026-06-04T00:00:00Z",
+  "status": "online",
+  "entitySlug": "blue-wave-action-group-inc",
+  "page": "blue-wave-ai",
+  "summary": {
+    "title": "BlueWave AI Live Signal",
+    "body": "BlueWave AI live signal is online.",
+    "updatedLabel": "Updated from feed"
+  },
+  "sections": [
+    {
+      "id": "live-signal-online",
+      "label": "Live Signal",
+      "title": "Live signal online",
+      "body": "This page can now receive approved BlueWave AI signals from the system serving layer.",
+      "status": "active",
+      "updatedAt": "2026-06-04T00:00:00Z",
+      "ctaLabel": "Explore the Mission",
+      "ctaHref": "/mission"
+    }
+  ],
+  "proof": []
+}
