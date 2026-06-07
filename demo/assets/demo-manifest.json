@@ -1,0 +1,60 @@
+﻿{
+  "schema": "f5.dominion.demo.assets.v1",
+  "generatedAt": "2026-06-07T00:00:00Z",
+  "sourceOfTruth": {
+    "repository": "Fractal5-Solutions/dominion-os-demo-build",
+    "path": "demo/assets/demo-manifest.json",
+    "environment": "demo-sandbox",
+    "runtime": "cloud-run"
+  },
+  "runtime": {
+    "root": "https://demo-reduwyf2ra-uc.a.run.app/",
+    "demo": "https://demo-reduwyf2ra-uc.a.run.app/demo",
+    "health": "https://demo-reduwyf2ra-uc.a.run.app/health",
+    "status": "https://demo-reduwyf2ra-uc.a.run.app/status"
+  },
+  "sections": {
+    "watchVideo": "https://demo-reduwyf2ra-uc.a.run.app/demo#recording-proof",
+    "playWithData": "https://demo-reduwyf2ra-uc.a.run.app/demo#live-operations",
+    "releaseReceipts": "https://demo-reduwyf2ra-uc.a.run.app/demo#evidence-proof"
+  },
+  "assets": {
+    "manifest": "https://demo-reduwyf2ra-uc.a.run.app/demo/assets/demo-manifest.json",
+    "config": "https://demo-reduwyf2ra-uc.a.run.app/demo/demo-config.js?v=20260326b",
+    "stylesheet": "https://demo-reduwyf2ra-uc.a.run.app/demo/assets/demo.css?v=20260326b",
+    "script": "https://demo-reduwyf2ra-uc.a.run.app/demo/assets/demo.js?v=20260326b",
+    "favicon": "https://demo-reduwyf2ra-uc.a.run.app/demo/assets/favicon.svg?v=20260326b",
+    "videoMp4": null,
+    "videoPoster": null,
+    "demoDownload": null,
+    "sampleData": null,
+    "releaseReceiptsJson": null
+  },
+  "assetPolicy": {
+    "directBinaryAssetsRequiredForFinalInlineEmbed": [
+      "videoMp4",
+      "demoDownload",
+      "sampleData"
+    ],
+    "currentFallbacks": {
+      "videoMp4": "sections.watchVideo",
+      "demoDownload": "sections.releaseReceipts",
+      "sampleData": "sections.playWithData"
+    },
+    "noSecrets": true,
+    "publicSafe": true,
+    "privateServicesExposed": false
+  },
+  "squarespace": {
+    "bridgePage": "https://www.fractal5solutions.com/demo-1",
+    "canonReference": "https://www.fractal5solutions.com/launch",
+    "embedMode": "single-code-block-with-remote-runtime-assets"
+  },
+  "claimControl": {
+    "rawCloudRunDemoPublicGreen": true,
+    "assetManifestSourceCreated": true,
+    "assetManifestCloudRunLiveConfirmed": false,
+    "fullCommercialGreenAllowed": false,
+    "reason": "Direct binary URLs for MP4, downloadable package, and sample-data asset must be generated and public-verified before claiming asset-complete /demo-1."
+  }
+}
