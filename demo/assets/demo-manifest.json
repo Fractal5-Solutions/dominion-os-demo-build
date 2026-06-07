@@ -19,7 +19,8 @@
     "releaseReceipts": "https://demo-reduwyf2ra-uc.a.run.app/demo#evidence-proof"
   },
   "assets": {
-    "manifest": "https://demo-reduwyf2ra-uc.a.run.app/demo/assets/demo-manifest.json",
+    "manifest": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/demo-manifest.json",
+    "cloudRunManifest": null,
     "videoMp4": null,
     "videoPoster": null,
     "demoDownload": null,
@@ -27,9 +28,6 @@
     "releaseReceiptsJson": null
   },
   "assetPolicy": {
-    "servedAssetRoutes": [
-      "/demo/assets/demo-manifest.json"
-    ],
     "directBinaryAssetsRequiredForFinalInlineEmbed": [
       "videoMp4",
       "demoDownload",
