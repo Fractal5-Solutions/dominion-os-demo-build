@@ -22,21 +22,25 @@
     "manifest": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/demo-manifest.json",
     "cloudRunManifest": null,
     "videoMp4": null,
-    "videoPoster": null,
+    "videoPoster": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/dominion-os-demo-poster.svg",
     "demoDownload": null,
-    "sampleData": null,
+    "sampleData": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/sample-data.json",
     "releaseReceiptsJson": null
   },
   "assetPolicy": {
+    "sourceServedAssets": [
+      "assets.manifest",
+      "assets.videoPoster",
+      "assets.sampleData"
+    ],
     "directBinaryAssetsRequiredForFinalInlineEmbed": [
       "videoMp4",
-      "demoDownload",
-      "sampleData"
+      "demoDownload"
     ],
     "currentFallbacks": {
       "videoMp4": "sections.watchVideo",
       "demoDownload": "sections.releaseReceipts",
-      "sampleData": "sections.playWithData"
+      "releaseReceiptsJson": "sections.releaseReceipts"
     },
     "noSecrets": true,
     "publicSafe": true,
@@ -50,8 +54,9 @@
   "claimControl": {
     "rawCloudRunDemoPublicGreen": true,
     "assetManifestSourceCreated": true,
+    "sourceServedAssetsPublished": true,
     "assetManifestCloudRunLiveConfirmed": false,
     "fullCommercialGreenAllowed": false,
-    "reason": "Direct binary URLs for MP4, downloadable package, and sample-data asset must be generated and public-verified before claiming asset-complete /demo-1."
+    "reason": "Generated poster and sample-data assets are source-served through the manifest. Direct binary MP4 and downloadable package URLs remain null until real files are generated and publicly verified."
   }
 }
