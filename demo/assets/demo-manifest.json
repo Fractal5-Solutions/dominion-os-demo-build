@@ -23,24 +23,23 @@
     "cloudRunManifest": null,
     "videoMp4": null,
     "videoPoster": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/dominion-os-demo-poster.svg",
-    "demoDownload": null,
+    "demoDownload": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/demo-download-package.json",
     "sampleData": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/sample-data.json",
-    "releaseReceiptsJson": null
+    "releaseReceiptsJson": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/release-receipts.json"
   },
   "assetPolicy": {
     "sourceServedAssets": [
       "assets.manifest",
       "assets.videoPoster",
-      "assets.sampleData"
+      "assets.demoDownload",
+      "assets.sampleData",
+      "assets.releaseReceiptsJson"
     ],
     "directBinaryAssetsRequiredForFinalInlineEmbed": [
-      "videoMp4",
-      "demoDownload"
+      "videoMp4"
     ],
     "currentFallbacks": {
-      "videoMp4": "sections.watchVideo",
-      "demoDownload": "sections.releaseReceipts",
-      "releaseReceiptsJson": "sections.releaseReceipts"
+      "videoMp4": "sections.watchVideo"
     },
     "noSecrets": true,
     "publicSafe": true,
@@ -57,6 +56,6 @@
     "sourceServedAssetsPublished": true,
     "assetManifestCloudRunLiveConfirmed": false,
     "fullCommercialGreenAllowed": false,
-    "reason": "Generated poster and sample-data assets are source-served through the manifest. Direct binary MP4 and downloadable package URLs remain null until real files are generated and publicly verified."
+    "reason": "Poster, sample-data, release receipts, and public demo package manifest are source-served through the manifest. Direct binary MP4 remains null until a real file is generated and publicly verified."
   }
 }
