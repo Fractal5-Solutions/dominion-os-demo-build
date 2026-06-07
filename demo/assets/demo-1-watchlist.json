@@ -1,0 +1,44 @@
+{
+  "schema": "f5.demo1.watchlist.v1",
+  "generatedAt": "2026-06-07T00:00:00Z",
+  "page": {
+    "name": "Fractal5 /demo-1",
+    "url": "https://www.fractal5solutions.com/demo-1",
+    "role": "public Squarespace bridge for Dominion OS 1.0 live demo"
+  },
+  "runtime": {
+    "name": "Dominion OS Cloud Run demo",
+    "root": "https://demo-reduwyf2ra-uc.a.run.app/",
+    "demo": "https://demo-reduwyf2ra-uc.a.run.app/demo",
+    "health": "https://demo-reduwyf2ra-uc.a.run.app/health",
+    "status": "https://demo-reduwyf2ra-uc.a.run.app/status"
+  },
+  "sourceServedAssets": {
+    "manifest": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/demo-manifest.json",
+    "poster": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/dominion-os-demo-poster.svg",
+    "sampleData": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/sample-data.json",
+    "demoPackage": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/demo-download-package.json",
+    "releaseReceipts": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/release-receipts.json",
+    "squarespaceCode": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/squarespace/demo-1-final.html"
+  },
+  "expectedStatus": {
+    "html": 200,
+    "json": 200,
+    "svg": 200
+  },
+  "requiredAssertions": [
+    "page contains Dominion OS, live on the cloud.",
+    "page contains Open Live Demo",
+    "page contains Watch Video",
+    "page contains Play With Data",
+    "page contains Health JSON",
+    "page contains Status JSON",
+    "page contains Contact Fractal5"
+  ],
+  "claimControl": {
+    "directMp4RequiredForMp4Claim": true,
+    "directMp4CurrentlyAvailable": false,
+    "fullCommerceGreenCurrentlyAllowed": false,
+    "reason": "The public bridge and source-served assets are ready. Direct MP4, commerce, native GCP self-healing, and production client portal proof require separate receipts."
+  }
+}
