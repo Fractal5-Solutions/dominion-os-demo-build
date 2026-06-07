@@ -33,6 +33,9 @@
     "page contains Play With Data",
     "page contains Health JSON",
     "page contains Status JSON",
+    "page contains View Sample Data",
+    "page contains Open Demo Package",
+    "page contains Open Receipts",
     "page contains Contact Fractal5"
   ],
   "claimControl": {
