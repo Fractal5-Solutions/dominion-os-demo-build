@@ -1,4 +1,4 @@
-﻿{
+{
   "schema": "f5.dominion.demo.assets.v1",
   "generatedAt": "2026-06-07T00:00:00Z",
   "sourceOfTruth": {
@@ -20,10 +20,6 @@
   },
   "assets": {
     "manifest": "https://demo-reduwyf2ra-uc.a.run.app/demo/assets/demo-manifest.json",
-    "config": "https://demo-reduwyf2ra-uc.a.run.app/demo/demo-config.js?v=20260326b",
-    "stylesheet": "https://demo-reduwyf2ra-uc.a.run.app/demo/assets/demo.css?v=20260326b",
-    "script": "https://demo-reduwyf2ra-uc.a.run.app/demo/assets/demo.js?v=20260326b",
-    "favicon": "https://demo-reduwyf2ra-uc.a.run.app/demo/assets/favicon.svg?v=20260326b",
     "videoMp4": null,
     "videoPoster": null,
     "demoDownload": null,
@@ -31,6 +27,9 @@
     "releaseReceiptsJson": null
   },
   "assetPolicy": {
+    "servedAssetRoutes": [
+      "/demo/assets/demo-manifest.json"
+    ],
     "directBinaryAssetsRequiredForFinalInlineEmbed": [
       "videoMp4",
       "demoDownload",
