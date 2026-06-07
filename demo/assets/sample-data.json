@@ -1,0 +1,64 @@
+{
+  "schema": "f5.dominion.demo.sample-data.v1",
+  "generatedAt": "2026-06-07T00:00:00Z",
+  "environment": "demo-sandbox",
+  "purpose": "Public-safe sample data for /demo-1 visitors to understand the Dominion OS live demo without exposing production data.",
+  "datasets": [
+    {
+      "id": "business-ops-signal",
+      "name": "Business Operations Signal",
+      "domain": "business",
+      "records": [
+        {
+          "timestamp": "2026-06-07T13:36:26Z",
+          "signal": "demo_route_green",
+          "route": "/demo",
+          "status": 200,
+          "evidence": "Public Cloud Run demo route verified by operator proof."
+        },
+        {
+          "timestamp": "2026-06-07T13:42:32Z",
+          "signal": "health_json_green",
+          "route": "/health",
+          "status": 200,
+          "evidence": "Public health endpoint returned JSON metadata."
+        },
+        {
+          "timestamp": "2026-06-07T13:42:32Z",
+          "signal": "status_json_green",
+          "route": "/status",
+          "status": 200,
+          "evidence": "Public status endpoint returned hardening and runtime metadata."
+        }
+      ]
+    },
+    {
+      "id": "politics-demo-signal",
+      "name": "Politics Demo Signal",
+      "domain": "politics",
+      "records": [
+        {
+          "jurisdiction": "sample-canada",
+          "workflow": "policy-to-proof",
+          "input": "sample public policy objective",
+          "output": "sample auditable decision packet",
+          "classification": "public-demo-placeholder"
+        },
+        {
+          "jurisdiction": "sample-usa",
+          "workflow": "campaign-ops-governance",
+          "input": "sample civic operations task",
+          "output": "sample controlled execution receipt",
+          "classification": "public-demo-placeholder"
+        }
+      ]
+    }
+  ],
+  "safety": {
+    "containsProductionData": false,
+    "containsCustomerData": false,
+    "containsSecrets": false,
+    "containsPaymentData": false,
+    "publicSafe": true
+  }
+}
