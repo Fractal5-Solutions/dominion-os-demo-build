@@ -2,11 +2,23 @@
 
 ## Purpose
 
-This document defines the controlled burn for stabilizing source-control automation in this repository. It is linked to issue #129 and supports the goal that a human operator can command source-control work in natural language while the system performs branching, patching, pull request creation, audit, evidence gathering, and merge-readiness analysis.
+This document binds demo-build source-control automation back to the existing Dominion OS source-code-first operating canon. It does not invent a parallel process. The source of truth for live AI operations is `Fractal5-Solutions/dominion-command-center`.
+
+This lane is linked to issue #129 and supports the already-established goal that a human operator can command work in natural language while the system performs discovery, branch creation, patching, pull request creation, audit, evidence gathering, and merge-readiness analysis.
+
+## Source-code-first authority
+
+The operating model already exists in source:
+
+- `docs/NHITL_AUTOPILOT.md` defines end-to-end non-human-in-the-loop automation, proof workflows, sidecar execution, and autopilot CI/orchestrator behavior.
+- `docs/NHITL_FULL_AUTO.md` defines continuous NHITL services, health endpoint behavior, proof backfill, tuning, and self-heal tasks.
+- `AUTOPILOT_README.md` defines autonomous watcher behavior, discovery, patch-stub generation, optimizer handoff, and PAT handling boundaries.
+
+This repository should optimize and connect to that source canon rather than create new operational doctrine.
 
 ## Current baseline
 
-The current controlled-burn baseline is PR #128 and issue #129.
+The current demo-build baseline is PR #128 and issue #129.
 
 Known state at burn start:
 
@@ -21,16 +33,19 @@ Known state at burn start:
 
 ## Doctrine
 
-1. Do not force-push.
-2. Do not write directly to `main`.
-3. Do not change production surfaces from this lane.
-4. Do not merge around red or unknown gates.
-5. Treat `startup_failure` as blocked until it is repaired, reclassified with rationale, or escalated as a repository or organization policy issue.
-6. Preserve the public-surface policy: public demo assets only, no secrets, no private APIs, no customer data, no payment systems, no signing keys, and no operational credentials.
+1. Source code first. Read and use the existing system before proposing new process.
+2. `dominion-command-center` is the Tier 1 control plane and source of truth.
+3. `dominion-os-demo-build` remains a public demo surface repository with no private source, secrets, customer data, signing keys, payment systems, or internal services.
+4. Do not force-push.
+5. Do not write directly to `main`.
+6. Do not change production surfaces from this lane.
+7. Do not merge around red or unknown gates.
+8. Treat `startup_failure` as blocked until it is repaired, reclassified with rationale, or escalated as a repository or organization policy issue.
+9. Optimize toward live political and business operations, not endless demo/development loops.
 
 ## Phase 1: resolve PR #128 cleanly
 
-Goal: get PR #128 to a clean, auditable posture.
+Goal: get PR #128 to a clean, auditable posture while preserving the live demo bridge and moving past first-demo posture.
 
 Actions:
 
@@ -47,39 +62,41 @@ Acceptance criteria:
 - No production change is included.
 - No merge occurs unless the gate posture is clean under this doctrine.
 
-## Phase 2: automation-health lane
+## Phase 2: connect demo-build to existing live-ops canon
 
-Goal: make automation health visible and auditable.
+Goal: bind demo-build automation evidence to existing NHITL/autopilot operations rather than inventing new process.
 
 Actions:
 
-- Add an Actions startup smoke test if workflow-file creation is permitted.
-- Document the difference between a job failure and a startup failure.
-- Update stale Actions incident documentation to reflect the current narrower state.
-- Record owner or administrator settings that may need manual verification.
+- Use source discovery against `dominion-command-center` before adding new automation.
+- Keep startup-policy auditing local and source-visible.
+- Use gate classification and PR evidence output to feed the existing NHITL/autopilot loop.
+- Record any repository settings that block source-controlled automation from becoming live operations.
 
 Acceptance criteria:
 
 - Automation health is visible in GitHub.
 - Startup failures have a documented handling path.
 - The health lane does not weaken security checks.
+- The demo-build lane points back to command-center live ops, not away from it.
 
 ## Phase 3: self-healing evidence loop
 
-Goal: make pull requests explain their own merge-readiness.
+Goal: make pull requests explain their own merge-readiness and become inputs to fully automated AI live operations.
 
 Actions:
 
-- Add gate classification semantics.
-- Add a PR evidence report format.
-- Add repair recommendation behavior for blocked checks.
-- Add a standard source-control automation operating template.
+- Use gate classification semantics.
+- Use startup-policy auditing for workflow `uses:` lines.
+- Produce PR evidence reports with changed files, head SHA, workflow state, and merge doctrine.
+- Feed repaired, verified PR evidence into the existing NHITL/autopilot execution path.
 
 Acceptance criteria:
 
 - Each PR can report changed files, head SHA, check states, gate classification, and merge doctrine.
 - Red or unknown gates are never normalized as green.
 - The system can recommend repair steps without hiding risk.
+- Source-control automation supports live business and political operations.
 
 ## Stop conditions
 
@@ -92,13 +109,14 @@ Stop and report if any of the following occurs:
 
 ## Operational target
 
-The final target is a clean source-control loop:
+The final target is a clean live-ops source-control loop:
 
 1. Natural-language command.
-2. Branch creation.
+2. Source discovery in command-center and repo-local files.
 3. Minimal patch.
 4. Pull request.
 5. Automated checks.
 6. Evidence report.
 7. Doctrine-based merge-readiness decision.
-8. Merge only when clean.
+8. Hand off green evidence to existing NHITL/autopilot live-ops execution.
+9. Merge only when clean.
