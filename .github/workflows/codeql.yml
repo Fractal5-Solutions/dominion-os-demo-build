@@ -2,8 +2,6 @@ name: codeql
 
 on:
   pull_request:
-    branches: [ main ]
-    types: [opened, synchronize, reopened]
   workflow_dispatch:
 
 permissions:
@@ -12,16 +10,18 @@ permissions:
   security-events: write
 
 jobs:
-  analyze-python:
-    name: CodeQL analyze Python
+  analyze:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [actions, python]
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/checkout@v4
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
-          languages: python
+          languages: ${{ matrix.language }}
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
