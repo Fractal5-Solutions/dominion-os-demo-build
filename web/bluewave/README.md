@@ -6,6 +6,18 @@ This folder stages the public `/signal` page for Blue Wave Action Group.
 
 Blue Wave Signal is a Substack-native video podcast that complements Matthew's existing Substack writing account. Substack is the primary home for the show and the companion writing stream. Other podcast, social, article, and store destinations are secondary distribution or support paths.
 
+## Squarespace paste file
+
+Use `signal.code.html` as the paste-ready Squarespace Code Block payload.
+
+Squarespace-specific notes:
+
+- The block is self-contained: HTML, scoped CSS, and a tiny scoped event script are included together.
+- All CSS is scoped under `#bw-signal`.
+- The block avoids external dependencies and does not require custom site-wide CSS.
+- The block avoids a nested `<main>` element so it can sit safely inside a Squarespace page.
+- The current version marker is `signal-squarespace-v1`.
+
 ## Current status
 
 - Social media accounts are not created yet.
