@@ -11,6 +11,9 @@ OUT = Path("bluewave_signal_manifest.json")
 REQUIRED_HTML_SNIPPETS = [
     'id="bw-signal"',
     "Blue Wave Signal",
+    "Substack-native video podcast",
+    "Watch on Substack",
+    "primary_platform",
     "social_accounts",
     "planned_not_created",
     "Planned",
@@ -31,9 +34,12 @@ REQUIRED_CONFIG_KEYS = [
     "page",
     "brand",
     "mode",
+    "primaryPlatform",
+    "contentModel",
     "safety",
     "hero",
     "featuredVideo",
+    "writingCompanion",
     "podcastLinks",
     "socialLinks",
     "articles",
@@ -62,10 +68,24 @@ def main() -> int:
         config_errors.append("page must be /signal")
     if config.get("mode") != "public_scaffold":
         config_errors.append("mode must be public_scaffold")
+    if config.get("primaryPlatform") != "Substack":
+        config_errors.append("primaryPlatform must be Substack")
+    if config.get("contentModel") != "video_podcast_plus_writing":
+        config_errors.append("contentModel must be video_podcast_plus_writing")
+    if config.get("featuredVideo", {}).get("platform") != "Substack":
+        config_errors.append("featuredVideo.platform must be Substack")
+    if config.get("writingCompanion", {}).get("platform") != "Substack":
+        config_errors.append("writingCompanion.platform must be Substack")
     if not config.get("safety", {}).get("publicOnly"):
         config_errors.append("safety.publicOnly must be true")
     if config.get("safety", {}).get("privateCommandAllowed"):
         config_errors.append("safety.privateCommandAllowed must be false")
+
+    podcast_links = config.get("podcastLinks", [])
+    if not podcast_links or podcast_links[0].get("platform") != "Substack":
+        config_errors.append("podcastLinks[0].platform must be Substack")
+    if podcast_links and podcast_links[0].get("role") != "primary_video_podcast_home":
+        config_errors.append("Substack podcast link must be primary_video_podcast_home")
 
     manifest = {
         "html_file": str(HTML_PATH),
