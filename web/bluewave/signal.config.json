@@ -1,0 +1,58 @@
+{
+  "page": "/signal",
+  "brand": "Blue Wave Action Group",
+  "mode": "public_scaffold",
+  "primaryPlatform": "Substack",
+  "contentModel": "video_podcast_plus_writing",
+  "safety": {
+    "publicOnly": true,
+    "privateCommandAllowed": false,
+    "allowedLinkSchemes": ["relative"],
+    "notes": [
+      "Use public media links only; do not add private systems, administrative surfaces, internal records, or non-public operational material.",
+      "Promote items from planned to live only after the official account, platform, or public page is created, secured, and approved."
+    ]
+  },
+  "hero": {
+    "eyebrow": "Blue Wave Action Group / Signal",
+    "title": "The signal starts here.",
+    "dek": "Blue Wave Signal is the Substack-native video podcast and public media hub that complements the existing Substack writing account, bringing video episodes, essays, articles, planned social channels, and store links into one clean stream.",
+    "primaryCta": { "label": "Watch on Substack", "href": "#flagship-show", "status": "planned" },
+    "secondaryCta": { "label": "Open store", "href": "/store", "status": "planned" }
+  },
+  "featuredVideo": {
+    "title": "Blue Wave Signal: Substack video podcast",
+    "platform": "Substack",
+    "embedUrl": "",
+    "status": "planned_not_created",
+    "description": "Replace this with the approved public Substack video podcast trailer or first episode embed only after the official post is live."
+  },
+  "writingCompanion": {
+    "platform": "Substack",
+    "relationship": "complements_existing_writing_account",
+    "status": "planned",
+    "description": "Use the writing account as the editorial home and companion stream for essays, show notes, transcripts, and article links."
+  },
+  "podcastLinks": [
+    { "platform": "Substack", "href": "", "status": "planned_not_created", "role": "primary_video_podcast_home" },
+    { "platform": "Apple Podcasts", "href": "", "status": "planned_not_created", "role": "audio_distribution" },
+    { "platform": "Spotify", "href": "", "status": "planned_not_created", "role": "audio_distribution" },
+    { "platform": "RSS", "href": "", "status": "planned_not_created", "role": "feed_distribution" }
+  ],
+  "socialLinks": [
+    { "platform": "X/Twitter", "handle": "", "href": "", "status": "planned_not_created" },
+    { "platform": "Instagram", "handle": "", "href": "", "status": "planned_not_created" },
+    { "platform": "TikTok/Shorts", "handle": "", "href": "", "status": "planned_not_created" },
+    { "platform": "Facebook", "handle": "", "href": "", "status": "planned_not_created" }
+  ],
+  "articles": [
+    { "title": "Substack Essay", "href": "", "status": "planned", "category": "essay" },
+    { "title": "Show Notes", "href": "", "status": "planned", "category": "notes" },
+    { "title": "News Links", "href": "", "status": "planned", "category": "links" }
+  ],
+  "store": {
+    "label": "Open the store",
+    "href": "/store",
+    "status": "planned"
+  }
+}
