@@ -1,0 +1,50 @@
+{
+  "page": "/signal",
+  "brand": "Blue Wave Action Group",
+  "mode": "public_scaffold",
+  "safety": {
+    "publicOnly": true,
+    "privateCommandAllowed": false,
+    "allowedLinkSchemes": ["relative"],
+    "notes": [
+      "Use public media links only; do not add private systems, administrative surfaces, credentials, internal records, or non-public operational material.",
+      "Promote items from planned to live only after the official account, platform, or public page is created, secured, and approved."
+    ]
+  },
+  "hero": {
+    "eyebrow": "Blue Wave Action Group / Signal",
+    "title": "The signal starts here.",
+    "dek": "Blue Wave Signal is the public media hub for the flagship video podcast, audio episodes, articles, planned social channels, and store links in one clean stream.",
+    "primaryCta": { "label": "Watch flagship show", "href": "#flagship-show", "status": "planned" },
+    "secondaryCta": { "label": "Open store", "href": "/store", "status": "planned" }
+  },
+  "featuredVideo": {
+    "title": "Blue Wave Signal: flagship show",
+    "platform": "pending",
+    "embedUrl": "",
+    "status": "planned_not_created",
+    "description": "Replace this with the approved public trailer or first episode embed only after the official platform is live."
+  },
+  "podcastLinks": [
+    { "platform": "Apple Podcasts", "href": "", "status": "planned_not_created" },
+    { "platform": "Spotify", "href": "", "status": "planned_not_created" },
+    { "platform": "YouTube", "href": "", "status": "planned_not_created" },
+    { "platform": "RSS", "href": "", "status": "planned_not_created" }
+  ],
+  "socialLinks": [
+    { "platform": "X/Twitter", "handle": "", "href": "", "status": "planned_not_created" },
+    { "platform": "Instagram", "handle": "", "href": "", "status": "planned_not_created" },
+    { "platform": "TikTok/Shorts", "handle": "", "href": "", "status": "planned_not_created" },
+    { "platform": "Facebook", "handle": "", "href": "", "status": "planned_not_created" }
+  ],
+  "articles": [
+    { "title": "Signal Brief", "href": "", "status": "planned", "category": "brief" },
+    { "title": "Field Notes", "href": "", "status": "planned", "category": "notes" },
+    { "title": "News Links", "href": "", "status": "planned", "category": "links" }
+  ],
+  "store": {
+    "label": "Open the store",
+    "href": "/store",
+    "status": "planned"
+  }
+}
