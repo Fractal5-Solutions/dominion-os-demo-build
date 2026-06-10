@@ -1,0 +1,21 @@
+name: proof-bluewave-signal
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - "web/bluewave/**"
+      - ".github/scripts/proof_bluewave_signal.py"
+      - ".github/workflows/proof-bluewave-signal.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Blue Wave Signal page
+        run: python .github/scripts/proof_bluewave_signal.py
