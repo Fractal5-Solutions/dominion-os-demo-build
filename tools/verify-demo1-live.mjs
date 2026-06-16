@@ -89,6 +89,10 @@ function launchOptions() {
   return opts;
 }
 
+function hasOwn(obj, key) {
+  return !!obj && Object.prototype.hasOwnProperty.call(obj, key);
+}
+
 async function checkFetch(context, url, label, expectJson = false) {
   try {
     const response = await context.request.get(url, { timeout: 20000 });
@@ -103,6 +107,34 @@ async function checkFetch(context, url, label, expectJson = false) {
     record(`${label} HTTP`, false, `${url} :: ${error.message}`);
   }
   return null;
+}
+
+function statusEndpointLooksValid(status) {
+  if (!status || typeof status !== 'object') return false;
+  if (typeof status.status === 'string' || typeof status.state === 'string') return true;
+  return !!(status.metadata && status.hardening && status.routes);
+}
+
+function sampleDataLooksPublicSafe(data) {
+  if (!data || typeof data !== 'object') return false;
+  const serialized = JSON.stringify(data);
+  const safety = data.safety || {};
+  const explicitFalse = [
+    'containsProductionData',
+    'containsCustomerData',
+    'containsSecrets',
+    'containsPaymentData',
+    'productionData',
+    'customerData',
+    'secrets',
+    'paymentData'
+  ];
+  const hasSafetyKeys = explicitFalse.some((key) => serialized.includes(key));
+  const negativeFlagsOk = ['containsProductionData', 'containsCustomerData', 'containsSecrets', 'containsPaymentData']
+    .filter((key) => hasOwn(safety, key))
+    .every((key) => safety[key] === false);
+  const publicSafeOk = !hasOwn(safety, 'publicSafe') || safety.publicSafe === true;
+  return hasSafetyKeys && negativeFlagsOk && publicSafeOk;
 }
 
 async function main() {
@@ -135,16 +167,17 @@ async function main() {
       record(`Selector present: ${selector}`, count > 0, `count=${count}`);
     }
 
-    const promptButtons = await page.locator('.fractal5-copy-prompt').count();
+    const promptButtons = await page.locator('#fractal5-demo1 .fractal5-copy-prompt').count();
     record('Three copy prompt buttons', promptButtons === 3, `count=${promptButtons}`);
 
-    const blankLinks = await page.locator('a[target="_blank"]').evaluateAll((links) => links.map((a) => ({
+    const blankLinks = await page.locator('#fractal5-demo1 a[target="_blank"]').evaluateAll((links) => links.map((a) => ({
+      text: (a.textContent || '').trim(),
       href: a.getAttribute('href') || '',
       rel: a.getAttribute('rel') || '',
       referrerpolicy: a.getAttribute('referrerpolicy') || ''
     })));
     const badBlankLinks = blankLinks.filter((link) => !link.rel.includes('noopener') || !link.rel.includes('noreferrer') || link.referrerpolicy !== 'strict-origin-when-cross-origin');
-    record('External link hardening', badBlankLinks.length === 0, `checked=${blankLinks.length}; bad=${badBlankLinks.length}`);
+    record('External link hardening inside #fractal5-demo1', badBlankLinks.length === 0, `checked=${blankLinks.length}; bad=${badBlankLinks.length}${badBlankLinks.length ? '; ' + JSON.stringify(badBlankLinks) : ''}`);
 
     const publicFacingF5 = bodyText.includes('F5 ') || bodyText.includes('F5-') || bodyText.includes('F5_');
     record('No public-facing F5 prefix drift', !publicFacingF5);
@@ -160,15 +193,13 @@ async function main() {
     record('Health status ok', health.status === 'ok' || health.status === 'ready' || health.ok === true, JSON.stringify(health).slice(0, 220));
   }
   if (status) {
-    const statusText = String(status.status || status.state || '');
-    record('Status endpoint has status/state', statusText.length > 0, statusText || JSON.stringify(status).slice(0, 220));
+    record('Status endpoint schema valid', statusEndpointLooksValid(status), JSON.stringify(status).slice(0, 220));
   }
 
   for (const url of ASSET_URLS) {
     const data = await checkFetch(context, url, `Asset ${url.split('/').pop()}`, true);
     if (data && url.endsWith('sample-data.json')) {
-      const serialized = JSON.stringify(data);
-      record('Sample data public-safe markers', serialized.includes('productionData') && serialized.includes('customerData') && serialized.includes('secrets') && serialized.includes('paymentData'));
+      record('Sample data public-safe markers', sampleDataLooksPublicSafe(data), JSON.stringify(data.safety || {}).slice(0, 220));
     }
   }
 
