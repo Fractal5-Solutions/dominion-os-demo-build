@@ -7,9 +7,19 @@
   - Verify the published Squarespace /demo-1 page contains the Chief of Staff block.
   - Verify public Cloud Run and demo-build asset routes respond.
 
-  Usage:
+  Usage, bundled Playwright Chromium:
     npm install -D playwright
     npx playwright install chromium
+    node tools/verify-demo1-live.mjs
+
+  Low-disk Windows fallback, installed Microsoft Edge:
+    npm install -D playwright
+    $env:BROWSER_CHANNEL="msedge"
+    node tools/verify-demo1-live.mjs
+
+  Low-disk Windows fallback, installed Google Chrome:
+    npm install -D playwright
+    $env:BROWSER_CHANNEL="chrome"
     node tools/verify-demo1-live.mjs
 
   Optional env:
@@ -17,6 +27,7 @@
     DEMO_RUNTIME_URL=https://demo-reduwyf2ra-uc.a.run.app/demo
     DEMO_HEALTH_URL=https://demo-reduwyf2ra-uc.a.run.app/health
     DEMO_STATUS_URL=https://demo-reduwyf2ra-uc.a.run.app/status
+    BROWSER_CHANNEL=msedge | chrome | chromium
     CHECK_BRANDED_DOMAIN=1
     BRANDED_DEMO_URL=https://demo.fractal5solutions.com/demo
 */
@@ -29,6 +40,7 @@ const DEMO_HEALTH_URL = process.env.DEMO_HEALTH_URL || 'https://demo-reduwyf2ra-
 const DEMO_STATUS_URL = process.env.DEMO_STATUS_URL || 'https://demo-reduwyf2ra-uc.a.run.app/status';
 const CHECK_BRANDED_DOMAIN = process.env.CHECK_BRANDED_DOMAIN === '1';
 const BRANDED_DEMO_URL = process.env.BRANDED_DEMO_URL || 'https://demo.fractal5solutions.com/demo';
+const BROWSER_CHANNEL = process.env.BROWSER_CHANNEL || '';
 
 const ASSET_URLS = [
   'https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/demo-manifest.json',
@@ -71,6 +83,12 @@ function record(name, ok, detail = '') {
   if (!ok) failures.push(row);
 }
 
+function launchOptions() {
+  const opts = { headless: true };
+  if (BROWSER_CHANNEL) opts.channel = BROWSER_CHANNEL;
+  return opts;
+}
+
 async function checkFetch(context, url, label, expectJson = false) {
   try {
     const response = await context.request.get(url, { timeout: 20000 });
@@ -88,7 +106,13 @@ async function checkFetch(context, url, label, expectJson = false) {
 }
 
 async function main() {
-  const browser = await chromium.launch({ headless: true });
+  if (BROWSER_CHANNEL) {
+    console.log(`Using installed browser channel: ${BROWSER_CHANNEL}`);
+  } else {
+    console.log('Using bundled Playwright Chromium. Set BROWSER_CHANNEL=msedge or chrome to use an installed browser.');
+  }
+
+  const browser = await chromium.launch(launchOptions());
   const context = await browser.newContext({
     viewport: { width: 1440, height: 1200 },
     ignoreHTTPSErrors: false
@@ -160,6 +184,7 @@ async function main() {
     generatedAt: new Date().toISOString(),
     demo1Url: DEMO1_URL,
     runtimeUrl: DEMO_RUNTIME_URL,
+    browserChannel: BROWSER_CHANNEL || 'bundled-chromium',
     failures: failures.length,
     results
   };
