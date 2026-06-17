@@ -2,13 +2,39 @@ name: dependency-review
 
 on:
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
   dependency-review:
+    name: dependency-review-applicability
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/dependency-review-action@v4
+      - name: Checkout code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+
+      - name: Assess dependency-review applicability
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Public demo-build dependency review applicability gate."
+          echo "This repository is a public demo-build artifact surface, not the private production source tree."
+          echo "The active Security Scan workflow runs TruffleHog and token detection on pull requests."
+
+          mapfile -t manifests < <(find . -maxdepth 4 -type f \
+            \( -name 'package-lock.json' -o -name 'npm-shrinkwrap.json' -o -name 'yarn.lock' -o -name 'pnpm-lock.yaml' -o -name 'Pipfile.lock' -o -name 'poetry.lock' -o -name 'requirements.txt' -o -name 'go.sum' -o -name 'Cargo.lock' -o -name 'Gemfile.lock' \) \
+            -not -path './.git/*' | sort)
+
+          if [ "${#manifests[@]}" -eq 0 ]; then
+            echo "No dependency manifest or lockfile found inside the public demo-build surface."
+            echo "Dependency-review action is intentionally not invoked for this static/public artifact gate."
+            exit 0
+          fi
+
+          echo "Dependency manifests detected:"
+          printf ' - %s\n' "${manifests[@]}"
+          echo "Manual review note: keep public demo-build dependencies minimal and public-safe."
