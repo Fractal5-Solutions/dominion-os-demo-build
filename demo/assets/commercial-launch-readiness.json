@@ -1,0 +1,122 @@
+{
+  "schema": "f5.dominion.commercial-launch-readiness.v1",
+  "generatedAt": "2026-06-18T00:00:00Z",
+  "sourceOfTruth": {
+    "repository": "Fractal5-Solutions/dominion-os-demo-build",
+    "path": "demo/assets/commercial-launch-readiness.json",
+    "environment": "demo-sandbox",
+    "publicSurface": "https://www.fractal5solutions.com/demo-1"
+  },
+  "overallStatus": "AMBER",
+  "summary": "Dominion OS is public-demo ready and controlled prospect-share ready. Full commercial launch remains blocked until commerce, customer portal, production observability, autonomous remediation, and client-safe payment/provisioning receipts exist.",
+  "statusMatrix": [
+    {
+      "area": "demo-runtime",
+      "status": "GREEN",
+      "currentEvidence": [
+        "Cloud Run demo route is the canonical public runtime target.",
+        "Health and status JSON routes are required by the /demo-1 delivery contract.",
+        "Operator receipts exist in demo/assets/release-receipts.json."
+      ],
+      "greenGate": "Public /demo, /health, and /status probes pass from the daemon/watchlist layer."
+    },
+    {
+      "area": "hardened-website-bridge",
+      "status": "AMBER",
+      "currentEvidence": [
+        "squarespace/demo-1-final.html is the source bridge package.",
+        "DEMO_1_POST_PUBLISH_VERIFICATION.md defines the live-DOM pass criteria."
+      ],
+      "greenGate": "The deployed Squarespace /demo-1 DOM returns HTTP 200 and contains all required strings, CTAs, referrer/link hardening, manifest allowlist, and Canon Light styling."
+    },
+    {
+      "area": "source-served-assets",
+      "status": "GREEN",
+      "currentEvidence": [
+        "demo-manifest.json, sample-data.json, demo-download-package.json, release-receipts.json, and watchlist artifacts are source-served.",
+        "direct MP4 remains null by design."
+      ],
+      "greenGate": "All source-served public assets return HTTP 200 with expected content types from the watchlist daemon."
+    },
+    {
+      "area": "security",
+      "status": "AMBER",
+      "currentEvidence": [
+        "Public demo assets assert no secrets, customer data, payment data, or private services.",
+        "Public bridge is intended to expose only approved public demo-build artifacts."
+      ],
+      "greenGate": "Secret scanning, dependency scanning, tenant-isolation proof, and public-boundary review receipts exist for the public release path."
+    },
+    {
+      "area": "build-test",
+      "status": "AMBER",
+      "currentEvidence": [
+        "PR #127 added public watchlist and post-publish verification scaffolding.",
+        "Existing checks prove the verification layer, not full commercial production qualification."
+      ],
+      "greenGate": "Current CI, link checks, asset checks, public-boundary checks, and e2e bridge checks pass on the release candidate."
+    },
+    {
+      "area": "cloud-health",
+      "status": "GREEN",
+      "currentEvidence": [
+        "Cloud Run root/demo/health/status routes are required public routes in the delivery contract.",
+        "release-receipts.json marks those routes as operator-verified."
+      ],
+      "greenGate": "Hourly daemon probes confirm current route health and publish receipts."
+    },
+    {
+      "area": "commerce-customer-portal",
+      "status": "RED",
+      "currentEvidence": [
+        "No public proof of checkout, customer portal, subscription, billing, tenant provisioning, or entitlement lifecycle is present in demo-build."
+      ],
+      "greenGate": "Live or deliberately invoice-only commercial intake is documented with payment/procurement, onboarding, entitlement, support, refund, and privacy receipts."
+    },
+    {
+      "area": "observability",
+      "status": "AMBER",
+      "currentEvidence": [
+        "Health/status endpoints exist.",
+        "No durable public proof of uptime checks, alert routing, SLOs, incident receipts, traces, or metrics retention is present in demo-build."
+      ],
+      "greenGate": "Uptime, alerting, log-sampling, incident response, and rollback receipts are generated and stored without exposing secrets."
+    },
+    {
+      "area": "autonomous-operations",
+      "status": "AMBER",
+      "currentEvidence": [
+        "Delivery contract names phi-ops as the operational daemon/evidence layer.",
+        "Native GCP self-healing is explicitly not allowed as a claim without separate proof."
+      ],
+      "greenGate": "Watcher ingestion, autonomous remediation, rollback/recovery, and self-healing receipts exist and can be audited."
+    }
+  ],
+  "claimControl": {
+    "allowedNow": [
+      "Dominion OS has a live public Google Cloud demo surface with public demo, health, and status routes, a canonical /demo-1 bridge package, source-served public demo assets, sample data, release receipts, and a watchlist verification layer."
+    ],
+    "notAllowedWithoutSeparateReceipts": [
+      "full SaaS commerce is green",
+      "customer portal is green",
+      "direct MP4 is available",
+      "native GCP self-healing is green",
+      "production observability is green",
+      "full commercial stack is 100% green"
+    ],
+    "directMp4CurrentlyAvailable": false,
+    "fullCommercialGreenCurrentlyAllowed": false
+  },
+  "requiredReceiptsForFullCommercialGreen": [
+    "deployed /demo-1 live-DOM verification receipt",
+    "daemon watchlist ingestion receipt",
+    "hourly probe output for /demo-1, Cloud Run routes, and raw assets",
+    "secret/public-boundary scan receipt",
+    "current CI/build/test receipt",
+    "commerce or invoice-only sales-motion receipt",
+    "customer onboarding and entitlement receipt",
+    "observability and alert-routing receipt",
+    "rollback and incident-response receipt",
+    "autonomous remediation/self-healing receipt if that claim is made"
+  ]
+}
