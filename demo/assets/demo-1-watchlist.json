@@ -1,6 +1,6 @@
 {
   "schema": "f5.demo1.watchlist.v1",
-  "generatedAt": "2026-06-07T00:00:00Z",
+  "generatedAt": "2026-06-18T00:00:00Z",
   "page": {
     "name": "Fractal5 /demo-1",
     "url": "https://www.fractal5solutions.com/demo-1",
@@ -19,7 +19,13 @@
     "sampleData": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/sample-data.json",
     "demoPackage": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/demo-download-package.json",
     "releaseReceipts": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/release-receipts.json",
-    "squarespaceCode": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/squarespace/demo-1-final.html"
+    "squarespaceCode": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/squarespace/demo-1-final.html",
+    "commercialLaunchReadiness": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/commercial-launch-readiness.json"
+  },
+  "documentation": {
+    "deliveryContract": "DEMO_1_DELIVERY_CONTRACT.md",
+    "postPublishVerification": "DEMO_1_POST_PUBLISH_VERIFICATION.md",
+    "commercialLaunchGreenGates": "docs/launch-readiness/2026-06-18-commercial-launch-green-gates.md"
   },
   "expectedStatus": {
     "html": 200,
@@ -38,10 +44,23 @@
     "page contains Open Receipts",
     "page contains Contact Fractal5"
   ],
+  "commercialGreenGates": [
+    "deployed /demo-1 live-DOM verification receipt",
+    "daemon watchlist ingestion receipt",
+    "hourly probe output for /demo-1, Cloud Run routes, and raw assets",
+    "secret/public-boundary scan receipt",
+    "current CI/build/test receipt",
+    "commerce or invoice-only sales-motion receipt",
+    "customer onboarding and entitlement receipt",
+    "observability and alert-routing receipt",
+    "rollback and incident-response receipt",
+    "autonomous remediation/self-healing receipt if that claim is made"
+  ],
   "claimControl": {
     "directMp4RequiredForMp4Claim": true,
     "directMp4CurrentlyAvailable": false,
     "fullCommerceGreenCurrentlyAllowed": false,
-    "reason": "The public bridge and source-served assets are ready. Direct MP4, commerce, native GCP self-healing, and production client portal proof require separate receipts."
+    "fullCommercialGreenCurrentlyAllowed": false,
+    "reason": "The public bridge and source-served assets are ready. Direct MP4, commerce, native GCP self-healing, production observability, and production client portal proof require separate receipts."
   }
 }
