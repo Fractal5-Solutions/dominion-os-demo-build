@@ -1,7 +1,7 @@
 {
   "schema": "f5.dominion.demo.download-package.v1",
-  "generatedAt": "2026-06-07T00:00:00Z",
-  "title": "Dominion OS 1.0 Public Demo Package",
+  "generatedAt": "2026-06-26T00:00:00Z",
+  "title": "Dominion OS + SaaS Suite Public Demo Package",
   "publicBridge": "https://www.fractal5solutions.com/demo-1",
   "runtimeDemo": "https://demo-reduwyf2ra-uc.a.run.app/demo",
   "contents": [
@@ -24,12 +24,23 @@
       "label": "Release receipts",
       "url": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/release-receipts.json",
       "type": "application/json"
+    },
+    {
+      "label": "Commercial launch readiness",
+      "url": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/commercial-launch-readiness.json",
+      "type": "application/json"
+    },
+    {
+      "label": "Compatibility receipts alias",
+      "url": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/receipts/demo-receipts.json",
+      "type": "application/json"
     }
   ],
-  "notes": "Public-safe demo package manifest. This is not a private source-code bundle and does not contain keys, customer data, payment data, or private runtime artifacts.",
+  "notes": "Public-safe demo package manifest. This is not a private source-code bundle and does not contain keys, customer data, payment data, private runtime artifacts, checkout credentials, or customer portal data.",
   "claimControl": {
     "directMp4Included": false,
     "binaryZipIncluded": false,
-    "reason": "The live demo route and public-safe source-served assets are packaged here. Binary media and installable packages require separate generation and public verification."
+    "fullCommercialGreenAllowed": false,
+    "reason": "The live demo route and public-safe source-served assets are packaged here. Binary media, installable packages, production commerce, and customer portal access require separate generation and public verification."
   }
 }
