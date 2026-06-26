@@ -1,0 +1,23 @@
+{
+  "schema": "f5.dominion.demo.receipts.compat.v1",
+  "generatedAt": "2026-06-26T00:00:00Z",
+  "purpose": "Compatibility receipt for older public references to demo/receipts/demo-receipts.json.",
+  "canonicalReceipt": {
+    "path": "demo/assets/release-receipts.json",
+    "url": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/release-receipts.json"
+  },
+  "publicBridge": "https://www.fractal5solutions.com/demo-1",
+  "runtimeDemo": "https://demo-reduwyf2ra-uc.a.run.app/demo",
+  "environment": "demo-sandbox",
+  "claimControl": {
+    "directMp4Available": false,
+    "fullCommercialGreenAllowed": false,
+    "reason": "This compatibility receipt exists only to prevent stale receipt references from resolving to 404. It does not widen public claims and does not prove commerce, customer portal, production observability, native self-healing, direct MP4, or full commercial green."
+  },
+  "safety": {
+    "containsSecrets": false,
+    "containsCustomerData": false,
+    "containsPaymentData": false,
+    "publicSafe": true
+  }
+}
