@@ -1,6 +1,6 @@
 {
   "schema": "f5.dominion.commercial-launch-readiness.v1",
-  "generatedAt": "2026-06-18T00:00:00Z",
+  "generatedAt": "2026-06-26T00:00:00Z",
   "sourceOfTruth": {
     "repository": "Fractal5-Solutions/dominion-os-demo-build",
     "path": "demo/assets/commercial-launch-readiness.json",
@@ -8,17 +8,17 @@
     "publicSurface": "https://www.fractal5solutions.com/demo-1"
   },
   "overallStatus": "AMBER",
-  "summary": "Dominion OS is public-demo ready and controlled prospect-share ready. Full commercial launch remains blocked until commerce, customer portal, production observability, autonomous remediation, and client-safe payment/provisioning receipts exist.",
+  "summary": "Dominion OS is public-demo ready and controlled prospect-share ready. Full commercial launch remains blocked until direct MP4 or intentionally non-MP4 recording language, commerce, customer portal, production observability, autonomous remediation, and client-safe payment/provisioning receipts exist.",
   "statusMatrix": [
     {
       "area": "demo-runtime",
-      "status": "GREEN",
+      "status": "AMBER",
       "currentEvidence": [
-        "Cloud Run demo route is the canonical public runtime target.",
-        "Health and status JSON routes are required by the /demo-1 delivery contract.",
-        "Operator receipts exist in demo/assets/release-receipts.json."
+        "Cloud Run demo, health, and status routes are the required public runtime targets.",
+        "Health/status routes provide liveness proof for the demo sandbox.",
+        "Direct MP4 remains null in demo/assets/demo-manifest.json, so public copy must not imply an actual direct MP4 until a verified asset exists."
       ],
-      "greenGate": "Public /demo, /health, and /status probes pass from the daemon/watchlist layer."
+      "greenGate": "Public /demo, /health, and /status probes pass, and the live demo copy contains no stale all-green, direct-MP4-complete, or full-commercial-green claims."
     },
     {
       "area": "hardened-website-bridge",
@@ -27,16 +27,16 @@
         "squarespace/demo-1-final.html is the source bridge package.",
         "DEMO_1_POST_PUBLISH_VERIFICATION.md defines the live-DOM pass criteria."
       ],
-      "greenGate": "The deployed Squarespace /demo-1 DOM returns HTTP 200 and contains all required strings, CTAs, referrer/link hardening, manifest allowlist, and Canon Light styling."
+      "greenGate": "The deployed Squarespace /demo-1 DOM returns HTTP 200 and contains all required strings, CTAs, referrer/link hardening, manifest allowlist, and approved visual styling."
     },
     {
       "area": "source-served-assets",
-      "status": "GREEN",
+      "status": "AMBER",
       "currentEvidence": [
-        "demo-manifest.json, sample-data.json, demo-download-package.json, release-receipts.json, and watchlist artifacts are source-served.",
-        "direct MP4 remains null by design."
+        "demo-manifest.json, sample-data.json, demo-download-package.json, release-receipts.json, commercial-launch-readiness.json, poster, and watchlist artifacts are intended source-served public assets.",
+        "direct MP4 remains null by design until a real file is generated and publicly verified."
       ],
-      "greenGate": "All source-served public assets return HTTP 200 with expected content types from the watchlist daemon."
+      "greenGate": "All source-served public assets return HTTP 200 with expected content types from the watchlist daemon, and no manifest URL points at a missing file."
     },
     {
       "area": "security",
@@ -61,9 +61,9 @@
       "status": "GREEN",
       "currentEvidence": [
         "Cloud Run root/demo/health/status routes are required public routes in the delivery contract.",
-        "release-receipts.json marks those routes as operator-verified."
+        "release-receipts.json records those routes as operator-verified demo-sandbox receipts."
       ],
-      "greenGate": "Hourly daemon probes confirm current route health and publish receipts."
+      "greenGate": "Hourly daemon probes confirm current route health and publish durable receipts."
     },
     {
       "area": "commerce-customer-portal",
@@ -105,7 +105,8 @@
       "full commercial stack is 100% green"
     ],
     "directMp4CurrentlyAvailable": false,
-    "fullCommercialGreenCurrentlyAllowed": false
+    "fullCommercialGreenCurrentlyAllowed": false,
+    "runtimeClaimDriftMustBeRecheckedAfterDeploy": true
   },
   "requiredReceiptsForFullCommercialGreen": [
     "deployed /demo-1 live-DOM verification receipt",
