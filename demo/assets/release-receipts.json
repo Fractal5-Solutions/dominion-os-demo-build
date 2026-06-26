@@ -1,8 +1,8 @@
 {
   "schema": "f5.dominion.demo.release-receipts.v1",
-  "generatedAt": "2026-06-07T00:00:00Z",
+  "generatedAt": "2026-06-26T00:00:00Z",
   "release": {
-    "name": "Dominion OS 1.0 Live Demo",
+    "name": "Dominion OS + SaaS Suite Live Demo",
     "publicBridge": "https://www.fractal5solutions.com/demo-1",
     "runtimeDemo": "https://demo-reduwyf2ra-uc.a.run.app/demo",
     "environment": "demo-sandbox"
@@ -12,25 +12,25 @@
       "id": "cloudrun-root",
       "url": "https://demo-reduwyf2ra-uc.a.run.app/",
       "expected": "200 text/html",
-      "status": "operator-verified"
+      "status": "operator-verified-demo-sandbox"
     },
     {
       "id": "cloudrun-demo",
       "url": "https://demo-reduwyf2ra-uc.a.run.app/demo",
       "expected": "200 text/html",
-      "status": "operator-verified"
+      "status": "operator-verified-demo-sandbox"
     },
     {
       "id": "cloudrun-health",
       "url": "https://demo-reduwyf2ra-uc.a.run.app/health",
       "expected": "200 application/json",
-      "status": "operator-verified"
+      "status": "operator-verified-demo-sandbox"
     },
     {
       "id": "cloudrun-status",
       "url": "https://demo-reduwyf2ra-uc.a.run.app/status",
       "expected": "200 application/json",
-      "status": "operator-verified"
+      "status": "operator-verified-demo-sandbox"
     },
     {
       "id": "github-manifest",
@@ -46,6 +46,26 @@
       "id": "github-sample-data",
       "path": "demo/assets/sample-data.json",
       "status": "merged-to-main"
+    },
+    {
+      "id": "github-demo-package",
+      "path": "demo/assets/demo-download-package.json",
+      "status": "merged-to-main"
+    },
+    {
+      "id": "github-release-receipts",
+      "path": "demo/assets/release-receipts.json",
+      "status": "merged-to-main"
+    },
+    {
+      "id": "github-commercial-readiness",
+      "path": "demo/assets/commercial-launch-readiness.json",
+      "status": "merged-to-main"
+    },
+    {
+      "id": "github-compat-demo-receipts",
+      "path": "demo/receipts/demo-receipts.json",
+      "status": "compatibility-alias-created-in-repair-pr"
     }
   ],
   "safety": {
@@ -55,7 +75,8 @@
     "publicSafe": true
   },
   "claimControl": {
+    "directMp4Available": false,
     "fullCommercialGreenAllowed": false,
-    "reason": "This receipt proves the public demo bridge asset layer. Commerce, rollback, native GCP self-healing, direct MP4, and binary package assets require separate receipts."
+    "reason": "This receipt proves the public demo bridge asset layer and demo-sandbox route receipts. Commerce, rollback, native GCP self-healing, direct MP4, production observability, customer portal, and binary package assets require separate receipts."
   }
 }
