@@ -11,18 +11,22 @@ Dominion OS has a credible public demo spine:
 - canonical public bridge target: `https://www.fractal5solutions.com/demo-1`
 - public Cloud Run runtime target: `https://demo-reduwyf2ra-uc.a.run.app/demo`
 - public health/status route requirements
-- source-served demo manifest, sample data, demo package manifest, release receipts, poster asset, and watchlist artifacts
+- source-served demo manifest, sample data, demo package manifest, release receipts, commercial readiness receipt, poster asset, and watchlist artifacts
 - PR #127 merged the `/demo-1` watchlist and post-publish verification layer
 
 Commercial launch is not fully green until separate receipts prove commerce, customer portal, production observability, autonomous remediation, and client-safe payment/provisioning boundaries.
+
+## Current repair blocker
+
+Direct MP4 remains null in `demo/assets/demo-manifest.json`. Until a real public MP4 URL exists and is verified, public copy may point to the video-equivalent runtime section but must not claim a direct MP4 asset is available.
 
 ## Status matrix
 
 | Area | Status | Gate to green |
 | --- | --- | --- |
-| Demo runtime | GREEN | Daemon confirms root/demo/health/status probes pass. |
+| Demo runtime | AMBER | Daemon confirms root/demo/health/status probes pass, and live copy contains no stale direct-MP4, all-green, or full-commercial-green claims. |
 | Hardened website bridge | AMBER | Live Squarespace `/demo-1` DOM passes the full post-publish checklist. |
-| Source-served assets | GREEN | Manifest, poster, sample data, package JSON, and release receipts return expected public content types. |
+| Source-served assets | AMBER | Manifest, poster, sample data, package JSON, release receipts, commercial readiness receipt, and compatibility receipt return expected public content types. |
 | Security | AMBER | Secret scan, dependency scan, public-boundary review, and tenant-isolation proof exist. |
 | Build/test | AMBER | Current CI, link checks, public-boundary checks, and e2e bridge checks pass on release candidate. |
 | Cloud health | GREEN | Hourly route probes publish durable receipts. |
