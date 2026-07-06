@@ -1,0 +1,42 @@
+name: demo1-public-proof
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 * * * *'
+  pull_request:
+    paths:
+      - 'demo/assets/**'
+      - 'squarespace/demo-1-final.html'
+      - 'tools/verify-demo1-public-proof.mjs'
+      - '.github/workflows/demo1-public-proof.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  public-proof:
+    name: Public proof receipt
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run public proof verifier
+        env:
+          PROBE_STRICT: 'false'
+          OUT_DIR: out/demo1-public-proof
+        run: node tools/verify-demo1-public-proof.mjs
+
+      - name: Upload probe receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo1-public-proof-receipt
+          path: out/demo1-public-proof/latest-probe.json
+          if-no-files-found: error
