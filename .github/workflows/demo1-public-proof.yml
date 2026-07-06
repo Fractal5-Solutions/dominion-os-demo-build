@@ -33,7 +33,7 @@ jobs:
 
       - name: Run public proof verifier
         env:
-          PROBE_STRICT: 'false'
+          PROBE_STRICT: 'true'
           OUT_DIR: out/demo1-public-proof
         run: node tools/verify-demo1-public-proof.mjs
 
