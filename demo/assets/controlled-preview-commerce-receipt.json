@@ -1,0 +1,35 @@
+{
+  "schema": "f5.dominion.controlled-preview-commerce-receipt.v1",
+  "generatedAt": "2026-07-06T00:45:00Z",
+  "status": "AMBER",
+  "commercialMode": "controlled-preview-invoice-only",
+  "summary": "Controlled commercial preview is allowed through direct Fractal5 contact and invoice/procurement handling. This is not self-serve SaaS checkout and does not prove a customer portal, automated billing, or subscription entitlement lifecycle.",
+  "allowedNow": [
+    "Prospect receives canonical /demo-1 bridge and public proof assets.",
+    "Prospect requests access through Fractal5 contact path.",
+    "Fractal5 may handle qualification, statement of work, invoice/procurement, onboarding, and controlled access manually."
+  ],
+  "notAllowedToClaim": [
+    "self-serve checkout is live",
+    "customer portal is green",
+    "subscription billing is automated",
+    "tenant provisioning is automated and receipted",
+    "payment processor production flow is proven",
+    "full SaaS commerce is green"
+  ],
+  "requiredReceiptsForGreen": [
+    "approved offer/pricing sheet or quote template",
+    "invoice/procurement receipt or checkout/payment receipt",
+    "customer onboarding/provisioning receipt",
+    "entitlement lifecycle receipt",
+    "support path receipt",
+    "refund/cancellation/offboarding receipt",
+    "privacy/data-processing receipt"
+  ],
+  "claimControl": {
+    "controlledPreviewCommercialUseAllowed": true,
+    "selfServeCommerceGreenAllowed": false,
+    "customerPortalGreenAllowed": false,
+    "fullCommercialGreenAllowed": false
+  }
+}
