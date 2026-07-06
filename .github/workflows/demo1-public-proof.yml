@@ -4,15 +4,26 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '17 * * * *'
+  push:
+    branches:
+      - main
+    paths:
+      - 'demo/assets/**'
+      - 'squarespace/demo-1-final.html'
+      - 'tools/verify-demo1-public-proof.mjs'
+      - '.github/workflows/demo1-public-proof.yml'
+      - 'docs/launch-readiness/**'
   pull_request:
     paths:
       - 'demo/assets/**'
       - 'squarespace/demo-1-final.html'
       - 'tools/verify-demo1-public-proof.mjs'
       - '.github/workflows/demo1-public-proof.yml'
+      - 'docs/launch-readiness/**'
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   public-proof:
