@@ -1,7 +1,7 @@
 name: demo1-public-proof
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: {}
   schedule:
     - cron: '17 * * * *'
   push:
@@ -13,17 +13,9 @@ on:
       - 'tools/verify-demo1-public-proof.mjs'
       - '.github/workflows/demo1-public-proof.yml'
       - 'docs/launch-readiness/**'
-  pull_request:
-    paths:
-      - 'demo/assets/**'
-      - 'squarespace/demo-1-final.html'
-      - 'tools/verify-demo1-public-proof.mjs'
-      - '.github/workflows/demo1-public-proof.yml'
-      - 'docs/launch-readiness/**'
 
 permissions:
   contents: read
-  actions: read
 
 jobs:
   public-proof:
@@ -32,12 +24,12 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+      - name: Confirm runner Node
+        run: |
+          node --version
+          node -e "if (typeof fetch !== 'function') { throw new Error('global fetch unavailable'); }"
 
       - name: Run public proof verifier
         env:
@@ -46,7 +38,8 @@ jobs:
         run: node tools/verify-demo1-public-proof.mjs
 
       - name: Upload probe receipt
-        uses: actions/upload-artifact@v4
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: demo1-public-proof-receipt
           path: out/demo1-public-proof/latest-probe.json
