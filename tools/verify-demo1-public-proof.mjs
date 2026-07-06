@@ -24,11 +24,21 @@ async function readJson(filePath) {
   return JSON.parse(raw);
 }
 
-function flattenUrls(watchlist) {
+function isHttpsUrl(value) {
+  if (typeof value !== 'string' || !value.startsWith('https://')) return false;
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+function flattenUrls(watchlist, manifest) {
   const urls = [];
-  function add(name, url, kind) {
-    if (typeof url === 'string' && url.startsWith('https://')) {
-      urls.push({ name, url, kind });
+  function add(name, url, kind, options = {}) {
+    if (isHttpsUrl(url)) {
+      urls.push({ name, url, kind, ...options });
     }
   }
   add('page.demo1', watchlist.page?.url, 'html');
@@ -40,32 +50,68 @@ function flattenUrls(watchlist) {
     else if (key === 'squarespaceCode') add(`asset.${key}`, value, 'html');
     else add(`asset.${key}`, value, 'json');
   }
+  add('asset.videoMp4', manifest?.assets?.videoMp4, 'mp4', { optionalWhenNull: true });
   return urls;
 }
 
-async function fetchWithTimeout(url) {
+async function readResponseBody(res, kind) {
+  if (kind === 'mp4') return '';
+  const text = await res.text();
+  return text.slice(0, 750000);
+}
+
+function resultFromResponse(res, body = '', error = null) {
+  const contentLength = res.headers?.get?.('content-length') || null;
+  return {
+    ok: res.ok,
+    status: res.status,
+    contentType: res.headers?.get?.('content-type') || '',
+    contentLength: contentLength ? Number(contentLength) : null,
+    bytes: body ? Buffer.byteLength(body) : Number(contentLength || 0),
+    error,
+    body
+  };
+}
+
+async function fetchWithTimeout(url, kind) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
+    if (kind === 'mp4') {
+      const head = await fetch(url, {
+        method: 'HEAD',
+        redirect: 'follow',
+        signal: controller.signal,
+        headers: { 'user-agent': 'fractal5-demo1-public-proof/1.1' }
+      });
+      if (head.ok || head.status !== 405) return resultFromResponse(head);
+
+      const range = await fetch(url, {
+        method: 'GET',
+        redirect: 'follow',
+        signal: controller.signal,
+        headers: {
+          'user-agent': 'fractal5-demo1-public-proof/1.1',
+          range: 'bytes=0-0'
+        }
+      });
+      return resultFromResponse(range);
+    }
+
     const res = await fetch(url, {
       method: 'GET',
       redirect: 'follow',
       signal: controller.signal,
-      headers: { 'user-agent': 'fractal5-demo1-public-proof/1.0' }
+      headers: { 'user-agent': 'fractal5-demo1-public-proof/1.1' }
     });
-    const text = await res.text();
-    return {
-      ok: res.ok,
-      status: res.status,
-      contentType: res.headers.get('content-type') || '',
-      bytes: Buffer.byteLength(text),
-      body: text.slice(0, 750000)
-    };
+    const body = await readResponseBody(res, kind);
+    return resultFromResponse(res, body);
   } catch (error) {
     return {
       ok: false,
       status: 0,
       contentType: '',
+      contentLength: null,
       bytes: 0,
       error: error?.message || String(error),
       body: ''
@@ -79,22 +125,38 @@ function includesAll(body, assertions) {
   return assertions.map((assertion) => ({ assertion, pass: body.includes(assertion) }));
 }
 
-function contentTypePass(kind, contentType) {
-  if (kind === 'json') return contentType.includes('json') || contentType.includes('text/plain');
-  if (kind === 'svg') return contentType.includes('svg') || contentType.includes('xml') || contentType.includes('text/plain');
-  return contentType.includes('html') || contentType.includes('text/plain');
+function statusPass(kind, status) {
+  if (kind === 'mp4') return status === 200 || status === 206;
+  return status === 200;
+}
+
+function contentTypePass(kind, contentType, url = '') {
+  const type = String(contentType || '').toLowerCase();
+  if (kind === 'json') return type.includes('json') || type.includes('text/plain');
+  if (kind === 'svg') return type.includes('svg') || type.includes('xml') || type.includes('text/plain');
+  if (kind === 'mp4') return type.includes('video/mp4') || (type.includes('application/octet-stream') && String(url).toLowerCase().includes('.mp4'));
+  return type.includes('html') || type.includes('text/plain');
+}
+
+function mp4EvidencePass(result, manifest) {
+  const directMp4 = manifest?.assets?.videoMp4 || null;
+  if (!directMp4) return false;
+  if (!result) return false;
+  return Boolean(result.ok && statusPass('mp4', result.status) && result.contentTypePass);
 }
 
 function deriveVerdict(results, assertionResults, claimDriftResults, manifest) {
-  const routeFailures = results.filter((r) => !r.ok || r.status !== 200);
-  const typeFailures = results.filter((r) => !contentTypePass(r.kind, r.contentType));
+  const routeFailures = results.filter((r) => !r.ok || !statusPass(r.kind, r.status));
+  const typeFailures = results.filter((r) => !r.contentTypePass);
   const assertionFailures = assertionResults.filter((r) => !r.pass);
   const claimDriftFailures = claimDriftResults.filter((r) => !r.pass);
   const directMp4 = manifest?.assets?.videoMp4 || null;
+  const mp4Result = results.find((r) => r.name === 'asset.videoMp4') || null;
 
   if (routeFailures.length > 0) return 'RED';
   if (typeFailures.length > 0) return 'AMBER';
   if (assertionFailures.length > 0) return 'AMBER';
+  if (directMp4 && !mp4EvidencePass(mp4Result, manifest)) return 'AMBER';
   if (!directMp4 && claimDriftFailures.length > 0) return 'AMBER';
   return 'GREEN';
 }
@@ -102,21 +164,23 @@ function deriveVerdict(results, assertionResults, claimDriftResults, manifest) {
 async function main() {
   const watchlist = await readJson(WATCHLIST_PATH);
   const manifest = await readJson(MANIFEST_PATH);
-  const urls = flattenUrls(watchlist);
+  const urls = flattenUrls(watchlist, manifest);
 
   const results = [];
   for (const item of urls) {
-    const fetched = await fetchWithTimeout(item.url);
+    const fetched = await fetchWithTimeout(item.url, item.kind);
     results.push({
       name: item.name,
       url: item.url,
       kind: item.kind,
       ok: fetched.ok,
       status: fetched.status,
+      statusPass: statusPass(item.kind, fetched.status),
       contentType: fetched.contentType,
+      contentLength: fetched.contentLength,
       bytes: fetched.bytes,
       error: fetched.error || null,
-      contentTypePass: contentTypePass(item.kind, fetched.contentType)
+      contentTypePass: contentTypePass(item.kind, fetched.contentType, item.url)
     });
     item.body = fetched.body;
   }
@@ -139,6 +203,8 @@ async function main() {
     pass: Boolean(directMp4) || !demoRuntime.includes(needle)
   }));
 
+  const mp4Result = results.find((r) => r.name === 'asset.videoMp4') || null;
+  const directMp4Verified = mp4EvidencePass(mp4Result, manifest);
   const verdict = deriveVerdict(results, assertionResults, claimDriftResults, manifest);
   const receipt = {
     schema: 'f5.demo1.public-proof.receipt.v1',
@@ -146,19 +212,22 @@ async function main() {
     strict: STRICT,
     verdict,
     manifestVideoMp4: directMp4,
+    manifestVideoMp4Verified: directMp4Verified,
     fullCommercialGreenAllowed: Boolean(manifest?.claimControl?.fullCommercialGreenAllowed),
     summary: {
       urlsChecked: results.length,
-      failedUrls: results.filter((r) => !r.ok || r.status !== 200).length,
+      failedUrls: results.filter((r) => !r.ok || !r.statusPass).length,
       failedAssertions: assertionResults.filter((r) => !r.pass).length,
-      claimDriftFailures: claimDriftResults.filter((r) => !r.pass).length
+      claimDriftFailures: claimDriftResults.filter((r) => !r.pass).length,
+      directMp4Checked: Boolean(directMp4),
+      directMp4Verified
     },
     results,
     assertionResults,
     claimDriftResults,
     claimControl: {
       allowControlledPreview: verdict !== 'RED',
-      allowDirectMp4Claim: Boolean(directMp4),
+      allowDirectMp4Claim: directMp4Verified,
       allowFullCommercialGreen: Boolean(manifest?.claimControl?.fullCommercialGreenAllowed) && verdict === 'GREEN'
     }
   };
