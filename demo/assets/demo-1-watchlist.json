@@ -1,6 +1,6 @@
 {
   "schema": "f5.demo1.watchlist.v1",
-  "generatedAt": "2026-06-18T00:00:00Z",
+  "generatedAt": "2026-07-06T00:45:00Z",
   "page": {
     "name": "Fractal5 /demo-1",
     "url": "https://www.fractal5solutions.com/demo-1",
@@ -20,12 +20,14 @@
     "demoPackage": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/demo-download-package.json",
     "releaseReceipts": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/release-receipts.json",
     "squarespaceCode": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/squarespace/demo-1-final.html",
-    "commercialLaunchReadiness": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/commercial-launch-readiness.json"
+    "commercialLaunchReadiness": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/commercial-launch-readiness.json",
+    "controlledPreviewCommerce": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/controlled-preview-commerce-receipt.json"
   },
   "documentation": {
     "deliveryContract": "DEMO_1_DELIVERY_CONTRACT.md",
     "postPublishVerification": "DEMO_1_POST_PUBLISH_VERIFICATION.md",
-    "commercialLaunchGreenGates": "docs/launch-readiness/2026-06-18-commercial-launch-green-gates.md"
+    "commercialLaunchGreenGates": "docs/launch-readiness/2026-06-18-commercial-launch-green-gates.md",
+    "nhitlExecutionReceipt": "docs/launch-readiness/2026-07-06-nhitl-unblock-execution.md"
   },
   "expectedStatus": {
     "html": 200,
@@ -33,23 +35,44 @@
     "svg": 200
   },
   "requiredAssertions": [
-    "page contains Dominion OS, live on the cloud.",
-    "page contains Open Live Demo",
-    "page contains Watch Video",
-    "page contains Play With Data",
-    "page contains Health JSON",
-    "page contains Status JSON",
-    "page contains View Sample Data",
-    "page contains Open Demo Package",
-    "page contains Open Receipts",
-    "page contains Contact Fractal5"
+    "Dominion OS, live on the cloud.",
+    "Open Live Demo",
+    "Watch Video",
+    "Play With Data",
+    "Health JSON",
+    "Status JSON",
+    "View Sample Data",
+    "Open Demo Package",
+    "Open Receipts",
+    "Contact Fractal5"
   ],
+  "requiredHardeningAssertions": [
+    "data-version=\"2026-06-08-hardened\"",
+    "rel=\"noopener noreferrer\"",
+    "referrerpolicy=\"strict-origin-when-cross-origin\"",
+    "hidden referrerpolicy=\"strict-origin-when-cross-origin\"",
+    "ALLOWED_RUNTIME_ORIGIN",
+    "ALLOWED_RAW_ASSETS_PREFIX",
+    "ALLOWED_FRACTAL5_URLS"
+  ],
+  "claimDriftChecks": {
+    "forbiddenWhenManifestVideoMp4Null": [
+      "Actual demo MP4 integrated",
+      "Open web MP4",
+      "Open master MP4",
+      "direct MP4 is available",
+      "MP4 integrated"
+    ],
+    "manifestVideoMp4Path": "assets.videoMp4",
+    "allowedFallbackWhenNull": "sections.watchVideo"
+  },
   "commercialGreenGates": [
     "deployed /demo-1 live-DOM verification receipt",
+    "claim-drift repair receipt for /demo MP4 language versus manifest",
     "daemon watchlist ingestion receipt",
     "hourly probe output for /demo-1, Cloud Run routes, and raw assets",
     "secret/public-boundary scan receipt",
-    "current CI/build/test receipt",
+    "current CI/build/test/e2e receipt",
     "commerce or invoice-only sales-motion receipt",
     "customer onboarding and entitlement receipt",
     "observability and alert-routing receipt",
@@ -61,6 +84,7 @@
     "directMp4CurrentlyAvailable": false,
     "fullCommerceGreenCurrentlyAllowed": false,
     "fullCommercialGreenCurrentlyAllowed": false,
-    "reason": "The public bridge and source-served assets are ready. Direct MP4, commerce, native GCP self-healing, production observability, and production client portal proof require separate receipts."
+    "controlledPreviewCommercialUseAllowed": true,
+    "reason": "The public bridge and source-served assets support controlled preview sharing. Direct MP4, full self-serve commerce, native GCP self-healing, production observability, and production customer portal proof require separate receipts."
   }
 }
