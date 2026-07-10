@@ -1,0 +1,70 @@
+{
+  "schema": "f5.dominion.commercial-proof-receipts-index.v1",
+  "generatedAt": "2026-07-07T18:35:00Z",
+  "repository": "Fractal5-Solutions/dominion-os-demo-build",
+  "primaryTracker": "Issue #145",
+  "overallStatus": "AMBER",
+  "claimControl": {
+    "controlledPreviewCommercialUseAllowed": true,
+    "directMp4CurrentlyAvailable": false,
+    "selfServeCommerceGreenAllowed": false,
+    "customerPortalGreenAllowed": false,
+    "productionObservabilityGreenAllowed": false,
+    "nativeGcpSelfHealingGreenAllowed": false,
+    "fullCommercialGreenAllowed": false,
+    "rule": "Full commercial green requires current receipts for every gate. This index does not itself prove external systems."
+  },
+  "receiptInventory": [
+    {
+      "name": "demo-manifest",
+      "path": "demo/assets/demo-manifest.json",
+      "status": "PUBLIC-SOURCE-OF-TRUTH",
+      "proves": ["runtime URLs", "source-served asset URLs", "direct MP4 remains null"],
+      "doesNotProve": ["direct MP4 availability", "full commercial green"]
+    },
+    {
+      "name": "commercial-launch-readiness",
+      "path": "demo/assets/commercial-launch-readiness.json",
+      "status": "AMBER-LEDGER",
+      "proves": ["claim boundaries", "required receipt list"],
+      "doesNotProve": ["external commerce", "customer portal", "observability", "autonomy"]
+    },
+    {
+      "name": "demo-1-watchlist",
+      "path": "demo/assets/demo-1-watchlist.json",
+      "status": "PUBLIC-PROOF-TARGETS",
+      "proves": ["target URL set", "required assertions", "claim-drift checks"],
+      "doesNotProve": ["that the latest workflow artifact has been observed"]
+    },
+    {
+      "name": "controlled-preview-commerce",
+      "path": "demo/assets/controlled-preview-commerce-receipt.json",
+      "status": "AMBER",
+      "proves": ["controlled-preview invoice-only commercial motion is allowed"],
+      "doesNotProve": ["self-serve checkout", "customer portal", "automated billing", "automated entitlement lifecycle"]
+    },
+    {
+      "name": "nhitl-unblock-execution",
+      "path": "docs/launch-readiness/2026-07-06-nhitl-unblock-execution.md",
+      "status": "EXECUTABLE-SCAFFOLD",
+      "proves": ["public-proof verifier and workflow were introduced"],
+      "doesNotProve": ["post-merge artifact observation"]
+    },
+    {
+      "name": "commercial-launch-completion-plan",
+      "path": "docs/launch-readiness/2026-07-07-commercial-launch-completion-plan.md",
+      "status": "EXECUTION-LEDGER",
+      "proves": ["remaining gates are decomposed into exit receipts"],
+      "doesNotProve": ["that external evidence-dependent gates are cleared"]
+    }
+  ],
+  "hardBlockersRemaining": [
+    "direct MP4 or /demo claim-drift repair receipt",
+    "exact deployed /demo-1 live-DOM verification receipt",
+    "post-merge strict public-proof workflow receipt artifact",
+    "current CI/build/test/e2e/security/dependency/public-boundary receipts",
+    "complete commerce/procurement/onboarding/entitlement/support/refund/privacy receipt package",
+    "observability/SLO/alerting/log-retention/incident/rollback receipt package",
+    "autonomous remediation/self-healing receipt if the claim is made"
+  ]
+}
