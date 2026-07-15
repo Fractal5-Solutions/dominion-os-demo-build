@@ -51,7 +51,7 @@ async function fetchWithTimeout(url) {
       method: 'GET',
       redirect: 'follow',
       signal: controller.signal,
-      headers: { 'user-agent': 'fractal5-demo1-public-proof/1.0' }
+      headers: { 'user-agent': 'fractal5-demo1-public-proof/1.1' }
     });
     const text = await res.text();
     return {
@@ -75,8 +75,16 @@ async function fetchWithTimeout(url) {
   }
 }
 
-function includesAll(body, assertions) {
-  return assertions.map((assertion) => ({ assertion, pass: body.includes(assertion) }));
+function normalizeAssertion(assertion) {
+  return String(assertion).replace(/^page contains\s+/i, '').replace(/^`|`$/g, '');
+}
+
+function includesAll(body, assertions, target) {
+  return assertions.map((assertion) => ({
+    assertion,
+    target,
+    pass: body.includes(assertion)
+  }));
 }
 
 function contentTypePass(kind, contentType) {
@@ -123,19 +131,20 @@ async function main() {
 
   const demo1 = urls.find((u) => u.name === 'page.demo1')?.body || '';
   const demoRuntime = urls.find((u) => u.name === 'runtime.demo')?.body || '';
+  const hardenedSource = urls.find((u) => u.name === 'asset.squarespaceCode')?.body || '';
 
-  const requiredAssertions = (watchlist.requiredAssertions || [])
-    .map((text) => String(text).replace(/^page contains\s+/i, '').replace(/^`|`$/g, ''));
-  const hardeningAssertions = watchlist.requiredHardeningAssertions || [];
+  const requiredAssertions = (watchlist.requiredAssertions || []).map(normalizeAssertion);
+  const hardeningAssertions = (watchlist.requiredHardeningAssertions || []).map(normalizeAssertion);
   const assertionResults = [
-    ...includesAll(demo1, requiredAssertions),
-    ...includesAll(demo1, hardeningAssertions)
+    ...includesAll(demo1, requiredAssertions, 'live:/demo-1'),
+    ...includesAll(hardenedSource, hardeningAssertions, 'source:squarespace/demo-1-final.html')
   ];
 
   const forbiddenWhenNoMp4 = watchlist.claimDriftChecks?.forbiddenWhenManifestVideoMp4Null || [];
   const directMp4 = manifest?.assets?.videoMp4 || null;
   const claimDriftResults = forbiddenWhenNoMp4.map((needle) => ({
     assertion: `runtime.demo must not contain ${needle} while assets.videoMp4 is null`,
+    target: 'runtime:/demo',
     pass: Boolean(directMp4) || !demoRuntime.includes(needle)
   }));
 
@@ -144,6 +153,7 @@ async function main() {
     schema: 'f5.demo1.public-proof.receipt.v1',
     generatedAt: nowIso(),
     strict: STRICT,
+    verifierVersion: '1.1-current-public-bridge-contract',
     verdict,
     manifestVideoMp4: directMp4,
     fullCommercialGreenAllowed: Boolean(manifest?.claimControl?.fullCommercialGreenAllowed),
@@ -151,7 +161,13 @@ async function main() {
       urlsChecked: results.length,
       failedUrls: results.filter((r) => !r.ok || r.status !== 200).length,
       failedAssertions: assertionResults.filter((r) => !r.pass).length,
-      claimDriftFailures: claimDriftResults.filter((r) => !r.pass).length
+      claimDriftFailures: claimDriftResults.filter((r) => !r.pass).length,
+      liveBridgeAssertionsChecked: requiredAssertions.length,
+      sourceHardeningAssertionsChecked: hardeningAssertions.length
+    },
+    assertionScopes: watchlist.assertionScopes || {
+      requiredAssertions: 'live deployed Squarespace /demo-1 page text and links',
+      requiredHardeningAssertions: 'source-served hardened Squarespace code package'
     },
     results,
     assertionResults,
