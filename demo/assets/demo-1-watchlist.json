@@ -1,10 +1,10 @@
 {
   "schema": "f5.demo1.watchlist.v1",
-  "generatedAt": "2026-07-06T00:45:00Z",
+  "generatedAt": "2026-07-15T13:35:00Z",
   "page": {
     "name": "Fractal5 /demo-1",
     "url": "https://www.fractal5solutions.com/demo-1",
-    "role": "public Squarespace bridge for Dominion OS 1.0 live demo"
+    "role": "current public Squarespace bridge for the Dominion OS controlled-preview demo proof surface"
   },
   "runtime": {
     "name": "Dominion OS Cloud Run demo",
@@ -21,30 +21,40 @@
     "releaseReceipts": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/release-receipts.json",
     "squarespaceCode": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/squarespace/demo-1-final.html",
     "commercialLaunchReadiness": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/commercial-launch-readiness.json",
-    "controlledPreviewCommerce": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/controlled-preview-commerce-receipt.json"
+    "controlledPreviewCommerce": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/controlled-preview-commerce-receipt.json",
+    "commercialProofReceiptsIndex": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/commercial-proof-receipts-index.json"
   },
   "documentation": {
     "deliveryContract": "DEMO_1_DELIVERY_CONTRACT.md",
     "postPublishVerification": "DEMO_1_POST_PUBLISH_VERIFICATION.md",
     "commercialLaunchGreenGates": "docs/launch-readiness/2026-06-18-commercial-launch-green-gates.md",
-    "nhitlExecutionReceipt": "docs/launch-readiness/2026-07-06-nhitl-unblock-execution.md"
+    "nhitlExecutionReceipt": "docs/launch-readiness/2026-07-06-nhitl-unblock-execution.md",
+    "commercialLaunchCompletionPlan": "docs/launch-readiness/2026-07-07-commercial-launch-completion-plan.md",
+    "fullCommercialGreenExecutionPlan": "docs/launch-readiness/2026-07-10-full-commercial-green-execution-plan.md"
   },
   "expectedStatus": {
     "html": 200,
     "json": 200,
     "svg": 200
   },
+  "assertionScopes": {
+    "requiredAssertions": "live deployed Squarespace /demo-1 page text and links",
+    "requiredHardeningAssertions": "source-served hardened Squarespace code package at sourceServedAssets.squarespaceCode"
+  },
   "requiredAssertions": [
-    "Dominion OS, live on the cloud.",
-    "Open Live Demo",
-    "Watch Video",
-    "Play With Data",
+    "Public proof for a governed command system.",
+    "Open live demo",
+    "Watch proof",
+    "Explore Dominion OS",
+    "Launch access path",
+    "Contact Fractal5",
     "Health JSON",
     "Status JSON",
-    "View Sample Data",
-    "Open Demo Package",
-    "Open Receipts",
-    "Contact Fractal5"
+    "Demo manifest",
+    "Readiness matrix",
+    "Watchlist",
+    "Controlled commercial preview is allowed.",
+    "Full self-serve SaaS launch, direct public MP4, customer portal green, production observability green, and autonomous self-healing are not claimed without separate receipts."
   ],
   "requiredHardeningAssertions": [
     "data-version=\"2026-06-08-hardened\"",
@@ -66,9 +76,16 @@
     "manifestVideoMp4Path": "assets.videoMp4",
     "allowedFallbackWhenNull": "sections.watchVideo"
   },
+  "publicBridgeGates": [
+    "live /demo-1 deployed page exposes the current public proof bridge assertions",
+    "source-served hardened Squarespace package preserves exact hardening and allowlist assertions",
+    "Cloud Run /demo, /health, and /status routes are declared and probed",
+    "source-served manifest, package, data, release receipts, readiness, watchlist, and proof index remain public-safe",
+    "direct MP4 claim stays blocked while demo-manifest assets.videoMp4 is null",
+    "full commercial green stays blocked unless separate commercial, observability, rollback, and autonomous-operation receipts exist"
+  ],
   "commercialGreenGates": [
-    "deployed /demo-1 live-DOM verification receipt",
-    "claim-drift repair receipt for /demo MP4 language versus manifest",
+    "claim-drift repair receipt for /demo MP4 language versus manifest or verified public MP4 promotion",
     "daemon watchlist ingestion receipt",
     "hourly probe output for /demo-1, Cloud Run routes, and raw assets",
     "secret/public-boundary scan receipt",
@@ -82,9 +99,10 @@
   "claimControl": {
     "directMp4RequiredForMp4Claim": true,
     "directMp4CurrentlyAvailable": false,
+    "publicBridgeContractCurrentlyAligned": true,
     "fullCommerceGreenCurrentlyAllowed": false,
     "fullCommercialGreenCurrentlyAllowed": false,
     "controlledPreviewCommercialUseAllowed": true,
-    "reason": "The public bridge and source-served assets support controlled preview sharing. Direct MP4, full self-serve commerce, native GCP self-healing, production observability, and production customer portal proof require separate receipts."
+    "reason": "The current public bridge and source-served assets support controlled preview sharing. Direct MP4, full self-serve commerce, native GCP self-healing, production observability, and production customer portal proof require separate receipts."
   }
 }
