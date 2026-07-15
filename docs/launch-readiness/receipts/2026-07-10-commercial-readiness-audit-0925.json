@@ -1,0 +1,50 @@
+{
+  "schema": "f5.dominion.commercial-readiness-audit.v1",
+  "generatedAt": "2026-07-10T09:25:48-07:00",
+  "overallStatus": "AMBER_CONTROLLED_PREVIEW_ONLY",
+  "canonicalBridge": "https://www.fractal5solutions.com/demo-1",
+  "oldSquarespaceDemoRouteIgnored": true,
+  "liveProbe": {
+    "webTool": {
+      "cloudRunDemo": "reachable",
+      "cloudRunHealth": "reachable_json_status_ok",
+      "cloudRunStatus": "reachable_json_hardening_metadata",
+      "demo1Bridge": "not_fetchable_by_web_tool_safe-open_policy",
+      "cloudRunRoot": "not_fetchable_by_web_tool_safe-open_policy"
+    },
+    "containerCurl": "external_network_blocked_http_000_for_all_urls_in_this_execution_environment",
+    "interpretation": "HTTP 000 from container curl is an environment network failure, not evidence of service outage. Web fetch independently reached Cloud Run demo, health, and status."
+  },
+  "statusMatrix": {
+    "demo": "AMBER",
+    "hardenedWebsiteBridge": "AMBER",
+    "sourceServedAssets": "GREEN",
+    "security": "AMBER",
+    "buildTest": "AMBER",
+    "cloudHealth": "GREEN",
+    "commerce": "AMBER_RED_FOR_SELF_SERVE",
+    "observability": "AMBER",
+    "autonomousOperations": "AMBER"
+  },
+  "claimControl": {
+    "directMp4ClaimAllowed": false,
+    "fullCommercialGreenAllowed": false,
+    "controlledPreviewCommercialUseAllowed": true,
+    "reason": "Cloud Run demo, source-served assets, canonical bridge source, PR #127 watchlist, and controlled-preview invoice-only posture exist. Direct MP4, exact deployed live-DOM proof, current CI/e2e/security receipts, self-serve commerce/customer portal, production observability, rollback, and autonomous remediation receipts remain incomplete or unproven."
+  },
+  "evidence": {
+    "pr127Merged": true,
+    "pr152Merged": true,
+    "manifestVideoMp4": null,
+    "manifestFullCommercialGreenAllowed": false,
+    "controlledPreviewCommerceMode": "invoice-only",
+    "publicHealthStatus": "ok",
+    "publicStatusHardeningHeaders": [
+      "Content-Security-Policy",
+      "X-Frame-Options",
+      "X-Content-Type-Options",
+      "Referrer-Policy",
+      "Permissions-Policy"
+    ]
+  }
+}
