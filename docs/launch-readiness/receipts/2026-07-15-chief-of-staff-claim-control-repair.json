@@ -1,0 +1,54 @@
+{
+  "schema": "f5.dominion.claim-control-repair.v1",
+  "generatedAt": "2026-07-15T13:35:00Z",
+  "repository": "Fractal5-Solutions/dominion-os-demo-build",
+  "branch": "chief-of-staff/claim-control-repair-20260715",
+  "overallStatus": "AMBER_CONTROLLED_PREVIEW_ONLY",
+  "diagnosis": {
+    "canonicalDemo1Bridge": "claim-safe and hardened in repository source",
+    "manifestVideoMp4": null,
+    "manifestDirectMp4ClaimAllowed": false,
+    "deployedRuntimeDemo": "publicly reachable but previously observed with direct-MP4-complete copy while the manifest remained null",
+    "rootCause": [
+      "deployed Cloud Run runtime copy drifted beyond the source-served manifest evidence",
+      "the public-proof verifier previously allowed a direct MP4 claim from any non-null manifest URL without verifying the media response"
+    ]
+  },
+  "repairs": [
+    {
+      "path": "tools/verify-demo1-public-proof.mjs",
+      "status": "completed_on_branch",
+      "effect": "Verifies a public MP4 by HEAD or range GET, requires HTTP 200 or 206 and a plausible media content type, performs case-insensitive claim-drift checks, and only permits the claim when the media verifies."
+    },
+    {
+      "path": "demo/assets/demo-1-watchlist.json",
+      "status": "completed_on_branch",
+      "effect": "Adds explicit direct-MP4 evidence requirements, artifact receipt requirements, case-insensitive drift policy, and a runtime-copy-repair flag."
+    },
+    {
+      "path": ".github/workflows/demo1-public-proof.yml",
+      "status": "completed_on_branch",
+      "effect": "Runs the strict public proof on relevant pull requests as well as main, serializes duplicate runs, and retains the public-safe receipt artifact for 30 days."
+    }
+  ],
+  "remainingAction": {
+    "gate": "Gate 1 public claim drift",
+    "status": "deployment_required",
+    "action": "Redeploy the Cloud Run /demo page with direct-MP4-complete wording and MP4 buttons removed or disabled until demo/assets/demo-manifest.json contains a real public MP4 URL and a current verifier receipt proves it.",
+    "reason": "The runtime page implementation containing the observed wording was not found in this repository, so repository-only changes cannot honestly prove the deployed copy is repaired."
+  },
+  "claimControl": {
+    "directMp4ClaimAllowed": false,
+    "fullCommercialGreenAllowed": false,
+    "controlledPreviewCommercialUseAllowed": true,
+    "commerceCustomerPortalGreen": false,
+    "productionObservabilityGreen": false,
+    "autonomousOperationsGreen": false
+  },
+  "security": {
+    "secretsIncluded": false,
+    "customerDataIncluded": false,
+    "paymentDataIncluded": false,
+    "privateRuntimeArtifactsIncluded": false
+  }
+}
