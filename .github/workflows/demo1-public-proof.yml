@@ -13,9 +13,22 @@ on:
       - 'tools/verify-demo1-public-proof.mjs'
       - '.github/workflows/demo1-public-proof.yml'
       - 'docs/launch-readiness/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'demo/assets/**'
+      - 'squarespace/demo-1-final.html'
+      - 'tools/verify-demo1-public-proof.mjs'
+      - '.github/workflows/demo1-public-proof.yml'
+      - 'docs/launch-readiness/**'
 
 permissions:
   contents: read
+
+concurrency:
+  group: demo1-public-proof-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   public-proof:
@@ -44,3 +57,4 @@ jobs:
           name: demo1-public-proof-receipt
           path: out/demo1-public-proof/latest-probe.json
           if-no-files-found: error
+          retention-days: 30
