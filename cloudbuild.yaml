@@ -41,7 +41,7 @@ steps:
       - --port
       - '8080'
       - --set-env-vars
-      - SERVICE_NAME=$_SERVICE_NAME,PROJECT_ID=$PROJECT_ID,REGION=$_REGION
+      - SERVICE_NAME=$_SERVICE_NAME,PROJECT_ID=$PROJECT_ID,REGION=$_REGION,APP_VERSION=$_APP_VERSION,RELEASE_SHA=$COMMIT_SHA,RELEASE_REPO=dominion-os-demo-build,SOURCE_OF_TRUTH_REPO=dominion-os-demo-build,SOURCE_OF_TRUTH_SHA=$COMMIT_SHA,IMAGE_REF=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE_NAME}:${_TAG}
       - --quiet
 
 substitutions:
@@ -51,6 +51,7 @@ substitutions:
   _DOCKERFILE: Dockerfile.production
   _BUILD_CONTEXT: .
   _TAG: latest
+  _APP_VERSION: 2026-07-16-claim-control-cutover
 
 images:
   - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE_NAME}:${_TAG}
