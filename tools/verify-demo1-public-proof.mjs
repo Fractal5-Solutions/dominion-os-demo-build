@@ -13,9 +13,11 @@ const WATCHLIST_PATH = path.join(ROOT, 'demo/assets/demo-1-watchlist.json');
 const MANIFEST_PATH = path.join(ROOT, 'demo/assets/demo-manifest.json');
 const OUT_DIR = process.env.OUT_DIR || path.join(ROOT, 'out/demo1-public-proof');
 const STRICT = String(process.env.PROBE_STRICT || 'false').toLowerCase() === 'true';
+const PROOF_MODE = String(process.env.PROOF_MODE || 'live').toLowerCase();
 const TIMEOUT_MS = Number(process.env.PROBE_TIMEOUT_MS || 20000);
 const GITHUB_REPOSITORY = String(process.env.GITHUB_REPOSITORY || '');
 const GITHUB_SHA = String(process.env.GITHUB_SHA || '');
+const PROOF_SOURCE_SHA = String(process.env.PROOF_SOURCE_SHA || GITHUB_SHA || '');
 
 function nowIso() {
   return new Date().toISOString();
@@ -42,8 +44,8 @@ function urlPathEndsWith(value, suffix) {
   }
 }
 
-function pinRawGithubUrlToCurrentSha(url) {
-  if (!GITHUB_REPOSITORY || !GITHUB_SHA || !isHttpsUrl(url)) return url;
+function pinRawGithubUrlToProofSha(url) {
+  if (!GITHUB_REPOSITORY || !PROOF_SOURCE_SHA || !isHttpsUrl(url)) return url;
   try {
     const parsed = new URL(url);
     if (parsed.hostname !== 'raw.githubusercontent.com') return url;
@@ -52,7 +54,7 @@ function pinRawGithubUrlToCurrentSha(url) {
     const [owner, repo, _ref, ...fileParts] = parts;
     const candidateRepo = `${owner}/${repo}`.toLowerCase();
     if (candidateRepo !== GITHUB_REPOSITORY.toLowerCase()) return url;
-    return `https://raw.githubusercontent.com/${owner}/${repo}/${GITHUB_SHA}/${fileParts.join('/')}`;
+    return `https://raw.githubusercontent.com/${owner}/${repo}/${PROOF_SOURCE_SHA}/${fileParts.join('/')}`;
   } catch {
     return url;
   }
@@ -74,7 +76,7 @@ function flattenUrls(watchlist, manifest) {
     if (key !== 'name') add(`runtime.${key}`, value, key === 'health' || key === 'status' ? 'json' : 'html');
   }
   for (const [key, value] of Object.entries(watchlist.sourceServedAssets || {})) {
-    const sourceServedUrl = pinRawGithubUrlToCurrentSha(value);
+    const sourceServedUrl = pinRawGithubUrlToProofSha(value);
     if (key === 'poster') add(`asset.${key}`, sourceServedUrl, 'svg');
     else if (key === 'squarespaceCode') add(`asset.${key}`, sourceServedUrl, 'html');
     else add(`asset.${key}`, sourceServedUrl, 'json');
@@ -105,7 +107,7 @@ async function fetchWithTimeout(url, kind) {
         method: 'HEAD',
         redirect: 'follow',
         signal: controller.signal,
-        headers: { 'user-agent': 'fractal5-demo1-public-proof/1.2' }
+        headers: { 'user-agent': 'fractal5-demo1-public-proof/1.3' }
       });
       if (res.status === 405) {
         res = await fetch(url, {
@@ -113,7 +115,7 @@ async function fetchWithTimeout(url, kind) {
           redirect: 'follow',
           signal: controller.signal,
           headers: {
-            'user-agent': 'fractal5-demo1-public-proof/1.2',
+            'user-agent': 'fractal5-demo1-public-proof/1.3',
             range: 'bytes=0-0'
           }
         });
@@ -125,7 +127,7 @@ async function fetchWithTimeout(url, kind) {
       method: 'GET',
       redirect: 'follow',
       signal: controller.signal,
-      headers: { 'user-agent': 'fractal5-demo1-public-proof/1.2' }
+      headers: { 'user-agent': 'fractal5-demo1-public-proof/1.3' }
     });
     const body = (await res.text()).slice(0, 750000);
     return responseResult(res, body);
@@ -136,8 +138,8 @@ async function fetchWithTimeout(url, kind) {
   }
 }
 
-function includesAll(body, assertions) {
-  return assertions.map((assertion) => ({ assertion, pass: body.includes(assertion) }));
+function includesAll(body, assertions, target) {
+  return assertions.map((assertion) => ({ assertion, target, pass: body.includes(assertion) }));
 }
 
 function statusPass(kind, status) {
@@ -166,6 +168,14 @@ function deriveVerdict(results, assertionResults, claimDriftResults, directMp4Ve
   if (assertionResults.some((r) => !r.pass)) return 'AMBER';
   if (claimDriftResults.some((r) => !r.pass)) return 'AMBER';
   if (results.some((r) => r.kind === 'mp4') && !directMp4Verified) return 'AMBER';
+  return 'GREEN';
+}
+
+function derivePrIntegrityVerdict(results, assertionResults) {
+  const sourceResults = results.filter((r) => r.name.startsWith('asset.'));
+  const sourceAssertions = assertionResults.filter((r) => r.target === 'source:squarespace/demo-1-final.html');
+  if (sourceResults.some((r) => !r.ok || !r.statusPass || !r.contentTypePass)) return 'RED';
+  if (sourceAssertions.some((r) => !r.pass)) return 'RED';
   return 'GREEN';
 }
 
@@ -213,11 +223,14 @@ async function main() {
 
   const demo1 = results.find((r) => r.name === 'page.demo1')?.body || '';
   const demoRuntime = results.find((r) => r.name === 'runtime.demo')?.body || '';
+  const hardenedSource = results.find((r) => r.name === 'asset.squarespaceCode')?.body || '';
   const requiredAssertions = (watchlist.requiredAssertions || [])
     .map((text) => String(text).replace(/^page contains\s+/i, '').replace(/^`|`$/g, ''));
+  const hardeningAssertions = (watchlist.requiredHardeningAssertions || [])
+    .map((text) => String(text).replace(/^page contains\s+/i, '').replace(/^`|`$/g, ''));
   const assertionResults = [
-    ...includesAll(demo1, requiredAssertions),
-    ...includesAll(demo1, watchlist.requiredHardeningAssertions || [])
+    ...includesAll(demo1, requiredAssertions, 'live:/demo-1'),
+    ...includesAll(hardenedSource, hardeningAssertions, 'source:squarespace/demo-1-final.html')
   ];
 
   const directMp4 = manifest?.assets?.videoMp4 || null;
@@ -225,18 +238,24 @@ async function main() {
   const forbiddenWhenNoMp4 = watchlist.claimDriftChecks?.forbiddenWhenManifestVideoMp4Null || [];
   const claimDriftResults = forbiddenWhenNoMp4.map((needle) => ({
     assertion: `runtime.demo must not contain ${needle} while assets.videoMp4 is null`,
+    target: 'runtime:/demo',
     pass: Boolean(directMp4) || !runtimeLower.includes(String(needle).toLowerCase())
   }));
 
   const mp4Result = results.find((r) => r.name === 'asset.videoMp4') || null;
   const directMp4Verified = mp4EvidencePass(mp4Result, manifest);
   const verdict = deriveVerdict(results, assertionResults, claimDriftResults, directMp4Verified);
+  const prIntegrityVerdict = derivePrIntegrityVerdict(results, assertionResults);
 
   const receipt = {
-    schema: 'f5.demo1.public-proof.receipt.v2',
+    schema: 'f5.demo1.public-proof.receipt.v3',
     generatedAt: nowIso(),
     strict: STRICT,
+    proofMode: PROOF_MODE,
+    verifierVersion: '1.3-pr-integrity-separated-from-live-readiness',
+    proofSourceSha: PROOF_SOURCE_SHA || null,
     verdict,
+    prIntegrityVerdict,
     manifestVideoMp4: directMp4,
     manifestVideoMp4Verified: directMp4Verified,
     fullCommercialGreenAllowed: Boolean(manifest?.claimControl?.fullCommercialGreenAllowed),
@@ -262,7 +281,10 @@ async function main() {
   await fs.writeFile(path.join(OUT_DIR, 'latest-probe.json'), `${JSON.stringify(receipt, null, 2)}\n`, 'utf8');
   console.log(JSON.stringify(receipt, null, 2));
 
-  if (STRICT && verdict !== 'GREEN') process.exitCode = 1;
+  if (STRICT) {
+    if (PROOF_MODE === 'pr' && prIntegrityVerdict !== 'GREEN') process.exitCode = 1;
+    if (PROOF_MODE !== 'pr' && verdict !== 'GREEN') process.exitCode = 1;
+  }
 }
 
 main().catch((error) => {
