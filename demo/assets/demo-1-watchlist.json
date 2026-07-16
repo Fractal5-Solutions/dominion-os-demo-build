@@ -1,6 +1,6 @@
 {
-  "schema": "f5.demo1.watchlist.v1",
-  "generatedAt": "2026-07-15T13:35:00Z",
+  "schema": "f5.demo1.watchlist.v2",
+  "generatedAt": "2026-07-16T23:50:00Z",
   "page": {
     "name": "Fractal5 /demo-1",
     "url": "https://www.fractal5solutions.com/demo-1",
@@ -35,7 +35,8 @@
   "expectedStatus": {
     "html": 200,
     "json": 200,
-    "svg": 200
+    "svg": 200,
+    "mp4": [200, 206]
   },
   "assertionScopes": {
     "requiredAssertions": "live deployed Squarespace /demo-1 page text and links",
@@ -66,6 +67,7 @@
     "ALLOWED_FRACTAL5_URLS"
   ],
   "claimDriftChecks": {
+    "caseInsensitive": true,
     "forbiddenWhenManifestVideoMp4Null": [
       "Actual demo MP4 integrated",
       "Open web MP4",
@@ -75,6 +77,28 @@
     ],
     "manifestVideoMp4Path": "assets.videoMp4",
     "allowedFallbackWhenNull": "sections.watchVideo"
+  },
+  "directMp4EvidenceRequirements": {
+    "requiredBeforeClaim": true,
+    "urlProtocol": "https",
+    "urlPathSuffix": ".mp4",
+    "allowedHttpStatus": [200, 206],
+    "allowedContentTypes": ["video/mp4", "application/octet-stream for an .mp4 URL"],
+    "receiptField": "claimControl.allowDirectMp4Claim",
+    "rule": "A non-null manifest URL alone is not proof. The current public-proof receipt must verify the media response."
+  },
+  "runtimeFreshnessRequirements": {
+    "routes": ["runtime.health", "runtime.status"],
+    "timestampFields": ["generatedAt", "timestamp", "generated_at"],
+    "maximumAgeSeconds": 900,
+    "rule": "Health and status receipts must be current and non-regressing; stale runtime payloads cannot support cloud-health green."
+  },
+  "workflowReceipt": {
+    "workflow": "demo1-public-proof",
+    "artifact": "demo1-public-proof-receipt",
+    "receiptPath": "out/demo1-public-proof/latest-probe.json",
+    "retentionDays": 30,
+    "requiredForGateClosure": true
   },
   "publicBridgeGates": [
     "live /demo-1 deployed page exposes the current public proof bridge assertions",
@@ -103,6 +127,7 @@
     "fullCommerceGreenCurrentlyAllowed": false,
     "fullCommercialGreenCurrentlyAllowed": false,
     "controlledPreviewCommercialUseAllowed": true,
-    "reason": "The current public bridge and source-served assets support controlled preview sharing. Direct MP4, full self-serve commerce, native GCP self-healing, production observability, and production customer portal proof require separate receipts."
+    "runtimeCopyRepairRequired": true,
+    "reason": "The current public bridge and source-served assets support controlled preview sharing. Direct MP4, full self-serve commerce, native GCP self-healing, production observability, and production customer portal proof require separate receipts. Runtime health and status must also remain fresh."
   }
 }
