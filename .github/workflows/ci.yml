@@ -22,19 +22,19 @@ jobs:
 
       - name: Enforce ASCII filename policy
         run: bash scripts/check_ascii_filenames.sh
-      
+
       - name: Set up Python
-        uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c # v4
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: '3.12'
-      
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install flake8 pytest black
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
-      
+
       - name: Lint with flake8
         run: |
           flake8 . --exclude=.git,__pycache__,.venv,.venv*,venv,node_modules,build,dist --count --select=E9,F63,F7,F82 --show-source --statistics
@@ -42,7 +42,7 @@ jobs:
 
       - name: Check formatting with black
         run: black --check . --exclude '/(\.git|__pycache__|\.venv.*|venv|node_modules|build|dist|backups)/' || true
-      
+
       - name: Run tests with pytest
         run: |
           if [ -d tests ]; then
@@ -50,7 +50,7 @@ jobs:
           else
             pytest -q
           fi
-      
+
       - name: Validate bash scripts
         run: |
           chmod +x scripts/*.sh *.sh 2>/dev/null || true
@@ -59,8 +59,8 @@ jobs:
               bash -n "$script" || exit 1
             fi
           done
-          echo "✅ All bash scripts validated"
-      
+          echo "All bash scripts validated"
+
       - name: Validate docker-compose
         run: |
           if command -v docker-compose >/dev/null 2>&1; then
@@ -71,8 +71,8 @@ jobs:
             echo "Docker Compose is unavailable on this runner; skipping validation."
             exit 0
           fi
-          echo "✅ docker-compose-mcp.yml is valid"
-  
+          echo "docker-compose-mcp.yml is valid"
+
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
@@ -81,19 +81,19 @@ jobs:
       security-events: write
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-      
+
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@c1824fd6edce30d7ab345a9989de00bbd46ef284 # 0.34.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # 0.36.0
         continue-on-error: ${{ vars.ENFORCE_TRIVY_SCAN != 'true' }}
         with:
           scan-type: 'fs'
           scan-ref: '.'
           format: 'sarif'
           output: 'trivy-results.sarif'
-      
+
       - name: Upload Trivy results to GitHub Security
         if: ${{ hashFiles('trivy-results.sarif') != '' }}
-        uses: github/codeql-action/upload-sarif@b8d3b6e8af63cde30bdc382c0bc28114f4346c88 # v2
+        uses: github/codeql-action/upload-sarif@e46ed2cbd01164d986452f91f178727624ae40d7 # v4.35.3
         with:
           sarif_file: 'trivy-results.sarif'
 
@@ -104,7 +104,7 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-      
+
       - name: Check configuration files
         run: |
           echo "Verifying deployment readiness..."
@@ -113,11 +113,11 @@ jobs:
           test -f prometheus.yml || exit 1
           test -f scripts/deploy_mcp_full.sh || exit 1
           test -x scripts/deploy_mcp_full.sh || exit 1
-          echo "✅ All configuration files present and valid"
-      
+          echo "All configuration files present and valid"
+
       - name: Generate deployment report
         run: |
-          echo "## 📊 Deployment Readiness Report" >> $GITHUB_STEP_SUMMARY
+          echo "## Deployment Readiness Report" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Configuration Files" >> $GITHUB_STEP_SUMMARY
           ls -lh docker-compose-mcp.yml .env.mcp.template prometheus.yml >> $GITHUB_STEP_SUMMARY
@@ -125,4 +125,4 @@ jobs:
           echo "### Automation Scripts" >> $GITHUB_STEP_SUMMARY
           ls -lh scripts/*.sh >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "✅ Ready for Docker Desktop Pro deployment" >> $GITHUB_STEP_SUMMARY
+          echo "Ready for Docker Desktop Pro deployment" >> $GITHUB_STEP_SUMMARY
