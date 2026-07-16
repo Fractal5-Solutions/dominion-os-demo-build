@@ -21,6 +21,7 @@ RUN pip install --no-cache-dir --user --upgrade pip setuptools wheel && \
 # Build a strict public runtime payload and strip plain Python source.
 RUN mkdir -p /runtime/scripts/telemetry /runtime/demo /runtime/store /runtime/products
 COPY command_core.py /runtime/
+COPY commercial_runtime.py /runtime/
 COPY demo /runtime/demo
 COPY store /runtime/store
 COPY products /runtime/products
@@ -28,7 +29,8 @@ COPY scripts/telemetry/config_project1.txt /runtime/scripts/telemetry/config_pro
 COPY scripts/telemetry/config_project2.txt /runtime/scripts/telemetry/config_project2.txt
 COPY scripts/telemetry/services_project1.txt /runtime/scripts/telemetry/services_project1.txt
 COPY scripts/telemetry/services_project2.txt /runtime/scripts/telemetry/services_project2.txt
-RUN python -m compileall -b /runtime/command_core.py && rm /runtime/command_core.py
+RUN python -m compileall -b /runtime/command_core.py /runtime/commercial_runtime.py && \
+    rm /runtime/command_core.py /runtime/commercial_runtime.py
 
 # Stage 2: Production runtime
 FROM python:3.12-slim AS production
@@ -85,4 +87,4 @@ CMD exec gunicorn --bind :${PORT:-8080} \
     --access-logfile - \
     --error-logfile - \
     --log-file - \
-    "command_core:app"
+    "commercial_runtime:app"
