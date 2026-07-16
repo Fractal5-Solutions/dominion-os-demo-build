@@ -8,10 +8,12 @@ const WATCHLIST_PATH = path.join(ROOT, 'demo/assets/demo-1-watchlist.json');
 const MANIFEST_PATH = path.join(ROOT, 'demo/assets/demo-manifest.json');
 const OUT_DIR = process.env.OUT_DIR || path.join(ROOT, 'out/demo1-public-proof');
 const STRICT = String(process.env.PROBE_STRICT || 'false').toLowerCase() === 'true';
+const PROOF_MODE = String(process.env.PROOF_MODE || 'live').toLowerCase();
 const TIMEOUT_MS = Number(process.env.PROBE_TIMEOUT_MS || 20000);
 const MAX_RECEIPT_AGE_SECONDS = Number(process.env.MAX_RECEIPT_AGE_SECONDS || 900);
 const GITHUB_REPOSITORY = String(process.env.GITHUB_REPOSITORY || '');
 const GITHUB_SHA = String(process.env.GITHUB_SHA || '');
+const PROOF_SOURCE_SHA = String(process.env.PROOF_SOURCE_SHA || GITHUB_SHA || '');
 
 const nowIso = () => new Date().toISOString();
 const readJson = async (filePath) => JSON.parse(await fs.readFile(filePath, 'utf8'));
@@ -26,8 +28,8 @@ function urlPathEndsWith(value, suffix) {
   catch { return false; }
 }
 
-function pinRawGithubUrlToCurrentSha(url) {
-  if (!GITHUB_REPOSITORY || !GITHUB_SHA || !isHttpsUrl(url)) return url;
+function pinRawGithubUrlToProofSha(url) {
+  if (!GITHUB_REPOSITORY || !PROOF_SOURCE_SHA || !isHttpsUrl(url)) return url;
   try {
     const parsed = new URL(url);
     if (parsed.hostname !== 'raw.githubusercontent.com') return url;
@@ -35,7 +37,7 @@ function pinRawGithubUrlToCurrentSha(url) {
     if (parts.length < 4) return url;
     const [owner, repo, _ref, ...fileParts] = parts;
     if (`${owner}/${repo}`.toLowerCase() !== GITHUB_REPOSITORY.toLowerCase()) return url;
-    return `https://raw.githubusercontent.com/${owner}/${repo}/${GITHUB_SHA}/${fileParts.join('/')}`;
+    return `https://raw.githubusercontent.com/${owner}/${repo}/${PROOF_SOURCE_SHA}/${fileParts.join('/')}`;
   } catch { return url; }
 }
 
@@ -50,7 +52,7 @@ function flattenUrls(watchlist, manifest) {
     if (key !== 'name') add(`runtime.${key}`, value, key === 'health' || key === 'status' ? 'json' : 'html');
   }
   for (const [key, value] of Object.entries(watchlist.sourceServedAssets || {})) {
-    const url = pinRawGithubUrlToCurrentSha(value);
+    const url = pinRawGithubUrlToProofSha(value);
     if (key === 'poster') add(`asset.${key}`, url, 'svg');
     else if (key === 'squarespaceCode') add(`asset.${key}`, url, 'html');
     else add(`asset.${key}`, url, 'json');
@@ -76,15 +78,15 @@ async function fetchWithTimeout(url, kind) {
   try {
     if (kind === 'mp4') {
       let res = await fetch(url, { method: 'HEAD', redirect: 'follow', signal: controller.signal,
-        headers: { 'user-agent': 'fractal5-demo1-public-proof/2.0' } });
+        headers: { 'user-agent': 'fractal5-demo1-public-proof/3.1' } });
       if (res.status === 405) {
         res = await fetch(url, { method: 'GET', redirect: 'follow', signal: controller.signal,
-          headers: { 'user-agent': 'fractal5-demo1-public-proof/2.0', range: 'bytes=0-0' } });
+          headers: { 'user-agent': 'fractal5-demo1-public-proof/3.1', range: 'bytes=0-0' } });
       }
       return responseResult(res);
     }
     const res = await fetch(url, { method: 'GET', redirect: 'follow', signal: controller.signal,
-      headers: { 'user-agent': 'fractal5-demo1-public-proof/2.0', 'cache-control': 'no-cache' } });
+      headers: { 'user-agent': 'fractal5-demo1-public-proof/3.1', 'cache-control': 'no-cache' } });
     return responseResult(res, (await res.text()).slice(0, 750000));
   } catch (error) { return responseResult(null, '', error?.message || String(error)); }
   finally { clearTimeout(timeout); }
@@ -126,6 +128,14 @@ function deriveVerdict(results, assertionResults, claimDriftResults, freshnessRe
   if (claimDriftResults.some((r) => !r.pass)) return 'AMBER';
   if (freshnessResults.some((r) => !r.pass)) return 'AMBER';
   if (results.some((r) => r.kind === 'mp4') && !directMp4Verified) return 'AMBER';
+  return 'GREEN';
+}
+
+function derivePrIntegrityVerdict(results, assertionResults) {
+  const sourceResults = results.filter((r) => r.name.startsWith('asset.'));
+  const sourceAssertions = assertionResults.filter((r) => r.target === 'source:squarespace/demo-1-final.html');
+  if (sourceResults.some((r) => !r.ok || !r.statusPass || !r.contentTypePass)) return 'RED';
+  if (sourceAssertions.some((r) => !r.pass)) return 'RED';
   return 'GREEN';
 }
 
@@ -171,10 +181,12 @@ async function main() {
   const freshnessResults = ['runtime.health', 'runtime.status']
     .map((name) => results.find((r) => r.name === name)).filter(Boolean).map(freshnessCheck);
   const verdict = deriveVerdict(results, assertionResults, claimDriftResults, freshnessResults, directMp4Verified);
+  const prIntegrityVerdict = derivePrIntegrityVerdict(results, assertionResults);
 
   const receipt = {
-    schema: 'f5.demo1.public-proof.receipt.v3', generatedAt: nowIso(), strict: STRICT,
-    verifierVersion: '3.0-claim-media-freshness-and-scope-safe', verdict,
+    schema: 'f5.demo1.public-proof.receipt.v4', generatedAt: nowIso(), strict: STRICT,
+    proofMode: PROOF_MODE, proofSourceSha: PROOF_SOURCE_SHA || null,
+    verifierVersion: '4.0-exact-pr-source-and-live-readiness-separated', verdict, prIntegrityVerdict,
     manifestVideoMp4: directMp4, manifestVideoMp4Verified: directMp4Verified,
     fullCommercialGreenAllowed: Boolean(manifest?.claimControl?.fullCommercialGreenAllowed),
     summary: {
@@ -198,7 +210,10 @@ async function main() {
   await fs.mkdir(OUT_DIR, { recursive: true });
   await fs.writeFile(path.join(OUT_DIR, 'latest-probe.json'), `${JSON.stringify(receipt, null, 2)}\n`, 'utf8');
   console.log(JSON.stringify(receipt, null, 2));
-  if (STRICT && verdict !== 'GREEN') process.exitCode = 1;
+  if (STRICT) {
+    if (PROOF_MODE === 'pr' && prIntegrityVerdict !== 'GREEN') process.exitCode = 1;
+    if (PROOF_MODE !== 'pr' && verdict !== 'GREEN') process.exitCode = 1;
+  }
 }
 
 main().catch((error) => { console.error(error); process.exit(1); });
