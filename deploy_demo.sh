@@ -8,13 +8,17 @@ AR_REPO="${AR_REPO:-dominion-demo-repo}"
 DOCKERFILE="${DOCKERFILE:-Dockerfile.production}"
 BUILD_CONTEXT="${BUILD_CONTEXT:-.}"
 TAG="${TAG:-latest}"
+APP_VERSION="${APP_VERSION:-2026-07-16-claim-control-cutover}"
 DEMO_HOST="${DEMO_HOST:-https://www.fractal5solutions.com/demo}"
 
-echo "== Fractal5 Demo Deploy =="
-echo "Project:  ${PROJECT_ID}"
-echo "Region:   ${REGION}"
-echo "Service:   ${SERVICE_NAME}"
-echo "Image:    ${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPO}/${SERVICE_NAME}:${TAG}"
+IMAGE_REF="${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPO}/${SERVICE_NAME}:${TAG}"
+
+printf '%s\n' "== Fractal5 Demo Deploy =="
+printf 'Project:  %s\n' "${PROJECT_ID}"
+printf 'Region:   %s\n' "${REGION}"
+printf 'Service:  %s\n' "${SERVICE_NAME}"
+printf 'Image:    %s\n' "${IMAGE_REF}"
+printf 'Version:  %s\n' "${APP_VERSION}"
 
 if ! gcloud auth list --filter=status:ACTIVE --format='value(account)' | grep -q '@'; then
   echo "ERROR: no active gcloud identity found. Run: gcloud auth login"
@@ -50,15 +54,17 @@ gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
 gcloud builds submit "${BUILD_CONTEXT}" \
   --project="${PROJECT_ID}" \
   --config=cloudbuild.yaml \
-  --substitutions="_SERVICE_NAME=${SERVICE_NAME},_REGION=${REGION},_AR_REPO=${AR_REPO},_DOCKERFILE=${DOCKERFILE},_BUILD_CONTEXT=${BUILD_CONTEXT},_TAG=${TAG}"
+  --substitutions="_SERVICE_NAME=${SERVICE_NAME},_REGION=${REGION},_AR_REPO=${AR_REPO},_DOCKERFILE=${DOCKERFILE},_BUILD_CONTEXT=${BUILD_CONTEXT},_TAG=${TAG},_APP_VERSION=${APP_VERSION}"
 
 SERVICE_URL="$(gcloud run services describe "${SERVICE_NAME}" --project="${PROJECT_ID}" --region="${REGION}" --format='value(status.url)')"
 
-echo
-echo "Deployment complete."
-echo "Service URL: ${SERVICE_URL}"
-echo "Demo URL:    ${DEMO_HOST}"
-echo
-echo "Smoke checks:"
-echo "  curl -I ${DEMO_HOST}"
-echo "  curl -s ${SERVICE_URL}/healthz"
+printf '\nDeployment submitted.\n'
+printf 'Service URL: %s\n' "${SERVICE_URL}"
+printf 'Demo URL:    %s\n' "${DEMO_HOST}"
+printf '\nSmoke checks:\n'
+printf '  curl -I %s\n' "${DEMO_HOST}"
+printf '  curl -s %s/health | jq .\n' "${SERVICE_URL}"
+printf '  curl -s https://www.fractal5solutions.com/status | jq .\n'
+printf '\nClaim-drift check:\n'
+printf '  The live /demo page must not contain: All-green release evidence, Actual demo MP4 integrated, Open web MP4, Open master MP4.\n'
+printf '  Only set all-green after demo1-public-proof and every #649 gate passes.\n'
