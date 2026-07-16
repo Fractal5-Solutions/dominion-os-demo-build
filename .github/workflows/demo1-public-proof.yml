@@ -36,8 +36,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Checkout
+      - name: Checkout exact source under test
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Confirm runner Node
         run: |
@@ -47,6 +49,8 @@ jobs:
       - name: Run public proof verifier
         env:
           PROBE_STRICT: 'true'
+          PROOF_MODE: ${{ github.event_name == 'pull_request' && 'pr' || 'live' }}
+          PROOF_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
           MAX_RECEIPT_AGE_SECONDS: '900'
           OUT_DIR: out/demo1-public-proof
         run: node tools/verify-demo1-public-proof.mjs
