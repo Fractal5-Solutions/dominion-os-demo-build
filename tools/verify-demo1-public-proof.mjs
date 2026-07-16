@@ -14,6 +14,8 @@ const MANIFEST_PATH = path.join(ROOT, 'demo/assets/demo-manifest.json');
 const OUT_DIR = process.env.OUT_DIR || path.join(ROOT, 'out/demo1-public-proof');
 const STRICT = String(process.env.PROBE_STRICT || 'false').toLowerCase() === 'true';
 const TIMEOUT_MS = Number(process.env.PROBE_TIMEOUT_MS || 20000);
+const GITHUB_REPOSITORY = String(process.env.GITHUB_REPOSITORY || '');
+const GITHUB_SHA = String(process.env.GITHUB_SHA || '');
 
 function nowIso() {
   return new Date().toISOString();
@@ -32,21 +34,52 @@ function isHttpsUrl(value) {
   }
 }
 
+function urlPathEndsWith(value, suffix) {
+  try {
+    return new URL(value).pathname.toLowerCase().endsWith(String(suffix).toLowerCase());
+  } catch {
+    return false;
+  }
+}
+
+function pinRawGithubUrlToCurrentSha(url) {
+  if (!GITHUB_REPOSITORY || !GITHUB_SHA || !isHttpsUrl(url)) return url;
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname !== 'raw.githubusercontent.com') return url;
+    const parts = parsed.pathname.split('/').filter(Boolean);
+    if (parts.length < 4) return url;
+    const [owner, repo, _ref, ...fileParts] = parts;
+    const candidateRepo = `${owner}/${repo}`.toLowerCase();
+    if (candidateRepo !== GITHUB_REPOSITORY.toLowerCase()) return url;
+    return `https://raw.githubusercontent.com/${owner}/${repo}/${GITHUB_SHA}/${fileParts.join('/')}`;
+  } catch {
+    return url;
+  }
+}
+
 function flattenUrls(watchlist, manifest) {
   const urls = [];
-  function add(name, url, kind) {
-    if (isHttpsUrl(url)) urls.push({ name, url, kind });
+  function add(name, url, kind, options = {}) {
+    if (isHttpsUrl(url)) {
+      urls.push({ name, url, kind, validUrl: true });
+      return;
+    }
+    if (options.requiredWhenPresent && url) {
+      urls.push({ name, url: String(url), kind, validUrl: false });
+    }
   }
   add('page.demo1', watchlist.page?.url, 'html');
   for (const [key, value] of Object.entries(watchlist.runtime || {})) {
     if (key !== 'name') add(`runtime.${key}`, value, key === 'health' || key === 'status' ? 'json' : 'html');
   }
   for (const [key, value] of Object.entries(watchlist.sourceServedAssets || {})) {
-    if (key === 'poster') add(`asset.${key}`, value, 'svg');
-    else if (key === 'squarespaceCode') add(`asset.${key}`, value, 'html');
-    else add(`asset.${key}`, value, 'json');
+    const sourceServedUrl = pinRawGithubUrlToCurrentSha(value);
+    if (key === 'poster') add(`asset.${key}`, sourceServedUrl, 'svg');
+    else if (key === 'squarespaceCode') add(`asset.${key}`, sourceServedUrl, 'html');
+    else add(`asset.${key}`, sourceServedUrl, 'json');
   }
-  add('asset.videoMp4', manifest?.assets?.videoMp4, 'mp4');
+  add('asset.videoMp4', manifest?.assets?.videoMp4, 'mp4', { requiredWhenPresent: true });
   return urls;
 }
 
@@ -117,14 +150,14 @@ function contentTypePass(kind, contentType, url = '') {
   if (kind === 'json') return type.includes('json') || type.includes('text/plain');
   if (kind === 'svg') return type.includes('svg') || type.includes('xml') || type.includes('text/plain');
   if (kind === 'mp4') {
-    return type.includes('video/mp4') || (type.includes('application/octet-stream') && String(url).toLowerCase().includes('.mp4'));
+    return type.includes('video/mp4') || (type.includes('application/octet-stream') && urlPathEndsWith(url, '.mp4'));
   }
   return type.includes('html') || type.includes('text/plain');
 }
 
 function mp4EvidencePass(result, manifest) {
   const directMp4 = manifest?.assets?.videoMp4 || null;
-  return Boolean(directMp4 && result?.ok && result?.statusPass && result?.contentTypePass);
+  return Boolean(directMp4 && result?.validUrl !== false && result?.ok && result?.statusPass && result?.contentTypePass);
 }
 
 function deriveVerdict(results, assertionResults, claimDriftResults, directMp4Verified) {
@@ -143,11 +176,29 @@ async function main() {
 
   const results = [];
   for (const item of urls) {
+    if (item.validUrl === false) {
+      results.push({
+        name: item.name,
+        url: item.url,
+        kind: item.kind,
+        validUrl: false,
+        ok: false,
+        status: 0,
+        statusPass: false,
+        contentType: '',
+        contentLength: null,
+        bytes: 0,
+        error: 'invalid or non-HTTPS URL',
+        contentTypePass: false
+      });
+      continue;
+    }
     const fetched = await fetchWithTimeout(item.url, item.kind);
     results.push({
       name: item.name,
       url: item.url,
       kind: item.kind,
+      validUrl: item.validUrl,
       ok: fetched.ok,
       status: fetched.status,
       statusPass: statusPass(item.kind, fetched.status),
