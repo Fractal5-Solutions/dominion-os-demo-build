@@ -5,35 +5,23 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: read
-  pull-requests: read
   security-events: write
 
 jobs:
   analyze:
-    name: codeql-applicability
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [actions]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
-
-      - name: Assess CodeQL applicability
-        shell: bash
-        run: |
-          set -euo pipefail
-          echo "Public demo-build CodeQL applicability gate."
-          echo "This branch contains static public demo artifacts, verification scripts, reports, and policy files."
-          echo "It is not the private Dominion OS production source tree and must not expose private code."
-
-          python_files=$(find . -type f -name '*.py' -not -path './.git/*' | wc -l | tr -d ' ')
-          js_files=$(find . -type f \( -name '*.js' -o -name '*.mjs' -o -name '*.cjs' \) -not -path './.git/*' | wc -l | tr -d ' ')
-          html_files=$(find . -type f -name '*.html' -not -path './.git/*' | wc -l | tr -d ' ')
-          json_files=$(find . -type f -name '*.json' -not -path './.git/*' | wc -l | tr -d ' ')
-
-          echo "Python files: ${python_files}"
-          echo "JavaScript files: ${js_files}"
-          echo "HTML files: ${html_files}"
-          echo "JSON files: ${json_files}"
-          echo "Security coverage remains enforced by the Security Scan, PHI + MCP CI/CD, governance-suite, and public-safety receipt checks."
-          echo "Full CodeQL analysis belongs on private source repositories, not this public demo-build artifact surface."
+      - uses: actions/checkout@v4
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
