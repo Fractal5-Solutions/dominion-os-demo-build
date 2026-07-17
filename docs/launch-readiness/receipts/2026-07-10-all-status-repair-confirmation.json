@@ -1,0 +1,107 @@
+{
+  "schema": "f5.dominion.all-status-repair-confirmation.v1",
+  "generatedAt": "2026-07-10T00:00:00-07:00",
+  "status": "AMBER_NOT_FULL_GREEN",
+  "sourceOfTruth": {
+    "repository": "Fractal5-Solutions/dominion-os-demo-build",
+    "branch": "agent/full-commercial-green-20260710",
+    "pullRequest": 152,
+    "canonicalBridge": "https://www.fractal5solutions.com/demo-1",
+    "runtimeDemo": "https://demo-reduwyf2ra-uc.a.run.app/demo"
+  },
+  "operatorIntent": "Repair and confirm all green/all status without overstating readiness.",
+  "result": "The proof machinery is repaired and current status is confirmed, but full commercial GREEN is not yet allowed because required external receipts are still missing.",
+  "repairsCompletedInThisBranch": [
+    {
+      "id": "full-commercial-green-execution-plan",
+      "status": "DONE",
+      "evidence": "docs/launch-readiness/2026-07-10-full-commercial-green-execution-plan.md and demo/assets/full-commercial-green-execution-plan.json define all receipt-producing gates."
+    },
+    {
+      "id": "all-status-repair-confirmation",
+      "status": "DONE",
+      "evidence": "This receipt records the current gate status without claiming unsupported green."
+    }
+  ],
+  "currentGateStatus": [
+    {
+      "area": "demo-runtime",
+      "status": "AMBER",
+      "reason": "The public package records a live Cloud Run demo route, but the previously identified MP4 claim drift cannot be repaired from dominion-os-demo-build because the runtime phrase was not found in this repository. Repair must occur in the deployed Cloud Run service source/image or by publishing a real verified MP4 URL."
+    },
+    {
+      "area": "hardened-website-bridge-source",
+      "status": "GREEN",
+      "reason": "squarespace/demo-1-final.html contains the hardened source bridge tokens, required CTAs, current receipts link, hidden poster fallback, noreferrer/referrer hardening, and manifest URL allowlist logic."
+    },
+    {
+      "area": "hardened-website-bridge-live-dom",
+      "status": "AMBER",
+      "reason": "A fresh live-DOM receipt from the deployed Squarespace page is still required before this gate is fully green."
+    },
+    {
+      "area": "source-served-assets-source",
+      "status": "GREEN",
+      "reason": "Manifest, poster, sample data, demo package, and release receipts exist in the public demo-build package and preserve public-safety claim control."
+    },
+    {
+      "area": "security-public-boundary",
+      "status": "AMBER",
+      "reason": "Public assets assert no secrets/customer/payment data, but current secret scan, dependency scan, tenant-isolation proof, and release-security receipts are not present in this packet."
+    },
+    {
+      "area": "build-test-e2e",
+      "status": "AMBER",
+      "reason": "The plan and watchlist are present, but a current release-candidate CI/build/link/browser/e2e receipt is still required."
+    },
+    {
+      "area": "cloud-health",
+      "status": "AMBER",
+      "reason": "Existing readiness evidence records /health and /status as green, but a fresh current-run route probe receipt is still required for final full commercial green."
+    },
+    {
+      "area": "commerce-customer-portal",
+      "status": "RED",
+      "reason": "No self-serve checkout, customer portal, automated billing, production payment/provisioning, or fully receipted invoice-only commercial motion is present in this public packet."
+    },
+    {
+      "area": "observability-alert-routing",
+      "status": "AMBER",
+      "reason": "Health/status endpoints and watchlist scaffolding exist, but SLO, uptime monitor, alert routing, log/metrics retention, and incident receipt proof are still required."
+    },
+    {
+      "area": "rollback-incident-response",
+      "status": "AMBER",
+      "reason": "Rollback and incident-response receipts remain required for Squarespace bridge, Cloud Run runtime, and source-served asset recovery."
+    },
+    {
+      "area": "autonomous-operations-self-healing",
+      "status": "AMBER",
+      "reason": "Watcher scaffolding exists, but autonomous remediation or native/equivalent self-healing is not green unless separately proved."
+    }
+  ],
+  "blockingReceiptsBeforeFullGreen": [
+    "demo runtime claim-drift repair receipt or real verified public MP4 receipt",
+    "deployed /demo-1 live-DOM verification receipt",
+    "fresh Cloud Run route probe receipt for root/demo/health/status",
+    "secret scan receipt",
+    "dependency scan receipt",
+    "public-boundary review receipt",
+    "tenant-isolation proof receipt",
+    "current CI/build/link/browser/e2e receipt",
+    "commerce motion receipt for either self-serve checkout or invoice-only procurement",
+    "customer onboarding and entitlement lifecycle receipt",
+    "observability and alert-routing receipt",
+    "rollback and incident-response receipt",
+    "autonomous watcher/remediation receipt or explicit alert-only scope"
+  ],
+  "claimControl": {
+    "controlledPreviewAllowed": true,
+    "fullCommercialGreenAllowed": false,
+    "directMp4ClaimAllowed": false,
+    "customerPortalGreenAllowed": false,
+    "selfServeCheckoutGreenAllowed": false,
+    "nativeGcpSelfHealingGreenAllowed": false,
+    "finalRule": "No receipt, no green."
+  }
+}

@@ -1,0 +1,141 @@
+{
+  "schema": "f5.dominion.commercial-launch-readiness.v1",
+  "generatedAt": "2026-07-15T13:35:00Z",
+  "sourceOfTruth": {
+    "repository": "Fractal5-Solutions/dominion-os-demo-build",
+    "path": "demo/assets/commercial-launch-readiness.json",
+    "environment": "demo-sandbox",
+    "publicSurface": "https://www.fractal5solutions.com/demo-1"
+  },
+  "overallStatus": "AMBER",
+  "summary": "Dominion OS is public-demo ready. The canonical /demo-1 public bridge contract is aligned for controlled prospect sharing, Cloud Run health/status remain the public runtime receipts, and source-served assets are public-safe. Full commercial launch remains blocked until direct MP4 evidence or corrected MP4 language, commerce/customer-portal or invoice-only procurement proof, production observability, autonomous remediation, rollback, and client-safe payment/provisioning receipts exist.",
+  "statusMatrix": [
+    {
+      "area": "demo-runtime",
+      "status": "GREEN-AMBER",
+      "currentEvidence": [
+        "Cloud Run /demo is declared as the public runtime surface.",
+        "Canonical demo-manifest.json still has assets.videoMp4 set to null and fullCommercialGreenAllowed set to false.",
+        "The public-proof verifier continues to forbid direct MP4 language while assets.videoMp4 is null."
+      ],
+      "greenGate": "Either publish and verify a real public MP4 asset with manifest metadata, or keep runtime/public bridge copy from implying direct MP4 availability."
+    },
+    {
+      "area": "hardened-website-bridge",
+      "status": "GREEN",
+      "currentEvidence": [
+        "Live https://www.fractal5solutions.com/demo-1 exposes the current public proof bridge: public demo, proof path, health/status JSON, manifest, readiness matrix, watchlist, controlled-access path, and public/private boundary language.",
+        "demo/assets/demo-1-watchlist.json now treats live bridge assertions and source hardening assertions as separate scopes instead of requiring legacy source CTA text to appear verbatim in the deployed Squarespace page.",
+        "tools/verify-demo1-public-proof.mjs now checks current live /demo-1 bridge assertions against the deployed page and checks hardened data-version, noreferrer/referrer policy, hidden poster fallback, and allowlist constants against the source-served squarespace/demo-1-final.html package."
+      ],
+      "greenGate": "Maintain live public-bridge assertions, source hardening assertions, and public-safe route/asset probes without exposing private systems."
+    },
+    {
+      "area": "source-served-assets",
+      "status": "GREEN",
+      "currentEvidence": [
+        "demo/assets/demo-manifest.json is public and source-served.",
+        "demo/assets/sample-data.json is public and asserts no production data, customer data, secrets, or payment data.",
+        "demo/assets/demo-download-package.json is public and states it is not a private source-code bundle and contains no keys, customer data, payment data, or private runtime artifacts.",
+        "demo/assets/release-receipts.json and commercial-proof-receipts-index.json preserve claim-control boundaries."
+      ],
+      "greenGate": "Keep source-served assets public, public-safe, and continuously watched; do not add binary or private assets without separate receipts."
+    },
+    {
+      "area": "security",
+      "status": "AMBER",
+      "currentEvidence": [
+        "Public demo assets assert no secrets, no customer data, no payment data, and no private services exposed.",
+        "The bridge and launch pages maintain public/private boundary language.",
+        "Current complete commercial-production security and tenant-isolation receipts remain separate gates."
+      ],
+      "greenGate": "Secret scanning, dependency scanning, tenant-isolation proof, public-boundary review, and release-security receipts exist for the public and production paths."
+    },
+    {
+      "area": "build-test",
+      "status": "AMBER",
+      "currentEvidence": [
+        "PR #146 merged the executable public-proof layer.",
+        "PR #150 made the public-proof verifier strict.",
+        "PR #151 and PR #152 merged durable commercial launch gate ledgers.",
+        "PR #153 merged the 2026-07-10 commercial readiness audit receipt.",
+        "A current post-merge strict public-proof artifact is still required before any all-green commercial claim."
+      ],
+      "greenGate": "Current CI, link checks, asset checks, public-boundary checks, e2e bridge checks, and runtime claim-drift checks pass on the release candidate."
+    },
+    {
+      "area": "cloud-health",
+      "status": "GREEN",
+      "currentEvidence": [
+        "Cloud Run /health and /status are the public runtime receipt surfaces declared by the manifest and watchlist.",
+        "The public bridge exposes the public demo, health, and status routes without exposing private APIs, keys, customer data, payment systems, signed services, or production workflows."
+      ],
+      "greenGate": "Continue hourly route probes and preserve public health/status receipts without exposing secrets."
+    },
+    {
+      "area": "commerce-customer-portal",
+      "status": "RED",
+      "currentEvidence": [
+        "No public proof of self-serve checkout, customer portal, subscription, billing, tenant provisioning, entitlement lifecycle, payment/procurement, support, refund, or privacy receipts is allowed to be inferred from the bridge.",
+        "Controlled-preview commercial use is allowed only as a governed/invoice-only or scoped access path with no payment data exposed on the public bridge."
+      ],
+      "greenGate": "Live checkout/customer portal or deliberately invoice-only sales motion is documented with payment/procurement, onboarding, entitlement, support, refund, and privacy receipts."
+    },
+    {
+      "area": "observability",
+      "status": "AMBER",
+      "currentEvidence": [
+        "Health and status endpoints exist and are public.",
+        "No durable public proof of uptime checks, alert routing, SLOs, incident receipts, traces, metrics retention, or rollback evidence is present as a full commercial receipt."
+      ],
+      "greenGate": "Uptime, alerting, log-sampling, SLO, incident-response, and rollback receipts are generated and stored without exposing secrets."
+    },
+    {
+      "area": "autonomous-operations",
+      "status": "AMBER",
+      "currentEvidence": [
+        "Native GCP self-healing remains explicitly unclaimed without separate proof.",
+        "Autonomous operations claims require watcher ingestion, remediation, and rollback/recovery receipts before they can move green."
+      ],
+      "greenGate": "Watcher ingestion, autonomous remediation, rollback/recovery, native or equivalent self-healing, and auditable receipts exist and are current."
+    }
+  ],
+  "publicBridgeClaimControl": {
+    "publicBridgeContractCurrentlyAligned": true,
+    "liveBridgeAssertionsCheckedByVerifier": true,
+    "sourceHardeningAssertionsCheckedByVerifier": true,
+    "controlledPreviewCommercialUseAllowed": true,
+    "fullCommercialGreenCurrentlyAllowed": false
+  },
+  "claimControl": {
+    "allowedNow": [
+      "Dominion OS has a live public Google Cloud demo surface with public demo, health, and status routes.",
+      "Dominion OS has a canonical Fractal5 /demo-1 public website bridge for controlled prospect sharing.",
+      "Dominion OS has source-served public demo assets, sample data, release receipts, watchlist verification scaffolding, and a commercial proof receipt index.",
+      "The public bridge contract is aligned: current live bridge assertions are verified on /demo-1 and hardening assertions are verified against the source-served Squarespace package."
+    ],
+    "notAllowedWithoutSeparateReceipts": [
+      "direct MP4 is available unless a real public MP4 URL is published and verified",
+      "full SaaS commerce is green",
+      "customer portal is green",
+      "native GCP self-healing is green",
+      "production observability is green",
+      "full commercial stack is 100% green"
+    ],
+    "directMp4CurrentlyAvailable": false,
+    "fullCommercialGreenCurrentlyAllowed": false,
+    "controlledPreviewCommercialUseAllowed": true
+  },
+  "requiredReceiptsForFullCommercialGreen": [
+    "claim-drift repair receipt for /demo MP4 language versus manifest or verified public MP4 promotion",
+    "daemon watchlist ingestion receipt",
+    "hourly probe output for /demo-1, Cloud Run routes, and raw assets",
+    "secret/public-boundary scan receipt",
+    "current CI/build/test/e2e receipt",
+    "commerce or invoice-only sales-motion receipt",
+    "customer onboarding and entitlement receipt",
+    "observability and alert-routing receipt",
+    "rollback and incident-response receipt",
+    "autonomous remediation/self-healing receipt if that claim is made"
+  ]
+}

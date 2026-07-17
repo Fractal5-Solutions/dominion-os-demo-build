@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import subprocess
 from datetime import datetime, timezone
@@ -15,6 +16,8 @@ import requests
 from flask import Flask, abort, jsonify, render_template_string, request, send_from_directory
 
 BASE_DIR = Path(__file__).resolve().parent
+
+logger = logging.getLogger("dominion-command-core")
 
 app = Flask(__name__)
 app.config["JSON_SORT_KEYS"] = False
@@ -292,9 +295,11 @@ def read_json_file(path: Path, default):
 def is_safe_slug(value: str) -> bool:
     if not value:
         return False
-    if value.startswith(".") or ".." in value or "/" in value or "\\" in value:
+    if "/" in value or "\\" in value:
         return False
-    return re.fullmatch(r"[A-Za-z0-9._-]+", value) is not None
+    if value.startswith(".") or value.endswith(".") or ".." in value:
+        return False
+    return re.fullmatch(r"[A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+)*", value) is not None
 
 
 def url_port(url: str) -> int | None:
@@ -330,8 +335,9 @@ def probe_service(base_url: str, health_paths: tuple[str, ...], enabled: bool) -
                 }
             last_status_code = response.status_code
             last_error = f"HTTP {response.status_code}"
-        except requests.RequestException as exc:
-            last_error = str(exc)
+        except requests.RequestException:
+            # Avoid exposing internal network exception details in API responses.
+            last_error = "request_failed"
 
     if last_status_code is not None:
         return {
@@ -568,13 +574,10 @@ def product_detail(slug: str):
     # Accept repo slugs like dominion-os-1.0-gcloud while blocking traversal.
     if not is_safe_slug(slug):
         abort(400)
-    product_file = BASE_DIR / "products" / slug / "product.json"
-    payload = read_json_file(product_file, None)
-    if payload is None:
-        abort(404)
-    payload["slug"] = slug
-    payload["spec_path"] = f"/api/products/{slug}"
-    return jsonify(payload)
+    for product in load_products():
+        if product.get("slug") == slug:
+            return jsonify(product)
+    abort(404)
 
 
 @app.route("/api/demo/experience")

@@ -1,5 +1,8 @@
 name: Production Deploy (Cost-Optimized)
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ main ]
@@ -10,7 +13,6 @@ on:
       - '.github/workflows/canon-phi-validation.yml'
   workflow_dispatch:
 
-# Cancel in-progress runs on new commits (saves 20-40%)
 concurrency:
   group: production-deploy-${{ github.ref }}
   cancel-in-progress: true
@@ -19,19 +21,18 @@ jobs:
   test:
     name: Quick Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 10  # Prevent runaway costs
-    
+    timeout-minutes: 10
+
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
-          fetch-depth: 1  # Shallow clone
-      
-      # Aggressive caching
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+          fetch-depth: 1
+
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: '3.12'
           cache: 'pip'
-      
+
       - name: Cache test dependencies
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
@@ -39,17 +40,16 @@ jobs:
             ~/.cache/pip
             .pytest_cache
           key: test-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
-      
+
       - name: Install minimal dependencies
         run: |
           pip install pytest pytest-cov bandit safety --quiet
-      
+
       - name: Fast security scan
         run: |
-          bandit -r . -ll -q || true  # Only high severity
-          safety check --bare || true  # Minimal output
-      
-      # Only run tests if code changed
+          bandit -r . -ll -q || true
+          safety check --bare || true
+
       - name: Check for code changes
         id: changed
         run: |
@@ -58,7 +58,7 @@ jobs:
           else
             echo "code_changed=false" >> $GITHUB_OUTPUT
           fi
-      
+
       - name: Run pytest
         if: steps.changed.outputs.code_changed == 'true'
         run: pytest --tb=short -q
@@ -68,7 +68,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     timeout-minutes: 15
-    
+
     permissions:
       contents: read
       id-token: write
@@ -78,7 +78,7 @@ jobs:
       SERVICE_NAME: dominion-os-demo
       IMAGE_REPO: us-central1-docker.pkg.dev/dominion-core-prod/dominion-os/dominion-os-demo
       DEPLOY_ENABLED: ${{ vars.ENABLE_PROD_DEPLOY || 'false' }}
-    
+
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
@@ -124,26 +124,23 @@ jobs:
           TOKEN_FILE="$RUNNER_TEMP/gcp-access-token.txt"
           printf '%s' "$GCP_ACCESS_TOKEN" > "$TOKEN_FILE"
           echo "token_file=$TOKEN_FILE" >> "$GITHUB_OUTPUT"
-      
-      # Use Docker buildx for layer caching
+
       - if: steps.preflight.outputs.ready == 'true'
         uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
-      
+
       - name: Build with cache
         if: steps.preflight.outputs.ready == 'true'
         env:
           CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ steps.gcp-token.outputs.token_file }}
         run: |
           docker login -u oauth2accesstoken --password-stdin https://us-central1-docker.pkg.dev < "${{ steps.gcp-token.outputs.token_file }}"
-          
-          # Build with GitHub Actions cache
           docker buildx build \
             --cache-from type=gha \
             --cache-to type=gha,mode=max \
             --tag ${IMAGE_REPO}:${{ github.sha }} \
             --push \
             .
-      
+
       - name: Deploy to Cloud Run
         if: steps.preflight.outputs.ready == 'true'
         env:
@@ -165,8 +162,7 @@ jobs:
         if: steps.preflight.outputs.ready != 'true'
         run: |
           echo "Skipping cost-optimized deploy. Missing prerequisites: ${{ steps.preflight.outputs.missing }}"
-      
-      # No artifact upload unless failure
+
       - name: Upload failure logs
         if: failure()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -174,5 +170,5 @@ jobs:
           name: deploy-failure-logs
           path: |
             *.log
-          retention-days: 3  # Minimal retention
+          retention-days: 3
           compression-level: 9

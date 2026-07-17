@@ -12,6 +12,7 @@ from __future__ import annotations
 import base64
 import hashlib
 import os
+import re
 import secrets
 from datetime import datetime, timedelta, timezone
 from http import HTTPStatus
@@ -43,6 +44,7 @@ PLACEHOLDER_VALUES = {
     "your_client_secret_here",
     "change-me",
 }
+SAFE_ERROR_RE = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
 
 app = Flask(__name__)
 app.config.update(
@@ -104,6 +106,13 @@ def verify_state(expected_state: str | None, received_state: str | None) -> bool
     if not expected_state or not received_state:
         return False
     return secrets.compare_digest(expected_state, received_state)
+
+
+def safe_error_token(value: str | None, default: str = "oauth_error") -> str:
+    token = (value or "").strip()
+    if SAFE_ERROR_RE.fullmatch(token):
+        return token
+    return default
 
 
 def health_payload() -> dict:
@@ -213,7 +222,7 @@ def github_auth():
 def github_callback():
     error = request.args.get("error")
     if error:
-        return redirect(f"/?error={quote(error)}")
+        return redirect("/?error=oauth_error")
 
     if not verify_state(session.get("state"), request.args.get("state")):
         return redirect("/?error=invalid_state")

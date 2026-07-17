@@ -1,0 +1,18 @@
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+
+  0      0   0      0   0      0      0      0                              0
+  0     36   0      0   0      0      0      0                              0
+HTTP/1.1 302 Found
+set-cookie: GCP_IAP_XSRF_NONCE_Io4OtzooAw-ut9JGeBQHrQ=1; expires=Sun, 19-Apr-2026 22:04:13 GMT; path=/; Secure; HttpOnly
+location: https://accounts.google.com/o/oauth2/v2/auth?client_id=369001918367-t5qrahnqdaasaifvk6akpqkpjk9vli58.apps.googleusercontent.com&response_type=code&scope=openid+email&redirect_uri=https://iap.googleapis.com/v1/oauth/clientIds/369001918367-t5qrahnqdaasaifvk6akpqkpjk9vli58.apps.googleusercontent.com:handleRedirect&code_challenge=ObHxnNCpdp1TSg_g7ws-SUgrK5eGgxkfdz470_N12KE&code_challenge_method=S256&cred_ref=true&state=AUKY-CwEY0P4INUl_FO4wP0wnNsWrR8pwFJ5fzfG60CWfdI1VMbxe1K9Wmz9o0_E5FYhrnSLLCC-hxLWczblWA8bHZDPVrEX3N7fdnalr-_4anjUaGaboaJ9rNY0VW89F9ypdukfKgGsvI3gxRO4M-AIWHsz-uAntOjRNFz9b87aZ76dMr_m3e0DoFgbp21YlwrPvwMd06UOrIkCYAw7J8Phfdrlopejdr4sap1cyziwvtB_CeTd3Mj2PT1IBoA39RNmDBK0audThA89MoD9vaT3sAC5H2a8MC6EnSwJBmqOeWEsAgCubDsB5hJ-ehKlG88Ce97BA_tpmsFxZiFaFq7CLW78WBHHQFHCX6AYpDA3Lt2AqtGqU5zmNSWFQqw_Xw1Nifs573aOwpgK2o4Su8QWw0S7tLGE3qS-V4uwPfQwhlionb0Bo4EoZO6EOmMhCk4ofpEP18QdWU3Jkp8Ox12B66Ic45QOPR6jhWL6GPcnCKa85hN8CvR8sHY787AADs2viM89mbdVEMCdVd73bhMJeww8Ly9vILMkLfglGyKb2DbdRfmOJ8a-ccaDG41D1zbuOJgY-UuzjWcLg-f4u5qThWg8uRDk1k9HncEdcKv1dMxzfi13Io-5SYrB0Id69b0KBmX9kHaRIdCwpcdpZTLb7pR0rl-xkEw5UsSg4uSexVkYbeoLOD4o6C2MwNld4CmfOiWBMN-4YabngRim7wRjNyw7Xby0tfYMcvQNCzHj7ea8bteiYCc_sw-jHpg-o6W3s836dDnusGj-wasaxrrgEthgPL90Barv3Qg_z73X4OqYbRzK3fxU8Y2_1VDwTsF0VWDeSvb07rlcnEKEXktYxYyROql739nnnyb_fmw-Kh7M9zjC-PCluMgY-iN31e6aOPvBvEj8Ek1PzAVbgdKdhIkiyftzNysqcuWYZ6b4wY0hJad4_KfLOCokxQpEFjAte3VvzeEf0XlGltSx6Wm1Wavs1mJD9XUGLLxcTklizNqAcJW3XdZPnuR3T_pqwq_-pdQWHcGj59azxAtGagGY7YG3d4vHkjPyEWMXyxBSYuaOjMk7_pV1ParNhW14w-9_Nz5OXXgyM5dJGaNh-O_jo41bWWCg-TJpG38TDJzPhDI4_CzDoK9u1tSYQLu0Ig05qGwsWFFXID62YIG_MofV7FrZAvRXomUvib7Ojev3ziRJtUJYV5ZA8lCcVd34tAFAxtRO7T4ppdHTFkwxq-ic76xmGLz2hglb1MM58qRN
+x-goog-iap-generated-response: true
+content-type: text/html; charset=UTF-8
+Content-Length: 36
+via: 1.1 google
+date: Sun, 19 Apr 2026 21:54:11 GMT
+Alt-Svc: h3=":443"; ma=2592000
+
+  0     36   0      0   0      0      0      0                              0
+  0     36   0      0   0      0      0      0                              0
+

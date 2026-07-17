@@ -1,0 +1,57 @@
+{
+  "schema": "f5.dominion.full-commercial-launch-contract.v1",
+  "generatedAt": "2026-07-16T23:59:00Z",
+  "commercialMode": "controlled-invoice-only",
+  "selfServeCheckoutClaimed": false,
+  "customerPortalClaimed": false,
+  "autonomousSelfHealingClaimed": false,
+  "requiredDocuments": [
+    "docs/commercial/INVOICE_ONLY_SALES_MOTION.md",
+    "docs/commercial/CUSTOMER_LIFECYCLE.md",
+    "docs/operations/INCIDENT_RESPONSE_AND_ROLLBACK.md"
+  ],
+  "gates": {
+    "publicProofIntegrity": {
+      "status": "GREEN",
+      "evidence": "PR #159 exact-head public-proof workflow and retained artifact"
+    },
+    "currentCiSecurity": {
+      "status": "GREEN",
+      "evidence": "Current codeql, governance, dependency review, security scan, Canon compliance, and PHI + MCP workflows passed on the latest maintenance candidate"
+    },
+    "authoritativePublicRuntimeCutover": {
+      "status": "BLOCKED_EXTERNAL_EXECUTION",
+      "requiredReceipt": "Authorized deployment receipt identifying exact GCP project, region, service, revision, image digest, operator, timestamp, and post-deploy public proof"
+    },
+    "invoiceProcurement": {
+      "status": "BLOCKED_REAL_BUYER_EVENT",
+      "requiredReceipt": "Redacted accepted quote/order and invoice or procurement reference"
+    },
+    "customerLifecycle": {
+      "status": "BLOCKED_REAL_BUYER_EVENT",
+      "requiredReceipt": "Redacted onboarding, entitlement ownership, support, and offboarding-readiness receipt"
+    },
+    "observabilityAlerting": {
+      "status": "BLOCKED_EXTERNAL_EXECUTION",
+      "requiredReceipt": "Current uptime/SLO, alert routing, log/metric retention, and notification test receipt for the authoritative service"
+    },
+    "rollbackIncidentResponse": {
+      "status": "BLOCKED_EXTERNAL_EXECUTION",
+      "requiredReceipt": "Authorized rollback or recovery exercise receipt"
+    },
+    "directMp4": {
+      "status": "NOT_REQUIRED_FOR_INVOICE_ONLY_LAUNCH",
+      "rule": "No direct MP4 claim is allowed while the manifest URL is null"
+    },
+    "autonomousOperations": {
+      "status": "NOT_CLAIMED_NOT_REQUIRED",
+      "rule": "Do not claim autonomous remediation or native self-healing without separate auditable evidence"
+    }
+  },
+  "claimControl": {
+    "controlledInvoiceOnlyCommercialLaunchAllowed": false,
+    "fullSelfServeSaasLaunchAllowed": false,
+    "fullCommercialGreenAllowed": false,
+    "promotionRule": "Only set controlledInvoiceOnlyCommercialLaunchAllowed true after runtime, procurement, customer lifecycle, observability, and rollback exercise receipts are current. Full self-serve SaaS remains a separate future gate."
+  }
+}

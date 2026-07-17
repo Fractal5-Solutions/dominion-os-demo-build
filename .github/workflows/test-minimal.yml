@@ -1,5 +1,9 @@
 name: Minimal Test Workflow
 
+permissions:
+  contents: read
+
+
 on:
   workflow_dispatch:
   push:
@@ -21,3 +25,4 @@ jobs:
           echo "Runner: $(uname -a)"
           echo "Date: $(date)"
           echo "Commit: ${{ github.sha }}"
+

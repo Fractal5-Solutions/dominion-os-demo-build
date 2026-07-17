@@ -1,0 +1,65 @@
+name: demo1-public-proof
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: '17 * * * *'
+  push:
+    branches:
+      - main
+    paths:
+      - 'demo/assets/**'
+      - 'squarespace/demo-1-final.html'
+      - 'tools/verify-demo1-public-proof.mjs'
+      - '.github/workflows/demo1-public-proof.yml'
+      - 'docs/launch-readiness/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'demo/assets/**'
+      - 'squarespace/demo-1-final.html'
+      - 'tools/verify-demo1-public-proof.mjs'
+      - '.github/workflows/demo1-public-proof.yml'
+      - 'docs/launch-readiness/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: demo1-public-proof-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  public-proof:
+    name: Public proof receipt
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact source under test
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Confirm runner Node
+        run: |
+          node --version
+          node -e "if (typeof fetch !== 'function') { throw new Error('global fetch unavailable'); }"
+
+      - name: Run public proof verifier
+        env:
+          PROBE_STRICT: 'true'
+          PROOF_MODE: ${{ github.event_name == 'pull_request' && 'pr' || 'live' }}
+          PROOF_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          MAX_RECEIPT_AGE_SECONDS: '900'
+          OUT_DIR: out/demo1-public-proof
+        run: node tools/verify-demo1-public-proof.mjs
+
+      - name: Upload probe receipt
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: demo1-public-proof-receipt
+          path: out/demo1-public-proof/latest-probe.json
+          if-no-files-found: error
+          retention-days: 30

@@ -1,0 +1,133 @@
+{
+  "schema": "f5.demo1.watchlist.v2",
+  "generatedAt": "2026-07-16T23:50:00Z",
+  "page": {
+    "name": "Fractal5 /demo-1",
+    "url": "https://www.fractal5solutions.com/demo-1",
+    "role": "current public Squarespace bridge for the Dominion OS controlled-preview demo proof surface"
+  },
+  "runtime": {
+    "name": "Dominion OS Cloud Run demo",
+    "root": "https://demo-reduwyf2ra-uc.a.run.app/",
+    "demo": "https://demo-reduwyf2ra-uc.a.run.app/demo",
+    "health": "https://demo-reduwyf2ra-uc.a.run.app/health",
+    "status": "https://demo-reduwyf2ra-uc.a.run.app/status"
+  },
+  "sourceServedAssets": {
+    "manifest": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/demo-manifest.json",
+    "poster": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/dominion-os-demo-poster.svg",
+    "sampleData": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/sample-data.json",
+    "demoPackage": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/demo-download-package.json",
+    "releaseReceipts": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/release-receipts.json",
+    "squarespaceCode": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/squarespace/demo-1-final.html",
+    "commercialLaunchReadiness": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/commercial-launch-readiness.json",
+    "controlledPreviewCommerce": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/controlled-preview-commerce-receipt.json",
+    "commercialProofReceiptsIndex": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/commercial-proof-receipts-index.json"
+  },
+  "documentation": {
+    "deliveryContract": "DEMO_1_DELIVERY_CONTRACT.md",
+    "postPublishVerification": "DEMO_1_POST_PUBLISH_VERIFICATION.md",
+    "commercialLaunchGreenGates": "docs/launch-readiness/2026-06-18-commercial-launch-green-gates.md",
+    "nhitlExecutionReceipt": "docs/launch-readiness/2026-07-06-nhitl-unblock-execution.md",
+    "commercialLaunchCompletionPlan": "docs/launch-readiness/2026-07-07-commercial-launch-completion-plan.md",
+    "fullCommercialGreenExecutionPlan": "docs/launch-readiness/2026-07-10-full-commercial-green-execution-plan.md"
+  },
+  "expectedStatus": {
+    "html": 200,
+    "json": 200,
+    "svg": 200,
+    "mp4": [200, 206]
+  },
+  "assertionScopes": {
+    "requiredAssertions": "live deployed Squarespace /demo-1 page text and links",
+    "requiredHardeningAssertions": "source-served hardened Squarespace code package at sourceServedAssets.squarespaceCode"
+  },
+  "requiredAssertions": [
+    "Public proof for a governed command system.",
+    "Open live demo",
+    "Watch proof",
+    "Explore Dominion OS",
+    "Launch access path",
+    "Contact Fractal5",
+    "Health JSON",
+    "Status JSON",
+    "Demo manifest",
+    "Readiness matrix",
+    "Watchlist",
+    "Controlled commercial preview is allowed.",
+    "Full self-serve SaaS launch, direct public MP4, customer portal green, production observability green, and autonomous self-healing are not claimed without separate receipts."
+  ],
+  "requiredHardeningAssertions": [
+    "data-version=\"2026-06-08-hardened\"",
+    "rel=\"noopener noreferrer\"",
+    "referrerpolicy=\"strict-origin-when-cross-origin\"",
+    "hidden referrerpolicy=\"strict-origin-when-cross-origin\"",
+    "ALLOWED_RUNTIME_ORIGIN",
+    "ALLOWED_RAW_ASSETS_PREFIX",
+    "ALLOWED_FRACTAL5_URLS"
+  ],
+  "claimDriftChecks": {
+    "caseInsensitive": true,
+    "forbiddenWhenManifestVideoMp4Null": [
+      "Actual demo MP4 integrated",
+      "Open web MP4",
+      "Open master MP4",
+      "direct MP4 is available",
+      "MP4 integrated"
+    ],
+    "manifestVideoMp4Path": "assets.videoMp4",
+    "allowedFallbackWhenNull": "sections.watchVideo"
+  },
+  "directMp4EvidenceRequirements": {
+    "requiredBeforeClaim": true,
+    "urlProtocol": "https",
+    "urlPathSuffix": ".mp4",
+    "allowedHttpStatus": [200, 206],
+    "allowedContentTypes": ["video/mp4", "application/octet-stream for an .mp4 URL"],
+    "receiptField": "claimControl.allowDirectMp4Claim",
+    "rule": "A non-null manifest URL alone is not proof. The current public-proof receipt must verify the media response."
+  },
+  "runtimeFreshnessRequirements": {
+    "routes": ["runtime.health", "runtime.status"],
+    "timestampFields": ["generatedAt", "timestamp", "generated_at"],
+    "maximumAgeSeconds": 900,
+    "rule": "Health and status receipts must be current and non-regressing; stale runtime payloads cannot support cloud-health green."
+  },
+  "workflowReceipt": {
+    "workflow": "demo1-public-proof",
+    "artifact": "demo1-public-proof-receipt",
+    "receiptPath": "out/demo1-public-proof/latest-probe.json",
+    "retentionDays": 30,
+    "requiredForGateClosure": true
+  },
+  "publicBridgeGates": [
+    "live /demo-1 deployed page exposes the current public proof bridge assertions",
+    "source-served hardened Squarespace package preserves exact hardening and allowlist assertions",
+    "Cloud Run /demo, /health, and /status routes are declared and probed",
+    "source-served manifest, package, data, release receipts, readiness, watchlist, and proof index remain public-safe",
+    "direct MP4 claim stays blocked while demo-manifest assets.videoMp4 is null",
+    "full commercial green stays blocked unless separate commercial, observability, rollback, and autonomous-operation receipts exist"
+  ],
+  "commercialGreenGates": [
+    "claim-drift repair receipt for /demo MP4 language versus manifest or verified public MP4 promotion",
+    "daemon watchlist ingestion receipt",
+    "hourly probe output for /demo-1, Cloud Run routes, and raw assets",
+    "secret/public-boundary scan receipt",
+    "current CI/build/test/e2e receipt",
+    "commerce or invoice-only sales-motion receipt",
+    "customer onboarding and entitlement receipt",
+    "observability and alert-routing receipt",
+    "rollback and incident-response receipt",
+    "autonomous remediation/self-healing receipt if that claim is made"
+  ],
+  "claimControl": {
+    "directMp4RequiredForMp4Claim": true,
+    "directMp4CurrentlyAvailable": false,
+    "publicBridgeContractCurrentlyAligned": true,
+    "fullCommerceGreenCurrentlyAllowed": false,
+    "fullCommercialGreenCurrentlyAllowed": false,
+    "controlledPreviewCommercialUseAllowed": true,
+    "runtimeCopyRepairRequired": true,
+    "reason": "The current public bridge and source-served assets support controlled preview sharing. Direct MP4, full self-serve commerce, native GCP self-healing, production observability, and production customer portal proof require separate receipts. Runtime health and status must also remain fresh."
+  }
+}

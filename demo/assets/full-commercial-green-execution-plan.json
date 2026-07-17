@@ -1,0 +1,157 @@
+{
+  "schema": "f5.dominion.full-commercial-green-execution-plan.v1",
+  "generatedAt": "2026-07-10T00:00:00-07:00",
+  "status": "PLAN_NOT_GREEN_RECEIPT",
+  "sourceOfTruth": {
+    "repository": "Fractal5-Solutions/dominion-os-demo-build",
+    "planPath": "docs/launch-readiness/2026-07-10-full-commercial-green-execution-plan.md",
+    "publicSurface": "https://www.fractal5solutions.com/demo-1",
+    "runtimeDemo": "https://demo-reduwyf2ra-uc.a.run.app/demo"
+  },
+  "overallTarget": "GREEN",
+  "currentBaseline": "AMBER_CONTROLLED_PREVIEW",
+  "finalVerdictRule": "No receipt, no green.",
+  "gates": [
+    {
+      "id": "demo-runtime-claim-drift",
+      "targetStatus": "GREEN",
+      "requiredReceipt": "docs/launch-readiness/receipts/<date>-demo-runtime-claim-drift-repair.json",
+      "mustPass": [
+        "/demo is live",
+        "/health is live",
+        "/status is live",
+        "No direct MP4 claim exists unless assets.videoMp4 is a real public verified URL"
+      ]
+    },
+    {
+      "id": "demo-1-live-dom",
+      "targetStatus": "GREEN",
+      "requiredReceipt": "docs/launch-readiness/receipts/<date>-demo-1-live-dom-verification.json",
+      "mustPass": [
+        "Live /demo-1 includes required CTA labels",
+        "Live /demo-1 includes hardened bridge tokens",
+        "Live /demo-1 uses current receipt and asset links",
+        "Old deleted /demo Squarespace route is ignored"
+      ]
+    },
+    {
+      "id": "source-served-assets",
+      "targetStatus": "GREEN",
+      "requiredReceipt": "docs/launch-readiness/receipts/<date>-source-served-assets.json",
+      "mustPass": [
+        "Manifest public fetch OK",
+        "Poster public fetch OK",
+        "Sample data public fetch OK",
+        "Demo package public fetch OK",
+        "Release receipts public fetch OK",
+        "No secrets, customer data, payment data, or private service endpoints"
+      ]
+    },
+    {
+      "id": "security-public-boundary",
+      "targetStatus": "GREEN",
+      "requiredReceipts": [
+        "docs/launch-readiness/receipts/<date>-secret-scan.json",
+        "docs/launch-readiness/receipts/<date>-dependency-scan.json",
+        "docs/launch-readiness/receipts/<date>-public-boundary-review.json",
+        "docs/launch-readiness/receipts/<date>-tenant-isolation-proof.json"
+      ],
+      "mustPass": [
+        "Secret scan clear",
+        "Dependency scan acceptable",
+        "Public-boundary review clear",
+        "Tenant isolation proven for production/customer path"
+      ]
+    },
+    {
+      "id": "ci-build-link-e2e",
+      "targetStatus": "GREEN",
+      "requiredReceipt": "docs/launch-readiness/receipts/<date>-ci-build-link-e2e.json",
+      "mustPass": [
+        "CI passes",
+        "Link checks pass",
+        "Browser/e2e checks pass",
+        "JSON schema checks pass",
+        "Claim-drift checks pass"
+      ]
+    },
+    {
+      "id": "commerce-motion",
+      "targetStatus": "GREEN",
+      "requiredReceipt": "docs/launch-readiness/receipts/<date>-commerce-motion.json",
+      "greenPaths": [
+        "self-serve-checkout",
+        "invoice-only-sales-motion"
+      ],
+      "mustPass": [
+        "Sales motion is explicit",
+        "Payment or invoice/procurement receipt exists",
+        "Refund/cancellation path exists",
+        "Terms/privacy/customer communication path exists"
+      ]
+    },
+    {
+      "id": "customer-onboarding-entitlement",
+      "targetStatus": "GREEN",
+      "requiredReceipt": "docs/launch-readiness/receipts/<date>-customer-onboarding-entitlement.json",
+      "mustPass": [
+        "Onboarding flow documented",
+        "Provision/suspend/renew/cancel/offboard lifecycle documented",
+        "Support path documented",
+        "Public demo does not expose customer data"
+      ]
+    },
+    {
+      "id": "observability-alert-routing",
+      "targetStatus": "GREEN",
+      "requiredReceipt": "docs/launch-readiness/receipts/<date>-observability-alert-routing.json",
+      "mustPass": [
+        "Uptime monitor exists",
+        "Alert routing exists",
+        "SLO exists",
+        "Log/metrics retention policy exists",
+        "Incident receipt format exists"
+      ]
+    },
+    {
+      "id": "rollback-incident-response",
+      "targetStatus": "GREEN",
+      "requiredReceipt": "docs/launch-readiness/receipts/<date>-rollback-incident-response.json",
+      "mustPass": [
+        "Squarespace rollback path documented",
+        "Cloud Run rollback path documented",
+        "Source asset rollback path documented",
+        "Last-known-good artifact references exist",
+        "Rollback rehearsal or simulation recorded"
+      ]
+    },
+    {
+      "id": "autonomous-operations-self-healing",
+      "targetStatus": "GREEN_IF_CLAIMED",
+      "requiredReceipt": "docs/launch-readiness/receipts/<date>-autonomous-operations-self-healing.json",
+      "mustPass": [
+        "Watchlist ingestion proven",
+        "Hourly probe output proven",
+        "Remediation behavior proven or explicitly scoped to alert-only",
+        "Native GCP self-healing proven only if claimed"
+      ]
+    }
+  ],
+  "finalGreenArtifacts": [
+    "demo/assets/commercial-launch-readiness.json updated to overallStatus GREEN",
+    "demo/assets/commercial-green-receipt.json created",
+    "docs/launch-readiness/receipts/<date>-full-commercial-green.json created"
+  ],
+  "claimControl": {
+    "directMp4ClaimAllowed": false,
+    "directMp4Rule": "Allowed only when assets.videoMp4 is a real public verified URL.",
+    "selfServeCheckoutClaimAllowed": false,
+    "selfServeCheckoutRule": "Allowed only with live checkout/payment receipt.",
+    "customerPortalClaimAllowed": false,
+    "customerPortalRule": "Allowed only with real verified customer portal and entitlement lifecycle receipt.",
+    "nativeGcpSelfHealingClaimAllowed": false,
+    "nativeGcpSelfHealingRule": "Allowed only with native GCP self-healing receipt.",
+    "fullCommercialGreenClaimAllowed": false,
+    "fullCommercialGreenRule": "Allowed only after all required receipts exist."
+  }
+}

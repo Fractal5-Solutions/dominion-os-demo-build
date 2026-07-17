@@ -1,0 +1,44 @@
+[
+  {
+    "approvalState": "DOES_NOT_NEED_APPROVAL",
+    "createTime": "2026-04-19T15:08:33.826081Z",
+    "deployEndTime": "2026-04-19T15:09:03.968063Z",
+    "deployStartTime": "2026-04-19T15:08:34.635500602Z",
+    "deployingBuild": "projects/44278986722/locations/us-central1/builds/cd514bfb-3aa4-45ea-b271-42540bac986d",
+    "enqueueTime": "2026-04-19T15:08:33.826081Z",
+    "etag": "76d8db1f426c086",
+    "metadata": {
+      "cloudRun": {
+        "revision": "dominion-bootstrap-mo5wax5e",
+        "service": "projects/44278986722/locations/us-central1/services/dominion-bootstrap",
+        "serviceUrls": [
+          "https://dominion-bootstrap-lh2dspv3va-uc.a.run.app"
+        ]
+      }
+    },
+    "name": "projects/dominion-marketplace-prod/locations/us-central1/deliveryPipelines/dominion-os-pipeline/releases/rel-20260419-075830-prod-marketplace/rollouts/rel-20260419-075830-prod-marketplace-to-prod-marketplace-0001",
+    "phases": [
+      {
+        "deploymentJobs": {
+          "deployJob": {
+            "deployJob": {},
+            "id": "deploy",
+            "jobRun": "projects/44278986722/locations/us-central1/deliveryPipelines/dominion-os-pipeline/releases/rel-20260419-075830-prod-marketplace/rollouts/rel-20260419-075830-prod-marketplace-to-prod-marketplace-0001/jobRuns/3901e1d6-4d49-4188-88da-77cb9481eec9",
+            "state": "SUCCEEDED"
+          },
+          "verifyJob": {
+            "id": "verify",
+            "state": "DISABLED",
+            "verifyJob": {}
+          }
+        },
+        "id": "stable",
+        "state": "SUCCEEDED"
+      }
+    ],
+    "state": "SUCCEEDED",
+    "targetId": "prod-marketplace",
+    "uid": "03a30a74edca422f986ed18abe990489"
+  }
+]
+

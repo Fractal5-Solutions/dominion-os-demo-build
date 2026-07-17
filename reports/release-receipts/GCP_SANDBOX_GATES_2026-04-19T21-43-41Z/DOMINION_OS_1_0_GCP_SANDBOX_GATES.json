@@ -1,0 +1,218 @@
+{
+  "generated_at_utc": "2026-04-19T21:56:03.1781378Z",
+  "bundle_dir": "D:\\phi-ops\\github\\dominion-os-demo-build\\reports\\release-receipts\\GCP_SANDBOX_GATES_2026-04-19T21-43-41Z",
+  "marketplace": {
+    "project": "dominion-marketplace-prod",
+    "region": "us-central1",
+    "pipeline": "dominion-os-pipeline",
+    "target": "prod-marketplace",
+    "service": "dominion-bootstrap"
+  },
+  "sandbox": {
+    "project": "f5-demo-sandbox",
+    "region": "us-central1",
+    "demo_url": "https://www.fractal5solutions.com/demo",
+    "store_url": "https://www.fractal5solutions.com/store"
+  },
+  "score": {
+    "passed": 20,
+    "failed": 0,
+    "total": 20,
+    "pass_rate_percent": 100.0,
+    "all_passed": true
+  },
+  "checks": [
+    {
+      "id": "M01",
+      "gate": "Active gcloud account",
+      "pass": true,
+      "summary": "accounts=1",
+      "evidence": {
+        "raw": "D:\\phi-ops\\github\\dominion-os-demo-build\\reports\\release-receipts\\GCP_SANDBOX_GATES_2026-04-19T21-43-41Z\\raw\\gcloud_auth_active.txt",
+        "accounts": [
+          "matthewburbidge@fractal5solutions.com"
+        ]
+      }
+    },
+    {
+      "id": "M02",
+      "gate": "Active project aligned",
+      "pass": true,
+      "summary": "active_project=dominion-marketplace-prod",
+      "evidence": {
+        "raw": "D:\\phi-ops\\github\\dominion-os-demo-build\\reports\\release-receipts\\GCP_SANDBOX_GATES_2026-04-19T21-43-41Z\\raw\\gcloud_project.txt",
+        "expected": "dominion-marketplace-prod"
+      }
+    },
+    {
+      "id": "M03",
+      "gate": "Billing enabled",
+      "pass": true,
+      "summary": "billing_enabled=True",
+      "evidence": {
+        "raw": "D:\\phi-ops\\github\\dominion-os-demo-build\\reports\\release-receipts\\GCP_SANDBOX_GATES_2026-04-19T21-43-41Z\\raw\\gcloud_billing.txt"
+      }
+    },
+    {
+      "id": "M04",
+      "gate": "Required APIs enabled",
+      "pass": true,
+      "summary": "missing=0",
+      "evidence": {
+        "missing": [],
+        "raw": "D:\\phi-ops\\github\\dominion-os-demo-build\\reports\\release-receipts\\GCP_SANDBOX_GATES_2026-04-19T21-43-41Z\\raw\\gcloud_required_apis.txt"
+      }
+    },
+    {
+      "id": "M05",
+      "gate": "Latest release render succeeded",
+      "pass": true,
+      "summary": "render_state=SUCCEEDED",
+      "evidence": {
+        "raw": "D:\\phi-ops\\github\\dominion-os-demo-build\\reports\\release-receipts\\GCP_SANDBOX_GATES_2026-04-19T21-43-41Z\\raw\\gcloud_release.txt"
+      }
+    },
+    {
+      "id": "M06",
+      "gate": "Latest rollout succeeded to target",
+      "pass": true,
+      "summary": "state=SUCCEEDED target=prod-marketplace",
+      "evidence": {
+        "raw": "D:\\phi-ops\\github\\dominion-os-demo-build\\reports\\release-receipts\\GCP_SANDBOX_GATES_2026-04-19T21-43-41Z\\raw\\gcloud_rollout.txt"
+      }
+    },
+    {
+      "id": "M07",
+      "gate": "Cloud Run service Ready=True",
+      "pass": true,
+      "summary": "ready=True",
+      "evidence": {
+        "raw": "D:\\phi-ops\\github\\dominion-os-demo-build\\reports\\release-receipts\\GCP_SANDBOX_GATES_2026-04-19T21-43-41Z\\raw\\gcloud_run_marketplace_service.txt",
+        "latest_ready_revision": "dominion-bootstrap-mo5wax5e"
+      }
+    },
+    {
+      "id": "M08",
+      "gate": "Cloud Run latest revision 100% traffic",
+      "pass": true,
+      "summary": "latest_traffic_pct=100",
+      "evidence": {
+        "raw": "D:\\phi-ops\\github\\dominion-os-demo-build\\reports\\release-receipts\\GCP_SANDBOX_GATES_2026-04-19T21-43-41Z\\raw\\gcloud_run_marketplace_service.txt"
+      }
+    },
+    {
+      "id": "M09",
+      "gate": "Private exposure posture",
+      "pass": true,
+      "summary": "public_invoker=False ingress=internal-and-cloud-load-balancing",
+      "evidence": {
+        "raw": "D:\\phi-ops\\github\\dominion-os-demo-build\\reports\\release-receipts\\GCP_SANDBOX_GATES_2026-04-19T21-43-41Z\\raw\\gcloud_run_iam_marketplace.txt"
+      }
+    },
+    {
+      "id": "M10",
+      "gate": "Runtime service account exists",
+      "pass": true,
+      "summary": "service_account=dominion-runtime@dominion-marketplace-prod.iam.gserviceaccount.com",
+      "evidence": {
+        "raw": "D:\\phi-ops\\github\\dominion-os-demo-build\\reports\\release-receipts\\GCP_SANDBOX_GATES_2026-04-19T21-43-41Z\\raw\\gcloud_runtime_sa.txt"
+      }
+    },
+    {
+      "id": "M11",
+      "gate": "Image digest pinned",
+      "pass": true,
+      "summary": "digest_pinned=True",
+      "evidence": {
+        "raw": "D:\\phi-ops\\github\\dominion-os-demo-build\\reports\\release-receipts\\GCP_SANDBOX_GATES_2026-04-19T21-43-41Z\\raw\\gcloud_run_marketplace_service.txt",
+        "image": "us-central1-docker.pkg.dev/dominion-marketplace-prod/dominion-os/dominion-bootstrap@sha256:a1ca9900c36e6dc3c2bb3ec71683842f328c3c5c4586af51aec68e8936fdec29"
+      }
+    },
+    {
+      "id": "M12",
+      "gate": "Ceiling performance profile active",
+      "pass": true,
+      "summary": "minScale=1 maxScale=100 cpu_throttling=false",
+      "evidence": {
+        "raw": "D:\\phi-ops\\github\\dominion-os-demo-build\\reports\\release-receipts\\GCP_SANDBOX_GATES_2026-04-19T21-43-41Z\\raw\\gcloud_run_marketplace_service.txt"
+      }
+    },
+    {
+      "id": "D01",
+      "gate": "Demo repo is public",
+      "pass": true,
+      "summary": "visibility=PUBLIC",
+      "evidence": {
+        "raw": "D:\\phi-ops\\github\\dominion-os-demo-build\\reports\\release-receipts\\GCP_SANDBOX_GATES_2026-04-19T21-43-41Z\\raw\\gh_repo_demo_build.txt"
+      }
+    },
+    {
+      "id": "D02",
+      "gate": "Public demo zip download responds 200",
+      "pass": true,
+      "summary": "status=200",
+      "evidence": {
+        "raw": "D:\\phi-ops\\github\\dominion-os-demo-build\\reports\\release-receipts\\GCP_SANDBOX_GATES_2026-04-19T21-43-41Z\\raw\\http_demo_zip_status.txt"
+      }
+    },
+    {
+      "id": "D03",
+      "gate": "Public /demo responds 200",
+      "pass": true,
+      "summary": "status=200",
+      "evidence": {
+        "raw": "D:\\phi-ops\\github\\dominion-os-demo-build\\reports\\release-receipts\\GCP_SANDBOX_GATES_2026-04-19T21-43-41Z\\raw\\http_demo_page_status.txt"
+      }
+    },
+    {
+      "id": "D04",
+      "gate": "Public /store responds 200",
+      "pass": true,
+      "summary": "status=200",
+      "evidence": {
+        "raw": "D:\\phi-ops\\github\\dominion-os-demo-build\\reports\\release-receipts\\GCP_SANDBOX_GATES_2026-04-19T21-43-41Z\\raw\\http_store_page_status.txt"
+      }
+    },
+    {
+      "id": "D05",
+      "gate": "Demo health endpoint is reachable (www=200 or canonical runtime 200/302)",
+      "pass": true,
+      "summary": "www_status=404 canonical_status=302",
+      "evidence": {
+        "raw_canonical": "D:\\phi-ops\\github\\dominion-os-demo-build\\reports\\release-receipts\\GCP_SANDBOX_GATES_2026-04-19T21-43-41Z\\raw\\http_demo_healthz_canonical_status.txt",
+        "raw_www": "D:\\phi-ops\\github\\dominion-os-demo-build\\reports\\release-receipts\\GCP_SANDBOX_GATES_2026-04-19T21-43-41Z\\raw\\http_demo_healthz_www_status.txt"
+      }
+    },
+    {
+      "id": "D06",
+      "gate": "Public demo download surface is reachable",
+      "pass": true,
+      "summary": "store_links=0 zip_status=200",
+      "evidence": {
+        "links": [],
+        "zip_raw": "D:\\phi-ops\\github\\dominion-os-demo-build\\reports\\release-receipts\\GCP_SANDBOX_GATES_2026-04-19T21-43-41Z\\raw\\http_demo_zip_status.txt",
+        "zip_status": "200"
+      }
+    },
+    {
+      "id": "D07",
+      "gate": "Public demo payload allowlist passes",
+      "pass": true,
+      "summary": "included_count=16",
+      "evidence": {
+        "raw": "D:\\phi-ops\\github\\dominion-os-demo-build\\reports\\release-receipts\\GCP_SANDBOX_GATES_2026-04-19T21-43-41Z\\raw\\verify_public_demo_surface.txt"
+      }
+    },
+    {
+      "id": "D08",
+      "gate": "Required sandbox Cloud Run services are Ready",
+      "pass": true,
+      "summary": "missing=0 not_ready=0",
+      "evidence": {
+        "not_ready": [],
+        "missing": [],
+        "raw": "D:\\phi-ops\\github\\dominion-os-demo-build\\reports\\release-receipts\\GCP_SANDBOX_GATES_2026-04-19T21-43-41Z\\raw\\gcloud_sandbox_services.txt"
+      }
+    }
+  ]
+}

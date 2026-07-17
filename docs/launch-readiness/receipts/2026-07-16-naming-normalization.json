@@ -1,0 +1,16 @@
+{
+  "schema": "f5.dominion.public-naming-receipt.v1",
+  "generatedAt": "2026-07-16T23:59:00Z",
+  "scope": [
+    "demo/assets/release-receipts.json",
+    "demo/assets/demo-download-package.json"
+  ],
+  "canonicalPublicName": "Dominion OS + SaaS Suite",
+  "schemaIdentifiersPreserved": true,
+  "claimBoundaryUnchanged": true,
+  "directMp4Claimed": false,
+  "fullCommercialGreenClaimed": false,
+  "containsSecrets": false,
+  "containsCustomerData": false,
+  "containsPaymentData": false
+}
