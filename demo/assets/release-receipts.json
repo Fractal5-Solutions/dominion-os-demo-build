@@ -1,8 +1,8 @@
 {
   "schema": "f5.dominion.demo.release-receipts.v1",
-  "generatedAt": "2026-06-07T00:00:00Z",
+  "generatedAt": "2026-07-16T23:59:00Z",
   "release": {
-    "name": "Dominion OS 1.0 Live Demo",
+    "name": "Dominion OS + SaaS Suite Public Demo",
     "publicBridge": "https://www.fractal5solutions.com/demo-1",
     "runtimeDemo": "https://demo-reduwyf2ra-uc.a.run.app/demo",
     "environment": "demo-sandbox"
