@@ -24,8 +24,9 @@ The immediate launch target is a governed **controlled invoice-only commercial s
 5. Conduct an authorized rollback/recovery exercise and retain a redacted receipt.
 6. Complete one genuine accepted quote/order and invoice or procurement event.
 7. Provision one real customer under the lifecycle control and retain a redacted onboarding/entitlement/support receipt.
-8. Update `demo/assets/full-commercial-launch-contract.json` only from those receipts and run the workflow in `live` mode.
-9. Promote `controlledInvoiceOnlyCommercialLaunchAllowed` only when the live-mode receipt is GREEN.
+8. Update each required live gate in `demo/assets/full-commercial-launch-contract.json` to `GREEN` only when it contains a current public-safe receipt reference, then run the verifier in `live` mode to confirm `liveEvidenceVerdict: GREEN` while launch flags remain fail-closed.
+9. Set only `controlledInvoiceOnlyCommercialLaunchAllowed` to `true`; keep self-serve SaaS and full-commercial flags false.
+10. Run the workflow in `live` mode again. Promote controlled invoice-only launch only when `commercialLaunchVerdict: GREEN` is emitted.
 
 ## Claim boundary
 
