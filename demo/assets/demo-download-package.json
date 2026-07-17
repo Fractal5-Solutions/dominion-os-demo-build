@@ -1,7 +1,7 @@
 {
   "schema": "f5.dominion.demo.download-package.v1",
-  "generatedAt": "2026-06-07T00:00:00Z",
-  "title": "Dominion OS 1.0 Public Demo Package",
+  "generatedAt": "2026-07-16T23:59:00Z",
+  "title": "Dominion OS + SaaS Suite Public Demo Package",
   "publicBridge": "https://www.fractal5solutions.com/demo-1",
   "runtimeDemo": "https://demo-reduwyf2ra-uc.a.run.app/demo",
   "contents": [
