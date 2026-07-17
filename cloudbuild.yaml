@@ -36,21 +36,22 @@ steps:
       - --platform
       - managed
       - --ingress
-      - internal-and-cloud-load-balancing
-      - --no-allow-unauthenticated
+      - all
+      - --allow-unauthenticated
       - --port
       - '8080'
       - --set-env-vars
-      - SERVICE_NAME=$_SERVICE_NAME,PROJECT_ID=$PROJECT_ID,REGION=$_REGION
+      - SERVICE_NAME=$_SERVICE_NAME,PROJECT_ID=$PROJECT_ID,REGION=$_REGION,APP_VERSION=$_APP_VERSION,RELEASE_SHA=$COMMIT_SHA,RELEASE_REPO=Fractal5-Solutions/dominion-os-demo-build,SOURCE_OF_TRUTH_SHA=$COMMIT_SHA
       - --quiet
 
 substitutions:
-  _SERVICE_NAME: dominion-demo
+  _SERVICE_NAME: demo
   _REGION: us-central1
   _AR_REPO: dominion-demo-repo
   _DOCKERFILE: Dockerfile.production
   _BUILD_CONTEXT: .
   _TAG: latest
+  _APP_VERSION: commercial-readiness
 
 images:
   - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE_NAME}:${_TAG}
