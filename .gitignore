@@ -43,6 +43,14 @@ docker-volumes/
 *.pid
 scripts/telemetry/*.json
 
+# Ignore secret scan outputs (generated locally)
+scan_results.txt
+
+# Local env files (sensitive) — ensure these are not re-added
+scripts/.env
+.env
+
+
 # Public demo governance
 # Keep thread-specific activation artifacts and contact dumps out of commits.
 reports/erica_activation_status_*.json

@@ -1,0 +1,16 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: detect-private-key
+      - id: detect-aws-credentials
+      - id: check-added-large-files
+
+  - repo: local
+    hooks:
+      - id: repo-secret-scan
+        name: repo secret scan
+        entry: python scripts/secret_scan.py
+        language: python
+        files: ''
+        types: [file]
