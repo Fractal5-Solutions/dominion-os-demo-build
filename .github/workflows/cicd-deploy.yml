@@ -1,4 +1,4 @@
-name: Build & Deploy Demo (OIDC)
+name: Build & Deploy Public Demo (OIDC)
 
 on:
   push:
@@ -11,6 +11,9 @@ on:
 permissions:
   contents: read
   id-token: write
+
+env:
+  PUBLIC_DEMO_BASE_URL: https://demo-reduwyf2ra-uc.a.run.app
 
 jobs:
   build-deploy:
@@ -67,6 +70,7 @@ jobs:
       - name: Submit Cloud Build
         if: steps.preflight.outputs.ready == 'true'
         run: |
+          set -euo pipefail
           REF="${GITHUB_REF##*/}"
           if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
             TAG="${REF}"
@@ -75,9 +79,95 @@ jobs:
           fi
 
           gcloud builds submit \
-            --project=${GCP_PROJECT_ID} \
-            --config cloudbuild.yaml \
-            --substitutions=_TAG="${TAG}",_REGION=us-central1,_SERVICE_NAME=dominion-demo,_AR_REPO=dominion-demo-repo
+            --project="${GCP_PROJECT_ID}" \
+            --config=cloudbuild.yaml \
+            --substitutions=_TAG="${TAG}",_REGION=us-central1,_SERVICE_NAME=demo,_AR_REPO=dominion-demo-repo,_APP_VERSION="${GITHUB_SHA}"
+
+      - name: Verify public deployment
+        if: steps.preflight.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/deploy-receipt
+          python - <<'PY'
+          import json
+          import os
+          import time
+          import urllib.request
+          from datetime import datetime, timezone
+
+          base = os.environ["PUBLIC_DEMO_BASE_URL"].rstrip("/")
+          expected_sha = os.environ["GITHUB_SHA"]
+          paths = ["/demo", "/health", "/status"]
+          attempts = 12
+          delay = 10
+          last = None
+
+          for _ in range(attempts):
+              results = []
+              try:
+                  for path in paths:
+                      req = urllib.request.Request(base + path, headers={"User-Agent": "fractal5-deploy-verifier/1.0"})
+                      with urllib.request.urlopen(req, timeout=20) as res:
+                          body = res.read().decode("utf-8", errors="replace")
+                          results.append({
+                              "path": path,
+                              "status": res.status,
+                              "contentType": res.headers.get("content-type", ""),
+                              "cacheControl": res.headers.get("cache-control", ""),
+                              "body": body,
+                          })
+
+                  health = json.loads(next(r["body"] for r in results if r["path"] == "/health"))
+                  status = json.loads(next(r["body"] for r in results if r["path"] == "/status"))
+                  demo_body = next(r["body"] for r in results if r["path"] == "/demo").lower()
+                  forbidden = ["actual demo mp4 integrated", "open web mp4", "open master mp4", "mp4 integrated"]
+                  claim_safe = not any(text in demo_body for text in forbidden)
+                  revision = health.get("revision") or status.get("revision") or ""
+                  release_sha = health.get("releaseCandidateSha") or status.get("releaseCandidateSha") or health.get("release_sha") or status.get("release_sha") or ""
+                  fresh = all((r["status"] == 200 for r in results))
+                  no_store = all("no-store" in r["cacheControl"].lower() for r in results if r["path"] in ("/health", "/status"))
+
+                  receipt = {
+                      "schema": "f5.public-demo.deploy-receipt.v1",
+                      "generatedAt": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+                      "expectedSha": expected_sha,
+                      "revision": revision,
+                      "releaseSha": release_sha,
+                      "routes": [{k: v for k, v in r.items() if k != "body"} for r in results],
+                      "claimSafe": claim_safe,
+                      "noStore": no_store,
+                      "pass": fresh and claim_safe and no_store and release_sha == expected_sha,
+                  }
+                  last = receipt
+                  if receipt["pass"]:
+                      break
+              except Exception as exc:
+                  last = {
+                      "schema": "f5.public-demo.deploy-receipt.v1",
+                      "generatedAt": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+                      "expectedSha": expected_sha,
+                      "pass": False,
+                      "error": str(exc),
+                  }
+              time.sleep(delay)
+
+          with open("out/deploy-receipt/public-demo-deploy.json", "w", encoding="utf-8") as fh:
+              json.dump(last, fh, indent=2)
+              fh.write("\n")
+          print(json.dumps(last, indent=2))
+          if not last or not last.get("pass"):
+              raise SystemExit(1)
+          PY
+
+      - name: Upload deployment receipt
+        if: always() && steps.preflight.outputs.ready == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: public-demo-deploy-receipt
+          path: out/deploy-receipt/public-demo-deploy.json
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Skip summary
         if: steps.preflight.outputs.ready != 'true'
