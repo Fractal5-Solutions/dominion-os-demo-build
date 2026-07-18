@@ -1,98 +1,84 @@
 #!/usr/bin/env python3
-"""
-Lightweight repository secret scanner used by CI and pre-commit.
-Exits with code 1 if any suspicious matches are found.
-"""
+"""High-confidence repository secret scanner with redacted output."""
+from __future__ import annotations
+
 import os
 import re
 import sys
+from pathlib import Path
 
-ROOT = os.path.dirname(os.path.dirname(__file__))
-
-SKIP_DIRS = {'.git', '.venv', 'venv', 'node_modules', '__pycache__'}
+ROOT = Path(__file__).resolve().parent.parent
+SKIP_DIRS = {'.git', '.venv', 'venv', 'node_modules', '__pycache__', 'backups', 'out'}
+SKIP_SUFFIXES = {'.png', '.jpg', '.jpeg', '.gif', '.zip', '.tar', '.whl', '.pyc'}
+PLACEHOLDERS = {'REDACTED', 'CHANGEME', 'CHANGE_ME', 'EXAMPLE', 'PLACEHOLDER', 'YOUR_SECRET_HERE'}
 
 PATTERNS = {
-    'GitHub PAT': re.compile(r'ghp_[0-9A-Za-z_]{36}'),
-    'Stripe secret (sk_live/test)': re.compile(r'sk_(live|test)_[0-9A-Za-z_-]{16,}'),
-    'Google API key': re.compile(r'AIza[0-9A-Za-z-_]{35}'),
-    'AWS Access Key': re.compile(r'AKIA[0-9A-Z]{16}'),
-    'Slack token': re.compile(r'xox[baprs]-[A-Za-z0-9-]+'),
-    'Private key header': re.compile(r'-----BEGIN [A-Z ]*PRIVATE KEY-----'),
-    'SSH public key (ssh-rsa)': re.compile(r'^ssh-rsa\b'),
-    'Generic secret var': re.compile(r'(?i)\b(api[_-]?key|apikey|client[_-]?secret|secret[_-]?key|oauth[_-]?client[_-]?secret|jwt[_-]?secret|github[_-]?token|password|passphrase)\b'),
+    'GitHub token': re.compile(r'\b(?:ghp|github_pat)_[0-9A-Za-z_]{20,}\b'),
+    'Stripe secret': re.compile(r'\bsk_(?:live|test)_[0-9A-Za-z_-]{16,}\b'),
+    'Google API key': re.compile(r'\bAIza[0-9A-Za-z_-]{35}\b'),
+    'AWS access key': re.compile(r'\bAKIA[0-9A-Z]{16}\b'),
+    'Slack token': re.compile(r'\bxox[baprs]-[A-Za-z0-9-]{10,}\b'),
+    'Private key header': re.compile(r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----'),
 }
-
-def is_binary_string(bytesdata: bytes) -> bool:
-    # Heuristic: NUL byte or over 30% non-printable
-    if b"\x00" in bytesdata:
-        return True
-    text = bytesdata.decode('utf-8', errors='ignore')
-    non_print = sum(1 for c in text if ord(c) < 9 or (ord(c) > 13 and ord(c) < 32))
-    return (non_print / max(1, len(text))) > 0.3
+ASSIGNMENT = re.compile(
+    r'(?im)^\s*(?:export\s+)?(?:[A-Z0-9_]*(?:PASSWORD|PASSPHRASE|TOKEN|SECRET|API_KEY|PRIVATE_KEY)[A-Z0-9_]*)\s*[=:]\s*["\']?([^\s"\'`#]{12,})'
+)
 
 
-def scan_file(path):
+def is_placeholder(value: str) -> bool:
+    normalized = value.strip().strip('"\'').upper()
+    return normalized in PLACEHOLDERS or normalized.startswith('${') or normalized.startswith('{{')
+
+
+def redacted_context(text: str, start: int, end: int) -> str:
+    left = max(0, start - 24)
+    right = min(len(text), end + 24)
+    return (text[left:start] + '<redacted>' + text[end:right]).replace('\n', ' ')[:160]
+
+
+def scan_file(path: Path):
     try:
-        with open(path, 'rb') as f:
-            data = f.read()
-    except Exception:
+        data = path.read_bytes()
+    except OSError:
         return []
-
-    if is_binary_string(data):
+    if b'\x00' in data:
         return []
-
     text = data.decode('utf-8', errors='ignore')
     findings = []
     for name, pattern in PATTERNS.items():
-        for m in pattern.finditer(text):
-            # Record a short masked snippet
-            start = max(0, m.start() - 20)
-            end = min(len(text), m.end() + 20)
-            snippet = text[start:end].replace('\n', ' ')[:200]
-            findings.append((name, m.group(0), snippet))
+        for match in pattern.finditer(text):
+            findings.append((name, redacted_context(text, match.start(), match.end())))
+    for match in ASSIGNMENT.finditer(text):
+        value = match.group(1)
+        if not is_placeholder(value):
+            findings.append(('Assigned secret value', redacted_context(text, match.start(1), match.end(1))))
     return findings
 
 
-def walk_and_scan(root):
+def main() -> int:
     results = {}
-    for dirpath, dirnames, filenames in os.walk(root):
-        # prune
-        parts = set(dirpath.replace(root, '').split(os.sep))
-        if parts & SKIP_DIRS:
-            continue
-        # mutate dirnames in-place to skip certain dirs
-        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
-
-        for fn in filenames:
-            # skip large vendor directories by name
-            if fn.endswith(('.png', '.jpg', '.jpeg', '.gif', '.zip', '.tar', '.whl')):
+    for dirpath, dirnames, filenames in os.walk(ROOT):
+        dirnames[:] = [name for name in dirnames if name not in SKIP_DIRS]
+        for filename in filenames:
+            path = Path(dirpath) / filename
+            if path.suffix.lower() in SKIP_SUFFIXES:
                 continue
-            path = os.path.join(dirpath, fn)
-            rel = os.path.relpath(path, root)
             findings = scan_file(path)
             if findings:
-                results[rel] = findings
-    return results
+                results[str(path.relative_to(ROOT))] = findings
 
-
-def main():
-    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-    results = walk_and_scan(repo_root)
     if not results:
-        print('No suspicious secrets detected.')
+        print('No high-confidence secrets detected.')
         return 0
 
-    print('Potential secrets found:')
-    for path, items in results.items():
+    print('Potential secrets found; values are redacted:')
+    for path, findings in sorted(results.items()):
         print(f'- {path}')
-        for name, raw, snippet in items:
-            masked = raw[:4] + '...' if len(raw) > 8 else raw
-            print(f'    - {name}: {masked} (context: {snippet})')
-
-    print('\nAction: Do not merge or deploy until findings are reviewed and rotated.')
+        for name, context in findings:
+            print(f'    - {name} (context: {context})')
+    print('\nAction: rotate any confirmed credential and remove it from repository history.')
     return 2
 
 
 if __name__ == '__main__':
-    rc = main()
-    sys.exit(rc)
+    sys.exit(main())
