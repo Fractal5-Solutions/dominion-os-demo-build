@@ -81,7 +81,7 @@ jobs:
           gcloud builds submit \
             --project="${GCP_PROJECT_ID}" \
             --config=cloudbuild.yaml \
-            --substitutions=_TAG="${TAG}",_REGION=us-central1,_SERVICE_NAME=demo,_AR_REPO=dominion-demo-repo,_APP_VERSION="${GITHUB_SHA}"
+            --substitutions=_TAG="${TAG}",_REGION=us-central1,_SERVICE_NAME=demo,_AR_REPO=dominion-demo-repo,_APP_VERSION="${GITHUB_SHA}",_RELEASE_SHA="${GITHUB_SHA}"
 
       - name: Verify public deployment
         if: steps.preflight.outputs.ready == 'true'
@@ -107,7 +107,7 @@ jobs:
               results = []
               try:
                   for path in paths:
-                      req = urllib.request.Request(base + path, headers={"User-Agent": "fractal5-deploy-verifier/1.0"})
+                      req = urllib.request.Request(base + path, headers={"User-Agent": "fractal5-deploy-verifier/1.1"})
                       with urllib.request.urlopen(req, timeout=20) as res:
                           body = res.read().decode("utf-8", errors="replace")
                           results.append({
@@ -121,7 +121,7 @@ jobs:
                   health = json.loads(next(r["body"] for r in results if r["path"] == "/health"))
                   status = json.loads(next(r["body"] for r in results if r["path"] == "/status"))
                   demo_body = next(r["body"] for r in results if r["path"] == "/demo").lower()
-                  forbidden = ["actual demo mp4 integrated", "open web mp4", "open master mp4", "mp4 integrated"]
+                  forbidden = ["all-green release evidence", "actual demo mp4 integrated", "open web mp4", "open master mp4", "direct mp4 is available", "mp4 integrated"]
                   claim_safe = not any(text in demo_body for text in forbidden)
                   revision = health.get("revision") or status.get("revision") or ""
                   release_sha = health.get("releaseCandidateSha") or status.get("releaseCandidateSha") or health.get("release_sha") or status.get("release_sha") or ""
@@ -148,7 +148,7 @@ jobs:
                       "generatedAt": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
                       "expectedSha": expected_sha,
                       "pass": False,
-                      "error": str(exc),
+                      "error": type(exc).__name__,
                   }
               time.sleep(delay)
 
