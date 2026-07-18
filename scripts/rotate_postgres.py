@@ -65,9 +65,8 @@ def main() -> int:
         repo = required('GITHUB_REPO')
         target_user = os.environ.get('TARGET_PG_USER', 'phi_admin').strip() or 'phi_admin'
         secret_name = os.environ.get('TARGET_REPO_SECRET', 'POSTGRES_PASSWORD').strip() or 'POSTGRES_PASSWORD'
-        new_password = os.environ.get('NEW_PG_PASSWORD') or generate_password()
+        new_password = generate_password()
 
-        print(f'Rotating password for {target_user}; secret destination is {secret_name}.')
         rotate_password(admin_dsn, target_user, new_password)
         store_github_secret(token, repo, secret_name, new_password)
         print('Rotation completed and repository secret update was confirmed.')
