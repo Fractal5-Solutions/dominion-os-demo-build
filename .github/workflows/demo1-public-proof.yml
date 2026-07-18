@@ -10,6 +10,7 @@ on:
     paths:
       - 'demo/assets/**'
       - 'squarespace/demo-1-final.html'
+      - 'tools/verify-demo1-proof-contract.mjs'
       - 'tools/verify-demo1-public-proof.mjs'
       - '.github/workflows/demo1-public-proof.yml'
       - 'docs/launch-readiness/**'
@@ -19,6 +20,7 @@ on:
     paths:
       - 'demo/assets/**'
       - 'squarespace/demo-1-final.html'
+      - 'tools/verify-demo1-proof-contract.mjs'
       - 'tools/verify-demo1-public-proof.mjs'
       - '.github/workflows/demo1-public-proof.yml'
       - 'docs/launch-readiness/**'
@@ -46,6 +48,12 @@ jobs:
           node --version
           node -e "if (typeof fetch !== 'function') { throw new Error('global fetch unavailable'); }"
 
+      - name: Guard proof contract
+        env:
+          PROOF_MODE: ${{ github.event_name == 'pull_request' && 'pr' || 'live' }}
+          PROOF_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: node tools/verify-demo1-proof-contract.mjs
+
       - name: Run public proof verifier
         env:
           PROBE_STRICT: 'true'
@@ -60,6 +68,6 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: demo1-public-proof-receipt
-          path: out/demo1-public-proof/latest-probe.json
+          path: out/demo1-public-proof/*.json
           if-no-files-found: error
           retention-days: 30
