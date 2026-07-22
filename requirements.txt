@@ -18,7 +18,7 @@ google-api-python-client>=2.97.0
 docker>=7.1.0
 
 # YAML Processing
-PyYAML>=6.0.1
+PyYAML>=6.0.3
 
 # Data Processing
 pandas>=2.0.3
