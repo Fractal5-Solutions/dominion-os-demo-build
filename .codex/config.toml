@@ -1,0 +1,13 @@
+# Project-scoped Codex defaults for dominion-os-demo-build.
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+web_search = "cached"
+model_reasoning_effort = "high"
+personality = "pragmatic"
+project_doc_max_bytes = 32768
+
+[features]
+shell_snapshot = true
+multi_agent = true
+hooks = true
+fast_mode = false
