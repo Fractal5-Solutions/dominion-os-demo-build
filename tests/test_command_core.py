@@ -2,7 +2,13 @@ import command_core
 
 
 def build_client():
-    command_core.app.config.update(TESTING=True, ENABLE_PROBES=False)
+    command_core.app.config.update(
+        TESTING=True,
+        COST_MODE="minimum_spend",
+        ENABLE_PROBES=False,
+        ENABLE_REMOTE_PROBES=False,
+        PUBLIC_DEMO_PRESERVED=True,
+    )
     return command_core.app.test_client()
 
 
@@ -13,6 +19,8 @@ def test_health_endpoints_are_available():
         response = client.get(path)
         assert response.status_code == 200
         assert response.json["status"] == "healthy"
+        assert response.json["cost_mode"] == "minimum_spend"
+        assert response.json["public_demo_preserved"] is True
 
 
 def test_root_supports_json_negotiation():
@@ -25,6 +33,8 @@ def test_root_supports_json_negotiation():
     assert response.json["release_repo"] == "dominion-os-demo-build"
     assert response.json["overlay"] == "business"
     assert response.json["source_of_truth"]["repo"] == "dominion-command-center"
+    assert response.json["cost_mode"] == "minimum_spend"
+    assert response.json["probe_policy"]["default_behavior"] == "metadata_only"
 
 
 def test_demo_and_store_pages_render():
@@ -37,6 +47,15 @@ def test_demo_and_store_pages_render():
     assert b'data-contract="demo-shell"' in demo_response.data
     assert store_response.status_code == 200
     assert b'data-contract="store-shell"' in store_response.data
+
+
+def test_demo_assets_are_served_with_cache_policy():
+    client = build_client()
+    response = client.get("/demo/assets/demo-manifest.json")
+
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.headers["Cache-Control"] == "public, max-age=300"
 
 
 def test_products_api_exposes_repo_inventory():
@@ -68,12 +87,34 @@ def test_status_reports_local_topology_without_live_probes():
     assert response.json["release_repo"] == "dominion-os-demo-build"
     assert response.json["overlay"] == "business"
     assert response.json["source_of_truth"]["repo"] == "dominion-command-center"
+    assert response.json["probe"]["local_enabled"] is False
+    assert response.json["probe"]["remote_enabled"] is False
     topology = response.json["topology"]
     assert len(topology["local_services"]) == 3
     assert {
         service["id"] for service in topology["local_services"]
     } == {"command-center-bims", "phi-oauth-server", "phi-askphi-widget"}
     assert set(topology["remote_projects"]) == {"dominion-os-1-0-main", "dominion-core-prod"}
+
+
+def test_demo_status_alias_uses_same_public_contract():
+    client = build_client()
+    response = client.get("/demo/status")
+
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.json["routes"]["demo_status"] == "/demo/status"
+    assert response.json["probe"]["policy"]["cost_mode"] == "minimum_spend"
+
+
+def test_remote_probe_request_stays_disabled_without_env_gate():
+    client = build_client()
+    response = client.get("/status?probe=remote")
+
+    assert response.status_code == 200
+    assert response.json["probe"]["remote_requested"] is True
+    assert response.json["probe"]["remote_enabled"] is False
+    assert response.json["probe"]["policy"]["remote_probe_env_enabled"] is False
 
 
 def test_health_reports_release_contract():
