@@ -1,12 +1,12 @@
 {
-  "schema": "f5.dominion.commercial-proof-receipts-index.v1",
-  "generatedAt": "2026-07-07T18:35:00Z",
+  "schema": "f5.dominion.commercial-proof-receipts-index.v2",
+  "generatedAt": "2026-07-24T13:40:34Z",
   "repository": "Fractal5-Solutions/dominion-os-demo-build",
-  "primaryTracker": "Issue #145",
   "overallStatus": "AMBER",
   "claimControl": {
     "controlledPreviewCommercialUseAllowed": true,
-    "directMp4CurrentlyAvailable": false,
+    "directMp4CurrentlyAvailable": true,
+    "visualPolishPatchAvailable": true,
     "selfServeCommerceGreenAllowed": false,
     "customerPortalGreenAllowed": false,
     "productionObservabilityGreenAllowed": false,
@@ -19,8 +19,22 @@
       "name": "demo-manifest",
       "path": "demo/assets/demo-manifest.json",
       "status": "PUBLIC-SOURCE-OF-TRUTH",
-      "proves": ["runtime URLs", "source-served asset URLs", "direct MP4 remains null"],
-      "doesNotProve": ["direct MP4 availability", "full commercial green"]
+      "proves": ["runtime URLs", "source-served asset URLs", "verified public MP4 URLs"],
+      "doesNotProve": ["full commercial green"]
+    },
+    {
+      "name": "release-receipts",
+      "path": "demo/assets/release-receipts.json",
+      "status": "PUBLIC-RUNTIME-RECEIPT",
+      "proves": ["Cloud Run demo route", "health/status routes", "web MP4", "master MP4"],
+      "doesNotProve": ["commerce", "customer portal", "production observability", "autonomous remediation"]
+    },
+    {
+      "name": "visual-runtime-polish-patch",
+      "path": "squarespace/demo-1-visual-runtime-polish-patch.html",
+      "status": "SOURCE-SERVED-PATCH",
+      "proves": ["page-scoped fix exists for the blank first-fold gap"],
+      "doesNotProve": ["that Squarespace has applied the patch live"]
     },
     {
       "name": "commercial-launch-readiness",
@@ -33,7 +47,7 @@
       "name": "demo-1-watchlist",
       "path": "demo/assets/demo-1-watchlist.json",
       "status": "PUBLIC-PROOF-TARGETS",
-      "proves": ["target URL set", "required assertions", "claim-drift checks"],
+      "proves": ["target URL set", "required assertions", "MP4 claim-drift checks", "visual polish patch tracking"],
       "doesNotProve": ["that the latest workflow artifact has been observed"]
     },
     {
@@ -42,26 +56,11 @@
       "status": "AMBER",
       "proves": ["controlled-preview invoice-only commercial motion is allowed"],
       "doesNotProve": ["self-serve checkout", "customer portal", "automated billing", "automated entitlement lifecycle"]
-    },
-    {
-      "name": "nhitl-unblock-execution",
-      "path": "docs/launch-readiness/2026-07-06-nhitl-unblock-execution.md",
-      "status": "EXECUTABLE-SCAFFOLD",
-      "proves": ["public-proof verifier and workflow were introduced"],
-      "doesNotProve": ["post-merge artifact observation"]
-    },
-    {
-      "name": "commercial-launch-completion-plan",
-      "path": "docs/launch-readiness/2026-07-07-commercial-launch-completion-plan.md",
-      "status": "EXECUTION-LEDGER",
-      "proves": ["remaining gates are decomposed into exit receipts"],
-      "doesNotProve": ["that external evidence-dependent gates are cleared"]
     }
   ],
   "hardBlockersRemaining": [
-    "direct MP4 or /demo claim-drift repair receipt",
-    "exact deployed /demo-1 live-DOM verification receipt",
-    "post-merge strict public-proof workflow receipt artifact",
+    "apply /demo-1 visual polish patch to the live Squarespace page before high-stakes demos",
+    "exact deployed /demo-1 live-DOM verification receipt after patch application",
     "current CI/build/test/e2e/security/dependency/public-boundary receipts",
     "complete commerce/procurement/onboarding/entitlement/support/refund/privacy receipt package",
     "observability/SLO/alerting/log-retention/incident/rollback receipt package",
