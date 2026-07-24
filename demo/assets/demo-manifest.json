@@ -1,6 +1,6 @@
 {
   "schema": "f5.dominion.demo.assets.v1",
-  "generatedAt": "2026-06-07T00:00:00Z",
+  "generatedAt": "2026-07-24T13:40:34Z",
   "sourceOfTruth": {
     "repository": "Fractal5-Solutions/dominion-os-demo-build",
     "path": "demo/assets/demo-manifest.json",
@@ -21,7 +21,8 @@
   "assets": {
     "manifest": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/demo-manifest.json",
     "cloudRunManifest": null,
-    "videoMp4": null,
+    "videoMp4": "https://demo-reduwyf2ra-uc.a.run.app/demo/assets/media/dominion_os_live_demo_web.mp4",
+    "videoMasterMp4": "https://demo-reduwyf2ra-uc.a.run.app/demo/assets/media/dominion_os_live_demo_master.mp4",
     "videoPoster": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/dominion-os-demo-poster.svg",
     "demoDownload": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/demo-download-package.json",
     "sampleData": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/sample-data.json",
@@ -35,8 +36,9 @@
       "assets.sampleData",
       "assets.releaseReceiptsJson"
     ],
-    "directBinaryAssetsRequiredForFinalInlineEmbed": [
-      "videoMp4"
+    "verifiedRuntimeMedia": [
+      "assets.videoMp4",
+      "assets.videoMasterMp4"
     ],
     "currentFallbacks": {
       "videoMp4": "sections.watchVideo"
@@ -48,14 +50,18 @@
   "squarespace": {
     "bridgePage": "https://www.fractal5solutions.com/demo-1",
     "canonReference": "https://www.fractal5solutions.com/launch",
-    "embedMode": "single-code-block-with-remote-runtime-assets"
+    "embedMode": "single-code-block-with-remote-runtime-assets",
+    "visualPolishPatch": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/squarespace/demo-1-visual-runtime-polish-patch.html"
   },
   "claimControl": {
     "rawCloudRunDemoPublicGreen": true,
     "assetManifestSourceCreated": true,
     "sourceServedAssetsPublished": true,
-    "assetManifestCloudRunLiveConfirmed": false,
+    "assetManifestCloudRunLiveConfirmed": true,
+    "allowDirectMp4Claim": true,
+    "directMp4CurrentlyAvailable": true,
     "fullCommercialGreenAllowed": false,
-    "reason": "Poster, sample-data, release receipts, and public demo package manifest are source-served through the manifest. Direct binary MP4 remains null until a real file is generated and publicly verified."
+    "verifiedAt": "2026-07-24T13:40:34Z",
+    "reason": "The public runtime demo, health, status, web MP4, and master MP4 returned 200 responses during operator verification. Full commercial green remains gated by separate commerce, customer-portal, observability, rollback, and autonomous-operation receipts."
   }
 }
