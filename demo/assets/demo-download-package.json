@@ -1,6 +1,6 @@
 {
   "schema": "f5.dominion.demo.download-package.v1",
-  "generatedAt": "2026-07-16T23:59:00Z",
+  "generatedAt": "2026-07-24T13:40:34Z",
   "title": "Dominion OS + SaaS Suite Public Demo Package",
   "publicBridge": "https://www.fractal5solutions.com/demo-1",
   "runtimeDemo": "https://demo-reduwyf2ra-uc.a.run.app/demo",
@@ -11,9 +11,9 @@
       "type": "runtime-route"
     },
     {
-      "label": "Demo poster",
-      "url": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/dominion-os-demo-poster.svg",
-      "type": "image/svg+xml"
+      "label": "Web MP4 proof recording",
+      "url": "https://demo-reduwyf2ra-uc.a.run.app/demo/assets/media/dominion_os_live_demo_web.mp4",
+      "type": "video/mp4"
     },
     {
       "label": "Sample data",
@@ -28,8 +28,9 @@
   ],
   "notes": "Public-safe demo package manifest. This is not a private source-code bundle and does not contain keys, customer data, payment data, or private runtime artifacts.",
   "claimControl": {
-    "directMp4Included": false,
+    "directMp4Included": true,
     "binaryZipIncluded": false,
-    "reason": "The live demo route and public-safe source-served assets are packaged here. Binary media and installable packages require separate generation and public verification."
+    "fullCommercialGreenAllowed": false,
+    "reason": "The public runtime route, public-safe assets, and verified web MP4 are included. Installable customer packages and commercial provisioning require separate receipts."
   }
 }
