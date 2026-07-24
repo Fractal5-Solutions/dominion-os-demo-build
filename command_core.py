@@ -19,13 +19,20 @@ BASE_DIR = Path(__file__).resolve().parent
 
 logger = logging.getLogger("dominion-command-core")
 
+
+def env_flag(name: str, default: str = "0") -> bool:
+    value = os.getenv(name, default).strip().lower()
+    return value not in {"", "0", "false", "no", "off"}
+
+
 app = Flask(__name__)
 app.config["JSON_SORT_KEYS"] = False
-app.config["ENABLE_PROBES"] = os.getenv("COMMAND_CORE_ENABLE_PROBES", "1").lower() not in {
-    "0",
-    "false",
-    "no",
-}
+app.config["COST_MODE"] = (
+    os.getenv("COMMAND_CORE_COST_MODE") or os.getenv("COST_MODE") or "minimum_spend"
+).strip().lower()
+app.config["ENABLE_PROBES"] = env_flag("COMMAND_CORE_ENABLE_PROBES", "0")
+app.config["ENABLE_REMOTE_PROBES"] = env_flag("COMMAND_CORE_ENABLE_REMOTE_PROBES", "0")
+app.config["PUBLIC_DEMO_PRESERVED"] = env_flag("COMMAND_CORE_PUBLIC_DEMO_PRESERVED", "1")
 
 APP_VERSION = os.getenv("APP_VERSION", "0.0.0-dev")
 SERVICE_NAME = os.getenv("SERVICE_NAME", "dominion-os-demo")
@@ -227,6 +234,17 @@ def now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def probe_policy() -> dict:
+    return {
+        "cost_mode": app.config.get("COST_MODE", "minimum_spend"),
+        "default_behavior": "metadata_only",
+        "public_demo_preserved": bool(app.config.get("PUBLIC_DEMO_PRESERVED", True)),
+        "local_probe_env_enabled": bool(app.config.get("ENABLE_PROBES", False)),
+        "remote_probe_env_enabled": bool(app.config.get("ENABLE_REMOTE_PROBES", False)),
+        "activation": "Add probe=local, probe=remote, or probe=all only after the matching env gate is enabled.",
+    }
+
+
 def resolve_release_sha() -> str:
     if RELEASE_SHA:
         return RELEASE_SHA
@@ -421,10 +439,14 @@ def service_info() -> dict:
         "timestamp": now_iso(),
         "project_id": PROJECT_ID,
         "region": REGION,
+        "cost_mode": app.config.get("COST_MODE", "minimum_spend"),
+        "public_demo_preserved": bool(app.config.get("PUBLIC_DEMO_PRESERVED", True)),
+        "probe_policy": probe_policy(),
         "routes": {
             "health": "/health",
             "ready": "/ready",
             "status": "/status",
+            "demo_status": "/demo/status",
             "demo": "/demo",
             "store": "/store",
             "products_api": "/api/products",
@@ -459,7 +481,6 @@ def build_topology(local_probe: bool, remote_probe: bool) -> dict:
 
 
 def send_static_page(directory: str):
-    # Validate directory to prevent path traversal
     allowed_dirs = {"demo", "store"}
     if directory not in allowed_dirs:
         abort(404)
@@ -476,6 +497,7 @@ def add_security_headers(response):
     response.headers.setdefault("Content-Security-Policy", (
         "default-src 'self'; "
         "img-src 'self' data:; "
+        "media-src 'self'; "
         "style-src 'self' 'unsafe-inline'; "
         "script-src 'self' 'unsafe-inline'; "
         "font-src 'self' data:; "
@@ -485,11 +507,16 @@ def add_security_headers(response):
         "form-action 'self' mailto:"
     ))
 
-    if request.path.startswith("/api/") or request.path in {
+    if request.path.startswith("/demo/assets/media/"):
+        response.headers.setdefault("Cache-Control", "public, max-age=31536000, immutable")
+    elif request.path.startswith("/demo/assets/"):
+        response.headers.setdefault("Cache-Control", "public, max-age=300")
+    elif request.path.startswith("/api/") or request.path in {
         "/health",
         "/healthz",
         "/ready",
         "/status",
+        "/demo/status",
         "/_ah/health",
     }:
         response.headers.setdefault("Cache-Control", "no-store")
@@ -523,26 +550,36 @@ def health():
             "service": SERVICE_NAME,
             **release_info(),
             "timestamp": now_iso(),
+            "cost_mode": app.config.get("COST_MODE", "minimum_spend"),
+            "public_demo_preserved": bool(app.config.get("PUBLIC_DEMO_PRESERVED", True)),
         }
     )
 
 
 @app.route("/status")
+@app.route("/demo/status")
 def status():
     local_requested, remote_requested, tokens = parse_probe_flags()
     local_probe = (
-        app.config.get("ENABLE_PROBES", True)
+        app.config.get("ENABLE_PROBES", False)
         and not app.testing
         and local_requested
     )
-    remote_probe = remote_requested
+    remote_probe = (
+        app.config.get("ENABLE_REMOTE_PROBES", False)
+        and not app.testing
+        and remote_requested
+    )
     return jsonify(
         {
             **service_info(),
             "probe": {
                 "tokens": tokens,
+                "local_requested": bool(local_requested),
+                "remote_requested": bool(remote_requested),
                 "local_enabled": bool(local_probe),
                 "remote_enabled": bool(remote_probe),
+                "policy": probe_policy(),
             },
             "inventory": {
                 "product_count": len(load_products()),
@@ -556,6 +593,11 @@ def status():
 @app.route("/demo")
 def demo_page():
     return send_static_page("demo")
+
+
+@app.route("/demo/assets/<path:filename>")
+def demo_assets(filename: str):
+    return send_from_directory(str(BASE_DIR / "demo" / "assets"), filename)
 
 
 @app.route("/store")
@@ -585,6 +627,8 @@ def product_detail(slug: str):
 def demo_experience_api():
     demo_payload = load_demo_experience()
     demo_payload["pages"] = {"demo": "/demo", "store": "/store"}
+    demo_payload["cost_mode"] = app.config.get("COST_MODE", "minimum_spend")
+    demo_payload["public_demo_preserved"] = bool(app.config.get("PUBLIC_DEMO_PRESERVED", True))
     return jsonify(demo_payload)
 
 
@@ -592,12 +636,18 @@ def demo_experience_api():
 def topology_api():
     local_requested, remote_requested, _tokens = parse_probe_flags()
     local_probe = (
-        app.config.get("ENABLE_PROBES", True)
+        app.config.get("ENABLE_PROBES", False)
         and not app.testing
         and local_requested
     )
-    remote_probe = remote_requested
-    return jsonify(build_topology(local_probe=local_probe, remote_probe=remote_probe))
+    remote_probe = (
+        app.config.get("ENABLE_REMOTE_PROBES", False)
+        and not app.testing
+        and remote_requested
+    )
+    payload = build_topology(local_probe=local_probe, remote_probe=remote_probe)
+    payload["probe_policy"] = probe_policy()
+    return jsonify(payload)
 
 
 if __name__ == "__main__":
