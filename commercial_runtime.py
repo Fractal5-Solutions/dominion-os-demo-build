@@ -16,6 +16,8 @@ PUBLIC_RECEIPT_PATHS = frozenset({
     "/healthz",
     "/ready",
     "/status",
+    "/demo/status",
+    "/api/v1/topology",
     "/_ah/health",
 })
 
