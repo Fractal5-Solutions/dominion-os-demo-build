@@ -1,0 +1,67 @@
+<!-- Fractal5 /demo-1 visual-runtime polish patch | 2026-07-24
+     Purpose: remove the empty Squarespace first-fold gap and tighten the public demo bridge.
+     Safe scope: only runs on pages containing #fractal5-demo-canon-light-v1.
+-->
+<style id="f5-demo1-polish-patch-20260724">
+  body:has(#fractal5-demo-canon-light-v1) #sections > section:first-child {
+    display: none !important;
+    min-height: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+  }
+
+  body:has(#fractal5-demo-canon-light-v1) section:has(#fractal5-demo-canon-light-v1) .content-wrapper {
+    padding-top: clamp(20px, 3vw, 34px) !important;
+  }
+
+  body:has(#fractal5-demo-canon-light-v1) #fractal5-demo-canon-light-v1 .demo-hero {
+    min-height: auto !important;
+  }
+
+  body:has(#fractal5-demo-canon-light-v1) #fractal5-demo-canon-light-v1 .demo-shell {
+    margin-top: 0 !important;
+  }
+
+  @media (max-width: 767px) {
+    body:has(#fractal5-demo-canon-light-v1) section:has(#fractal5-demo-canon-light-v1) .content-wrapper {
+      padding-top: 18px !important;
+    }
+  }
+</style>
+<script id="f5-demo1-polish-patch-js-20260724">
+(function () {
+  "use strict";
+  function applyPatch() {
+    var root = document.getElementById("fractal5-demo-canon-light-v1");
+    if (!root) return;
+
+    var section = root.closest("section.page-section");
+    if (section) {
+      var wrapper = section.querySelector(".content-wrapper");
+      if (wrapper) wrapper.style.paddingTop = "clamp(20px, 3vw, 34px)";
+    }
+
+    var sections = document.querySelector("#sections");
+    var first = sections && sections.querySelector("section.page-section:first-child");
+    if (first && first !== section) {
+      var text = (first.textContent || "").replace(/\s+/g, "").trim();
+      if (!text || text.length < 60) {
+        first.style.display = "none";
+        first.style.minHeight = "0";
+        first.style.height = "0";
+        first.style.padding = "0";
+        first.style.margin = "0";
+        first.style.overflow = "hidden";
+      }
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", applyPatch, { once: true });
+  } else {
+    applyPatch();
+  }
+})();
+</script>
