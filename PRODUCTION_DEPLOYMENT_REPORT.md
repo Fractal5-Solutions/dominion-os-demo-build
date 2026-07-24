@@ -1,125 +1,27 @@
-# 🚀 PHI Perfect LiveOps - Production Deployment Report
+# Archived Production Deployment Report Notice
 
-**Deployment Date:** $(date '+%Y-%m-%d %H:%M:%S %Z')
-**Project:** dominion-core-prod
-**Region:** us-central1
+**Archived:** 2026-07-24  
+**Status:** superseded for public claims  
+**Current doctrine:** [`MINIMUM_SPEND_PUBLIC_DEMO_MODE.md`](MINIMUM_SPEND_PUBLIC_DEMO_MODE.md)  
+**Current claim boundary:** [`DOMINION_OS_DEPLOYMENT_PROOF.md`](DOMINION_OS_DEPLOYMENT_PROOF.md)
 
-## ✅ Deployment Status
+## Decision
 
-### Infrastructure Configuration
-- **Memory:** 4 GiB per service
-- **CPU:** 2 cores per service
-- **Concurrency:** 250 requests per instance
-- **Min Instances:** 1 (always warm)
-- **Max Instances:** 100 (auto-scaling)
-- **Timeout:** 300 seconds
-- **Execution Environment:** Gen2 (hardened)
+This historical deployment report is no longer an active liveops or infrastructure claim.
 
-### Deployed Services
+Earlier versions described always-warm services, high scaling limits, broad service health, automatic rollback, real-time logs, and perfect liveops. Those statements must not be treated as current public proof unless fresh receipts support them.
 
-#### Cloud Run Services
+## Current public-demo posture
 
-NAME                       URL                                                        STATUS
-api                        https://api-reduwyf2ra-uc.a.run.app                        True
-chatgpt-gateway            https://chatgpt-gateway-reduwyf2ra-uc.a.run.app            True
-demo                       https://demo-reduwyf2ra-uc.a.run.app                       True
-dominion-ai-gateway        https://dominion-ai-gateway-reduwyf2ra-uc.a.run.app        True
-dominion-api               https://dominion-api-reduwyf2ra-uc.a.run.app               True
-dominion-chief-of-staff    https://dominion-chief-of-staff-reduwyf2ra-uc.a.run.app    True
-dominion-demo              https://dominion-demo-reduwyf2ra-uc.a.run.app              True
-dominion-demo-service      https://dominion-demo-service-reduwyf2ra-uc.a.run.app      True
-dominion-gateway           https://dominion-gateway-reduwyf2ra-uc.a.run.app           True
-dominion-os                https://dominion-os-reduwyf2ra-uc.a.run.app                True
-dominion-os-1-0-101        https://dominion-os-1-0-101-reduwyf2ra-uc.a.run.app        True
-dominion-os-demo           https://dominion-os-demo-reduwyf2ra-uc.a.run.app           True
-dominion-phi-ui            https://dominion-phi-ui-reduwyf2ra-uc.a.run.app            True
-phi-askphi-widget          https://phi-askphi-widget-reduwyf2ra-uc.a.run.app          True
-phi-expenditure-dashboard  https://phi-expenditure-dashboard-reduwyf2ra-uc.a.run.app  True
-phi-oauth-server           https://phi-oauth-server-reduwyf2ra-uc.a.run.app           False
-pipeline                   https://pipeline-reduwyf2ra-uc.a.run.app                   True
+- `/demo-1` remains protected as the public proof bridge.
+- Default status endpoints should be lightweight.
+- Remote probes should run only on deliberate operator request.
+- Expensive AI/model work should not run by default.
+- Noncritical infrastructure should avoid always-warm assumptions.
+- Claims must remain public-safe and receipt-gated.
 
+## Replacement guidance
 
-### Monitoring & Observability
-- ✅ Cloud Logging enabled
-- ✅ Cloud Trace enabled
-- ✅ Error rate metrics configured
-- ✅ Uptime checks for critical services
-- ✅ Service account with least-privilege access
+Use [`RUNBOOK_STATUS_PROBES.md`](RUNBOOK_STATUS_PROBES.md) for probe semantics. Use [`MINIMUM_SPEND_PUBLIC_DEMO_MODE.md`](MINIMUM_SPEND_PUBLIC_DEMO_MODE.md) for current operating doctrine.
 
-### Security Hardening
-- ✅ Gen2 execution environment (enhanced security)
-- ✅ Service account with minimal IAM roles
-- ✅ Secrets in Secret Manager
-- ✅ VPC networking ready
-- ✅ HTTPS-only traffic
-- ✅ Auto-scaling for DDoS protection
-
-### LiveOps Features
-- ✅ Zero-downtime deployments
-- ✅ Automatic rollback on errors
-- ✅ Traffic splitting for canary deployments
-- ✅ Real-time logs and metrics
-- ✅ Health checks configured
-- ✅ Cost optimization with min instances
-
-## 📊 Service Health
-
-- **Total Services:** 17
-- **Healthy Services:** 16
-- **Health Rate:** 94.1%
-
-
-## 🎯 Perfect LiveOps Checklist
-
-- [x] All services deployed to production
-- [x] Health checks passing
-- [x] Monitoring and alerting configured
-- [x] Security hardening applied
-- [x] Auto-scaling enabled
-- [x] Zero-downtime deployment pipeline
-- [x] Cost optimization configured
-- [x] Documentation complete
-
-## 📝 Next Steps
-
-1. **Configure Custom Domain** (Optional)
-   ```bash
-   gcloud run domain-mappings create --service=dominion-gateway --domain=yourdomain.com
-   ```
-
-2. **Setup CI/CD Pipeline**
-   - Connect GitHub Actions for automated deployments
-   - Configure branch protection rules
-   - Set up automated testing
-
-3. **Monitor Performance**
-   - Review Cloud Monitoring dashboards
-   - Set up custom alerts
-   - Optimize based on metrics
-
-4. **Scale as Needed**
-   - Adjust min/max instances based on traffic
-   - Configure memory and CPU based on profiling
-   - Implement caching strategies
-
-## 🔗 Useful Commands
-
-```bash
-# View service logs
-gcloud run logs read dominion-api --region=us-central1 --tail=100
-
-# Check service status
-gcloud run services describe dominion-api --region=us-central1
-
-# Update service configuration
-gcloud run services update dominion-api --region=us-central1 --memory=8Gi
-
-# Roll back deployment
-gcloud run services update-traffic dominion-api --to-revisions=PREVIOUS=100
-```
-
----
-
-**Status:** ✅ PRODUCTION READY AND OPERATIONAL
-**Generated by:** PHI Perfect LiveOps System
-**Dominion OS SaaS Suite** - Enterprise Grade Cloud Infrastructure
+Keep the demo alive. Put the expensive machinery to sleep.
