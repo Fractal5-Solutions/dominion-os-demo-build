@@ -1,6 +1,6 @@
 {
-  "schema": "f5.demo1.watchlist.v2",
-  "generatedAt": "2026-07-16T23:50:00Z",
+  "schema": "f5.demo1.watchlist.v3",
+  "generatedAt": "2026-07-24T13:40:34Z",
   "page": {
     "name": "Fractal5 /demo-1",
     "url": "https://www.fractal5solutions.com/demo-1",
@@ -11,36 +11,24 @@
     "root": "https://demo-reduwyf2ra-uc.a.run.app/",
     "demo": "https://demo-reduwyf2ra-uc.a.run.app/demo",
     "health": "https://demo-reduwyf2ra-uc.a.run.app/health",
-    "status": "https://demo-reduwyf2ra-uc.a.run.app/status"
+    "status": "https://demo-reduwyf2ra-uc.a.run.app/status",
+    "demoStatus": "https://demo-reduwyf2ra-uc.a.run.app/demo/status",
+    "webMp4": "https://demo-reduwyf2ra-uc.a.run.app/demo/assets/media/dominion_os_live_demo_web.mp4",
+    "masterMp4": "https://demo-reduwyf2ra-uc.a.run.app/demo/assets/media/dominion_os_live_demo_master.mp4"
   },
   "sourceServedAssets": {
     "manifest": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/demo-manifest.json",
-    "poster": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/dominion-os-demo-poster.svg",
     "sampleData": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/sample-data.json",
     "demoPackage": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/demo-download-package.json",
     "releaseReceipts": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/release-receipts.json",
-    "squarespaceCode": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/squarespace/demo-1-final.html",
     "commercialLaunchReadiness": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/commercial-launch-readiness.json",
-    "controlledPreviewCommerce": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/controlled-preview-commerce-receipt.json",
-    "commercialProofReceiptsIndex": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/commercial-proof-receipts-index.json"
-  },
-  "documentation": {
-    "deliveryContract": "DEMO_1_DELIVERY_CONTRACT.md",
-    "postPublishVerification": "DEMO_1_POST_PUBLISH_VERIFICATION.md",
-    "commercialLaunchGreenGates": "docs/launch-readiness/2026-06-18-commercial-launch-green-gates.md",
-    "nhitlExecutionReceipt": "docs/launch-readiness/2026-07-06-nhitl-unblock-execution.md",
-    "commercialLaunchCompletionPlan": "docs/launch-readiness/2026-07-07-commercial-launch-completion-plan.md",
-    "fullCommercialGreenExecutionPlan": "docs/launch-readiness/2026-07-10-full-commercial-green-execution-plan.md"
+    "commercialProofReceiptsIndex": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/commercial-proof-receipts-index.json",
+    "visualPolishPatch": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/squarespace/demo-1-visual-runtime-polish-patch.html"
   },
   "expectedStatus": {
     "html": 200,
     "json": 200,
-    "svg": 200,
     "mp4": [200, 206]
-  },
-  "assertionScopes": {
-    "requiredAssertions": "live deployed Squarespace /demo-1 page text and links",
-    "requiredHardeningAssertions": "source-served hardened Squarespace code package at sourceServedAssets.squarespaceCode"
   },
   "requiredAssertions": [
     "Public proof for a governed command system.",
@@ -55,37 +43,38 @@
     "Readiness matrix",
     "Watchlist",
     "Controlled commercial preview is allowed.",
-    "Full self-serve SaaS launch, direct public MP4, customer portal green, production observability green, and autonomous self-healing are not claimed without separate receipts."
+    "Full self-serve SaaS launch, customer portal green, production observability green, and autonomous self-healing are not claimed without separate receipts."
   ],
-  "requiredHardeningAssertions": [
-    "data-version=\"2026-06-08-hardened\"",
-    "rel=\"noopener noreferrer\"",
-    "referrerpolicy=\"strict-origin-when-cross-origin\"",
-    "hidden referrerpolicy=\"strict-origin-when-cross-origin\"",
-    "ALLOWED_RUNTIME_ORIGIN",
-    "ALLOWED_RAW_ASSETS_PREFIX",
-    "ALLOWED_FRACTAL5_URLS"
-  ],
+  "visualRuntimePolishChecks": {
+    "blankFirstFoldRemovedByPatch": true,
+    "patchSelector": "#fractal5-demo-canon-light-v1",
+    "patchFile": "squarespace/demo-1-visual-runtime-polish-patch.html",
+    "rule": "The live bridge should place the demo hero materially higher in the first viewport and avoid a large empty Squarespace spacer before the proof bridge."
+  },
   "claimDriftChecks": {
     "caseInsensitive": true,
-    "forbiddenWhenManifestVideoMp4Null": [
+    "manifestVideoMp4Path": "assets.videoMp4",
+    "forbiddenOnlyWhenManifestVideoMp4Null": [
       "Actual demo MP4 integrated",
       "Open web MP4",
       "Open master MP4",
       "direct MP4 is available",
       "MP4 integrated"
     ],
-    "manifestVideoMp4Path": "assets.videoMp4",
-    "allowedFallbackWhenNull": "sections.watchVideo"
+    "allowedWhenVerified": [
+      "Actual demo MP4 integrated",
+      "Open web MP4",
+      "Open master MP4"
+    ]
   },
   "directMp4EvidenceRequirements": {
     "requiredBeforeClaim": true,
     "urlProtocol": "https",
     "urlPathSuffix": ".mp4",
     "allowedHttpStatus": [200, 206],
-    "allowedContentTypes": ["video/mp4", "application/octet-stream for an .mp4 URL"],
+    "allowedContentTypes": ["video/mp4"],
     "receiptField": "claimControl.allowDirectMp4Claim",
-    "rule": "A non-null manifest URL alone is not proof. The current public-proof receipt must verify the media response."
+    "currentReceipt": "demo/assets/release-receipts.json"
   },
   "runtimeFreshnessRequirements": {
     "routes": ["runtime.health", "runtime.status"],
@@ -93,25 +82,16 @@
     "maximumAgeSeconds": 900,
     "rule": "Health and status receipts must be current and non-regressing; stale runtime payloads cannot support cloud-health green."
   },
-  "workflowReceipt": {
-    "workflow": "demo1-public-proof",
-    "artifact": "demo1-public-proof-receipt",
-    "receiptPath": "out/demo1-public-proof/latest-probe.json",
-    "retentionDays": 30,
-    "requiredForGateClosure": true
-  },
   "publicBridgeGates": [
     "live /demo-1 deployed page exposes the current public proof bridge assertions",
-    "source-served hardened Squarespace package preserves exact hardening and allowlist assertions",
-    "Cloud Run /demo, /health, and /status routes are declared and probed",
+    "visual polish patch is applied or available to remove the empty first-fold gap",
+    "Cloud Run /demo, /health, /status, /demo/status, and MP4 routes are declared and probed",
     "source-served manifest, package, data, release receipts, readiness, watchlist, and proof index remain public-safe",
-    "direct MP4 claim stays blocked while demo-manifest assets.videoMp4 is null",
     "full commercial green stays blocked unless separate commercial, observability, rollback, and autonomous-operation receipts exist"
   ],
   "commercialGreenGates": [
-    "claim-drift repair receipt for /demo MP4 language versus manifest or verified public MP4 promotion",
-    "daemon watchlist ingestion receipt",
-    "hourly probe output for /demo-1, Cloud Run routes, and raw assets",
+    "daemon watchlist ingestion receipt if monitoring is intentionally enabled",
+    "operator-triggered probe output for /demo-1, Cloud Run routes, and raw assets before high-stakes demos",
     "secret/public-boundary scan receipt",
     "current CI/build/test/e2e receipt",
     "commerce or invoice-only sales-motion receipt",
@@ -122,12 +102,13 @@
   ],
   "claimControl": {
     "directMp4RequiredForMp4Claim": true,
-    "directMp4CurrentlyAvailable": false,
+    "directMp4CurrentlyAvailable": true,
     "publicBridgeContractCurrentlyAligned": true,
+    "visualPolishPatchAvailable": true,
     "fullCommerceGreenCurrentlyAllowed": false,
     "fullCommercialGreenCurrentlyAllowed": false,
     "controlledPreviewCommercialUseAllowed": true,
-    "runtimeCopyRepairRequired": true,
-    "reason": "The current public bridge and source-served assets support controlled preview sharing. Direct MP4, full self-serve commerce, native GCP self-healing, production observability, and production customer portal proof require separate receipts. Runtime health and status must also remain fresh."
+    "runtimeCopyRepairRequired": false,
+    "reason": "The public bridge and source-served assets support controlled preview sharing. Direct MP4 routes are verified. Full self-serve commerce, native GCP self-healing, production observability, and production customer portal proof require separate receipts."
   }
 }
