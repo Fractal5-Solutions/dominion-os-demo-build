@@ -1,6 +1,6 @@
 {
   "schema": "f5.dominion.demo.release-receipts.v1",
-  "generatedAt": "2026-07-16T23:59:00Z",
+  "generatedAt": "2026-07-24T13:40:34Z",
   "release": {
     "name": "Dominion OS + SaaS Suite Public Demo",
     "publicBridge": "https://www.fractal5solutions.com/demo-1",
@@ -9,37 +9,52 @@
   },
   "receipts": [
     {
-      "id": "cloudrun-root",
-      "url": "https://demo-reduwyf2ra-uc.a.run.app/",
-      "expected": "200 text/html",
-      "status": "operator-verified"
-    },
-    {
       "id": "cloudrun-demo",
       "url": "https://demo-reduwyf2ra-uc.a.run.app/demo",
       "expected": "200 text/html",
-      "status": "operator-verified"
+      "status": "operator-verified",
+      "verifiedAt": "2026-07-24T13:37:46Z"
     },
     {
       "id": "cloudrun-health",
       "url": "https://demo-reduwyf2ra-uc.a.run.app/health",
       "expected": "200 application/json",
-      "status": "operator-verified"
+      "status": "operator-verified",
+      "verifiedAt": "2026-07-24T13:37:46Z"
     },
     {
       "id": "cloudrun-status",
       "url": "https://demo-reduwyf2ra-uc.a.run.app/status",
       "expected": "200 application/json",
-      "status": "operator-verified"
+      "status": "operator-verified",
+      "verifiedAt": "2026-07-24T13:37:46Z"
+    },
+    {
+      "id": "cloudrun-demo-status",
+      "url": "https://demo-reduwyf2ra-uc.a.run.app/demo/status",
+      "expected": "200 application/json",
+      "status": "operator-verified",
+      "verifiedAt": "2026-07-24T13:37:46Z"
+    },
+    {
+      "id": "cloudrun-web-mp4",
+      "url": "https://demo-reduwyf2ra-uc.a.run.app/demo/assets/media/dominion_os_live_demo_web.mp4",
+      "expected": "200 video/mp4",
+      "status": "operator-verified",
+      "contentLengthBytes": 8431115,
+      "verifiedAt": "2026-07-24T13:37:46Z"
+    },
+    {
+      "id": "cloudrun-master-mp4",
+      "url": "https://demo-reduwyf2ra-uc.a.run.app/demo/assets/media/dominion_os_live_demo_master.mp4",
+      "expected": "200 video/mp4",
+      "status": "operator-verified",
+      "contentLengthBytes": 10762096,
+      "verifiedAt": "2026-07-24T13:40:34Z"
     },
     {
       "id": "github-manifest",
       "path": "demo/assets/demo-manifest.json",
-      "status": "merged-to-main"
-    },
-    {
-      "id": "github-poster",
-      "path": "demo/assets/dominion-os-demo-poster.svg",
       "status": "merged-to-main"
     },
     {
@@ -55,7 +70,8 @@
     "publicSafe": true
   },
   "claimControl": {
+    "directMp4CurrentlyAvailable": true,
     "fullCommercialGreenAllowed": false,
-    "reason": "This receipt proves the public demo bridge asset layer. Commerce, rollback, native GCP self-healing, direct MP4, and binary package assets require separate receipts."
+    "reason": "This receipt proves the public demo bridge, runtime routes, and served MP4 proof assets. Commerce, customer portal, rollback, production observability, and autonomous self-healing require separate receipts."
   }
 }
