@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fractal5 Demo | Gated Operator Experience</title>
+    <title>Fractal5 Demo | Public-Safe Operator Experience</title>
     <style>
         :root {
             --bg: #ffffff;
@@ -101,7 +101,7 @@
             margin: 0;
             font-size: clamp(2.9rem, 6.8vw, 6.2rem);
             line-height: 0.92;
-            letter-spacing: -0.05em;
+            letter-spacing: 0;
             max-width: 11ch;
         }
 
@@ -223,7 +223,7 @@
         .section h2 {
             margin: 0;
             font-size: clamp(1.4rem, 2.4vw, 2rem);
-            letter-spacing: -0.03em;
+            letter-spacing: 0;
         }
 
         .section-copy {
@@ -431,10 +431,10 @@
         <section class="hero">
             <div class="hero-layout">
                 <div>
-                    <span class="eyebrow">Gated /demo</span>
+                    <span class="eyebrow">Public /demo</span>
                     <h1>Fractal5 demo surface, built for real users.</h1>
                     <p class="hero-copy">
-                        This is the public entry point behind Cloud Run and IAP.
+                        This is the public-safe entry point served by Cloud Run.
                         It shows the live demo contract, operational state, and the
                         code-backed surfaces people can actually click: overview,
                         store, health, and topology.
@@ -442,14 +442,14 @@
                     <div class="hero-actions">
                         <a class="btn btn-primary" id="open-command-center" href="#live-state">Review live state</a>
                         <a class="btn btn-secondary" href="/store">Open store</a>
-                        <a class="btn btn-secondary" href="/status">View JSON status</a>
+                        <a class="btn btn-secondary" href="/demo/status">View demo status</a>
                     </div>
                 </div>
 
                 <div class="hero-aside">
                     <div class="signal">
                         <strong>Access pattern</strong>
-                        <div class="value">Users enter through the LB, pass IAP, and land on this demo page.</div>
+                        <div class="value">Prospects enter through the public demo link and land on this demo page.</div>
                     </div>
                     <div class="signal">
                         <strong>Current contract</strong>
@@ -464,7 +464,7 @@
 
             <div class="status-pills">
                 <span class="pill"><span class="dot"></span> Cloud Run ready</span>
-                <span class="pill"><span class="dot"></span> IAP gated</span>
+                <span class="pill"><span class="dot"></span> Public-safe data</span>
                 <span class="pill"><span class="dot"></span> Mobile responsive</span>
                 <span class="pill"><span class="dot"></span> Audit-friendly</span>
             </div>
@@ -514,7 +514,7 @@
                 <article class="card">
                     <span class="status-chip status-green">Step 1</span>
                     <h3>Open the demo</h3>
-                    <p>Use <code>/demo</code> to enter the gated experience and verify the user-facing shell loads cleanly.</p>
+                    <p>Use <code>/demo</code> to enter the public demo experience and verify the user-facing shell loads cleanly.</p>
                 </article>
                 <article class="card">
                     <span class="status-chip status-green">Step 2</span>
@@ -560,12 +560,12 @@
             <div class="grid-2">
                 <article class="card">
                     <h3>Fetch the page</h3>
-                    <pre><code>curl -I https://www.fractal5solutions.com/demo</code></pre>
-                    <p class="mini-note">Expect IAP protection on the public path and a normal response for authorized users.</p>
+                    <pre><code>curl -I https://demo-reduwyf2ra-uc.a.run.app/demo</code></pre>
+                    <p class="mini-note">Expect a public-safe Cloud Run response for the demo surface.</p>
                 </article>
                 <article class="card">
                     <h3>Fetch health</h3>
-                    <pre><code>curl -s https://www.fractal5solutions.com/demo/healthz | jq .</code></pre>
+                    <pre><code>curl -s https://demo-reduwyf2ra-uc.a.run.app/health | jq .</code></pre>
                     <p class="mini-note">Use this to confirm the service revision is healthy after deploy.</p>
                 </article>
             </div>
@@ -601,7 +601,7 @@ console.log(payload.config.version, payload.pages.demo);</code></pre>
         </section>
 
         <div class="footer">
-            Built for Fractal5 Solutions · route <code>/demo</code> · backed by Cloud Run + IAP + Artifact Registry
+            Built for Fractal5 Solutions · route <code>/demo</code> · backed by Cloud Run + public-safe assets + Artifact Registry
         </div>
     </main>
 
