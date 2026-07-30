@@ -21,6 +21,11 @@ PUBLIC_RECEIPT_PATHS = frozenset({
     "/_ah/health",
 })
 
+ALLOWED_PUBLIC_ORIGINS = frozenset({
+    "https://www.fractal5solutions.com",
+    "https://fractal5solutions.com",
+})
+
 
 def utc_now_iso() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
@@ -32,6 +37,16 @@ def runtime_revision(payload: dict) -> str:
         or os.getenv("REVISION")
         or str(payload.get("revision") or "local")
     )
+
+
+def add_vary_header(response, value: str) -> None:
+    existing = {
+        item.strip()
+        for item in response.headers.get("Vary", "").split(",")
+        if item.strip()
+    }
+    existing.add(value)
+    response.headers["Vary"] = ", ".join(sorted(existing))
 
 
 @app.after_request
@@ -58,6 +73,12 @@ def add_public_receipt_metadata(response):
     response.headers["Cache-Control"] = "no-store, max-age=0, must-revalidate"
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
+
+    origin = request.headers.get("Origin", "")
+    if origin in ALLOWED_PUBLIC_ORIGINS:
+        response.headers["Access-Control-Allow-Origin"] = origin
+        add_vary_header(response, "Origin")
+
     return response
 
 
