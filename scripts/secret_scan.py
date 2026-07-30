@@ -150,6 +150,10 @@ REFERENCE_PATTERNS = (
     re.compile(r"^(?:secrets|env|vars)\.[A-Za-z0-9_.-]+$", re.IGNORECASE),
     re.compile(r"^(?:os\.getenv|process\.env)\b", re.IGNORECASE),
     re.compile(r"^[A-Z_][A-Z0-9_]*$"),
+    re.compile(
+        r"^(?:self|this|config|settings|token_data)\.[A-Za-z_][A-Za-z0-9_.]*$",
+        re.IGNORECASE,
+    ),
     re.compile(r"^[A-Za-z_][A-Za-z0-9_.]*\s*(?:\[|\()"),
     re.compile(r"^[A-Za-z_][A-Za-z0-9_.]*\[[^]]+\]$"),
     re.compile(r"^[A-Za-z0-9_.-]+:latest$", re.IGNORECASE),
