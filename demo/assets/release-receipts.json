@@ -30,7 +30,8 @@
     "publicRuntimeLiveClaimAllowed": false,
     "note": "Historical operator receipts are retained below. They do not override the current route review. The public page enables runtime links only after a fresh health response succeeds."
   },
-  "historicalReceipts": [
+  "receiptInterpretation": "The receipts array records historical operator verification. currentReview controls present-tense public claims.",
+  "receipts": [
     {
       "id": "cloudrun-demo",
       "url": "https://demo-reduwyf2ra-uc.a.run.app/demo",
