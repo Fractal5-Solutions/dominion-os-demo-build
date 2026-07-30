@@ -1,13 +1,36 @@
 {
   "schema": "f5.dominion.demo.release-receipts.v1",
-  "generatedAt": "2026-07-24T13:40:34Z",
+  "generatedAt": "2026-07-30T12:32:03Z",
   "release": {
     "name": "Dominion OS + SaaS Suite Public Demo",
     "publicBridge": "https://www.fractal5solutions.com/demo-1",
     "runtimeDemo": "https://demo-reduwyf2ra-uc.a.run.app/demo",
     "environment": "demo-sandbox"
   },
-  "receipts": [
+  "currentReview": {
+    "state": "verification-pending",
+    "observedAt": "2026-07-30T12:32:03Z",
+    "routes": [
+      {
+        "id": "cloudrun-demo",
+        "url": "https://demo-reduwyf2ra-uc.a.run.app/demo",
+        "observedHttpStatus": 404
+      },
+      {
+        "id": "cloudrun-health",
+        "url": "https://demo-reduwyf2ra-uc.a.run.app/health",
+        "observedHttpStatus": 404
+      },
+      {
+        "id": "cloudrun-status",
+        "url": "https://demo-reduwyf2ra-uc.a.run.app/status",
+        "observedHttpStatus": 404
+      }
+    ],
+    "publicRuntimeLiveClaimAllowed": false,
+    "note": "Historical operator receipts are retained below. They do not override the current route review. The public page enables runtime links only after a fresh health response succeeds."
+  },
+  "historicalReceipts": [
     {
       "id": "cloudrun-demo",
       "url": "https://demo-reduwyf2ra-uc.a.run.app/demo",
@@ -63,6 +86,7 @@
       "status": "merged-to-main"
     }
   ],
+  "deploymentEvidence": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/cloud-deployment-manifest.json",
   "safety": {
     "containsSecrets": false,
     "containsCustomerData": false,
@@ -70,8 +94,10 @@
     "publicSafe": true
   },
   "claimControl": {
-    "directMp4CurrentlyAvailable": true,
+    "directMp4CurrentlyAvailable": false,
+    "publicRuntimeLiveClaimAllowed": false,
+    "multiCloudDeploymentArchitectureAllowed": true,
     "fullCommercialGreenAllowed": false,
-    "reason": "This receipt proves the public demo bridge, runtime routes, and served MP4 proof assets. Commerce, customer portal, rollback, production observability, and autonomous self-healing require separate receipts."
+    "reason": "The source-served evidence layer and deployment packages can be presented. Current live runtime and direct MP4 claims remain disabled until fresh public verification succeeds. Commerce, customer portal, rollback, production observability, and autonomous self-healing require separate receipts."
   }
 }
