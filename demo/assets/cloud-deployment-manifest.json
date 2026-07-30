@@ -1,6 +1,6 @@
 {
   "schema": "f5.dominion.cloud-deployments.v1",
-  "generatedAt": "2026-07-30T12:06:55Z",
+  "generatedAt": "2026-07-30T12:32:03Z",
   "product": "Dominion OS + SaaS Suite",
   "publicBridge": "https://www.fractal5solutions.com/demo-1",
   "assets": {
@@ -38,7 +38,7 @@
           "status": "https://demo-reduwyf2ra-uc.a.run.app/status"
         },
         "lastExternalReview": {
-          "observedAt": "2026-07-30T12:06:55Z",
+          "observedAt": "2026-07-30T12:32:03Z",
           "demoHttpStatus": 404,
           "healthHttpStatus": 404,
           "statusHttpStatus": 404
