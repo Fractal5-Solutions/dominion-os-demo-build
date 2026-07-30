@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """High-signal repository secret scanner used by CI and pre-commit.
 
-The scanner fails on concrete credential formats and credential-like assignment
-values. It deliberately does not fail merely because documentation or source
-code mentions words such as ``password``, ``token``, or ``secret``.
+The scanner fails on concrete credential formats and credential-like literal
+assignments. It does not fail merely because documentation or source code
+mentions secret vocabulary or passes credential variables through code.
 """
 from __future__ import annotations
 
@@ -21,10 +21,8 @@ SKIP_DIRS = {
     ".mypy_cache",
     ".pytest_cache",
     ".ruff_cache",
-    ".venv",
     "__pycache__",
     "node_modules",
-    "venv",
 }
 
 SKIP_SUFFIXES = {
@@ -54,6 +52,10 @@ SKIP_SUFFIXES = {
     ".whl",
     ".xlsx",
     ".zip",
+}
+
+INTENTIONAL_FIXTURE_PATHS = {
+    Path("tests/test_secret_scan.py"),
 }
 
 MAX_TEXT_BYTES = 5 * 1024 * 1024
@@ -91,18 +93,26 @@ SECRET_KEY_SUFFIX = r"(?:" + "|".join(
     ]
 ) + r")"
 
-ASSIGNMENT_PATTERN = re.compile(
+PLAIN_ASSIGNMENT_PATTERN = re.compile(
     rf"""
-    ^\s*
-    (?:export\s+)?
-    [\"']?
+    ^\s*(?:-\s*)?(?:export\s+)?
     (?P<key>[A-Z0-9_.-]*{SECRET_KEY_SUFFIX})
-    [\"']?
-    \s*(?:=|:)\s*
-    (?P<value>.*?)
-    \s*[,;]?\s*$
+    \s*(?:=|:)\s*(?P<value>.*?)\s*[,;]?\s*$
     """,
     re.IGNORECASE | re.VERBOSE,
+)
+
+QUOTED_KEY_ASSIGNMENT_PATTERN = re.compile(
+    rf"""
+    ^\s*[\"'](?P<key>[A-Z0-9_.-]*{SECRET_KEY_SUFFIX})[\"']
+    \s*:\s*(?P<value>.*?)\s*[,;]?\s*$
+    """,
+    re.IGNORECASE | re.VERBOSE,
+)
+
+ASSIGNMENT_PATTERNS = (
+    PLAIN_ASSIGNMENT_PATTERN,
+    QUOTED_KEY_ASSIGNMENT_PATTERN,
 )
 
 PLACEHOLDER_MARKERS = {
@@ -123,6 +133,7 @@ PLACEHOLDER_MARKERS = {
     "redacted",
     "replace-me",
     "replace_me",
+    "replace_with",
     "sample",
     "token_here",
     "unset",
@@ -132,12 +143,15 @@ PLACEHOLDER_MARKERS = {
 }
 
 REFERENCE_PATTERNS = (
-    re.compile(r"^\$\{[^}]+\}$"),
+    re.compile(r"^\\?\$\{[^}]+\}$"),
     re.compile(r"^\$[A-Za-z_][A-Za-z0-9_]*$"),
     re.compile(r"^%[A-Za-z_][A-Za-z0-9_]*%$"),
-    re.compile(r"^\$\{\{.*\}\}$"),
+    re.compile(r"^\\?\$\{\{.*\}\}$"),
     re.compile(r"^(?:secrets|env|vars)\.[A-Za-z0-9_.-]+$", re.IGNORECASE),
     re.compile(r"^(?:os\.getenv|process\.env)\b", re.IGNORECASE),
+    re.compile(r"^[A-Z_][A-Z0-9_]*$"),
+    re.compile(r"^[A-Za-z_][A-Za-z0-9_.]*\s*(?:\[|\()"),
+    re.compile(r"^[A-Za-z_][A-Za-z0-9_.]*\[[^]]+\]$"),
     re.compile(r"^[A-Za-z0-9_.-]+:latest$", re.IGNORECASE),
     re.compile(r"^(?:/)?secrets?/", re.IGNORECASE),
 )
@@ -186,14 +200,32 @@ def _looks_like_placeholder_or_reference(value: str) -> bool:
     return any(pattern.search(value) for pattern in REFERENCE_PATTERNS)
 
 
-def _looks_like_credential_value(value: str) -> bool:
+def _normalized_identifier(value: str) -> str:
+    return re.sub(r"[^a-z0-9]", "", value.lower())
+
+
+def _looks_like_credential_value(value: str, key: str) -> bool:
     if _looks_like_placeholder_or_reference(value):
         return False
     if len(value) < 6:
         return False
     if any(character.isspace() for character in value):
-        # Quoted passphrases are retained by _strip_assignment_value, but prose
-        # and shell command fragments should not become generic findings.
+        return False
+    if any(character in value for character in "()[]{}"):
+        return False
+
+    value_identifier = _normalized_identifier(value)
+    key_identifier = _normalized_identifier(key.split(".")[-1])
+    if value_identifier == key_identifier:
+        return False
+    if value_identifier in {
+        "accesstoken",
+        "clientsecret",
+        "keypassword",
+        "password",
+        "secretkey",
+        "token",
+    }:
         return False
     return True
 
@@ -217,6 +249,7 @@ def _line_number(text: str, offset: int) -> int:
 
 def scan_text(text: str) -> list[Finding]:
     findings: list[Finding] = []
+    lines = text.splitlines()
 
     for kind, pattern in TOKEN_PATTERNS.items():
         for match in pattern.finditer(text):
@@ -224,31 +257,33 @@ def scan_text(text: str) -> list[Finding]:
             if _looks_like_placeholder_or_reference(raw):
                 continue
             line_number = _line_number(text, match.start())
-            line = text.splitlines()[line_number - 1] if text.splitlines() else ""
+            line = lines[line_number - 1] if lines else ""
             findings.append(
                 Finding(kind, line_number, raw, _redacted_context(line, raw))
             )
 
-    for line_number, line in enumerate(text.splitlines(), start=1):
+    for line_number, line in enumerate(lines, start=1):
         if not line.strip() or line.lstrip().startswith(("#", "//", "*")):
             continue
-        match = ASSIGNMENT_PATTERN.match(line)
+        match = next(
+            (candidate.match(line) for candidate in ASSIGNMENT_PATTERNS if candidate.match(line)),
+            None,
+        )
         if not match:
             continue
+        key = match.group("key")
         value = _strip_assignment_value(match.group("value"))
-        if not _looks_like_credential_value(value):
+        if not _looks_like_credential_value(value, key):
             continue
         findings.append(
             Finding(
-                f"Credential assignment ({match.group('key')})",
+                f"Credential assignment ({key})",
                 line_number,
                 value,
                 _redacted_context(line, value),
             )
         )
 
-    # A single value can be detected both by a concrete token format and by its
-    # assignment. Preserve the higher-confidence format finding only.
     unique: dict[tuple[int, str], Finding] = {}
     for finding in findings:
         key = (finding.line_number, finding.raw)
@@ -272,11 +307,24 @@ def scan_file(path: os.PathLike[str] | str) -> list[Finding]:
     return scan_text(data.decode("utf-8", errors="ignore"))
 
 
+def _skip_directory_name(name: str) -> bool:
+    normalized = name.lower()
+    return (
+        name in SKIP_DIRS
+        or normalized == "venv"
+        or normalized.startswith("venv_")
+        or normalized.startswith(".venv")
+    )
+
+
 def iter_repository_files(root: Path) -> Iterable[Path]:
     for dirpath, dirnames, filenames in os.walk(root):
-        dirnames[:] = [name for name in dirnames if name not in SKIP_DIRS]
+        dirnames[:] = [name for name in dirnames if not _skip_directory_name(name)]
         for filename in filenames:
             path = Path(dirpath) / filename
+            relative = path.relative_to(root)
+            if relative in INTENTIONAL_FIXTURE_PATHS:
+                continue
             if path.suffix.lower() in SKIP_SUFFIXES:
                 continue
             yield path
