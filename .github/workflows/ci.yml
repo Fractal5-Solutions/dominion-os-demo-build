@@ -58,29 +58,27 @@ jobs:
 
           test_path = Path('tests/test_demo1_multicloud_source.py')
           text = test_path.read_text(encoding='utf-8')
-          old = '''        href = anchor["href"]
-        assert (
-            href.endswith("/cloud-deployment-manifest.json")
-            or href == "https://www.fractal5solutions.com/#contact"
-        )
-'''
-          new = '''        target = anchor["data-runtime-target"]
-        href = anchor["href"]
-        if target.endswith("/demo"):
-            assert href == "#deployment-platforms"
-        elif target.endswith("/health"):
-            assert href == "https://www.fractal5solutions.com/dominion-os"
-        else:
-            raise AssertionError(f"Unexpected runtime target: {target}")
-        assert href != target
-'''
+          old = "\n".join([
+              '        href = anchor["href"]',
+              '        assert (',
+              '            href.endswith("/cloud-deployment-manifest.json")',
+              '            or href == "https://www.fractal5solutions.com/#contact"',
+              '        )',
+          ]) + "\n"
+          new = "\n".join([
+              '        target = anchor["data-runtime-target"]',
+              '        href = anchor["href"]',
+              '        if target.endswith("/demo"):',
+              '            assert href == "#deployment-platforms"',
+              '        elif target.endswith("/health"):',
+              '            assert href == "https://www.fractal5solutions.com/dominion-os"',
+              '        else:',
+              '            raise AssertionError(f"Unexpected runtime target: {target}")',
+              '        assert href != target',
+          ]) + "\n"
           if text.count(old) != 1:
               raise SystemExit('tests/test_demo1_multicloud_source.py: stale assertion block not found exactly once')
           test_path.write_text(text.replace(old, new), encoding='utf-8')
-
-          standalone = Path('.github/workflows/demo-contract-reconciliation-once.yml')
-          if standalone.exists():
-              standalone.unlink()
 
           ci_path = Path('.github/workflows/ci.yml')
           ci_text = ci_path.read_text(encoding='utf-8')
@@ -113,7 +111,6 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A \
             .github/workflows/ci.yml \
-            .github/workflows/demo-contract-reconciliation-once.yml \
             command_core.py \
             tests/test_demo1_multicloud_source.py
           git commit -m "fix(demo): enforce cache and fail-safe link contracts [generated]"
