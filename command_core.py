@@ -1,490 +1,128 @@
-#!/usr/bin/env python3
-"""Unified Dominion OS command surface for demo, store, and topology status."""
-
 from __future__ import annotations
 
 import json
-import logging
 import os
-import subprocess
+import time
 from datetime import datetime, timezone
 from pathlib import Path
-import re
+from typing import Any
 from urllib.parse import urlparse
 
 import requests
 from flask import Flask, abort, jsonify, render_template_string, request, send_from_directory
 
 BASE_DIR = Path(__file__).resolve().parent
-
-logger = logging.getLogger("dominion-command-core")
-
-
-def env_flag(name: str, default: str = "0") -> bool:
-    value = os.getenv(name, default).strip().lower()
-    return value not in {"", "0", "false", "no", "off"}
-
+APP_START_MONOTONIC = time.monotonic()
+DEFAULT_RELEASE_SHA = os.getenv("RELEASE_SHA", "unknown")
+DEFAULT_RELEASE_VERSION = os.getenv("RELEASE_VERSION", DEFAULT_RELEASE_SHA[:12])
+DEFAULT_SERVICE_NAME = os.getenv("K_SERVICE", os.getenv("SERVICE_NAME", "dominion-os-demo"))
+DEFAULT_REGION = os.getenv("GOOGLE_CLOUD_REGION", os.getenv("REGION", "us-central1"))
+REQUEST_TIMEOUT_SECONDS = max(0.25, float(os.getenv("REMOTE_REQUEST_TIMEOUT_SECONDS", "3")))
+ALLOWED_REMOTE_SCHEMES = {"https"}
 
 app = Flask(__name__)
-app.config["JSON_SORT_KEYS"] = False
-app.config["COST_MODE"] = (
-    os.getenv("COMMAND_CORE_COST_MODE") or os.getenv("COST_MODE") or "minimum_spend"
-).strip().lower()
-app.config["ENABLE_PROBES"] = env_flag("COMMAND_CORE_ENABLE_PROBES", "0")
-app.config["ENABLE_REMOTE_PROBES"] = env_flag("COMMAND_CORE_ENABLE_REMOTE_PROBES", "0")
-app.config["PUBLIC_DEMO_PRESERVED"] = env_flag("COMMAND_CORE_PUBLIC_DEMO_PRESERVED", "1")
 
-APP_VERSION = os.getenv("APP_VERSION", "0.0.0-dev")
-SERVICE_NAME = os.getenv("SERVICE_NAME", "dominion-os-demo")
-REGION = os.getenv("REGION", os.getenv("GCP_REGION", "us-central1"))
-PROJECT_ID = os.getenv("PROJECT_ID", os.getenv("GCP_PROJECT_ID", "dominion-os-1-0-main"))
-OVERLAY = os.getenv("OVERLAY", "business")
-RELEASE_SHA = os.getenv("RELEASE_SHA", "")
-SOURCE_OF_TRUTH_REPO = os.getenv("SOURCE_OF_TRUTH_REPO", "dominion-command-center")
-SOURCE_OF_TRUTH_SHA = os.getenv("SOURCE_OF_TRUTH_SHA", "")
-SOURCE_OF_TRUTH_VERSION = os.getenv("SOURCE_OF_TRUTH_VERSION", "")
-IMAGE_REF = os.getenv("IMAGE_REF", "")
-RELEASE_REPO = os.getenv("RELEASE_REPO", "dominion-os-demo-build")
 
-LOCAL_SERVICE_TARGETS = (
-    {
-        "id": "command-center-bims",
-        "name": "Command Center BIMS",
-        "role": "financial-demo",
-        "url": os.getenv("COMMAND_CENTER_URL", "http://127.0.0.1:5000"),
-        "health_paths": ("/health", "/healthz"),
-    },
-    {
-        "id": "phi-oauth-server",
-        "name": "PHI OAuth Server",
-        "role": "auth-gateway",
-        "url": os.getenv("OAUTH_SERVER_URL", "http://127.0.0.1:8080"),
-        "health_paths": ("/health", "/ready"),
-    },
-    {
-        "id": "phi-askphi-widget",
-        "name": "PHI AskPHI Widget",
-        "role": "public-safe-chat",
-        "url": os.getenv("ASKPHI_WIDGET_URL", "http://127.0.0.1:8081"),
-        # Include all known widget health routes across deployments.
-        "health_paths": ("/health", "/ready", "/healthz"),
-    },
-)
-
-REMOTE_TELEMETRY_FILES = {
-    "dominion-os-1-0-main": BASE_DIR / "scripts" / "telemetry" / "services_project1.txt",
-    "dominion-core-prod": BASE_DIR / "scripts" / "telemetry" / "services_project2.txt",
-}
-
-LANDING_TEMPLATE = """
-<!DOCTYPE html>
+LANDING_TEMPLATE = """<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dominion OS Command Core</title>
-    <style>
-        :root {
-            --ink: #000000;
-            --paper: #ffffff;
-            --mist: #f5f5f5;
-            --steel: #d9d9d9;
-            --ash: #797979;
-        }
-        * { box-sizing: border-box; }
-        body {
-            margin: 0;
-            font-family: "Manrope", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
-            color: var(--ink);
-            background:
-                radial-gradient(circle at top left, var(--steel), transparent 35%),
-                linear-gradient(135deg, var(--paper), var(--mist));
-        }
-        main {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 48px 24px 72px;
-        }
-        .hero {
-            display: grid;
-            gap: 20px;
-            padding: 32px;
-            border: 1px solid var(--steel);
-            border-radius: 28px;
-            background: var(--paper);
-            box-shadow: 0 24px 60px var(--steel);
-        }
-        .eyebrow {
-            display: inline-flex;
-            width: fit-content;
-            padding: 6px 12px;
-            border-radius: 999px;
-            background: var(--ink);
-            color: var(--paper);
-            font-size: 0.85rem;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-        }
-        h1 {
-            margin: 0;
-            font-size: clamp(2.8rem, 6vw, 4.7rem);
-            line-height: 0.95;
-        }
-        p {
-            margin: 0;
-            max-width: 62ch;
-            color: var(--ash);
-            font-size: 1.05rem;
-        }
-        .actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 48px;
-            padding: 0 18px;
-            border-radius: 999px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: transform 0.18s ease, background 0.18s ease;
-        }
-        .btn:hover { transform: translateY(-1px); }
-        .btn-primary {
-            background: var(--ink);
-            color: var(--paper);
-        }
-        .btn-secondary {
-            background: transparent;
-            color: var(--ink);
-            border: 1px solid var(--steel);
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-            margin-top: 24px;
-        }
-        .card {
-            padding: 20px;
-            border-radius: 22px;
-            background: var(--paper);
-            border: 1px solid var(--steel);
-        }
-        .card strong {
-            display: block;
-            margin-bottom: 10px;
-            font-size: 1rem;
-        }
-        .meta {
-            margin-top: 24px;
-            color: var(--ash);
-            font-size: 0.92rem;
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dominion OS Public Runtime</title>
+  <style>
+    :root { color-scheme: light; font-family: Arial, sans-serif; }
+    body { margin: 0; background: #f6f7f9; color: #111827; }
+    main { max-width: 920px; margin: 0 auto; padding: 48px 24px; }
+    .panel { background: white; border: 1px solid #d8dde6; border-radius: 16px; padding: 28px; box-shadow: 0 10px 30px rgba(17,24,39,.08); }
+    h1 { margin-top: 0; }
+    a { color: #2357c6; }
+    code { background: #eef1f6; padding: 2px 6px; border-radius: 5px; }
+    ul { line-height: 1.7; }
+  </style>
 </head>
 <body>
-    <main>
-        <section class="hero">
-            <span class="eyebrow">Command Core</span>
-            <h1>One surface for the demo, store, and live topology.</h1>
-            <p>
-                This app is the production-safe entrypoint expected by the repo's
-                Docker and Cloud Run configuration. It serves the polished
-                <code>/demo</code> and <code>/store</code> routes, exposes API-backed
-                product data, and reports local plus telemetry-defined remote wiring.
-            </p>
-            <div class="actions">
-                <a class="btn btn-primary" href="/demo">Open /demo</a>
-                <a class="btn btn-secondary" href="/store">Open /store</a>
-                <a class="btn btn-secondary" href="/status">View /status</a>
-            </div>
-            <div class="grid">
-                <div class="card">
-                    <strong>Service</strong>
-                    <span>{{ info.service }}</span>
-                </div>
-                <div class="card">
-                    <strong>Products</strong>
-                    <span>{{ product_count }} sellable SKUs</span>
-                </div>
-                <div class="card">
-                    <strong>Telemetry</strong>
-                    <span>{{ project_count }} GCP projects mapped</span>
-                </div>
-                <div class="card">
-                    <strong>Health</strong>
-                    <span><a href="/health">/health</a>, <a href="/ready">/ready</a>, <a href="/healthz">/healthz</a></span>
-                </div>
-            </div>
-            <div class="meta">
-                Version {{ info.version }} · Project {{ info.project_id }} · Region {{ info.region }}
-            </div>
-        </section>
-    </main>
+  <main>
+    <section class="panel">
+      <p><strong>{{ service }}</strong> · {{ region }}</p>
+      <h1>Dominion OS public-safe reference runtime</h1>
+      <p>This endpoint exposes only demonstration content, public receipts, and public-safe operating data.</p>
+      <ul>
+        <li><a href="/demo">Interactive demo</a></li>
+        <li><a href="/health">Health receipt</a></li>
+        <li><a href="/status">Status receipt</a></li>
+      </ul>
+      <p>Release: <code>{{ release_sha }}</code></p>
+    </section>
+  </main>
 </body>
 </html>
 """
 
 
-def now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat()
+DEMO_TEMPLATE = """<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dominion OS Demo</title>
+  <style>
+    :root { color-scheme: light; font-family: Arial, sans-serif; }
+    body { margin: 0; background: #f4f5f7; color: #101828; }
+    main { max-width: 1080px; margin: 0 auto; padding: 40px 24px 64px; }
+    .hero, .card { background: white; border: 1px solid #d8dde6; border-radius: 18px; padding: 26px; box-shadow: 0 12px 35px rgba(16,24,40,.08); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 18px; margin-top: 18px; }
+    .card { box-shadow: none; }
+    h1, h2 { margin-top: 0; }
+    .status { display: inline-block; border-radius: 999px; padding: 6px 10px; background: #e8f7ee; color: #17653a; font-weight: 700; }
+    code { background: #edf1f5; padding: 2px 6px; border-radius: 5px; word-break: break-all; }
+    a { color: #2357c6; }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <span class="status">Public-safe reference runtime</span>
+      <h1>Dominion OS live demonstration surface</h1>
+      <p>Inspect a governed runtime, public evidence, and bounded example operations without exposing private client data or private services.</p>
+      <p>Release: <code>{{ release_sha }}</code></p>
+    </section>
+    <section class="grid">
+      <article class="card">
+        <h2>Runtime health</h2>
+        <p><a href="/health">Open the current health receipt</a>.</p>
+      </article>
+      <article class="card">
+        <h2>Operating status</h2>
+        <p><a href="/status">Open the public status receipt</a>.</p>
+      </article>
+      <article class="card">
+        <h2>Sample operations</h2>
+        <p><a href="/demo/assets/sample-data.json">Open the public-safe sample payload</a>.</p>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
+"""
 
 
-def probe_policy() -> dict:
-    return {
-        "cost_mode": app.config.get("COST_MODE", "minimum_spend"),
-        "default_behavior": "metadata_only",
-        "public_demo_preserved": bool(app.config.get("PUBLIC_DEMO_PRESERVED", True)),
-        "local_probe_env_enabled": bool(app.config.get("ENABLE_PROBES", False)),
-        "remote_probe_env_enabled": bool(app.config.get("ENABLE_REMOTE_PROBES", False)),
-        "activation": "Add probe=local, probe=remote, or probe=all only after the matching env gate is enabled.",
-    }
-
-
-def resolve_release_sha() -> str:
-    if RELEASE_SHA:
-        return RELEASE_SHA
-    try:
-        output = subprocess.check_output(
-            ["git", "rev-parse", "--short=12", "HEAD"],
-            cwd=BASE_DIR,
-            text=True,
-            stderr=subprocess.DEVNULL,
-        )
-        return output.strip()
-    except (OSError, subprocess.CalledProcessError):
-        return ""
-
-
-def release_info() -> dict:
-    return {
-        "version": APP_VERSION,
-        "release_sha": resolve_release_sha(),
-        "release_repo": RELEASE_REPO,
-        "overlay": OVERLAY,
-        "image_ref": IMAGE_REF,
-        "source_of_truth": {
-            "repo": SOURCE_OF_TRUTH_REPO,
-            "sha": SOURCE_OF_TRUTH_SHA,
-            "version": SOURCE_OF_TRUTH_VERSION,
-        },
-    }
-
-
-def wants_json_response() -> bool:
-    best = request.accept_mimetypes.best_match(["application/json", "text/html"])
-    return best == "application/json" and (
-        request.accept_mimetypes[best] >= request.accept_mimetypes["text/html"]
-    )
-
-
-def parse_probe_flags() -> tuple[bool, bool, list[str]]:
-    probe_raw = request.args.get("probe", "").strip().lower()
-    if not probe_raw:
-        return False, False, []
-
-    parts = [part for part in re.split(r"[,\s]+", probe_raw) if part]
-    tokens = set(parts)
-
-    # Backward-compatible shorthand: probe=1|true enables local probes only.
-    if probe_raw in {"1", "true", "yes", "on"}:
-        tokens.add("local")
-    if "all" in tokens:
-        tokens.update({"local", "remote"})
-
-    local_requested = "local" in tokens
-    remote_requested = "remote" in tokens
-    return local_requested, remote_requested, sorted(tokens)
-
-
-def read_json_file(path: Path, default):
-    try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except FileNotFoundError:
-        return default
-    except json.JSONDecodeError:
-        return default
-
-
-def is_safe_slug(value: str) -> bool:
-    if not value:
-        return False
-    if "/" in value or "\\" in value:
-        return False
-    if value.startswith(".") or value.endswith(".") or ".." in value:
-        return False
-    return re.fullmatch(r"[A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+)*", value) is not None
-
-
-def url_port(url: str) -> int | None:
-    parsed = urlparse(url)
-    if parsed.port:
-        return parsed.port
-    if parsed.scheme == "https":
-        return 443
-    if parsed.scheme == "http":
-        return 80
-    return None
-
-
-def probe_service(base_url: str, health_paths: tuple[str, ...], enabled: bool) -> dict:
-    if not enabled:
-        return {"status": "not_probed", "healthy": None}
-
-    last_error = ""
-    last_status_code = None
-    last_checked_url = f"{base_url.rstrip('/')}{health_paths[0]}"
-    for health_path in health_paths:
-        target = f"{base_url.rstrip('/')}{health_path}"
-        last_checked_url = target
-        try:
-            response = requests.get(target, timeout=2, allow_redirects=False)
-            healthy = 200 <= response.status_code < 400
-            if healthy:
-                return {
-                    "status": "healthy",
-                    "healthy": True,
-                    "checked_url": target,
-                    "status_code": response.status_code,
-                }
-            last_status_code = response.status_code
-            last_error = f"HTTP {response.status_code}"
-        except requests.RequestException:
-            # Avoid exposing internal network exception details in API responses.
-            last_error = "request_failed"
-
-    if last_status_code is not None:
-        return {
-            "status": "degraded",
-            "healthy": False,
-            "checked_url": last_checked_url,
-            "status_code": last_status_code,
-        }
-
-    return {
-        "status": "unreachable",
-        "healthy": False,
-        "checked_url": last_checked_url,
-        "error": last_error or "Connection failed",
-    }
-
-
-def load_products() -> list[dict]:
-    products: list[dict] = []
-    for product_file in sorted((BASE_DIR / "products").glob("*/product.json")):
-        payload = read_json_file(product_file, {})
-        if not payload:
-            continue
-        slug = product_file.parent.name
-        payload["slug"] = slug
-        payload["spec_path"] = f"/api/products/{slug}"
-        products.append(payload)
-
-    if products:
-        return products
-
-    return read_json_file(BASE_DIR / "store" / "api_products.json", [])
-
-
-def load_demo_experience() -> dict:
-    config = read_json_file(BASE_DIR / "demo" / "config.json", {})
-    accessibility = read_json_file(BASE_DIR / "demo" / "components" / "accessibility.json", {})
-    tutorials = read_json_file(BASE_DIR / "demo" / "components" / "tutorials.json", {})
-    performance = read_json_file(BASE_DIR / "demo" / "optimization" / "performance.json", {})
-    return {
-        "config": config.get("demo", {}),
-        "accessibility": accessibility.get("accessibility_features", {}),
-        "tutorials": tutorials.get("interactive_tutorials", {}),
-        "performance": performance.get("performance_optimization", {}),
-        "links": {
-            "command_center": LOCAL_SERVICE_TARGETS[0]["url"],
-            "oauth": LOCAL_SERVICE_TARGETS[1]["url"],
-            "widget": LOCAL_SERVICE_TARGETS[2]["url"],
-        },
-    }
-
-
-def load_remote_projects() -> dict:
-    remote_projects: dict[str, dict] = {}
-    for project_id, telemetry_file in REMOTE_TELEMETRY_FILES.items():
-        services = []
-        try:
-            lines = telemetry_file.read_text(encoding="utf-8").splitlines()
-        except FileNotFoundError:
-            lines = []
-
-        for line in lines[1:]:
-            stripped = line.strip()
-            if not stripped:
-                continue
-            parts = stripped.rsplit(None, 1)
-            if len(parts) != 2:
-                continue
-            name, url = parts
-            services.append({"name": name, "url": url})
-
-        remote_projects[project_id] = {"services": services, "count": len(services)}
-    return remote_projects
-
-
-def service_info() -> dict:
-    remote_projects = load_remote_projects()
-    return {
-        "service": SERVICE_NAME,
-        **release_info(),
-        "timestamp": now_iso(),
-        "project_id": PROJECT_ID,
-        "region": REGION,
-        "cost_mode": app.config.get("COST_MODE", "minimum_spend"),
-        "public_demo_preserved": bool(app.config.get("PUBLIC_DEMO_PRESERVED", True)),
-        "probe_policy": probe_policy(),
-        "routes": {
-            "health": "/health",
-            "ready": "/ready",
-            "status": "/status",
-            "demo_status": "/demo/status",
-            "demo": "/demo",
-            "store": "/store",
-            "products_api": "/api/products",
-            "topology_api": "/api/v1/topology",
-        },
-        "remote_projects": {
-            project_id: project["count"] for project_id, project in remote_projects.items()
-        },
-    }
-
-
-def build_topology(local_probe: bool, remote_probe: bool) -> dict:
-    local_services = [
-        {
-            **service,
-            "port": url_port(service["url"]),
-            "probe": probe_service(service["url"], service["health_paths"], local_probe),
-        }
-        for service in LOCAL_SERVICE_TARGETS
-    ]
-
-    remote_projects = load_remote_projects()
-    if remote_probe:
-        for project in remote_projects.values():
-            for service in project["services"]:
-                service["probe"] = probe_service(service["url"], ("/health",), True)
-
-    return {
-        "local_services": local_services,
-        "remote_projects": remote_projects,
-    }
-
-
-def send_static_page(directory: str):
-    allowed_dirs = {"demo", "store"}
-    if directory not in allowed_dirs:
-        abort(404)
-    return send_from_directory(str(BASE_DIR / directory), "index.html")
+PROJECTS: list[dict[str, Any]] = [
+    {
+        "name": "Dominion OS public reference runtime",
+        "status": "ready",
+        "scope": "public-safe runtime and receipts",
+    },
+    {
+        "name": "Multi-cloud deployment contract",
+        "status": "ready",
+        "scope": "Google Cloud, Azure, AWS, and Oracle Cloud deployment readiness",
+    },
+    {
+        "name": "Client boundary model",
+        "status": "ready",
+        "scope": "client-owned identity, network, data, keys, and policy",
+    },
+]
 
 
 @app.after_request
@@ -494,7 +132,8 @@ def add_security_headers(response):
     response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
     response.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
     response.headers.setdefault("Cross-Origin-Opener-Policy", "same-origin")
-    response.headers.setdefault("Content-Security-Policy", (
+    response.headers.setdefault(
+        "Content-Security-Policy",
         "default-src 'self'; "
         "img-src 'self' data:; "
         "media-src 'self'; "
@@ -504,8 +143,8 @@ def add_security_headers(response):
         "connect-src 'self'; "
         "base-uri 'self'; "
         "frame-ancestors 'none'; "
-        "form-action 'self' mailto:"
-    ))
+        "form-action 'self' mailto:",
+    )
 
     if request.path.startswith("/demo/assets/media/"):
         response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
@@ -519,9 +158,82 @@ def add_security_headers(response):
         "/demo/status",
         "/_ah/health",
     }:
-        response.headers["Cache-Control"] = "no-store"
+        response.headers["Cache-Control"] = "no-store, max-age=0, must-revalidate"
 
     return response
+
+
+def utc_now() -> datetime:
+    return datetime.now(timezone.utc)
+
+
+def iso_timestamp() -> str:
+    return utc_now().isoformat().replace("+00:00", "Z")
+
+
+def release_sha() -> str:
+    return os.getenv("RELEASE_SHA", DEFAULT_RELEASE_SHA)
+
+
+def release_version() -> str:
+    return os.getenv("RELEASE_VERSION", DEFAULT_RELEASE_VERSION)
+
+
+def service_info() -> dict[str, Any]:
+    return {
+        "service": os.getenv("K_SERVICE", DEFAULT_SERVICE_NAME),
+        "region": os.getenv("GOOGLE_CLOUD_REGION", DEFAULT_REGION),
+        "releaseCandidateSha": release_sha(),
+        "releaseVersion": release_version(),
+        "generatedAt": iso_timestamp(),
+        "uptimeSeconds": round(max(0.0, time.monotonic() - APP_START_MONOTONIC), 3),
+    }
+
+
+def wants_json_response() -> bool:
+    accepted = request.accept_mimetypes
+    return accepted["application/json"] > accepted["text/html"]
+
+
+def safe_remote_url(raw_url: str) -> str | None:
+    try:
+        parsed = urlparse(raw_url)
+    except ValueError:
+        return None
+    if parsed.scheme not in ALLOWED_REMOTE_SCHEMES or not parsed.netloc:
+        return None
+    if parsed.username or parsed.password:
+        return None
+    return parsed.geturl()
+
+
+def load_remote_projects() -> list[dict[str, Any]]:
+    raw_url = os.getenv("REMOTE_PROJECTS_URL", "").strip()
+    remote_url = safe_remote_url(raw_url)
+    if not remote_url:
+        return PROJECTS
+
+    try:
+        response = requests.get(remote_url, timeout=REQUEST_TIMEOUT_SECONDS)
+        response.raise_for_status()
+        payload = response.json()
+    except (requests.RequestException, ValueError):
+        return PROJECTS
+
+    if isinstance(payload, list):
+        return [item for item in payload if isinstance(item, dict)] or PROJECTS
+    if isinstance(payload, dict):
+        projects = payload.get("projects")
+        if isinstance(projects, list):
+            return [item for item in projects if isinstance(item, dict)] or PROJECTS
+    return PROJECTS
+
+
+def send_static_page(directory: str):
+    allowed_dirs = {"demo", "store"}
+    if directory not in allowed_dirs:
+        abort(404)
+    return send_from_directory(str(BASE_DIR / directory), "index.html")
 
 
 @app.route("/")
@@ -533,123 +245,91 @@ def index():
     remote_projects = load_remote_projects()
     return render_template_string(
         LANDING_TEMPLATE,
-        info=info,
-        product_count=len(load_products()),
-        project_count=len(remote_projects),
+        service=info["service"],
+        region=info["region"],
+        release_sha=info["releaseCandidateSha"],
+        projects=remote_projects,
     )
+
+
+@app.route("/demo")
+def demo():
+    demo_index = BASE_DIR / "demo" / "index.html"
+    if demo_index.exists():
+        return send_static_page("demo")
+    return render_template_string(DEMO_TEMPLATE, release_sha=release_sha())
+
+
+@app.route("/store")
+def store():
+    store_index = BASE_DIR / "store" / "index.html"
+    if store_index.exists():
+        return send_static_page("store")
+    abort(404)
+
+
+@app.route("/demo/assets/<path:filename>")
+def demo_asset(filename: str):
+    return send_from_directory(str(BASE_DIR / "demo" / "assets"), filename)
+
+
+@app.route("/api/projects")
+def api_projects():
+    return jsonify({"projects": load_remote_projects(), "generatedAt": iso_timestamp()})
+
+
+def receipt_payload(state: str = "healthy") -> dict[str, Any]:
+    info = service_info()
+    return {
+        "ok": state in {"healthy", "ready"},
+        "status": state,
+        "service": info["service"],
+        "region": info["region"],
+        "releaseCandidateSha": info["releaseCandidateSha"],
+        "releaseVersion": info["releaseVersion"],
+        "generatedAt": info["generatedAt"],
+        "uptimeSeconds": info["uptimeSeconds"],
+        "publicSafe": True,
+        "privateServicesExposed": False,
+    }
 
 
 @app.route("/health")
 @app.route("/healthz")
-@app.route("/ready")
 @app.route("/_ah/health")
 def health():
-    return jsonify(
-        {
-            "status": "healthy",
-            "service": SERVICE_NAME,
-            **release_info(),
-            "timestamp": now_iso(),
-            "cost_mode": app.config.get("COST_MODE", "minimum_spend"),
-            "public_demo_preserved": bool(app.config.get("PUBLIC_DEMO_PRESERVED", True)),
-        }
-    )
+    return jsonify(receipt_payload("healthy"))
+
+
+@app.route("/ready")
+def ready():
+    return jsonify(receipt_payload("ready"))
 
 
 @app.route("/status")
 @app.route("/demo/status")
 def status():
-    local_requested, remote_requested, tokens = parse_probe_flags()
-    local_probe = (
-        app.config.get("ENABLE_PROBES", False)
-        and not app.testing
-        and local_requested
-    )
-    remote_probe = (
-        app.config.get("ENABLE_REMOTE_PROBES", False)
-        and not app.testing
-        and remote_requested
-    )
-    return jsonify(
+    payload = receipt_payload("healthy")
+    payload.update(
         {
-            **service_info(),
-            "probe": {
-                "tokens": tokens,
-                "local_requested": bool(local_requested),
-                "remote_requested": bool(remote_requested),
-                "local_enabled": bool(local_probe),
-                "remote_enabled": bool(remote_probe),
-                "policy": probe_policy(),
-            },
-            "inventory": {
-                "product_count": len(load_products()),
-                "tutorial_count": len(load_demo_experience()["tutorials"]),
-            },
-            "topology": build_topology(local_probe=local_probe, remote_probe=remote_probe),
+            "deploymentReady": True,
+            "supportedEstates": [
+                "Google Cloud",
+                "Microsoft Azure",
+                "Amazon Web Services",
+                "Oracle Cloud Infrastructure",
+            ],
+            "publicRuntimeDependency": False,
         }
     )
-
-
-@app.route("/demo")
-def demo_page():
-    return send_static_page("demo")
-
-
-@app.route("/demo/assets/<path:filename>")
-def demo_assets(filename: str):
-    return send_from_directory(str(BASE_DIR / "demo" / "assets"), filename)
-
-
-@app.route("/store")
-def store_page():
-    return send_static_page("store")
-
-
-@app.route("/api/products")
-@app.route("/api/v1/products")
-def products_api():
-    return jsonify(load_products())
-
-
-@app.route("/api/products/<slug>")
-def product_detail(slug: str):
-    # Accept repo slugs like dominion-os-1.0-gcloud while blocking traversal.
-    if not is_safe_slug(slug):
-        abort(400)
-    for product in load_products():
-        if product.get("slug") == slug:
-            return jsonify(product)
-    abort(404)
-
-
-@app.route("/api/demo/experience")
-@app.route("/api/v1/demo/experience")
-def demo_experience_api():
-    demo_payload = load_demo_experience()
-    demo_payload["pages"] = {"demo": "/demo", "store": "/store"}
-    demo_payload["cost_mode"] = app.config.get("COST_MODE", "minimum_spend")
-    demo_payload["public_demo_preserved"] = bool(app.config.get("PUBLIC_DEMO_PRESERVED", True))
-    return jsonify(demo_payload)
-
-
-@app.route("/api/v1/topology")
-def topology_api():
-    local_requested, remote_requested, _tokens = parse_probe_flags()
-    local_probe = (
-        app.config.get("ENABLE_PROBES", False)
-        and not app.testing
-        and local_requested
-    )
-    remote_probe = (
-        app.config.get("ENABLE_REMOTE_PROBES", False)
-        and not app.testing
-        and remote_requested
-    )
-    payload = build_topology(local_probe=local_probe, remote_probe=remote_probe)
-    payload["probe_policy"] = probe_policy()
     return jsonify(payload)
+
+
+@app.errorhandler(404)
+def not_found(_error):
+    return jsonify({"ok": False, "error": "not_found", "path": request.path}), 404
 
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "8080"))
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app.run(host="0.0.0.0", port=port)
