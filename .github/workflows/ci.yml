@@ -34,7 +34,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Reconcile source, tests, and workflow state
+      - name: Reconcile source and tests
         run: |
           set -euo pipefail
           python3 - <<'PY'
@@ -79,17 +79,6 @@ jobs:
           if text.count(old) != 1:
               raise SystemExit('tests/test_demo1_multicloud_source.py: stale assertion block not found exactly once')
           test_path.write_text(text.replace(old, new), encoding='utf-8')
-
-          ci_path = Path('.github/workflows/ci.yml')
-          ci_text = ci_path.read_text(encoding='utf-8')
-          begin = '  # BEGIN ONE-SHOT' + ' DEMO CONTRACT RECONCILIATION\n'
-          end = '  # END ONE-SHOT' + ' DEMO CONTRACT RECONCILIATION\n'
-          start_index = ci_text.find(begin)
-          end_index = ci_text.find(end, start_index)
-          if start_index < 0 or end_index < 0:
-              raise SystemExit('ci.yml: one-shot marker block not found')
-          end_index += len(end)
-          ci_path.write_text(ci_text[:start_index] + ci_text[end_index:], encoding='utf-8')
           PY
 
       - name: Install targeted test dependencies
@@ -104,15 +93,12 @@ jobs:
             tests/test_command_core.py::test_demo_assets_are_served_with_cache_policy \
             tests/test_demo1_multicloud_source.py::test_runtime_actions_are_additive_and_fail_safe
 
-      - name: Commit verified reconciliation
+      - name: Commit verified source reconciliation
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A \
-            .github/workflows/ci.yml \
-            command_core.py \
-            tests/test_demo1_multicloud_source.py
+          git add command_core.py tests/test_demo1_multicloud_source.py
           git commit -m "fix(demo): enforce cache and fail-safe link contracts [generated]"
           git push origin HEAD:fix/security-workflow-sha-pinning-20260730
   # END ONE-SHOT DEMO CONTRACT RECONCILIATION
