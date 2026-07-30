@@ -4,18 +4,23 @@ on:
   push:
     branches:
       - fix/security-workflow-sha-pinning-20260730
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: demo-contract-reconciliation-once
+  group: demo-contract-reconciliation-once-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
   reconcile:
-    if: github.actor != 'github-actions[bot]'
+    if: >-
+      github.actor != 'github-actions[bot]' &&
+      (github.event_name != 'pull_request' || github.head_ref == 'fix/security-workflow-sha-pinning-20260730')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repair branch
