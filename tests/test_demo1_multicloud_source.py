@@ -64,11 +64,15 @@ def test_runtime_actions_are_additive_and_fail_safe():
         assert anchor["data-runtime-target"].startswith(
             "https://demo-reduwyf2ra-uc.a.run.app/"
         )
+        target = anchor["data-runtime-target"]
         href = anchor["href"]
-        assert (
-            href.endswith("/cloud-deployment-manifest.json")
-            or href == "https://www.fractal5solutions.com/#contact"
-        )
+        if target.endswith("/demo"):
+            assert href == "#deployment-platforms"
+        elif target.endswith("/health"):
+            assert href == "https://www.fractal5solutions.com/dominion-os"
+        else:
+            raise AssertionError(f"Unexpected runtime target: {target}")
+        assert href != target
         if anchor.get("target") == "_blank":
             assert "noopener" in anchor.get("rel", "")
 

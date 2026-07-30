@@ -508,9 +508,9 @@ def add_security_headers(response):
     ))
 
     if request.path.startswith("/demo/assets/media/"):
-        response.headers.setdefault("Cache-Control", "public, max-age=31536000, immutable")
+        response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
     elif request.path.startswith("/demo/assets/"):
-        response.headers.setdefault("Cache-Control", "public, max-age=300")
+        response.headers["Cache-Control"] = "public, max-age=300"
     elif request.path.startswith("/api/") or request.path in {
         "/health",
         "/healthz",
@@ -519,7 +519,7 @@ def add_security_headers(response):
         "/demo/status",
         "/_ah/health",
     }:
-        response.headers.setdefault("Cache-Control", "no-store")
+        response.headers["Cache-Control"] = "no-store"
 
     return response
 
