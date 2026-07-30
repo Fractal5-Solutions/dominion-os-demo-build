@@ -1,0 +1,72 @@
+name: Restore canonical command core once
+
+on:
+  push:
+    branches:
+      - fix/security-workflow-sha-pinning-20260730
+    paths:
+      - '.github/workflows/restore-command-core-once.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: restore-command-core-once
+  cancel-in-progress: true
+
+jobs:
+  restore:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repair branch
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: fix/security-workflow-sha-pinning-20260730
+          fetch-depth: 0
+
+      - name: Restore canonical implementation and harden cache contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --no-tags
+          git checkout origin/main -- command_core.py
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('command_core.py')
+          text = path.read_text(encoding='utf-8')
+          replacements = {
+              '        response.headers.setdefault("Cache-Control", "public, max-age=31536000, immutable")':
+                  '        response.headers["Cache-Control"] = "public, max-age=31536000, immutable"',
+              '        response.headers.setdefault("Cache-Control", "public, max-age=300")':
+                  '        response.headers["Cache-Control"] = "public, max-age=300"',
+              '        response.headers.setdefault("Cache-Control", "no-store")':
+                  '        response.headers["Cache-Control"] = "no-store, max-age=0, must-revalidate"',
+          }
+          for old, new in replacements.items():
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'Expected exactly one occurrence of {old!r}; found {count}')
+              text = text.replace(old, new)
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Prove runtime and public contracts
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          pip install flask requests pytest
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pytest -q tests
+
+      - name: Commit verified restoration
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add command_core.py
+          git diff --cached --quiet && { echo "No command-core change to commit"; exit 0; }
+          git commit -m "fix(runtime): restore canonical command core and cache contracts [generated]"
+          git push origin HEAD:fix/security-workflow-sha-pinning-20260730
