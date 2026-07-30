@@ -34,3 +34,31 @@ def test_status_receipt_is_fresh_and_uncached(monkeypatch):
     with app.test_client() as client:
         response = client.get("/status")
     assert_fresh_receipt(response)
+
+
+def test_receipt_allows_fractal5_page_origin():
+    with app.test_client() as client:
+        response = client.get(
+            "/health",
+            headers={"Origin": "https://www.fractal5solutions.com"},
+        )
+    assert response.headers["Access-Control-Allow-Origin"] == "https://www.fractal5solutions.com"
+    assert "Origin" in response.headers.get("Vary", "")
+
+
+def test_receipt_allows_apex_fractal5_origin():
+    with app.test_client() as client:
+        response = client.get(
+            "/status",
+            headers={"Origin": "https://fractal5solutions.com"},
+        )
+    assert response.headers["Access-Control-Allow-Origin"] == "https://fractal5solutions.com"
+
+
+def test_receipt_rejects_untrusted_origin():
+    with app.test_client() as client:
+        response = client.get(
+            "/health",
+            headers={"Origin": "https://example.com"},
+        )
+    assert "Access-Control-Allow-Origin" not in response.headers

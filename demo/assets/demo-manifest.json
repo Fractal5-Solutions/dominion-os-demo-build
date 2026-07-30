@@ -1,6 +1,6 @@
 {
   "schema": "f5.dominion.demo.assets.v1",
-  "generatedAt": "2026-07-24T13:40:34Z",
+  "generatedAt": "2026-07-30T12:32:03Z",
   "sourceOfTruth": {
     "repository": "Fractal5-Solutions/dominion-os-demo-build",
     "path": "demo/assets/demo-manifest.json",
@@ -20,6 +20,7 @@
   },
   "assets": {
     "manifest": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/demo-manifest.json",
+    "cloudDeployments": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/cloud-deployment-manifest.json",
     "cloudRunManifest": null,
     "videoMp4": "https://demo-reduwyf2ra-uc.a.run.app/demo/assets/media/dominion_os_live_demo_web.mp4",
     "videoMasterMp4": "https://demo-reduwyf2ra-uc.a.run.app/demo/assets/media/dominion_os_live_demo_master.mp4",
@@ -31,17 +32,19 @@
   "assetPolicy": {
     "sourceServedAssets": [
       "assets.manifest",
+      "assets.cloudDeployments",
       "assets.videoPoster",
       "assets.demoDownload",
       "assets.sampleData",
       "assets.releaseReceiptsJson"
     ],
-    "verifiedRuntimeMedia": [
+    "runtimeMedia": [
       "assets.videoMp4",
       "assets.videoMasterMp4"
     ],
     "currentFallbacks": {
-      "videoMp4": "sections.watchVideo"
+      "runtimeDemo": "assets.cloudDeployments",
+      "videoMp4": "assets.releaseReceiptsJson"
     },
     "noSecrets": true,
     "publicSafe": true,
@@ -49,19 +52,22 @@
   },
   "squarespace": {
     "bridgePage": "https://www.fractal5solutions.com/demo-1",
-    "canonReference": "https://www.fractal5solutions.com/launch",
+    "canonReference": "https://www.fractal5solutions.com/dominion-os",
     "embedMode": "single-code-block-with-remote-runtime-assets",
-    "visualPolishPatch": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/squarespace/demo-1-visual-runtime-polish-patch.html"
+    "source": "squarespace/demo-1-final.html"
   },
   "claimControl": {
-    "rawCloudRunDemoPublicGreen": true,
+    "rawCloudRunDemoPublicGreen": false,
     "assetManifestSourceCreated": true,
     "sourceServedAssetsPublished": true,
-    "assetManifestCloudRunLiveConfirmed": true,
-    "allowDirectMp4Claim": true,
-    "directMp4CurrentlyAvailable": true,
+    "assetManifestCloudRunLiveConfirmed": false,
+    "publicRuntimeRequiresFreshHealthReceipt": true,
+    "allowDirectMp4Claim": false,
+    "directMp4CurrentlyAvailable": false,
+    "multiCloudDeploymentArchitectureAllowed": true,
+    "fourContinuouslyLivePublicDeploymentsAllowed": false,
     "fullCommercialGreenAllowed": false,
-    "verifiedAt": "2026-07-24T13:40:34Z",
-    "reason": "The public runtime demo, health, status, web MP4, and master MP4 returned 200 responses during operator verification. Full commercial green remains gated by separate commerce, customer-portal, observability, rollback, and autonomous-operation receipts."
+    "reviewedAt": "2026-07-30T12:32:03Z",
+    "reason": "The source-served public evidence remains available. During the July 30, 2026 review, the published Cloud Run demo, health, and status routes returned HTTP 404. The Squarespace bridge must therefore keep runtime actions on evidence fallbacks until a fresh health receipt succeeds. Azure and AWS are presented as dedicated deployment packages; OCI remains client-scoped."
   }
 }
