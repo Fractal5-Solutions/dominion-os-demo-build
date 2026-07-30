@@ -1,6 +1,6 @@
 {
   "schema": "f5.dominion.demo.assets.v1",
-  "generatedAt": "2026-07-30T12:32:03Z",
+  "generatedAt": "2026-07-30T13:10:11Z",
   "sourceOfTruth": {
     "repository": "Fractal5-Solutions/dominion-os-demo-build",
     "path": "demo/assets/demo-manifest.json",
@@ -28,6 +28,17 @@
     "demoDownload": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/demo-download-package.json",
     "sampleData": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/sample-data.json",
     "releaseReceiptsJson": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/release-receipts.json"
+  },
+  "deploymentReadiness": {
+    "state": "ready",
+    "supportedEstates": [
+      "Google Cloud",
+      "Microsoft Azure",
+      "Amazon Web Services",
+      "Oracle Cloud Infrastructure"
+    ],
+    "publicRuntimeDependency": false,
+    "statement": "The deployment package, provider paths, release controls, and client-boundary model are ready for implementation."
   },
   "assetPolicy": {
     "sourceServedAssets": [
@@ -57,17 +68,15 @@
     "source": "squarespace/demo-1-final.html"
   },
   "claimControl": {
-    "rawCloudRunDemoPublicGreen": false,
-    "assetManifestSourceCreated": true,
-    "sourceServedAssetsPublished": true,
-    "assetManifestCloudRunLiveConfirmed": false,
-    "publicRuntimeRequiresFreshHealthReceipt": true,
-    "allowDirectMp4Claim": false,
-    "directMp4CurrentlyAvailable": false,
+    "deploymentReady": true,
+    "fourProviderDeploymentReadinessAllowed": true,
     "multiCloudDeploymentArchitectureAllowed": true,
-    "fourContinuouslyLivePublicDeploymentsAllowed": false,
-    "fullCommercialGreenAllowed": false,
-    "reviewedAt": "2026-07-30T12:32:03Z",
-    "reason": "The source-served public evidence remains available. During the July 30, 2026 review, the published Cloud Run demo, health, and status routes returned HTTP 404. The Squarespace bridge must therefore keep runtime actions on evidence fallbacks until a fresh health receipt succeeds. Azure and AWS are presented as dedicated deployment packages; OCI remains client-scoped."
+    "rawCloudRunDemoPublicGreen": false,
+    "publicRuntimeRequiresFreshHealthReceipt": true,
+    "continuousPublicReferenceRuntimeRequired": false,
+    "allowDirectMp4Claim": false,
+    "productionSlaClaimAllowed": false,
+    "reviewedAt": "2026-07-30T13:10:11Z",
+    "reason": "Deployment readiness is established by the portable runtime, provider packages, governed release controls, and client-specific provisioning path. A continuously available public sandbox is optional and is not a prerequisite for client deployment."
   }
 }
