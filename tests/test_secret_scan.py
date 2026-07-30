@@ -33,13 +33,28 @@ class SecretScanTests(unittest.TestCase):
         text = "\n".join(
             [
                 "GITHUB_TOKEN=ghp_your_github_token_here",
+                "GITHUB_TOKEN=ghp_replace_with_github_token",
                 "STRIPE_SECRET_KEY=sk_live_your_stripe_secret_key_here",
                 "POSTGRES_PASSWORD=change_this_secure_password",
                 "OAUTH_CLIENT_SECRET=your_oauth_client_secret",
                 "FINALIZER_TOKEN=${{ secrets.FINALIZER_TOKEN }}",
                 "AUTH_TOKEN=$GITHUB_TOKEN",
+                r'"X-API-Key": "\${APOLLO_API_KEY}",',
                 "REDIS_PASSWORD=",
                 "GCP_SERVICE_ACCOUNT_KEY_PATH=/secrets/gcp-key.json",
+            ]
+        )
+        self.assertEqual(secret_scan.scan_text(text), [])
+
+    def test_code_references_are_not_literal_credentials(self) -> None:
+        text = "\n".join(
+            [
+                'app.secret_key = secrets.token_hex(32)',
+                'client_secret = GITHUB_CLIENT_SECRET',
+                'access_token = token_data["access_token"]',
+                'password = str(password)',
+                'key_password = self.key_password',
+                '"client_secret": GITHUB_CLIENT_SECRET,',
             ]
         )
         self.assertEqual(secret_scan.scan_text(text), [])
@@ -56,14 +71,52 @@ class SecretScanTests(unittest.TestCase):
         self.assertEqual(secret_scan.scan_text(text), [])
 
     def test_repository_credential_templates_are_clean(self) -> None:
-        for relative_path in (".env.desktop-pro", ".env.mcp.template"):
+        for relative_path in (".env.desktop-pro", ".env.mcp.template", "scripts/.env.example"):
             with self.subTest(relative_path=relative_path):
                 self.assertEqual(
                     secret_scan.scan_file(secret_scan.ROOT / relative_path),
                     [],
                 )
 
-    def test_binary_and_large_files_are_skipped(self) -> None:
+    def test_vendored_virtual_environments_are_not_scanned(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            vendored = root / ".venv_phi2" / "lib" / "package.py"
+            vendored.parent.mkdir(parents=True)
+            vendored.write_text('PASSWORD="Real-looking-value-123"\n', encoding="utf-8")
+            source = root / "source.py"
+            source.write_text("print('clean')\n", encoding="utf-8")
+
+            files = {path.relative_to(root) for path in secret_scan.iter_repository_files(root)}
+            self.assertEqual(files, {Path("source.py")})
+            self.assertEqual(secret_scan.walk_and_scan(root), {})
+
+    def test_local_compose_credentials_must_be_injected(self) -> None:
+        compose_files = (
+            "scripts/docker-compose.yml",
+            "backups/20260309_024913/scripts/docker-compose.yml",
+        )
+        generator_files = (
+            "scripts/phi_cost_minimization_engine.sh",
+            "scripts/phi_cost_minimization_simple.sh",
+            "backups/20260309_024913/scripts/phi_cost_minimization_engine.sh",
+            "backups/20260309_024913/scripts/phi_cost_minimization_simple.sh",
+        )
+
+        for relative_path in (*compose_files, *generator_files):
+            with self.subTest(relative_path=relative_path):
+                text = (secret_scan.ROOT / relative_path).read_text(encoding="utf-8")
+                self.assertNotIn("sovereign_password", text)
+                self.assertNotIn("sovereign_admin", text)
+                self.assertIn("${POSTGRES_PASSWORD:?", text)
+                self.assertIn("${GRAFANA_ADMIN_PASSWORD:?", text)
+
+        for relative_path in generator_files:
+            with self.subTest(quoted_heredoc=relative_path):
+                text = (secret_scan.ROOT / relative_path).read_text(encoding="utf-8")
+                self.assertIn('cat > "$DOCKER_COMPOSE_FILE" <<\'EOF\'', text)
+
+    def test_binary_files_are_skipped(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             binary = root / "binary.dat"
