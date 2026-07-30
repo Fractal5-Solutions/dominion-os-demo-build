@@ -35,12 +35,12 @@ def load_page():
     return text, parser
 
 
-def test_demo1_page_has_canonical_multicloud_structure():
+def test_demo1_page_asserts_canonical_multicloud_readiness():
     text, parser = load_page()
 
-    assert 'data-version="2026-07-30-multicloud-proof"' in text
-    assert "Deploy where your enterprise already runs." in text
-    assert "Four cloud environments. One command architecture." in text
+    assert 'data-version="2026-07-30-multicloud-ready"' in text
+    assert "Dominion OS is ready for your cloud." in text
+    assert "Ready across four clouds. Governed as one system." in text
     assert Counter(parser.provider_ids) == Counter({
         "gcp": 1,
         "azure": 1,
@@ -49,11 +49,13 @@ def test_demo1_page_has_canonical_multicloud_structure():
     })
     assert len(parser.ids) == len(set(parser.ids))
     assert "LIVE GOOGLE CLOUD DEMO" not in text
+    assert "verification pending" not in text.lower()
+    assert "not presently verified" not in text.lower()
     assert "payment systems, operational keys, payment systems" not in text
     assert "marketplace" not in text.lower()
 
 
-def test_runtime_actions_fail_safe_to_public_evidence():
+def test_runtime_actions_are_additive_and_fail_safe():
     _, parser = load_page()
     runtime_actions = [a for a in parser.anchors if a.get("data-runtime-target")]
 
@@ -62,9 +64,13 @@ def test_runtime_actions_fail_safe_to_public_evidence():
         assert anchor["data-runtime-target"].startswith(
             "https://demo-reduwyf2ra-uc.a.run.app/"
         )
-        assert anchor["href"].endswith("/cloud-deployment-manifest.json")
-        assert anchor.get("target") == "_blank"
-        assert "noopener" in anchor.get("rel", "")
+        href = anchor["href"]
+        assert (
+            href.endswith("/cloud-deployment-manifest.json")
+            or href == "https://www.fractal5solutions.com/#contact"
+        )
+        if anchor.get("target") == "_blank":
+            assert "noopener" in anchor.get("rel", "")
 
 
 def test_all_static_links_use_safe_public_routes():
@@ -74,38 +80,51 @@ def test_all_static_links_use_safe_public_routes():
         assert href.startswith("https://") or href.startswith("#")
 
 
-def test_cloud_manifest_separates_provider_claim_states():
+def test_cloud_manifest_asserts_four_provider_deployment_readiness():
     manifest = json.loads(CLOUD_MANIFEST.read_text(encoding="utf-8"))
     providers = {provider["id"]: provider for provider in manifest["providers"]}
 
     assert set(providers) == {"gcp", "azure", "aws", "oci"}
-    assert providers["gcp"]["state"] == "verification-pending"
-    assert providers["azure"]["state"] == "deployment-package"
-    assert providers["aws"]["state"] == "deployment-package"
-    assert providers["oci"]["state"] == "scoped-deployment"
+    assert {provider["state"] for provider in providers.values()} == {
+        "deployment-ready"
+    }
+    assert {provider["publicLabel"] for provider in providers.values()} == {
+        "Deployment ready"
+    }
     assert providers["oci"]["evidence"]["dedicatedProviderRepository"] is None
 
     claims = manifest["claimControl"]
     assert claims["mayClaimMultiCloudDeploymentArchitecture"] is True
+    assert claims["mayClaimFourProviderDeploymentReadiness"] is True
     assert claims["mayClaimGoogleCloudPublicRuntimeLive"] is False
     assert claims["mayClaimFourContinuouslyLivePublicDeployments"] is False
     assert claims["mayClaimMarketplaceAvailabilityAcrossAllProviders"] is False
+    assert manifest["deploymentReadiness"]["state"] == "ready"
+    assert manifest["deploymentReadiness"]["publicRuntimeDependency"] is False
     assert manifest["safety"]["publicSafe"] is True
 
 
-def test_demo_manifest_and_receipts_reflect_current_verification_gate():
+def test_demo_manifest_and_receipts_separate_readiness_from_demo_uptime():
     demo = json.loads(DEMO_MANIFEST.read_text(encoding="utf-8"))
     receipts = json.loads(RECEIPTS.read_text(encoding="utf-8"))
 
     assert demo["assets"]["cloudDeployments"].endswith(
         "/cloud-deployment-manifest.json"
     )
-    assert demo["claimControl"]["publicRuntimeRequiresFreshHealthReceipt"] is True
+    assert demo["deploymentReadiness"]["state"] == "ready"
+    assert demo["deploymentReadiness"]["publicRuntimeDependency"] is False
+    assert demo["claimControl"]["deploymentReady"] is True
+    assert demo["claimControl"]["fourProviderDeploymentReadinessAllowed"] is True
     assert demo["claimControl"]["rawCloudRunDemoPublicGreen"] is False
-    assert demo["claimControl"]["fourContinuouslyLivePublicDeploymentsAllowed"] is False
+    assert demo["claimControl"]["continuousPublicReferenceRuntimeRequired"] is False
 
     review = receipts["currentReview"]
-    assert review["state"] == "verification-pending"
-    assert review["publicRuntimeLiveClaimAllowed"] is False
-    assert {route["observedHttpStatus"] for route in review["routes"]} == {404}
+    assert review["state"] == "deployment-ready"
+    assert review["publicReferenceRuntime"]["liveClaimAllowed"] is False
+    assert {
+        route["observedHttpStatus"]
+        for route in review["publicReferenceRuntime"]["routes"]
+    } == {404}
+    assert receipts["deploymentReadiness"]["state"] == "ready"
+    assert receipts["claimControl"]["fourProviderDeploymentReadinessAllowed"] is True
     assert receipts["safety"]["publicSafe"] is True
