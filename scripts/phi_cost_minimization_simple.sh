@@ -41,7 +41,7 @@ create_local_docker_environment() {
     cost_log "Setting up local Docker environment for cost minimization..."
 
     # Create docker-compose.yml for local development
-    cat > "$DOCKER_COMPOSE_FILE" << EOF
+    cat > "$DOCKER_COMPOSE_FILE" <<'EOF'
 version: '3.8'
 
 services:
@@ -74,7 +74,7 @@ services:
     environment:
       POSTGRES_DB: phi_dominion
       POSTGRES_USER: phi_admin
-      POSTGRES_PASSWORD: sovereign_password
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in scripts/.env}
     ports:
       - "5432:5432"
     volumes:
@@ -104,7 +104,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      GF_SECURITY_ADMIN_PASSWORD: sovereign_admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?Set GRAFANA_ADMIN_PASSWORD in scripts/.env}
     volumes:
       - grafana_data:/var/lib/grafana
     restart: unless-stopped
