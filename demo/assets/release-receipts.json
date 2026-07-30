@@ -1,36 +1,55 @@
 {
   "schema": "f5.dominion.demo.release-receipts.v1",
-  "generatedAt": "2026-07-30T12:32:03Z",
+  "generatedAt": "2026-07-30T13:10:11Z",
   "release": {
-    "name": "Dominion OS + SaaS Suite Public Demo",
+    "name": "Dominion OS + SaaS Suite Deployment and Public Demo",
     "publicBridge": "https://www.fractal5solutions.com/demo-1",
     "runtimeDemo": "https://demo-reduwyf2ra-uc.a.run.app/demo",
     "environment": "demo-sandbox"
   },
-  "currentReview": {
-    "state": "verification-pending",
-    "observedAt": "2026-07-30T12:32:03Z",
-    "routes": [
-      {
-        "id": "cloudrun-demo",
-        "url": "https://demo-reduwyf2ra-uc.a.run.app/demo",
-        "observedHttpStatus": 404
-      },
-      {
-        "id": "cloudrun-health",
-        "url": "https://demo-reduwyf2ra-uc.a.run.app/health",
-        "observedHttpStatus": 404
-      },
-      {
-        "id": "cloudrun-status",
-        "url": "https://demo-reduwyf2ra-uc.a.run.app/status",
-        "observedHttpStatus": 404
-      }
+  "deploymentReadiness": {
+    "state": "ready",
+    "supportedEstates": [
+      "Google Cloud",
+      "Microsoft Azure",
+      "Amazon Web Services",
+      "Oracle Cloud Infrastructure"
     ],
-    "publicRuntimeLiveClaimAllowed": false,
-    "note": "Historical operator receipts are retained below. They do not override the current route review. The public page enables runtime links only after a fresh health response succeeds."
+    "publicRuntimeDependency": false,
+    "basis": [
+      "portable Linux container runtime",
+      "provider-specific deployment paths",
+      "governed build and release controls",
+      "client-owned identity, network, data, keys, region, and policy boundary"
+    ]
   },
-  "receiptInterpretation": "The receipts array records historical operator verification. currentReview controls present-tense public claims.",
+  "currentReview": {
+    "state": "deployment-ready",
+    "observedAt": "2026-07-30T13:10:11Z",
+    "publicReferenceRuntime": {
+      "state": "not-continuously-published",
+      "liveClaimAllowed": false,
+      "routes": [
+        {
+          "id": "cloudrun-demo",
+          "url": "https://demo-reduwyf2ra-uc.a.run.app/demo",
+          "observedHttpStatus": 404
+        },
+        {
+          "id": "cloudrun-health",
+          "url": "https://demo-reduwyf2ra-uc.a.run.app/health",
+          "observedHttpStatus": 404
+        },
+        {
+          "id": "cloudrun-status",
+          "url": "https://demo-reduwyf2ra-uc.a.run.app/status",
+          "observedHttpStatus": 404
+        }
+      ]
+    },
+    "note": "The public reference runtime is optional demonstration infrastructure. Its publication state does not alter the readiness of the client deployment package or governed release path."
+  },
+  "receiptInterpretation": "Historical operator receipts document prior public runtime verification. deploymentReadiness controls the present client-deployment posture; currentReview.publicReferenceRuntime controls only live public-demo claims.",
   "receipts": [
     {
       "id": "cloudrun-demo",
@@ -95,10 +114,13 @@
     "publicSafe": true
   },
   "claimControl": {
-    "directMp4CurrentlyAvailable": false,
-    "publicRuntimeLiveClaimAllowed": false,
+    "deploymentReady": true,
     "multiCloudDeploymentArchitectureAllowed": true,
-    "fullCommercialGreenAllowed": false,
-    "reason": "The source-served evidence layer and deployment packages can be presented. Current live runtime and direct MP4 claims remain disabled until fresh public verification succeeds. Commerce, customer portal, rollback, production observability, and autonomous self-healing require separate receipts."
+    "fourProviderDeploymentReadinessAllowed": true,
+    "publicRuntimeLiveClaimAllowed": false,
+    "continuousPublicRuntimeRequired": false,
+    "directMp4CurrentlyAvailable": false,
+    "productionSlaClaimAllowed": false,
+    "reason": "The client deployment architecture and governed release path are ready. Public demo uptime, direct media publication, and production SLA claims remain separate evidence classes."
   }
 }

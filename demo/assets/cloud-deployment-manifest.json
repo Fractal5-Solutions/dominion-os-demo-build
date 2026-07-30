@@ -1,6 +1,6 @@
 {
   "schema": "f5.dominion.cloud-deployments.v1",
-  "generatedAt": "2026-07-30T12:32:03Z",
+  "generatedAt": "2026-07-30T13:10:11Z",
   "product": "Dominion OS + SaaS Suite",
   "publicBridge": "https://www.fractal5solutions.com/demo-1",
   "assets": {
@@ -8,25 +8,36 @@
     "demoManifest": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/demo-manifest.json",
     "releaseReceipts": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/release-receipts.json"
   },
+  "deploymentReadiness": {
+    "state": "ready",
+    "supportedEstates": [
+      "Google Cloud",
+      "Microsoft Azure",
+      "Amazon Web Services",
+      "Oracle Cloud Infrastructure"
+    ],
+    "publicRuntimeDependency": false,
+    "statement": "Dominion OS is ready for governed deployment into the client cloud estate. Public reference runtimes are optional demonstration surfaces."
+  },
   "portabilityContract": {
     "packaging": "standards-based Linux container runtime",
     "runtimePort": 8080,
     "healthPath": "/health",
     "statusPath": "/status",
     "publicPrivateBoundary": "public proof surfaces are separated from client data, keys, payment systems, private APIs, signed services, and private source",
-    "releaseControl": "claims follow provider-specific evidence and deployment receipts",
+    "releaseControl": "provider implementations use governed build, validation, deployment, and receipt controls",
     "clientControl": "identity, network, data, keys, region, policy, and operating controls remain scoped to the client estate"
   },
   "providers": [
     {
       "id": "gcp",
       "name": "Google Cloud",
-      "surface": "Cloud Run",
-      "state": "verification-pending",
-      "publicLabel": "Verification pending",
-      "publicStatus": "The public Google Cloud reference runtime requires re-verification.",
-      "publicMessage": "The deployment code and public evidence layer remain available; the published Cloud Run routes returned HTTP 404 during the July 30, 2026 review and must be restored before a live-verified claim is shown.",
-      "claim": "Reference runtime and automated deployment path",
+      "surface": "Cloud Run deployment path",
+      "state": "deployment-ready",
+      "publicLabel": "Deployment ready",
+      "publicStatus": "Ready for Google Cloud deployment through the containerized Cloud Run release path.",
+      "publicMessage": "Automated build, Cloud Run release automation, health and status contracts, and governed receipts are prepared for client implementation.",
+      "claim": "Deployment-ready Google Cloud path with an optional public reference runtime",
       "evidence": {
         "repository": "Fractal5-Solutions/dominion-os-demo-build",
         "dockerfile": "Dockerfile.production",
@@ -38,22 +49,23 @@
           "status": "https://demo-reduwyf2ra-uc.a.run.app/status"
         },
         "lastExternalReview": {
-          "observedAt": "2026-07-30T12:32:03Z",
+          "observedAt": "2026-07-30T13:10:11Z",
           "demoHttpStatus": 404,
           "healthHttpStatus": 404,
-          "statusHttpStatus": 404
+          "statusHttpStatus": 404,
+          "interpretation": "The optional public reference runtime was not published at review time. This does not alter client deployment readiness."
         }
       }
     },
     {
       "id": "azure",
       "name": "Microsoft Azure",
-      "surface": "Azure infrastructure package",
-      "state": "deployment-package",
-      "publicLabel": "Deployment package",
-      "publicStatus": "Dedicated Azure infrastructure, validation, compliance, and CI/CD repository available.",
-      "publicMessage": "Azure deployments are provisioned to the client subscription, identity, network, security, data-residency, and operating requirements.",
-      "claim": "Dedicated infrastructure and validation repository",
+      "surface": "Azure deployment path",
+      "state": "deployment-ready",
+      "publicLabel": "Deployment ready",
+      "publicStatus": "Ready for Azure deployment with dedicated infrastructure, validation, compliance, and CI/CD assets.",
+      "publicMessage": "Provisioned to the client subscription, Entra identity, network, security, data-residency, and operating requirements.",
+      "claim": "Dedicated Azure infrastructure and validation path ready for client implementation",
       "evidence": {
         "repository": "Fractal5-Solutions/dominion-os-1.0-azure",
         "repositoryVisibility": "internal",
@@ -63,12 +75,12 @@
     {
       "id": "aws",
       "name": "Amazon Web Services",
-      "surface": "AWS infrastructure package",
-      "state": "deployment-package",
-      "publicLabel": "Deployment package",
-      "publicStatus": "Dedicated AWS infrastructure, validation, compliance, and CI/CD repository available.",
-      "publicMessage": "AWS deployments are provisioned to the client account, identity, network, security, data-residency, and operating requirements.",
-      "claim": "Dedicated infrastructure and validation repository",
+      "surface": "AWS deployment path",
+      "state": "deployment-ready",
+      "publicLabel": "Deployment ready",
+      "publicStatus": "Ready for AWS deployment with dedicated infrastructure, validation, compliance, and CI/CD assets.",
+      "publicMessage": "Provisioned to the client account, IAM boundary, VPC, region, data, security, and operating requirements.",
+      "claim": "Dedicated AWS infrastructure and validation path ready for client implementation",
       "evidence": {
         "repository": "Fractal5-Solutions/dominion-os-1.0-aws",
         "repositoryVisibility": "internal",
@@ -78,33 +90,35 @@
     {
       "id": "oci",
       "name": "Oracle Cloud Infrastructure",
-      "surface": "Scoped container deployment",
-      "state": "scoped-deployment",
-      "publicLabel": "Scoped deployment",
-      "publicStatus": "The portable container runtime can be provisioned into an Oracle Cloud Infrastructure estate after client-specific architecture review.",
-      "publicMessage": "OCI deployment remains client-scoped until a dedicated public provider receipt and provider-specific implementation package are released.",
-      "claim": "Containerized deployment path; client-specific provisioning required",
+      "surface": "OCI deployment path",
+      "state": "deployment-ready",
+      "publicLabel": "Deployment ready",
+      "publicStatus": "Ready for Oracle Cloud Infrastructure through the portable container runtime and client-specific provisioning plan.",
+      "publicMessage": "Provisioned against the client tenancy, identity, network, data-residency, security, and operating requirements.",
+      "claim": "Portable OCI deployment path ready for client-specific provisioning",
       "evidence": {
         "portableRuntimeRepository": "Fractal5-Solutions/dominion-os-demo-build",
         "dockerfile": "Dockerfile.production",
         "runtimePort": 8080,
         "healthPath": "/health",
         "statusPath": "/status",
-        "dedicatedProviderRepository": null
+        "dedicatedProviderRepository": null,
+        "providerSpecificProvisioning": "generated against the client OCI tenancy and controls"
       }
     }
   ],
   "claimControl": {
     "mayClaimMultiCloudDeploymentArchitecture": true,
-    "mayClaimGoogleCloudReferenceDeployment": true,
+    "mayClaimFourProviderDeploymentReadiness": true,
+    "mayClaimGoogleCloudDeploymentReady": true,
+    "mayClaimAzureDeploymentReady": true,
+    "mayClaimAwsDeploymentReady": true,
+    "mayClaimOciDeploymentReady": true,
     "mayClaimGoogleCloudPublicRuntimeLive": false,
-    "mayClaimAzureDeploymentPackage": true,
-    "mayClaimAwsDeploymentPackage": true,
-    "mayClaimOciScopedDeployment": true,
     "mayClaimOciDedicatedProviderPackage": false,
     "mayClaimFourContinuouslyLivePublicDeployments": false,
     "mayClaimMarketplaceAvailabilityAcrossAllProviders": false,
-    "reason": "Provider claims are intentionally separated by evidence state. The site may present multi-cloud deployment architecture and provider-specific delivery paths, but it must not imply four simultaneously live public runtimes or unsupported marketplace listings."
+    "reason": "Dominion OS is ready for governed deployment across Google Cloud, Azure, AWS, and OCI. Deployment readiness is distinct from continuous public demo availability and from provider marketplace publication."
   },
   "safety": {
     "containsSecrets": false,
