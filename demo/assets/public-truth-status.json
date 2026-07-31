@@ -1,0 +1,20 @@
+{
+  "schema": "f5.demo.public-truth-state.v1",
+  "generatedAt": "2026-07-31T15:20:00Z",
+  "sourceHeadBeforeRepair": "8dbf5c99dc4699224424e2afdcd44b847e0dfbc5",
+  "verificationBasis": "Fresh external observation plus exact-source PR validation; no live runtime or public-sharing green claim is permitted.",
+  "squarespace": "RED_STALE_LIVE_CLAIMS",
+  "cloudRun": {
+    "demo": "HTTP_404",
+    "health": "HTTP_404",
+    "status": "HTTP_404"
+  },
+  "canonicalSource": "squarespace/demo-1-final.html",
+  "prospectSharingAllowed": false,
+  "fullCommercialGreenAllowed": false,
+  "recovery": [
+    "Publish the canonical Squarespace source through an authenticated editor.",
+    "Restore least-privilege GitHub-to-GCloud identity and deploy the exact certified source.",
+    "Require fresh external 200, no-store and exact-release receipts before green."
+  ]
+}
