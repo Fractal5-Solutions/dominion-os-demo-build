@@ -19,12 +19,16 @@ jobs:
   build-deploy:
     runs-on: ubuntu-latest
     env:
-      DEPLOY_ENABLED: ${{ vars.ENABLE_OIDC_DEPLOY || 'false' }}
-      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID || '732190342674' }}
-      WIF_PROVIDER: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER || secrets.GCP_WIF_PROVIDER }}
-      WIF_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL || secrets.GCP_WIF_SA_EMAIL }}
+      # These are public resource identifiers, not credentials. Repository
+      # variables may override them; legacy secret locations remain compatible.
+      DEPLOY_ENABLED: ${{ vars.ENABLE_OIDC_DEPLOY || 'true' }}
+      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID || 'f5-prod-command-core' }}
+      WIF_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER || secrets.GCP_WORKLOAD_IDENTITY_PROVIDER || secrets.GCP_WIF_PROVIDER || 'projects/732190342674/locations/global/workloadIdentityPools/fractal5-github-pool/providers/github-provider' }}
+      WIF_SERVICE_ACCOUNT: ${{ vars.GCP_SERVICE_ACCOUNT_EMAIL || secrets.GCP_SERVICE_ACCOUNT_EMAIL || secrets.GCP_WIF_SA_EMAIL || 'dominion-demo-oidc-sa@f5-prod-command-core.iam.gserviceaccount.com' }}
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: false
 
       - name: Preflight deploy prerequisites
         id: preflight
@@ -33,7 +37,7 @@ jobs:
           set -euo pipefail
           missing=()
           if [ "${DEPLOY_ENABLED}" != "true" ]; then
-            missing+=("ENABLE_OIDC_DEPLOY variable is not true")
+            missing+=("ENABLE_OIDC_DEPLOY is explicitly disabled")
           fi
           if [ -z "${WIF_PROVIDER}" ]; then
             missing+=("GCP_WORKLOAD_IDENTITY_PROVIDER/GCP_WIF_PROVIDER")
@@ -52,6 +56,10 @@ jobs:
             echo "ready=true" >> "$GITHUB_OUTPUT"
             echo "missing=" >> "$GITHUB_OUTPUT"
           fi
+
+          echo "project=${GCP_PROJECT_ID}"
+          echo "provider=${WIF_PROVIDER##*/}"
+          echo "service_account_domain=${WIF_SERVICE_ACCOUNT#*@}"
 
       - name: Authenticate to Google Cloud
         if: steps.preflight.outputs.ready == 'true'
@@ -99,7 +107,7 @@ jobs:
           base = os.environ["PUBLIC_DEMO_BASE_URL"].rstrip("/")
           expected_sha = os.environ["GITHUB_SHA"]
           paths = ["/demo", "/health", "/status"]
-          attempts = 12
+          attempts = 18
           delay = 10
           last = None
 
