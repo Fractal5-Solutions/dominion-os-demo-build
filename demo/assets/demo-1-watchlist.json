@@ -23,7 +23,8 @@
     "releaseReceipts": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/release-receipts.json",
     "commercialLaunchReadiness": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/commercial-launch-readiness.json",
     "commercialProofReceiptsIndex": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/commercial-proof-receipts-index.json",
-    "visualPolishPatch": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/squarespace/demo-1-visual-runtime-polish-patch.html"
+    "visualPolishPatch": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/squarespace/demo-1-visual-runtime-polish-patch.html",
+    "squarespaceCode": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/squarespace/demo-1-final.html"
   },
   "expectedStatus": {
     "html": 200,
@@ -117,5 +118,12 @@
     "controlledPreviewCommercialUseAllowed": false,
     "runtimeCopyRepairRequired": true,
     "reason": "The live Squarespace page still carries stale live-runtime claims and the configured Cloud Run demo, health and status routes return 404. The canonical multi-cloud source is public-safe but is not the live Squarespace publication. No live, MP4, controlled-preview or full-commercial green claim is allowed until publication and fresh runtime receipts pass."
-  }
+  },
+  "requiredHardeningAssertions": [
+    "MULTI-CLOUD DEPLOYMENT READY",
+    "Dominion OS is ready for your cloud.",
+    "Ready across four clouds. Governed as one system.",
+    "Public demo uptime is optional and independent of client deployment readiness.",
+    "Choose the estate. We deploy the system."
+  ]
 }
