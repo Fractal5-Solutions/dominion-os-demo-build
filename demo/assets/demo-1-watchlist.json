@@ -1,10 +1,10 @@
 {
   "schema": "f5.demo1.watchlist.v3",
-  "generatedAt": "2026-07-24T13:40:34Z",
+  "generatedAt": "2026-07-31T15:10:00Z",
   "page": {
     "name": "Fractal5 /demo-1",
     "url": "https://www.fractal5solutions.com/demo-1",
-    "role": "current public Squarespace bridge for the Dominion OS controlled-preview demo proof surface"
+    "role": "live Squarespace bridge currently requiring publication of the canonical truthful source before prospect sharing"
   },
   "runtime": {
     "name": "Dominion OS Cloud Run demo",
@@ -28,22 +28,17 @@
   "expectedStatus": {
     "html": 200,
     "json": 200,
-    "mp4": [200, 206]
+    "mp4": [
+      200,
+      206
+    ]
   },
   "requiredAssertions": [
-    "Public proof for a governed command system.",
-    "Open live demo",
-    "Watch proof",
-    "Explore Dominion OS",
-    "Launch access path",
-    "Contact Fractal5",
-    "Health JSON",
-    "Status JSON",
-    "Demo manifest",
-    "Readiness matrix",
-    "Watchlist",
-    "Controlled commercial preview is allowed.",
-    "Full self-serve SaaS launch, customer portal green, production observability green, and autonomous self-healing are not claimed without separate receipts."
+    "DOMINION OS™ + SAAS SUITE · MULTI-CLOUD DEPLOYMENT READY",
+    "Dominion OS is ready for your cloud.",
+    "Ready across four clouds. Governed as one system.",
+    "Public demo uptime is optional and independent of client deployment readiness.",
+    "Choose the estate. We deploy the system."
   ],
   "visualRuntimePolishChecks": {
     "blankFirstFoldRemovedByPatch": true,
@@ -71,14 +66,26 @@
     "requiredBeforeClaim": true,
     "urlProtocol": "https",
     "urlPathSuffix": ".mp4",
-    "allowedHttpStatus": [200, 206],
-    "allowedContentTypes": ["video/mp4"],
+    "allowedHttpStatus": [
+      200,
+      206
+    ],
+    "allowedContentTypes": [
+      "video/mp4"
+    ],
     "receiptField": "claimControl.allowDirectMp4Claim",
     "currentReceipt": "demo/assets/release-receipts.json"
   },
   "runtimeFreshnessRequirements": {
-    "routes": ["runtime.health", "runtime.status"],
-    "timestampFields": ["generatedAt", "timestamp", "generated_at"],
+    "routes": [
+      "runtime.health",
+      "runtime.status"
+    ],
+    "timestampFields": [
+      "generatedAt",
+      "timestamp",
+      "generated_at"
+    ],
     "maximumAgeSeconds": 900,
     "rule": "Health and status receipts must be current and non-regressing; stale runtime payloads cannot support cloud-health green."
   },
@@ -102,13 +109,13 @@
   ],
   "claimControl": {
     "directMp4RequiredForMp4Claim": true,
-    "directMp4CurrentlyAvailable": true,
-    "publicBridgeContractCurrentlyAligned": true,
+    "directMp4CurrentlyAvailable": false,
+    "publicBridgeContractCurrentlyAligned": false,
     "visualPolishPatchAvailable": true,
     "fullCommerceGreenCurrentlyAllowed": false,
     "fullCommercialGreenCurrentlyAllowed": false,
-    "controlledPreviewCommercialUseAllowed": true,
-    "runtimeCopyRepairRequired": false,
-    "reason": "The public bridge and source-served assets support controlled preview sharing. Direct MP4 routes are verified. Full self-serve commerce, native GCP self-healing, production observability, and production customer portal proof require separate receipts."
+    "controlledPreviewCommercialUseAllowed": false,
+    "runtimeCopyRepairRequired": true,
+    "reason": "The live Squarespace page still carries stale live-runtime claims and the configured Cloud Run demo, health and status routes return 404. The canonical multi-cloud source is public-safe but is not the live Squarespace publication. No live, MP4, controlled-preview or full-commercial green claim is allowed until publication and fresh runtime receipts pass."
   }
 }
