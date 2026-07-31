@@ -1,7 +1,8 @@
 {
   "schema": "f5.demo.public-truth-state.v1",
-  "generatedAt": "2026-07-31T15:10:00Z",
+  "generatedAt": "2026-07-31T15:20:00Z",
   "sourceHeadBeforeRepair": "8dbf5c99dc4699224424e2afdcd44b847e0dfbc5",
+  "verificationBasis": "Fresh external observation plus exact-source PR validation; no live runtime or public-sharing green claim is permitted.",
   "squarespace": "RED_STALE_LIVE_CLAIMS",
   "cloudRun": {
     "demo": "HTTP_404",
