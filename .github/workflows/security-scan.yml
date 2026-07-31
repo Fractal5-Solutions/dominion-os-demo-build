@@ -21,7 +21,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run TruffleHog OSS
-        uses: trufflesecurity/trufflehog@afd5336caad0f61da51750ffe39869974b27b0db # main
+        uses: trufflesecurity/trufflehog@82df476e759c1448517fac6bfb3677685cdcd78a # main
         continue-on-error: ${{ vars.ENFORCE_SECRET_SCAN != 'true' }}
         with:
           path: ./
