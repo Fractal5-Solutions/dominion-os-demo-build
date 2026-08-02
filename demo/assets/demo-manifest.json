@@ -42,6 +42,7 @@
       "Oracle Cloud Infrastructure",
       "controlled private environments"
     ],
+    "publicRuntimeDependency": false,
     "statement": "The portable runtime and governed provider delivery contract are ready. Public provider runtimes are separately certified states."
   },
   "squarespace": {
@@ -54,9 +55,13 @@
     "failClosed": true,
     "deploymentReady": true,
     "multiCloudDeploymentArchitectureAllowed": true,
+    "fourProviderDeploymentReadinessAllowed": true,
     "staticPublicDemoClaimAllowed": true,
     "providerRuntimeLiveClaimAllowed": false,
+    "rawCloudRunDemoPublicGreen": false,
+    "continuousPublicReferenceRuntimeRequired": false,
     "directMp4ClaimAllowed": false,
+    "allowDirectMp4Claim": false,
     "productionSlaClaimAllowed": false,
     "fullCommercialGreenAllowed": false,
     "reason": "Static public proof and deployment architecture are verified. Provider runtime, Squarespace publication, commerce, production SLA, and direct media claims require separate current receipts."
