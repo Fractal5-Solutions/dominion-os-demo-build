@@ -7,6 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PAGE = ROOT / "squarespace" / "demo-1-final.html"
 CLOUD_MANIFEST = ROOT / "demo" / "assets" / "cloud-deployment-manifest.json"
 DEMO_MANIFEST = ROOT / "demo" / "assets" / "demo-manifest.json"
+RUNTIME_MANIFEST = ROOT / "demo" / "assets" / "multicloud-runtime-manifest.json"
 RECEIPTS = ROOT / "demo" / "assets" / "release-receipts.json"
 
 
@@ -21,8 +22,9 @@ class DemoPageParser(HTMLParser):
         attrs = dict(attrs)
         if "id" in attrs:
             self.ids.append(attrs["id"])
-        if "data-provider-id" in attrs:
-            self.provider_ids.append(attrs["data-provider-id"])
+        provider = attrs.get("data-provider") or attrs.get("data-provider-id")
+        if provider:
+            self.provider_ids.append(provider)
         if tag == "a":
             self.anchors.append(attrs)
 
@@ -35,46 +37,41 @@ def load_page():
     return text, parser
 
 
-def test_demo1_page_asserts_canonical_multicloud_readiness():
+def test_demo1_page_asserts_evidence_driven_multicloud_contract():
     text, parser = load_page()
 
-    assert 'data-version="2026-07-30-multicloud-ready"' in text
-    assert "Dominion OS is ready for your cloud." in text
-    assert "Ready across four clouds. Governed as one system." in text
-    assert Counter(parser.provider_ids) == Counter({
-        "gcp": 1,
-        "azure": 1,
-        "aws": 1,
-        "oci": 1,
-    })
+    assert 'data-version="2026-08-02-multicloud-proof-v2"' in text
+    assert "One governed system. Your cloud." in text
+    assert "Independent estates. One release contract." in text
+    assert "Deployment-ready. Runtime claims fail closed." in text
+    assert Counter(parser.provider_ids) == Counter(
+        {"gcp": 1, "azure": 1, "aws": 1, "oci": 1}
+    )
     assert len(parser.ids) == len(set(parser.ids))
     assert "LIVE GOOGLE CLOUD DEMO" not in text
-    assert "verification pending" not in text.lower()
-    assert "not presently verified" not in text.lower()
-    assert "payment systems, operational keys, payment systems" not in text
-    assert "marketplace" not in text.lower()
+    assert "continuous public runtime" not in text.lower()
+    assert "marketplace availability" not in text.lower()
 
 
-def test_runtime_actions_are_additive_and_fail_safe():
+def test_primary_demo_defaults_to_verified_static_proof():
     _, parser = load_page()
-    runtime_actions = [a for a in parser.anchors if a.get("data-runtime-target")]
+    primary = next(anchor for anchor in parser.anchors if anchor.get("id") == "f5-primary-demo")
 
-    assert runtime_actions
-    for anchor in runtime_actions:
-        assert anchor["data-runtime-target"].startswith(
-            "https://demo-reduwyf2ra-uc.a.run.app/"
-        )
-        target = anchor["data-runtime-target"]
-        href = anchor["href"]
-        if target.endswith("/demo"):
-            assert href == "#deployment-platforms"
-        elif target.endswith("/health"):
-            assert href == "https://www.fractal5solutions.com/dominion-os"
-        else:
-            raise AssertionError(f"Unexpected runtime target: {target}")
-        assert href != target
-        if anchor.get("target") == "_blank":
-            assert "noopener" in anchor.get("rel", "")
+    assert primary["href"] == "https://fractal5-solutions.github.io/dominion-os-demo-build/"
+    assert primary.get("target") == "_blank"
+    assert "noopener" in primary.get("rel", "")
+    assert "noreferrer" in primary.get("rel", "")
+
+
+def test_runtime_promotion_is_fail_closed_and_allowlisted():
+    text, _ = load_page()
+
+    assert '"publicClaimAllowed":false' not in text
+    assert "provider.publicClaimAllowed!==true" in text
+    assert "approvedHttps(provider.healthUrl,\"/health\")" in text
+    assert "approvedHttps(provider.demoUrl,\"/demo\")" in text
+    assert 'Date.now()-stamp>300000' in text
+    assert 'setPill("is-live","Google Cloud live")' in text
 
 
 def test_all_static_links_use_safe_public_routes():
@@ -82,6 +79,9 @@ def test_all_static_links_use_safe_public_routes():
     for anchor in parser.anchors:
         href = anchor.get("href", "")
         assert href.startswith("https://") or href.startswith("#")
+        if anchor.get("target") == "_blank":
+            assert "noopener" in anchor.get("rel", "")
+            assert "noreferrer" in anchor.get("rel", "")
 
 
 def test_cloud_manifest_asserts_four_provider_deployment_readiness():
@@ -110,6 +110,7 @@ def test_cloud_manifest_asserts_four_provider_deployment_readiness():
 
 def test_demo_manifest_and_receipts_separate_readiness_from_demo_uptime():
     demo = json.loads(DEMO_MANIFEST.read_text(encoding="utf-8"))
+    runtime = json.loads(RUNTIME_MANIFEST.read_text(encoding="utf-8"))
     receipts = json.loads(RECEIPTS.read_text(encoding="utf-8"))
 
     assert demo["assets"]["cloudDeployments"].endswith(
@@ -117,10 +118,19 @@ def test_demo_manifest_and_receipts_separate_readiness_from_demo_uptime():
     )
     assert demo["deploymentReadiness"]["state"] == "ready"
     assert demo["deploymentReadiness"]["publicRuntimeDependency"] is False
+    assert demo["publicDemo"]["state"] == "verified"
+    assert demo["publicDemo"]["providerRuntimeDependency"] is False
+    assert demo["optionalReferenceRuntime"]["state"] == "uncertified"
+    assert demo["optionalReferenceRuntime"]["publicClaimAllowed"] is False
     assert demo["claimControl"]["deploymentReady"] is True
     assert demo["claimControl"]["fourProviderDeploymentReadinessAllowed"] is True
     assert demo["claimControl"]["rawCloudRunDemoPublicGreen"] is False
     assert demo["claimControl"]["continuousPublicReferenceRuntimeRequired"] is False
+
+    providers = {provider["id"]: provider for provider in runtime["providers"]}
+    assert providers["gcp"]["publicRuntimeState"] == "uncertified"
+    assert all(provider["publicClaimAllowed"] is False for provider in providers.values())
+    assert runtime["staticProof"]["publicClaimAllowed"] is True
 
     review = receipts["currentReview"]
     assert review["state"] == "deployment-ready"

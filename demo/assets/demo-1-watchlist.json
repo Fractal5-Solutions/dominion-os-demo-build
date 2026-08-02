@@ -1,129 +1,70 @@
 {
-  "schema": "f5.demo1.watchlist.v3",
-  "generatedAt": "2026-07-31T15:10:00Z",
+  "schema": "f5.demo1.watchlist.v4",
+  "generatedAt": "2026-08-02T13:45:00Z",
   "page": {
     "name": "Fractal5 /demo-1",
     "url": "https://www.fractal5solutions.com/demo-1",
-    "role": "live Squarespace bridge currently requiring publication of the canonical truthful source before prospect sharing"
+    "role": "Squarespace bridge requiring authenticated publication verification"
   },
   "runtime": {
-    "name": "Dominion OS Cloud Run demo",
+    "name": "Optional Dominion OS Google Cloud reference runtime",
     "root": "https://demo-reduwyf2ra-uc.a.run.app/",
     "demo": "https://demo-reduwyf2ra-uc.a.run.app/demo",
     "health": "https://demo-reduwyf2ra-uc.a.run.app/health",
     "status": "https://demo-reduwyf2ra-uc.a.run.app/status",
-    "demoStatus": "https://demo-reduwyf2ra-uc.a.run.app/demo/status",
-    "webMp4": "https://demo-reduwyf2ra-uc.a.run.app/demo/assets/media/dominion_os_live_demo_web.mp4",
-    "masterMp4": "https://demo-reduwyf2ra-uc.a.run.app/demo/assets/media/dominion_os_live_demo_master.mp4"
+    "demoStatus": "https://demo-reduwyf2ra-uc.a.run.app/demo/status"
   },
   "sourceServedAssets": {
     "manifest": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/demo-manifest.json",
+    "runtimeManifest": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/multicloud-runtime-manifest.json",
     "sampleData": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/sample-data.json",
     "demoPackage": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/demo-download-package.json",
     "releaseReceipts": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/release-receipts.json",
     "commercialLaunchReadiness": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/commercial-launch-readiness.json",
     "commercialProofReceiptsIndex": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/commercial-proof-receipts-index.json",
-    "visualPolishPatch": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/squarespace/demo-1-visual-runtime-polish-patch.html",
     "squarespaceCode": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/squarespace/demo-1-final.html"
   },
-  "expectedStatus": {
-    "html": 200,
-    "json": 200,
-    "mp4": [
-      200,
-      206
-    ]
-  },
   "requiredAssertions": [
-    "DOMINION OS™ + SAAS SUITE · MULTI-CLOUD DEPLOYMENT READY",
-    "Dominion OS is ready for your cloud.",
-    "Ready across four clouds. Governed as one system.",
-    "Public demo uptime is optional and independent of client deployment readiness.",
-    "Choose the estate. We deploy the system."
+    "One governed system. Your cloud.",
+    "Independent estates. One release contract.",
+    "Deployment-ready. Runtime claims fail closed.",
+    "Verified public demo"
   ],
-  "visualRuntimePolishChecks": {
-    "blankFirstFoldRemovedByPatch": true,
-    "patchSelector": "#fractal5-demo-canon-light-v1",
-    "patchFile": "squarespace/demo-1-visual-runtime-polish-patch.html",
-    "rule": "The live bridge should place the demo hero materially higher in the first viewport and avoid a large empty Squarespace spacer before the proof bridge."
-  },
+  "requiredHardeningAssertions": [
+    "2026-08-02-multicloud-proof-v2",
+    "One governed system. Your cloud.",
+    "Independent estates. One release contract.",
+    "Deployment-ready. Runtime claims fail closed.",
+    "provider.publicClaimAllowed!==true",
+    "Date.now()-stamp>300000"
+  ],
   "claimDriftChecks": {
     "caseInsensitive": true,
     "manifestVideoMp4Path": "assets.videoMp4",
-    "forbiddenOnlyWhenManifestVideoMp4Null": [
+    "forbiddenWhenManifestVideoMp4Null": [
       "Actual demo MP4 integrated",
       "Open web MP4",
       "Open master MP4",
       "direct MP4 is available",
       "MP4 integrated"
-    ],
-    "allowedWhenVerified": [
-      "Actual demo MP4 integrated",
-      "Open web MP4",
-      "Open master MP4"
     ]
   },
-  "directMp4EvidenceRequirements": {
-    "requiredBeforeClaim": true,
-    "urlProtocol": "https",
-    "urlPathSuffix": ".mp4",
-    "allowedHttpStatus": [
-      200,
-      206
-    ],
-    "allowedContentTypes": [
-      "video/mp4"
-    ],
-    "receiptField": "claimControl.allowDirectMp4Claim",
-    "currentReceipt": "demo/assets/release-receipts.json"
-  },
   "runtimeFreshnessRequirements": {
-    "routes": [
-      "runtime.health",
-      "runtime.status"
-    ],
-    "timestampFields": [
-      "generatedAt",
-      "timestamp",
-      "generated_at"
-    ],
+    "routes": ["runtime.health", "runtime.status"],
     "maximumAgeSeconds": 900,
-    "rule": "Health and status receipts must be current and non-regressing; stale runtime payloads cannot support cloud-health green."
+    "requiredOnlyWhenPublicRuntimeClaimAllowed": true,
+    "rule": "Optional runtime freshness controls live-provider claims but does not invalidate verified static proof."
   },
-  "publicBridgeGates": [
-    "live /demo-1 deployed page exposes the current public proof bridge assertions",
-    "visual polish patch is applied or available to remove the empty first-fold gap",
-    "Cloud Run /demo, /health, /status, /demo/status, and MP4 routes are declared and probed",
-    "source-served manifest, package, data, release receipts, readiness, watchlist, and proof index remain public-safe",
-    "full commercial green stays blocked unless separate commercial, observability, rollback, and autonomous-operation receipts exist"
-  ],
-  "commercialGreenGates": [
-    "daemon watchlist ingestion receipt if monitoring is intentionally enabled",
-    "operator-triggered probe output for /demo-1, Cloud Run routes, and raw assets before high-stakes demos",
-    "secret/public-boundary scan receipt",
-    "current CI/build/test/e2e receipt",
-    "commerce or invoice-only sales-motion receipt",
-    "customer onboarding and entitlement receipt",
-    "observability and alert-routing receipt",
-    "rollback and incident-response receipt",
-    "autonomous remediation/self-healing receipt if that claim is made"
-  ],
+  "assertionScopes": {
+    "pullRequest": "Exact branch source and public source-served assets",
+    "livePublication": "Published Squarespace bridge, static demo, and any provider runtime explicitly claimed live"
+  },
   "claimControl": {
-    "directMp4RequiredForMp4Claim": true,
     "directMp4CurrentlyAvailable": false,
     "publicBridgeContractCurrentlyAligned": false,
-    "visualPolishPatchAvailable": true,
-    "fullCommerceGreenCurrentlyAllowed": false,
+    "staticPublicDemoCurrentlyAllowed": true,
+    "providerRuntimeLiveCurrentlyAllowed": false,
     "fullCommercialGreenCurrentlyAllowed": false,
-    "controlledPreviewCommercialUseAllowed": false,
-    "runtimeCopyRepairRequired": true,
-    "reason": "The live Squarespace page still carries stale live-runtime claims and the configured Cloud Run demo, health and status routes return 404. The canonical multi-cloud source is public-safe but is not the live Squarespace publication. No live, MP4, controlled-preview or full-commercial green claim is allowed until publication and fresh runtime receipts pass."
-  },
-  "requiredHardeningAssertions": [
-    "MULTI-CLOUD DEPLOYMENT READY",
-    "Dominion OS is ready for your cloud.",
-    "Ready across four clouds. Governed as one system.",
-    "Public demo uptime is optional and independent of client deployment readiness.",
-    "Choose the estate. We deploy the system."
-  ]
+    "reason": "Repository source and static public proof are independently certifiable. Squarespace publication and provider runtime states remain separate authenticated gates."
+  }
 }

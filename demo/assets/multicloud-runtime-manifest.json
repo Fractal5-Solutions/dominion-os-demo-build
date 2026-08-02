@@ -1,0 +1,70 @@
+{
+  "schema": "f5.dominion.multicloud-runtime.v1",
+  "generatedAt": "2026-08-02T13:20:00Z",
+  "source": {
+    "repository": "Fractal5-Solutions/dominion-os-demo-build",
+    "branch": "main"
+  },
+  "staticProof": {
+    "url": "https://fractal5-solutions.github.io/dominion-os-demo-build/",
+    "receipt": "https://fractal5-solutions.github.io/dominion-os-demo-build/release.json",
+    "state": "verified-public-safe",
+    "publicClaimAllowed": true
+  },
+  "providers": [
+    {
+      "id": "gcp",
+      "name": "Google Cloud",
+      "deploymentState": "deployment-ready",
+      "publicRuntimeState": "uncertified",
+      "publicClaimAllowed": false,
+      "demoUrl": "https://demo-reduwyf2ra-uc.a.run.app/demo",
+      "healthUrl": "https://demo-reduwyf2ra-uc.a.run.app/health",
+      "statusUrl": "https://demo-reduwyf2ra-uc.a.run.app/status",
+      "certification": {
+        "maxReceiptAgeSeconds": 300,
+        "requiredStatus": [
+          "healthy",
+          "ok"
+        ],
+        "requiredReleaseBinding": true
+      }
+    },
+    {
+      "id": "azure",
+      "name": "Microsoft Azure",
+      "deploymentState": "architecture-ready",
+      "publicRuntimeState": "not-published",
+      "publicClaimAllowed": false
+    },
+    {
+      "id": "aws",
+      "name": "Amazon Web Services",
+      "deploymentState": "architecture-ready",
+      "publicRuntimeState": "not-published",
+      "publicClaimAllowed": false
+    },
+    {
+      "id": "oci",
+      "name": "Oracle Cloud Infrastructure",
+      "deploymentState": "portable-path-ready",
+      "publicRuntimeState": "not-published",
+      "publicClaimAllowed": false
+    }
+  ],
+  "claimControl": {
+    "failClosed": true,
+    "continuousPublicRuntimeClaimAllowed": false,
+    "multiCloudArchitectureClaimAllowed": true,
+    "staticPublicDemoClaimAllowed": true,
+    "directMp4ClaimAllowed": false,
+    "productionSlaClaimAllowed": false,
+    "rule": "A provider may be labelled live only after its approved health endpoint returns an explicit healthy state and a receipt no older than 300 seconds."
+  },
+  "safety": {
+    "containsSecrets": false,
+    "containsCustomerData": false,
+    "containsPaymentData": false,
+    "publicSafe": true
+  }
+}
