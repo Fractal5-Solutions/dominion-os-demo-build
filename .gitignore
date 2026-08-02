@@ -1,10 +1,16 @@
 # Environment files with secrets
-.env.mcp
 .env
+.env.*
+!.env.example
+!.env.*.example
 *.env.local
+scripts/.env
+scripts/.env.*
+!scripts/.env.example
 
 # Python virtual environments
 .venv/
+.venv*/
 venv/
 env/
 ENV/
@@ -38,21 +44,15 @@ scripts/telemetry/*.log
 .tmp/
 temp/
 
-# Docker volumes (local data)
+# Docker volumes and local data
 docker-volumes/
 *.pid
 scripts/telemetry/*.json
 
-# Ignore secret scan outputs (generated locally)
+# Local scan outputs
 scan_results.txt
 
-# Local env files (sensitive) — ensure these are not re-added
-scripts/.env
-.env
-
-
 # Public demo governance
-# Keep thread-specific activation artifacts and contact dumps out of commits.
 reports/erica_activation_status_*.json
 reports/erica_activation_status_*.md
 reports/erica_outbound_package_*.md
