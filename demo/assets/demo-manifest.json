@@ -1,33 +1,37 @@
 {
-  "schema": "f5.dominion.demo.assets.v1",
-  "generatedAt": "2026-07-31T15:20:00Z",
+  "schema": "f5.dominion.demo.assets.v2",
+  "generatedAt": "2026-08-02T13:30:00Z",
   "sourceOfTruth": {
     "repository": "Fractal5-Solutions/dominion-os-demo-build",
-    "path": "demo/assets/demo-manifest.json",
-    "environment": "demo-sandbox",
-    "runtime": "cloud-run"
+    "environment": "public-safe-demo",
+    "runtimeStateContract": "demo/assets/multicloud-runtime-manifest.json"
   },
-  "runtime": {
+  "publicDemo": {
+    "primary": "https://fractal5-solutions.github.io/dominion-os-demo-build/",
+    "receipt": "https://fractal5-solutions.github.io/dominion-os-demo-build/release.json",
+    "mode": "static-public-safe-exact-release",
+    "state": "verified",
+    "providerRuntimeDependency": false
+  },
+  "optionalReferenceRuntime": {
+    "provider": "gcp",
     "root": "https://demo-reduwyf2ra-uc.a.run.app/",
     "demo": "https://demo-reduwyf2ra-uc.a.run.app/demo",
     "health": "https://demo-reduwyf2ra-uc.a.run.app/health",
-    "status": "https://demo-reduwyf2ra-uc.a.run.app/status"
-  },
-  "sections": {
-    "watchVideo": "https://demo-reduwyf2ra-uc.a.run.app/demo#recording-proof",
-    "playWithData": "https://demo-reduwyf2ra-uc.a.run.app/demo#live-operations",
-    "releaseReceipts": "https://demo-reduwyf2ra-uc.a.run.app/demo#evidence-proof"
+    "status": "https://demo-reduwyf2ra-uc.a.run.app/status",
+    "state": "uncertified",
+    "publicClaimAllowed": false,
+    "activationRule": "A live claim requires a fresh healthy receipt, named revision, and exact release binding."
   },
   "assets": {
-    "manifest": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/demo-manifest.json",
+    "runtimeManifest": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/multicloud-runtime-manifest.json",
     "cloudDeployments": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/cloud-deployment-manifest.json",
-    "cloudRunManifest": null,
-    "videoMp4": null,
-    "videoMasterMp4": null,
-    "videoPoster": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/dominion-os-demo-poster.svg",
-    "demoDownload": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/demo-download-package.json",
     "sampleData": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/sample-data.json",
-    "releaseReceiptsJson": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/release-receipts.json"
+    "demoDownload": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/demo-download-package.json",
+    "releaseReceiptsJson": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/release-receipts.json",
+    "videoPoster": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/dominion-os-demo-poster.svg",
+    "videoMp4": null,
+    "videoMasterMp4": null
   },
   "deploymentReadiness": {
     "state": "ready",
@@ -35,45 +39,33 @@
       "Google Cloud",
       "Microsoft Azure",
       "Amazon Web Services",
-      "Oracle Cloud Infrastructure"
+      "Oracle Cloud Infrastructure",
+      "controlled private environments"
     ],
-    "publicRuntimeDependency": false,
-    "statement": "The deployment package, provider paths, release controls, and client-boundary model are ready for implementation."
-  },
-  "assetPolicy": {
-    "sourceServedAssets": [
-      "assets.manifest",
-      "assets.cloudDeployments",
-      "assets.videoPoster",
-      "assets.demoDownload",
-      "assets.sampleData",
-      "assets.releaseReceiptsJson"
-    ],
-    "runtimeMedia": [],
-    "currentFallbacks": {
-      "runtimeDemo": "assets.cloudDeployments",
-      "videoMp4": "assets.releaseReceiptsJson"
-    },
-    "noSecrets": true,
-    "publicSafe": true,
-    "privateServicesExposed": false
+    "statement": "The portable runtime and governed provider delivery contract are ready. Public provider runtimes are separately certified states."
   },
   "squarespace": {
     "bridgePage": "https://www.fractal5solutions.com/demo-1",
     "canonReference": "https://www.fractal5solutions.com/dominion-os",
-    "embedMode": "single-code-block-with-remote-runtime-assets",
-    "source": "squarespace/demo-1-final.html"
+    "source": "squarespace/demo-1-final.html",
+    "publicationState": "requires-authenticated-editor-verification"
   },
   "claimControl": {
+    "failClosed": true,
     "deploymentReady": true,
-    "fourProviderDeploymentReadinessAllowed": true,
     "multiCloudDeploymentArchitectureAllowed": true,
-    "rawCloudRunDemoPublicGreen": false,
-    "publicRuntimeRequiresFreshHealthReceipt": true,
-    "continuousPublicReferenceRuntimeRequired": false,
-    "allowDirectMp4Claim": false,
+    "staticPublicDemoClaimAllowed": true,
+    "providerRuntimeLiveClaimAllowed": false,
+    "directMp4ClaimAllowed": false,
     "productionSlaClaimAllowed": false,
-    "reviewedAt": "2026-07-31T15:20:00Z",
-    "reason": "Multi-cloud deployment readiness is source-backed. The live Squarespace publication is stale and the Cloud Run runtime and media routes return 404; direct-runtime and MP4 claims remain disabled until fresh receipts pass."
+    "fullCommercialGreenAllowed": false,
+    "reason": "Static public proof and deployment architecture are verified. Provider runtime, Squarespace publication, commerce, production SLA, and direct media claims require separate current receipts."
+  },
+  "safety": {
+    "containsSecrets": false,
+    "containsCustomerData": false,
+    "containsPaymentData": false,
+    "containsPrivateEndpoints": false,
+    "publicSafe": true
   }
 }
