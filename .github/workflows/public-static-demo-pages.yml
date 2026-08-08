@@ -22,6 +22,7 @@ on:
       - 'demo/assets/multicloud-runtime-manifest.json'
       - 'demo/assets/demo-manifest.json'
       - 'demo/assets/cloud-deployment-manifest.json'
+      - 'demo/assets/demo-download-package.json'
 
 permissions:
   contents: read
@@ -29,7 +30,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: public-static-demo-pages-${{ github.ref }}
+  group: public-static-demo-pages
   cancel-in-progress: true
 
 jobs:
@@ -52,7 +53,7 @@ jobs:
 
   build:
     name: Build exact public-safe release
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: contract
     runs-on: ubuntu-latest
     steps:
@@ -80,7 +81,7 @@ jobs:
           source = Path('squarespace/demo-1-final.html').read_text(encoding='utf-8')
           required = [
               'data-version="2026-08-02-multicloud-proof-v2"',
-              'Open verified public demo',
+              'Open public static demo',
               'Runtime claims fail closed.',
           ]
           forbidden = [
@@ -150,7 +151,7 @@ jobs:
 
   deploy:
     name: Deploy and verify exact release
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: build
     environment:
       name: github-pages
@@ -193,7 +194,7 @@ jobs:
                       and receipt.get('releaseSha') == expected_sha
                       and receipt.get('failClosed') is True
                       and receipt.get('providerRuntimeClaimedLive') is False
-                      and 'Open verified public demo' in html
+                      and 'Open public static demo' in html
                       and 'Runtime claims fail closed.' in html
                       and 'LIVE GOOGLE CLOUD DEMO' not in html
                   )

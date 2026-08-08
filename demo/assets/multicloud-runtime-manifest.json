@@ -1,6 +1,6 @@
 {
   "schema": "f5.dominion.multicloud-runtime.v1",
-  "generatedAt": "2026-08-02T13:20:00Z",
+  "generatedAt": "2026-08-08T23:46:00Z",
   "source": {
     "repository": "Fractal5-Solutions/dominion-os-demo-build",
     "branch": "main"
@@ -8,8 +8,9 @@
   "staticProof": {
     "url": "https://fractal5-solutions.github.io/dominion-os-demo-build/",
     "receipt": "https://fractal5-solutions.github.io/dominion-os-demo-build/release.json",
-    "state": "verified-public-safe",
-    "publicClaimAllowed": true
+    "state": "source-ready",
+    "publicClaimAllowed": false,
+    "verificationRule": "A deployed static release is verified only by a current release.json with pass=true, failClosed=true, providerRuntimeClaimedLive=false, and a full exact release SHA."
   },
   "providers": [
     {
@@ -23,11 +24,10 @@
       "statusUrl": "https://demo-reduwyf2ra-uc.a.run.app/status",
       "certification": {
         "maxReceiptAgeSeconds": 300,
-        "requiredStatus": [
-          "healthy",
-          "ok"
-        ],
-        "requiredReleaseBinding": true
+        "requiredStatus": ["healthy", "ok"],
+        "requiredReleaseBinding": true,
+        "expectedReleaseSha": null,
+        "requiredNamedRevision": true
       }
     },
     {
@@ -59,7 +59,7 @@
     "staticPublicDemoClaimAllowed": true,
     "directMp4ClaimAllowed": false,
     "productionSlaClaimAllowed": false,
-    "rule": "A provider may be labelled live only after its approved health endpoint returns an explicit healthy state and a receipt no older than 300 seconds."
+    "rule": "A provider may be labelled live only after publicClaimAllowed is explicitly enabled, a full expected release SHA is configured, and the approved health receipt is fresh, healthy, bound to that exact release SHA, and names a non-local revision."
   },
   "safety": {
     "containsSecrets": false,

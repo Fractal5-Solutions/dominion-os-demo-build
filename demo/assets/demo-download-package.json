@@ -1,36 +1,43 @@
 {
-  "schema": "f5.dominion.demo.download-package.v1",
-  "generatedAt": "2026-07-24T13:40:34Z",
+  "schema": "f5.dominion.demo.download-package.v2",
+  "generatedAt": "2026-08-08T23:43:00Z",
   "title": "Dominion OS + SaaS Suite Public Demo Package",
   "publicBridge": "https://www.fractal5solutions.com/demo-1",
-  "runtimeDemo": "https://demo-reduwyf2ra-uc.a.run.app/demo",
+  "runtimeDemo": null,
   "contents": [
     {
-      "label": "Live demo",
-      "url": "https://demo-reduwyf2ra-uc.a.run.app/demo",
-      "type": "runtime-route"
+      "label": "Public static demo",
+      "url": "https://fractal5-solutions.github.io/dominion-os-demo-build/",
+      "type": "text/html"
     },
     {
-      "label": "Web MP4 proof recording",
-      "url": "https://demo-reduwyf2ra-uc.a.run.app/demo/assets/media/dominion_os_live_demo_web.mp4",
-      "type": "video/mp4"
+      "label": "Exact-release receipt",
+      "url": "https://fractal5-solutions.github.io/dominion-os-demo-build/release.json",
+      "type": "application/json"
+    },
+    {
+      "label": "Deployment manifest",
+      "url": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/cloud-deployment-manifest.json",
+      "type": "application/json"
+    },
+    {
+      "label": "Runtime claim-control manifest",
+      "url": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/multicloud-runtime-manifest.json",
+      "type": "application/json"
     },
     {
       "label": "Sample data",
       "url": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/sample-data.json",
       "type": "application/json"
-    },
-    {
-      "label": "Release receipts",
-      "url": "https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/release-receipts.json",
-      "type": "application/json"
     }
   ],
-  "notes": "Public-safe demo package manifest. This is not a private source-code bundle and does not contain keys, customer data, payment data, or private runtime artifacts.",
+  "notes": "Public-safe static demonstration package. Provider runtime availability is not implied by this package and requires separate current health, revision, and exact-release evidence.",
   "claimControl": {
-    "directMp4Included": true,
+    "directMp4Included": false,
+    "runtimeRouteIncluded": false,
+    "providerRuntimeClaimedLive": false,
     "binaryZipIncluded": false,
     "fullCommercialGreenAllowed": false,
-    "reason": "The public runtime route, public-safe assets, and verified web MP4 are included. Installable customer packages and commercial provisioning require separate receipts."
+    "reason": "Only public-safe static proof, release metadata, claim-control manifests, and sample data are included. Runtime and commercial claims remain separately evidence-gated."
   }
 }

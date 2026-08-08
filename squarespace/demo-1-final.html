@@ -9,27 +9,27 @@
           <span>Google Cloud</span><span>Microsoft Azure</span><span>AWS</span><span>Oracle Cloud</span><span>Private</span>
         </div>
         <div class="f5-actions">
-          <a class="f5-btn" id="f5-primary-demo" href="https://fractal5-solutions.github.io/dominion-os-demo-build/" target="_blank" rel="noopener noreferrer">Open verified public demo</a>
+          <a class="f5-btn" id="f5-primary-demo" href="https://fractal5-solutions.github.io/dominion-os-demo-build/" target="_blank" rel="noopener noreferrer">Open public static demo</a>
           <a class="f5-btn f5-btn-quiet" href="#f5-proof">Inspect proof</a>
           <a class="f5-btn f5-btn-quiet" href="https://www.fractal5solutions.com/#contact">Plan a deployment</a>
         </div>
-        <p class="f5-note">The public demonstration contains no customer data, credentials, payment data, private APIs, or production controls. Provider runtime claims activate only after current machine-produced health evidence.</p>
+        <p class="f5-note">The public demonstration contains no customer data, credentials, payment data, private APIs, or production controls. Static verification and provider runtime claims activate only after their corresponding machine-produced receipts pass.</p>
       </div>
 
       <aside class="f5-panel f5-state" aria-label="Current public proof state">
         <div class="f5-status-line">
           <span class="f5-kicker">CURRENT PROOF STATE</span>
-          <span class="f5-pill is-static" id="f5-state-pill"><i></i><b>Static proof verified</b></span>
+          <span class="f5-pill is-static" id="f5-state-pill"><i></i><b>Static proof available</b></span>
         </div>
         <h2 id="f5-state-title">Deployment-ready. Runtime claims fail closed.</h2>
-        <p id="f5-state-copy" aria-live="polite">The verified public-safe demonstration is available. A provider is labelled live only when its approved health endpoint returns a fresh, explicit healthy receipt.</p>
+        <p id="f5-state-copy" aria-live="polite">The public-safe static surface is available. Its deployed release is labelled verified only after the exact-release receipt passes; a provider is labelled live only after fresh health, named revision, and exact release evidence agree.</p>
         <div class="f5-facts">
           <div><small>Runtime</small><strong>Portable OCI container</strong></div>
           <div><small>Release</small><strong>Digest + receipt bound</strong></div>
           <div><small>Identity</small><strong>Short-lived OIDC</strong></div>
           <div><small>Cost</small><strong>Scale-to-zero first</strong></div>
         </div>
-        <p class="f5-meta" id="f5-state-meta">Checking approved runtime evidence&hellip;</p>
+        <p class="f5-meta" id="f5-state-meta">Checking deployed static-release evidence&hellip;</p>
       </aside>
     </div>
   </section>
@@ -62,15 +62,15 @@
     <div class="f5-panel f5-evidence">
       <div><span class="f5-kicker">PUBLIC EVIDENCE</span><h2 id="f5-evidence-title">Inspect what is safe to prove.</h2><p id="f5-evidence-copy">Loading the current public evidence contract&hellip;</p></div>
       <div class="f5-links">
-        <a href="https://fractal5-solutions.github.io/dominion-os-demo-build/" target="_blank" rel="noopener noreferrer">Verified public demo<span>Static, public-safe exact-release surface</span></a>
-        <a href="https://fractal5-solutions.github.io/dominion-os-demo-build/release.json" target="_blank" rel="noopener noreferrer">Release receipt<span>Exact public-demo source binding</span></a>
+        <a href="https://fractal5-solutions.github.io/dominion-os-demo-build/" target="_blank" rel="noopener noreferrer">Public static demo<span>Exact-release verification is receipt-gated</span></a>
+        <a href="https://fractal5-solutions.github.io/dominion-os-demo-build/release.json" target="_blank" rel="noopener noreferrer">Release receipt<span>Exact public-demo deployment binding</span></a>
         <a href="https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/cloud-deployment-manifest.json" target="_blank" rel="noopener noreferrer">Deployment manifest<span>Provider and claim-control contract</span></a>
         <a href="https://www.fractal5solutions.com/dominion-os">Dominion OS&trade;<span>Architecture and operating model</span></a>
       </div>
     </div>
   </section>
 
-  <script id="f5-demo-config" type="application/json">{"runtimeManifest":"https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/multicloud-runtime-manifest.json","fallbackManifest":"https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/demo-manifest.json","staticDemo":"https://fractal5-solutions.github.io/dominion-os-demo-build/","allowedOrigins":["https://demo-reduwyf2ra-uc.a.run.app"]}</script>
+  <script id="f5-demo-config" type="application/json">{"runtimeManifest":"https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/multicloud-runtime-manifest.json","fallbackManifest":"https://raw.githubusercontent.com/Fractal5-Solutions/dominion-os-demo-build/main/demo/assets/demo-manifest.json","staticDemo":"https://fractal5-solutions.github.io/dominion-os-demo-build/","staticReceipt":"https://fractal5-solutions.github.io/dominion-os-demo-build/release.json","allowedOrigins":["https://demo-reduwyf2ra-uc.a.run.app"]}</script>
   <script>
   (function(){"use strict";
     var root=document.getElementById("fractal5-demo1"); if(!root)return;
@@ -80,28 +80,45 @@
     function approvedHttps(value,path){try{var u=new URL(String(value||""));return u.protocol==="https:"&&allowed.indexOf(u.origin)>=0&&u.pathname===path?u:null}catch(e){return null}}
     function setText(id,value){var n=document.getElementById(id);if(n)n.textContent=value}
     function setPill(cls,label){var p=document.getElementById("f5-state-pill");if(!p)return;p.className="f5-pill "+cls;var b=p.querySelector("b");if(b)b.textContent=label}
-    function certifyGcp(provider){
-      var h=approvedHttps(provider.healthUrl,"/health"),d=approvedHttps(provider.demoUrl,"/demo");
-      if(!h||!d||provider.publicClaimAllowed!==true)return Promise.reject(new Error("not_claimable"));
-      return fetchJson(h.href,5000).then(function(receipt){
-        var state=String(receipt.status||"").toLowerCase(),stamp=Date.parse(receipt.generatedAt||receipt.timestamp||"");
-        if(["healthy","ok"].indexOf(state)<0||!stamp||Date.now()-stamp>300000)throw new Error("stale_or_unhealthy");
-        setPill("is-live","Google Cloud live");
-        setText("f5-state-title","Deployment-ready. Google Cloud proof is live.");
-        setText("f5-state-copy","The verified static demonstration remains available, and the approved Google Cloud runtime has supplied a fresh healthy receipt.");
-        setText("f5-state-meta","Certified "+new Date(stamp).toLocaleString()+" · "+String(receipt.revision||"named revision"));
-        var a=document.getElementById("f5-primary-demo");a.href=d.href;a.textContent="Open live Google Cloud demo";
-        var card=root.querySelector('[data-provider="gcp"]');if(card){card.querySelector("em").textContent="Ready + live";card.querySelector("em").className="is-live";card.querySelector("[data-runtime-state]").textContent="Fresh public runtime receipt verified."}
+    function verifyStatic(){
+      if(!cfg.staticReceipt)return Promise.reject(new Error("static_receipt_missing"));
+      return fetchJson(cfg.staticReceipt,5000).then(function(receipt){
+        var sha=String(receipt.releaseSha||"").toLowerCase();
+        if(receipt.pass===true&&receipt.failClosed===true&&receipt.providerRuntimeClaimedLive===false&&/^[0-9a-f]{40}$/.test(sha)){
+          setPill("is-static","Static proof verified");
+          setText("f5-state-meta","Deployed static release verified · "+sha.slice(0,12));
+          var a=document.getElementById("f5-primary-demo");if(a)a.textContent="Open verified public demo";
+          return receipt
+        }
+        throw new Error("static_receipt_invalid")
       })
     }
+    function certifyGcp(provider){
+      var h=approvedHttps(provider.healthUrl,"/health"),d=approvedHttps(provider.demoUrl,"/demo"),cert=provider.certification||{};
+      var expected=String(cert.expectedReleaseSha||"").toLowerCase();
+      if(!h||!d||provider.publicClaimAllowed!==true||!/^[0-9a-f]{40}$/.test(expected)||cert.requiredReleaseBinding!==true||cert.requiredNamedRevision!==true)return Promise.reject(new Error("not_claimable"));
+      return fetchJson(h.href,5000).then(function(receipt){
+        var state=String(receipt.status||"").toLowerCase(),stamp=Date.parse(receipt.generatedAt||receipt.timestamp||"");
+        var revision=String(receipt.revision||"").trim(),bound=String(receipt.releaseCandidateSha||"").toLowerCase();
+        if(["healthy","ok"].indexOf(state)<0||!stamp||Date.now()-stamp>300000||!revision||revision.toLowerCase()==="local"||bound!==expected)throw new Error("runtime_receipt_not_exact");
+        setPill("is-live","Google Cloud live");
+        setText("f5-state-title","Deployment-ready. Google Cloud proof is live.");
+        setText("f5-state-copy","The verified static demonstration remains available, and the approved Google Cloud runtime has supplied fresh health, named revision, and exact-release evidence.");
+        setText("f5-state-meta","Certified "+new Date(stamp).toLocaleString()+" · "+revision+" · "+bound.slice(0,12));
+        var a=document.getElementById("f5-primary-demo");a.href=d.href;a.textContent="Open live Google Cloud demo";
+        var card=root.querySelector('[data-provider="gcp"]');if(card){card.querySelector("em").textContent="Ready + live";card.querySelector("em").className="is-live";card.querySelector("[data-runtime-state]").textContent="Fresh exact-release runtime receipt verified."}
+      })
+    }
+    verifyStatic().catch(function(){
+      setPill("is-static","Static proof available");
+      setText("f5-state-meta","Public static demo available · exact-release verification receipt unavailable or invalid");
+    });
     fetchJson(cfg.runtimeManifest,6000).then(function(m){
       var providers=Array.isArray(m.providers)?m.providers:[],gcp=providers.filter(function(p){return p.id==="gcp"})[0];
-      setText("f5-evidence-copy","Runtime state contract loaded. Live labels remain conditional on fresh provider receipts.");
+      setText("f5-evidence-copy","Runtime state contract loaded. Live labels remain conditional on fresh, named-revision, exact-release receipts.");
       if(gcp)return certifyGcp(gcp)
     }).catch(function(){
-      setPill("is-static","Static proof verified");
-      setText("f5-state-meta","Verified public demo available · no live provider runtime currently certified");
-      setText("f5-evidence-copy","The verified static demonstration remains the public source of truth while runtime evidence is unavailable.");
+      setText("f5-evidence-copy","The static demonstration remains the public source of truth while provider runtime evidence is unavailable or uncertified.");
     });
   })();
   </script>
