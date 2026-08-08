@@ -6,24 +6,36 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/public-static-demo-pages.yml'
+      - 'scripts/verify_multicloud_demo_contract.py'
       - 'squarespace/demo-1-final.html'
+      - 'demo/assets/multicloud-runtime-manifest.json'
       - 'demo/assets/demo-manifest.json'
       - 'demo/assets/cloud-deployment-manifest.json'
       - 'demo/assets/sample-data.json'
+      - 'demo/assets/demo-download-package.json'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/public-static-demo-pages.yml'
+      - 'scripts/verify_multicloud_demo_contract.py'
+      - 'squarespace/demo-1-final.html'
+      - 'demo/assets/multicloud-runtime-manifest.json'
+      - 'demo/assets/demo-manifest.json'
+      - 'demo/assets/cloud-deployment-manifest.json'
       - 'demo/assets/demo-download-package.json'
 
 permissions:
   contents: read
   pages: write
   id-token: write
-  issues: write
 
 concurrency:
   group: public-static-demo-pages
   cancel-in-progress: true
 
 jobs:
-  build:
+  contract:
+    name: Verify fail-closed multicloud contract
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -31,12 +43,35 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Build public-safe static site
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+
+      - name: Verify page and runtime claim contract
+        run: python scripts/verify_multicloud_demo_contract.py
+
+  build:
+    name: Build exact public-safe release
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: contract
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          persist-credentials: false
+
+      - name: Build static site and exact-release receipt
         shell: bash
         run: |
           set -euo pipefail
           rm -rf _site
-          mkdir -p _site
+          mkdir -p _site/assets
+          cp demo/assets/multicloud-runtime-manifest.json _site/assets/
+          cp demo/assets/cloud-deployment-manifest.json _site/assets/
+          cp demo/assets/sample-data.json _site/assets/
+          cp demo/assets/demo-download-package.json _site/assets/
           python3 - <<'PY'
           import json
           import os
@@ -45,14 +80,15 @@ jobs:
 
           source = Path('squarespace/demo-1-final.html').read_text(encoding='utf-8')
           required = [
-              'MULTI-CLOUD DEPLOYMENT READY',
-              'Dominion OS is ready for your cloud.',
-              'Public sandbox availability is a separate demonstration service',
+              'data-version="2026-08-02-multicloud-proof-v2"',
+              'Open public static demo',
+              'Runtime claims fail closed.',
           ]
           forbidden = [
               'LIVE GOOGLE CLOUD DEMO',
               'Dominion OS, live on the cloud.',
-              'Send this page to prospects who need to see Dominion OS in operation.',
+              'Open web MP4',
+              'Open master MP4',
           ]
           for marker in required:
               if marker not in source:
@@ -61,11 +97,11 @@ jobs:
               if marker in source:
                   raise SystemExit(f'stale live-runtime claim detected: {marker}')
 
-          head_sha = os.environ['GITHUB_SHA']
           generated_at = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
+          head_sha = os.environ['GITHUB_SHA']
           banner = '''
           <div role="status" style="max-width:1200px;margin:18px auto 0;padding:14px 20px;border:1px solid #e4ded3;border-radius:14px;background:#fbfaf7;color:#2a2b2e;font:600 13px/1.55 Manrope,system-ui,-apple-system,Segoe UI,sans-serif">
-            Public deployment demonstration · Static, public-safe proof surface. Client deployments are scoped and executed under governed provider contracts. The optional Google Cloud Run sandbox is not represented as live here.
+            Verified public deployment demonstration · Static, public-safe exact-release surface. Provider runtime claims remain fail-closed until fresh machine-produced evidence passes.
           </div>
           '''
           document = f'''<!doctype html>
@@ -73,38 +109,34 @@ jobs:
           <head>
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width,initial-scale=1">
-            <meta name="description" content="Dominion OS™ + SaaS Suite multi-cloud deployment demonstration from Fractal5 Solutions.">
+            <meta name="description" content="Dominion OS™ + SaaS Suite governed multicloud deployment demonstration from Fractal5 Solutions.">
             <meta name="robots" content="index,follow">
-            <meta name="referrer" content="strict-origin-when-cross-origin">
-            <title>Dominion OS™ Multi-Cloud Deployment Demo | Fractal5 Solutions</title>
+            <meta name="referrer" content="no-referrer">
+            <title>Dominion OS™ Multicloud Demo | Fractal5 Solutions</title>
           </head>
-          <body style="margin:0;background:#fff">
-          {banner}
-          {source}
-          </body>
-          </html>
-          '''
+          <body style="margin:0;background:#fff">{banner}{source}</body>
+          </html>'''
           Path('_site/index.html').write_text(document, encoding='utf-8', newline='\n')
           Path('_site/404.html').write_text(document, encoding='utf-8', newline='\n')
           Path('_site/.nojekyll').write_text('', encoding='utf-8')
+
           receipt = {
-              'schema': 'f5.public-static-demo.release.v1',
+              'schema': 'f5.public-static-demo.release.v2',
               'generatedAt': generated_at,
               'releaseSha': head_sha,
-              'mode': 'static-public-safe-deployment-demonstration',
-              'cloudRunSandboxClaimedLive': False,
+              'mode': 'static-public-safe-exact-release',
               'source': 'squarespace/demo-1-final.html',
+              'runtimeManifest': 'demo/assets/multicloud-runtime-manifest.json',
+              'providerRuntimeClaimedLive': False,
+              'failClosed': True,
               'pass': True,
               'certificationRule': (
-                  'PASS means the static public-safe deployment demonstration was built '
-                  'from the reviewed canonical source at this exact commit. It does not '
-                  'certify a live Cloud Run sandbox or a client production deployment.'
+                  'PASS certifies this exact static public-safe release only. Provider runtime '
+                  'availability requires a separate current health, revision, and release receipt.'
               ),
           }
           Path('_site/release.json').write_text(
-              json.dumps(receipt, indent=2) + '\n',
-              encoding='utf-8',
-              newline='\n',
+              json.dumps(receipt, indent=2) + '\n', encoding='utf-8', newline='\n'
           )
           print(json.dumps(receipt, indent=2))
           PY
@@ -118,23 +150,22 @@ jobs:
           path: _site
 
   deploy:
+    name: Deploy and verify exact release
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: build
     steps:
       - name: Deploy GitHub Pages
         id: deployment
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
 
-      - name: Verify exact public static release
+      - name: Verify exact public release
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
           HEAD_SHA: ${{ github.sha }}
-          GH_TOKEN: ${{ github.token }}
-          REPOSITORY: ${{ github.repository }}
-          ISSUE_NUMBER: '180'
         shell: bash
         run: |
           set -euo pipefail
@@ -142,85 +173,37 @@ jobs:
           import json
           import os
           import time
-          import urllib.error
           import urllib.request
 
           page_url = os.environ['PAGE_URL'].rstrip('/') + '/'
           release_url = page_url + 'release.json'
           expected_sha = os.environ['HEAD_SHA']
-          last_error = None
-          html = ''
-          receipt = {}
+          last_error = ''
           for _ in range(30):
               try:
-                  request = urllib.request.Request(
-                      page_url,
-                      headers={'User-Agent': 'fractal5-static-demo-verifier/1.0'},
-                  )
-                  with urllib.request.urlopen(request, timeout=20) as response:
+                  req = urllib.request.Request(page_url, headers={'User-Agent': 'fractal5-static-demo-verifier/2.0'})
+                  with urllib.request.urlopen(req, timeout=20) as response:
+                      html = response.read(2_000_000).decode('utf-8', errors='replace')
                       if response.status != 200:
                           raise RuntimeError(f'page HTTP {response.status}')
-                      html = response.read(2_000_000).decode('utf-8', errors='replace')
-                  request = urllib.request.Request(
-                      release_url,
-                      headers={'User-Agent': 'fractal5-static-demo-verifier/1.0'},
-                  )
-                  with urllib.request.urlopen(request, timeout=20) as response:
-                      if response.status != 200:
-                          raise RuntimeError(f'release HTTP {response.status}')
+                  req = urllib.request.Request(release_url, headers={'User-Agent': 'fractal5-static-demo-verifier/2.0'})
+                  with urllib.request.urlopen(req, timeout=20) as response:
                       receipt = json.loads(response.read().decode('utf-8'))
-                  if receipt.get('releaseSha') == expected_sha:
-                      break
+                  passed = (
+                      receipt.get('pass') is True
+                      and receipt.get('releaseSha') == expected_sha
+                      and receipt.get('failClosed') is True
+                      and receipt.get('providerRuntimeClaimedLive') is False
+                      and 'Open public static demo' in html
+                      and 'Runtime claims fail closed.' in html
+                      and 'LIVE GOOGLE CLOUD DEMO' not in html
+                  )
+                  if passed:
+                      print(json.dumps({'page': page_url, 'release': release_url, 'sha': expected_sha, 'pass': True}, indent=2))
+                      raise SystemExit(0)
+                  last_error = 'receipt or page contract mismatch'
               except Exception as exc:
                   last_error = str(exc)
               time.sleep(10)
-
-          required = [
-              'MULTI-CLOUD DEPLOYMENT READY',
-              'Static, public-safe proof surface',
-              'The optional Google Cloud Run sandbox is not represented as live here.',
-          ]
-          forbidden = [
-              'LIVE GOOGLE CLOUD DEMO',
-              'Dominion OS, live on the cloud.',
-          ]
-          passed = (
-              bool(html)
-              and all(marker in html for marker in required)
-              and not any(marker in html for marker in forbidden)
-              and receipt.get('pass') is True
-              and receipt.get('releaseSha') == expected_sha
-              and receipt.get('cloudRunSandboxClaimedLive') is False
-          )
-          body = '\n'.join([
-              '## Public static demo proof',
-              '',
-              f'- Exact commit: `{expected_sha}`',
-              f'- Page URL: {page_url}',
-              f'- Release receipt: {release_url}',
-              f'- Static public-safe marker: **{all(marker in html for marker in required)}**',
-              f'- Stale live-runtime claims absent: **{not any(marker in html for marker in forbidden)}**',
-              f'- Exact-release receipt: **{receipt.get("releaseSha") == expected_sha}**',
-              f'- Final static-demo verdict: **{"PASS" if passed else "FAIL"}**',
-              '',
-              'This proves a public, shareable, static deployment demonstration. It does not close the separate Cloud Run runtime incident.',
-          ])
-          api = f"https://api.github.com/repos/{os.environ['REPOSITORY']}/issues/{os.environ['ISSUE_NUMBER']}/comments"
-          request = urllib.request.Request(
-              api,
-              data=json.dumps({'body': body}).encode('utf-8'),
-              method='POST',
-              headers={
-                  'Authorization': f"Bearer {os.environ['GH_TOKEN']}",
-                  'Accept': 'application/vnd.github+json',
-                  'Content-Type': 'application/json',
-                  'X-GitHub-Api-Version': '2022-11-28',
-                  'User-Agent': 'fractal5-static-demo-verifier/1.0',
-              },
-          )
-          with urllib.request.urlopen(request, timeout=30):
-              pass
-          print(body)
-          if not passed:
-              raise SystemExit(last_error or 'static public demo verification failed')
+          raise SystemExit(last_error or 'exact public release verification failed')
           PY

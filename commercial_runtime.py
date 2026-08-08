@@ -24,6 +24,7 @@ PUBLIC_RECEIPT_PATHS = frozenset({
 ALLOWED_PUBLIC_ORIGINS = frozenset({
     "https://www.fractal5solutions.com",
     "https://fractal5solutions.com",
+    "https://fractal5-solutions.github.io",
 })
 
 
