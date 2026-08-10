@@ -21,7 +21,7 @@ docker>=7.1.0
 PyYAML>=6.0.3
 
 # Data Processing
-pandas>=2.0.3
+pandas>=3.0.5
 numpy>=1.24.3
 
 # CLI & Terminal Tools
