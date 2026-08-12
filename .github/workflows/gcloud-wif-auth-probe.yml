@@ -1,0 +1,96 @@
+name: GCloud WIF Auth Probe
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/gcloud-wif-auth-probe.yml"
+      - ".github/workflows/cicd-deploy.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  GCP_PROJECT_ID: f5-prod-command-core
+  GCP_PROJECT_NUMBER: "732190342674"
+  WIF_PROVIDER: projects/732190342674/locations/global/workloadIdentityPools/fractal5-github-pool/providers/github-provider
+  WIF_SERVICE_ACCOUNT: dominion-demo-oidc-sa@f5-prod-command-core.iam.gserviceaccount.com
+
+jobs:
+  auth-probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: false
+
+      - name: Probe Google Workload Identity Federation
+        id: auth
+        continue-on-error: true
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.WIF_SERVICE_ACCOUNT }}
+          create_credentials_file: true
+          export_environment_variables: true
+
+      - name: Write auth receipt
+        env:
+          AUTH_OUTCOME: ${{ steps.auth.outcome }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/gcloud-auth-receipt
+          python - <<'PY'
+          import json
+          import os
+          from datetime import datetime, timezone
+
+          outcome = os.environ.get("AUTH_OUTCOME", "unknown")
+          passed = outcome == "success"
+          receipt = {
+              "schema": "fractal5.gcloud-wif-auth-receipt.v1",
+              "generatedAt": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+              "sourceSha": os.environ["GITHUB_SHA"],
+              "repository": os.environ["GITHUB_REPOSITORY"],
+              "ref": os.environ["GITHUB_REF"],
+              "projectId": os.environ["GCP_PROJECT_ID"],
+              "projectNumber": os.environ["GCP_PROJECT_NUMBER"],
+              "provider": os.environ["WIF_PROVIDER"],
+              "serviceAccount": os.environ["WIF_SERVICE_ACCOUNT"],
+              "authActionOutcome": outcome,
+              "state": "AUTHENTICATED" if passed else "AUTH_FAILED",
+              "pass": passed,
+              "deploymentAttempted": False,
+              "cloudMutationAttempted": False,
+              "certificationRule": "Authentication GREEN requires a successful short-lived WIF exchange on the exact source/ref. This probe never deploys or mutates Google Cloud resources."
+          }
+          with open("out/gcloud-auth-receipt/gcloud-wif-auth.json", "w", encoding="utf-8") as handle:
+              json.dump(receipt, handle, indent=2)
+              handle.write("\n")
+          print(json.dumps(receipt, indent=2))
+          PY
+
+      - name: Upload auth receipt
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: gcloud-wif-auth-receipt
+          path: out/gcloud-auth-receipt/gcloud-wif-auth.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Auth probe verdict
+        shell: bash
+        env:
+          AUTH_OUTCOME: ${{ steps.auth.outcome }}
+        run: |
+          set -euo pipefail
+          if [ "${AUTH_OUTCOME}" = "success" ]; then
+            echo "GCloud WIF authentication probe succeeded. No deployment or cloud mutation was attempted."
+          else
+            echo "GCloud WIF authentication probe failed. See the auth action log and receipt; deployment remains withheld."
+          fi
