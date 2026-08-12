@@ -4,9 +4,10 @@ on:
   pull_request:
     paths:
       - 'policy/public_proof_phi_boundary.yaml'
-      - 'scripts/start_all_local_systems.sh'
-      - 'scripts/telemetry/prove_and_maintain.sh'
-      - 'scripts/phi_sovereign_autopilot_nhitl.sh'
+      - '**/*.sh'
+      - '**/*.py'
+      - '**/*.yml'
+      - '**/*.yaml'
       - '.github/CODEOWNERS'
       - '.github/workflows/public-proof-phi-boundary.yml'
   workflow_dispatch:
@@ -32,7 +33,7 @@ jobs:
           grep -Fq 'public_repo_may_start_private_runtime: false' "$policy"
           grep -Fq 'public_repo_may_contain_secrets_or_signing_material: false' "$policy"
 
-      - name: Enforce non-commanding public compatibility scripts
+      - name: Validate known compatibility tombstones
         shell: bash
         run: |
           set -euo pipefail
@@ -40,30 +41,80 @@ jobs:
             'scripts/start_all_local_systems.sh'
             'scripts/telemetry/prove_and_maintain.sh'
             'scripts/phi_sovereign_autopilot_nhitl.sh'
-          )
-          forbidden=(
-            'python3 main.py'
-            'pip install'
-            'docker-compose up'
-            'docker compose up'
-            '/workspaces/phi-mcp-server'
-            'tools/call'
-            'gcloud config set project'
-            'nohup '
+            'scripts/activate_max_sovereign_mode.sh'
+            'scripts/phi_ai_continuous_improvement.sh'
+            'scripts/gcp_secure_deployment.sh'
+            'deploy_demo.sh'
+            'deploy_to_gcp.sh'
+            'phi_perfect_liveops_deployment.sh'
           )
           for script in "${scripts[@]}"; do
+            test -f "$script"
             bash -n "$script"
+            grep -Eq 'REFUSED|NON-COMMANDING' "$script"
+          done
+
+      - name: Reject private runtime and privileged cloud orchestration
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t files < <(find . -type f \
+            \( -name '*.sh' -o -name '*.py' -o -name '*.yml' -o -name '*.yaml' \) \
+            -not -path './.git/*' \
+            -not -path './backups/*' \
+            -not -path './.github/workflows/public-proof-phi-boundary.yml' \
+            -print)
+
+          forbidden=(
+            '/workspaces/phi-mcp-server'
+            '/workspaces/dominion-command-center'
+            'tools/call'
+            'python3 main.py'
+            'docker-compose up'
+            'docker compose up'
+            'gcloud projects add-iam-policy-binding'
+            'gcloud iam service-accounts create'
+            'gcloud services enable'
+            'gcloud run deploy'
+            'gcloud builds submit'
+            'gcloud config set project dominion-core-prod'
+            'gcloud config set project dominion-os-1-0-main'
+            'nohup python3 main.py'
+          )
+
+          failed=0
+          for file in "${files[@]}"; do
             for token in "${forbidden[@]}"; do
-              if grep -Fq "$token" "$script"; then
-                echo "Forbidden public proof-lane runtime orchestration token in $script: $token" >&2
-                exit 1
+              if grep -Fq "$token" "$file"; then
+                echo "Forbidden public proof-lane command token in $file: $token" >&2
+                failed=1
               fi
             done
           done
-          grep -Fq 'Phi is the sole Dominion command service.' 'scripts/start_all_local_systems.sh'
-          grep -Fq 'NON-COMMANDING / SANDBOX-ONLY' 'scripts/start_all_local_systems.sh'
-          grep -Fq 'Phi is the sole Dominion command service.' 'scripts/telemetry/prove_and_maintain.sh'
-          grep -Fq 'Phi is the sole Dominion command service.' 'scripts/phi_sovereign_autopilot_nhitl.sh'
+          exit "$failed"
+
+      - name: Reject destructive autonomous maintenance in public scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t files < <(find scripts -type f -name '*.sh' -not -path 'scripts/backups/*' -print 2>/dev/null || true)
+          forbidden=(
+            'rm -rf'
+            '-delete'
+            'git reset --hard'
+            'git push --force'
+            'git push -f'
+          )
+          failed=0
+          for file in "${files[@]}"; do
+            for token in "${forbidden[@]}"; do
+              if grep -Fq -- "$token" "$file"; then
+                echo "Forbidden destructive public maintenance token in $file: $token" >&2
+                failed=1
+              fi
+            done
+          done
+          exit "$failed"
 
       - name: Enforce boundary code ownership
         shell: bash
@@ -71,6 +122,6 @@ jobs:
           set -euo pipefail
           owners='.github/CODEOWNERS'
           grep -Fq 'policy/**' "$owners"
-          grep -Fq 'scripts/start_all_local_systems.sh' "$owners"
-          grep -Fq 'scripts/telemetry/prove_and_maintain.sh' "$owners"
-          grep -Fq 'scripts/phi_sovereign_autopilot_nhitl.sh' "$owners"
+          grep -Fq 'scripts/**' "$owners"
+          grep -Fq '*.sh' "$owners"
+          grep -Fq '.github/workflows/public-proof-phi-boundary.yml' "$owners"
