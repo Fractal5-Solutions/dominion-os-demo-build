@@ -34,5 +34,5 @@ pathlib>=1.0.1
 
 # Dependency conflict resolution
 sympy>=1.14.0
-pydantic>=2.12.5
+pydantic>=2.13.4
 pydantic-core>=2.41.5
