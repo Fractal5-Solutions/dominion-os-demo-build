@@ -1,4 +1,4 @@
-version: 1
+version: 2
 status: active_binding
 as_of: 2026-08-12
 repository: Fractal5-Solutions/dominion-os-demo-build
@@ -15,6 +15,9 @@ invariants:
   public_repo_may_install_private_runtime_dependencies: false
   public_repo_may_contain_production_data: false
   public_repo_may_contain_secrets_or_signing_material: false
+  public_repo_may_call_credential_bearing_business_integrations: false
+  public_repo_may_harvest_private_business_or_crm_data: false
+  public_repo_may_write_private_business_or_crm_data: false
   proof_runtime_must_be_sandboxed: true
   no_receipt_means_no_green: true
 
@@ -23,6 +26,7 @@ allowed:
   - sandboxed_public_demo_artifacts
   - read_only_local_proof_verification
   - public_safe_documentation
+  - synthetic_or_explicitly_public_demo_data
 
 forbidden:
   - start_phi_mcp
@@ -34,3 +38,6 @@ forbidden:
   - production_credentials
   - production_customer_data
   - private_signing_keys
+  - credential_bearing_crm_api_calls
+  - private_crm_data_harvest
+  - private_business_integration_sync
