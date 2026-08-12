@@ -7,6 +7,7 @@ on:
       - 'scripts/start_all_local_systems.sh'
       - 'scripts/telemetry/prove_and_maintain.sh'
       - 'scripts/phi_sovereign_autopilot_nhitl.sh'
+      - '.github/CODEOWNERS'
       - '.github/workflows/public-proof-phi-boundary.yml'
   workflow_dispatch:
 
@@ -63,3 +64,13 @@ jobs:
           grep -Fq 'NON-COMMANDING / SANDBOX-ONLY' 'scripts/start_all_local_systems.sh'
           grep -Fq 'Phi is the sole Dominion command service.' 'scripts/telemetry/prove_and_maintain.sh'
           grep -Fq 'Phi is the sole Dominion command service.' 'scripts/phi_sovereign_autopilot_nhitl.sh'
+
+      - name: Enforce boundary code ownership
+        shell: bash
+        run: |
+          set -euo pipefail
+          owners='.github/CODEOWNERS'
+          grep -Fq 'policy/**' "$owners"
+          grep -Fq 'scripts/start_all_local_systems.sh' "$owners"
+          grep -Fq 'scripts/telemetry/prove_and_maintain.sh' "$owners"
+          grep -Fq 'scripts/phi_sovereign_autopilot_nhitl.sh' "$owners"
