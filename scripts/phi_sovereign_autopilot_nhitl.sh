@@ -5,7 +5,7 @@
 set -euo pipefail
 
 cat <<'EOF'
-Phi public proof boundary: ENFORCED.
+Phi public proof boundary: NON-COMMANDING / ENFORCED.
 
 This public repository does not start Phi MCP, inspect private cloud accounts,
 change cloud projects, control Docker/private services, or execute Dominion
