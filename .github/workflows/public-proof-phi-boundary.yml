@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'policy/public_proof_phi_boundary.yaml'
+      - 'policy/public_artifact_manifest.yaml'
       - '**/*.sh'
       - '**/*.py'
       - '**/*.yml'
@@ -33,6 +34,18 @@ jobs:
           grep -Fq 'public_repo_may_start_private_runtime: false' "$policy"
           grep -Fq 'public_repo_may_contain_secrets_or_signing_material: false' "$policy"
 
+      - name: Validate artifact-only migration contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          manifest='policy/public_artifact_manifest.yaml'
+          test -f "$manifest"
+          grep -Fq 'target_state: artifact_only' "$manifest"
+          grep -Fq 'private_runtime_source_allowed: false' "$manifest"
+          grep -Fq 'deployment_orchestration_allowed: false' "$manifest"
+          grep -Fq 'history_rewrite_in_this_phase: false' "$manifest"
+          grep -Fq 'secret_rotation_precedes_history_sanitation: true' "$manifest"
+
       - name: Validate known compatibility tombstones
         shell: bash
         run: |
@@ -48,11 +61,23 @@ jobs:
             'deploy_to_gcp.sh'
             'phi_perfect_liveops_deployment.sh'
           )
+          failed=0
           for script in "${scripts[@]}"; do
-            test -f "$script"
-            bash -n "$script"
-            grep -Eq 'REFUSED|NON-COMMANDING' "$script"
+            if [ ! -f "$script" ]; then
+              echo "Missing required compatibility tombstone: $script" >&2
+              failed=1
+              continue
+            fi
+            if ! bash -n "$script"; then
+              echo "Invalid shell syntax in tombstone: $script" >&2
+              failed=1
+            fi
+            if ! grep -Eq 'REFUSED|NON-COMMANDING' "$script"; then
+              echo "Missing refusal/non-commanding marker in tombstone: $script" >&2
+              failed=1
+            fi
           done
+          exit "$failed"
 
       - name: Reject private runtime and privileged cloud orchestration
         shell: bash
