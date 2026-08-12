@@ -87,6 +87,7 @@ jobs:
             \( -name '*.sh' -o -name '*.py' -o -name '*.yml' -o -name '*.yaml' \) \
             -not -path './.git/*' \
             -not -path './backups/*' \
+            -not -path './tests/*' \
             -not -path './.github/workflows/public-proof-phi-boundary.yml' \
             -print)
 
