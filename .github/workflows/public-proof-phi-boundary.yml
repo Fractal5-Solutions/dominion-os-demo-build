@@ -33,6 +33,9 @@ jobs:
           grep -Fq 'public_repo_may_command_dominion_services: false' "$policy"
           grep -Fq 'public_repo_may_start_private_runtime: false' "$policy"
           grep -Fq 'public_repo_may_contain_secrets_or_signing_material: false' "$policy"
+          grep -Fq 'public_repo_may_call_credential_bearing_business_integrations: false' "$policy"
+          grep -Fq 'public_repo_may_harvest_private_business_or_crm_data: false' "$policy"
+          grep -Fq 'public_repo_may_write_private_business_or_crm_data: false' "$policy"
 
       - name: Validate artifact-only migration contract
         shell: bash
@@ -79,7 +82,7 @@ jobs:
           done
           exit "$failed"
 
-      - name: Reject private runtime and privileged cloud orchestration
+      - name: Reject private runtime and privileged integrations
         shell: bash
         run: |
           set -euo pipefail
@@ -106,13 +109,16 @@ jobs:
             'gcloud config set project dominion-core-prod'
             'gcloud config set project dominion-os-1-0-main'
             'nohup python3 main.py'
+            'api.apollo.io'
+            'X-API-Key: $APOLLO_API_KEY'
+            'data/apollo_crm'
           )
 
           failed=0
           for file in "${files[@]}"; do
             for token in "${forbidden[@]}"; do
               if grep -Fq "$token" "$file"; then
-                echo "Forbidden public proof-lane command token in $file: $token" >&2
+                echo "Forbidden public proof-lane command/integration token in $file: $token" >&2
                 failed=1
               fi
             done
