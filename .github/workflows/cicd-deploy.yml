@@ -24,6 +24,7 @@ jobs:
       # root and explicitly enables this repository through variables.
       DEPLOY_ENABLED: ${{ vars.ENABLE_OIDC_DEPLOY || 'false' }}
       GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID || 'f5-prod-command-core' }}
+      GCP_PROJECT_NUMBER: ${{ vars.GCP_PROJECT_NUMBER || '732190342674' }}
       WIF_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER || secrets.GCP_WORKLOAD_IDENTITY_PROVIDER || secrets.GCP_WIF_PROVIDER || '' }}
       WIF_SERVICE_ACCOUNT: ${{ vars.GCP_SERVICE_ACCOUNT_EMAIL || secrets.GCP_SERVICE_ACCOUNT_EMAIL || secrets.GCP_WIF_SA_EMAIL || '' }}
     steps:
@@ -37,6 +38,8 @@ jobs:
         run: |
           set -euo pipefail
           missing=()
+          canonical_provider=""
+
           if [ "${DEPLOY_ENABLED}" != "true" ]; then
             missing+=("ENABLE_OIDC_DEPLOY is not true")
           fi
@@ -49,6 +52,27 @@ jobs:
           if [ -z "${GCP_PROJECT_ID}" ]; then
             missing+=("GCP_PROJECT_ID")
           fi
+          if ! [[ "${GCP_PROJECT_NUMBER}" =~ ^[0-9]+$ ]]; then
+            missing+=("GCP_PROJECT_NUMBER must be numeric")
+          fi
+
+          # google-github-actions/auth requires the full provider resource name:
+          # projects/NUMBER/locations/global/workloadIdentityPools/POOL/providers/PROVIDER
+          # A legacy POOL/PROVIDER shorthand is normalized only when the numeric
+          # project number is known. Any other shape fails closed before STS.
+          if [ -n "${WIF_PROVIDER}" ] && [[ "${GCP_PROJECT_NUMBER}" =~ ^[0-9]+$ ]]; then
+            if [[ "${WIF_PROVIDER}" =~ ^projects/([0-9]+)/locations/global/workloadIdentityPools/([^/]+)/providers/([^/]+)$ ]]; then
+              if [ "${BASH_REMATCH[1]}" != "${GCP_PROJECT_NUMBER}" ]; then
+                missing+=("WIF provider project number does not match GCP_PROJECT_NUMBER")
+              else
+                canonical_provider="${WIF_PROVIDER}"
+              fi
+            elif [[ "${WIF_PROVIDER}" =~ ^([^/]+)/([^/]+)$ ]]; then
+              canonical_provider="projects/${GCP_PROJECT_NUMBER}/locations/global/workloadIdentityPools/${BASH_REMATCH[1]}/providers/${BASH_REMATCH[2]}"
+            else
+              missing+=("WIF provider must be full resource name or POOL/PROVIDER shorthand")
+            fi
+          fi
 
           if [ "${#missing[@]}" -gt 0 ]; then
             echo "ready=false" >> "$GITHUB_OUTPUT"
@@ -57,12 +81,14 @@ jobs:
             echo "ready=true" >> "$GITHUB_OUTPUT"
             echo "missing=" >> "$GITHUB_OUTPUT"
           fi
+          printf 'provider=%s\n' "${canonical_provider}" >> "$GITHUB_OUTPUT"
 
           echo "project=${GCP_PROJECT_ID}"
-          if [ -n "${WIF_PROVIDER}" ]; then
-            echo "provider=${WIF_PROVIDER##*/}"
+          echo "project_number=${GCP_PROJECT_NUMBER}"
+          if [ -n "${canonical_provider}" ]; then
+            echo "provider=${canonical_provider##*/}"
           else
-            echo "provider=absent"
+            echo "provider=absent-or-invalid"
           fi
           if [ -n "${WIF_SERVICE_ACCOUNT}" ]; then
             echo "service_account_domain=${WIF_SERVICE_ACCOUNT#*@}"
@@ -87,6 +113,7 @@ jobs:
               "generatedAt": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
               "expectedSha": os.environ["GITHUB_SHA"],
               "projectId": os.environ.get("GCP_PROJECT_ID", ""),
+              "projectNumber": os.environ.get("GCP_PROJECT_NUMBER", ""),
               "state": "WITHHELD",
               "pass": False,
               "reason": os.environ.get("MISSING_CONTROLS", "deployment prerequisites absent"),
@@ -102,7 +129,7 @@ jobs:
         if: steps.preflight.outputs.ready == 'true'
         uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
         with:
-          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          workload_identity_provider: ${{ steps.preflight.outputs.provider }}
           service_account: ${{ env.WIF_SERVICE_ACCOUNT }}
 
       - name: Set up gcloud
@@ -244,6 +271,7 @@ jobs:
               "generatedAt": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
               "expectedSha": os.environ["GITHUB_SHA"],
               "projectId": os.environ.get("GCP_PROJECT_ID", ""),
+              "projectNumber": os.environ.get("GCP_PROJECT_NUMBER", ""),
               "state": "FAILED_BEFORE_PUBLIC_VERIFICATION",
               "pass": False,
               "certificationRule": "Authentication or build failure is never public-demo GREEN.",
