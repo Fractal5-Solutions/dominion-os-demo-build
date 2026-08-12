@@ -1,0 +1,53 @@
+name: Public proof Phi boundary
+
+on:
+  pull_request:
+    paths:
+      - 'policy/public_proof_phi_boundary.yaml'
+      - 'scripts/start_all_local_systems.sh'
+      - '.github/workflows/public-proof-phi-boundary.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  enforce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate public proof policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          policy='policy/public_proof_phi_boundary.yaml'
+          test -f "$policy"
+          grep -Fq 'phi_is_sole_dominion_command_service: true' "$policy"
+          grep -Fq 'public_repo_may_command_phi_mcp: false' "$policy"
+          grep -Fq 'public_repo_may_command_dominion_services: false' "$policy"
+          grep -Fq 'public_repo_may_start_private_runtime: false' "$policy"
+          grep -Fq 'public_repo_may_contain_secrets_or_signing_material: false' "$policy"
+
+      - name: Enforce non-commanding compatibility script
+        shell: bash
+        run: |
+          set -euo pipefail
+          script='scripts/start_all_local_systems.sh'
+          bash -n "$script"
+          forbidden=(
+            'python3 main.py'
+            'pip install'
+            'docker-compose up'
+            'docker compose up'
+            '/workspaces/phi-mcp-server'
+            'tools/call'
+          )
+          for token in "${forbidden[@]}"; do
+            if grep -Fq "$token" "$script"; then
+              echo "Forbidden public proof-lane runtime orchestration token: $token" >&2
+              exit 1
+            fi
+          done
+          grep -Fq 'Phi is the sole Dominion command service.' "$script"
+          grep -Fq 'NON-COMMANDING / SANDBOX-ONLY' "$script"
