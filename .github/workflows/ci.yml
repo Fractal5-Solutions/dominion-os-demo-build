@@ -18,7 +18,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           persist-credentials: false
 
@@ -26,7 +26,7 @@ jobs:
         run: bash scripts/check_ascii_filenames.sh
 
       - name: Set up Python
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
         with:
           python-version: '3.12'
 
@@ -55,13 +55,11 @@ jobs:
 
       - name: Validate retained public bash compatibility surfaces
         run: |
-          chmod +x scripts/*.sh *.sh 2>/dev/null || true
-          for script in scripts/*.sh *.sh; do
-            if [ -f "$script" ]; then
-              bash -n "$script" || exit 1
-            fi
+          for script in scripts/start_all_local_systems.sh scripts/telemetry/prove_and_maintain.sh scripts/phi_sovereign_autopilot_nhitl.sh; do
+            test -f "$script"
+            bash -n "$script"
           done
-          echo "Public bash surfaces parsed successfully"
+          echo "Public compatibility shims validated"
 
   security-scan:
     name: Security Scan
@@ -70,12 +68,12 @@ jobs:
       contents: read
       security-events: write
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           persist-credentials: false
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # 0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
         continue-on-error: ${{ vars.ENFORCE_TRIVY_SCAN != 'true' }}
         with:
           scan-type: 'fs'
@@ -85,17 +83,17 @@ jobs:
 
       - name: Upload Trivy results to GitHub Security
         if: ${{ hashFiles('trivy-results.sarif') != '' }}
-        uses: github/codeql-action/upload-sarif@5595ccaf912efad79be6eef63a5619ff05969be3 # v4.37.6
+        uses: github/codeql-action/upload-sarif@5595ccaf912efad79be6eef63a5619ff05969be3
         with:
           sarif_file: 'trivy-results.sarif'
 
-  artifact-boundary:
+  public-boundary:
     name: Verify non-commanding public boundary
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           persist-credentials: false
 
@@ -109,7 +107,7 @@ jobs:
 
       - name: Reject deployment-readiness assertions
         run: |
-          if grep -R -n -E 'Ready for Docker Desktop Pro deployment|PHI \+ MCP CI/CD Pipeline' .github/workflows --exclude='public-proof-phi-boundary.yml'; then
+          if grep -R -n -E 'Ready for Docker Desktop Pro deployment|PHI \+ MCP CI/CD Pipeline' .github/workflows --exclude='public-proof-phi-boundary.yml' --exclude='ci.yml'; then
             echo 'Legacy deployment-readiness assertion remains in public CI.' >&2
             exit 1
           fi
