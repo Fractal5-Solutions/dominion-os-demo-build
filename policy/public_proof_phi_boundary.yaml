@@ -1,0 +1,36 @@
+version: 1
+status: active_binding
+as_of: 2026-08-12
+repository: Fractal5-Solutions/dominion-os-demo-build
+visibility_class: public_proof_lane
+canonical_authority:
+  repository: Fractal5-Solutions/dominion-command-center
+  policy_path: policy/phi_command_authority_policy.yaml
+
+invariants:
+  phi_is_sole_dominion_command_service: true
+  public_repo_may_command_phi_mcp: false
+  public_repo_may_command_dominion_services: false
+  public_repo_may_start_private_runtime: false
+  public_repo_may_install_private_runtime_dependencies: false
+  public_repo_may_contain_production_data: false
+  public_repo_may_contain_secrets_or_signing_material: false
+  proof_runtime_must_be_sandboxed: true
+  no_receipt_means_no_green: true
+
+allowed:
+  - static_proof_assets
+  - sandboxed_public_demo_artifacts
+  - read_only_local_proof_verification
+  - public_safe_documentation
+
+forbidden:
+  - start_phi_mcp
+  - stop_phi_mcp
+  - direct_phi_mcp_tool_call
+  - start_dominion_private_services
+  - direct_dominion_runtime_mutation
+  - private_command_center_access
+  - production_credentials
+  - production_customer_data
+  - private_signing_keys
