@@ -103,7 +103,7 @@ class SecretScanTests(unittest.TestCase):
             "backups/20260309_024913/scripts/phi_cost_minimization_simple.sh",
         )
 
-        for relative_path in (*compose_files, *generator_files):
+        for relative_path in compose_files:
             with self.subTest(relative_path=relative_path):
                 text = (secret_scan.ROOT / relative_path).read_text(encoding="utf-8")
                 self.assertNotIn("sovereign_password", text)
@@ -112,8 +112,25 @@ class SecretScanTests(unittest.TestCase):
                 self.assertIn("${GRAFANA_ADMIN_PASSWORD:?", text)
 
         for relative_path in generator_files:
-            with self.subTest(quoted_heredoc=relative_path):
+            with self.subTest(relative_path=relative_path):
                 text = (secret_scan.ROOT / relative_path).read_text(encoding="utf-8")
+                self.assertNotIn("sovereign_password", text)
+                self.assertNotIn("sovereign_admin", text)
+
+                is_public_tombstone = (
+                    relative_path.startswith("scripts/")
+                    and "PUBLIC PROOF LANE" in text
+                    and "NON-COMMANDING" in text
+                    and "REFUSED" in text
+                    and "exit 2" in text
+                )
+                if is_public_tombstone:
+                    self.assertNotIn("docker-compose up", text)
+                    self.assertNotIn("docker compose up", text)
+                    continue
+
+                self.assertIn("${POSTGRES_PASSWORD:?", text)
+                self.assertIn("${GRAFANA_ADMIN_PASSWORD:?", text)
                 self.assertIn('cat > "$DOCKER_COMPOSE_FILE" <<\'EOF\'', text)
 
     def test_binary_files_are_skipped(self) -> None:

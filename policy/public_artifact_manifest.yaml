@@ -1,0 +1,88 @@
+version: 1
+status: migration_contract
+as_of: 2026-08-12
+repository: Fractal5-Solutions/dominion-os-demo-build
+target_state: artifact_only
+
+purpose: >-
+  Define the allowlisted public proof/build representation for Dominion demo surfaces.
+  The public repository is not a command plane, private runtime source repository,
+  deployment operator, or substitute for Phi.
+
+authority:
+  phi_is_sole_dominion_command_service: true
+  dominion_command_center_is_tier_1_control_plane: true
+  public_repository_has_command_authority: false
+
+allowed_classes:
+  - compiled_or_bundled_public_demo_assets
+  - static_html_css_js_required_by_approved_demo_surface
+  - public_safe_sample_data
+  - public_safe_health_or_status_receipts
+  - public_safe_integrity_manifests
+  - public_safe_license_and_attribution_material
+  - minimal_documentation_required_to_explain_public_proof_boundary
+  - ci_policy_needed_to_verify_public_artifact_integrity_and_safety
+
+prohibited_classes:
+  private_runtime_source_allowed: false
+  private_repository_source_allowed: false
+  deployment_orchestration_allowed: false
+  cloud_iam_mutation_allowed: false
+  cloud_project_mutation_allowed: false
+  phi_mcp_runtime_control_allowed: false
+  dominion_runtime_control_allowed: false
+  private_workspace_path_references_allowed: false
+  customer_or_production_data_allowed: false
+  credentials_allowed: false
+  secrets_allowed: false
+  signing_private_keys_allowed: false
+  arbitrary_shell_or_autopilot_control_allowed: false
+  private_service_topology_material_allowed: false
+  backup_dumps_of_internal_source_allowed: false
+
+build_provenance:
+  build_occurs_in_private_governed_lane: true
+  public_publish_is_output_only: true
+  generated_artifacts_require_source_commit_reference: true
+  generated_artifacts_require_build_receipt: true
+  generated_artifacts_require_hash_manifest: true
+  private_signing_material_must_not_enter_public_repo: true
+
+migration:
+  phase_1_current_source_containment: active
+  phase_2_inventory_and_allowlist: required
+  phase_3_clean_candidate_tree: required
+  phase_4_security_integrity_smoke_tests: required
+  phase_5_controlled_cutover: required
+  history_rewrite_in_this_phase: false
+  secret_rotation_precedes_history_sanitation: true
+
+candidate_tree_rules:
+  deny_by_default: true
+  file_must_match_allowed_class: true
+  unknown_file_classification: block
+  executable_source_default: block
+  deployment_configuration_default: block
+  backup_directory_default: block
+  local_runtime_configuration_default: block
+  generated_receipt_must_be_public_safe: true
+
+acceptance:
+  - public artifact inventory has zero unclassified files
+  - no current executable can command Phi or Dominion services
+  - no current file can mutate cloud IAM or deploy private services
+  - secret scanning passes
+  - dependency and security checks pass where applicable
+  - artifact hashes are generated and verified
+  - public demo smoke tests pass from the candidate artifact tree
+  - proof surface works without access to Phi private runtime
+  - review and merge governance is valid and receipt-backed
+
+history_sanitation:
+  separate_program_required: true
+  destructive_operation: true
+  backup_required_before_rewrite: true
+  credential_impact_review_required: true
+  secret_rotation_precedes_history_sanitation: true
+  force_push_without_explicit_authorization: false

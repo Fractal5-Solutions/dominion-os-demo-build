@@ -1,1 +1,10 @@
 * @Fractal5-X
+
+# Public Phi/Dominion proof-lane boundary changes require security and maintainer review.
+policy/**                                      @Fractal5-Solutions/secops @Fractal5-Solutions/maintainers
+scripts/**                                     @Fractal5-Solutions/secops @Fractal5-Solutions/maintainers
+*.sh                                           @Fractal5-Solutions/secops @Fractal5-Solutions/maintainers
+*.py                                           @Fractal5-Solutions/secops @Fractal5-Solutions/maintainers
+*.yml                                          @Fractal5-Solutions/secops @Fractal5-Solutions/maintainers
+*.yaml                                         @Fractal5-Solutions/secops @Fractal5-Solutions/maintainers
+.github/workflows/public-proof-phi-boundary.yml @Fractal5-Solutions/secops @Fractal5-Solutions/maintainers

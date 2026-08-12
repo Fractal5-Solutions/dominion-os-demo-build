@@ -1,4 +1,4 @@
-name: PHI + MCP CI/CD Pipeline
+name: Public Demo CI
 
 permissions:
   contents: read
@@ -18,7 +18,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           persist-credentials: false
 
@@ -26,11 +26,11 @@ jobs:
         run: bash scripts/check_ascii_filenames.sh
 
       - name: Set up Python
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
         with:
           python-version: '3.12'
 
-      - name: Install dependencies
+      - name: Install test dependencies
         run: |
           python -m pip install --upgrade pip
           pip install flake8 pytest black
@@ -53,27 +53,13 @@ jobs:
             pytest -q
           fi
 
-      - name: Validate bash scripts
+      - name: Validate retained public bash compatibility surfaces
         run: |
-          chmod +x scripts/*.sh *.sh 2>/dev/null || true
-          for script in scripts/*.sh *.sh; do
-            if [ -f "$script" ]; then
-              bash -n "$script" || exit 1
-            fi
+          for script in scripts/start_all_local_systems.sh scripts/telemetry/prove_and_maintain.sh scripts/phi_sovereign_autopilot_nhitl.sh; do
+            test -f "$script"
+            bash -n "$script"
           done
-          echo "All bash scripts validated"
-
-      - name: Validate docker-compose
-        run: |
-          if command -v docker-compose >/dev/null 2>&1; then
-            docker-compose -f docker-compose-mcp.yml config > /dev/null
-          elif docker compose version >/dev/null 2>&1; then
-            docker compose -f docker-compose-mcp.yml config > /dev/null
-          else
-            echo "Docker Compose is unavailable on this runner; skipping validation."
-            exit 0
-          fi
-          echo "docker-compose-mcp.yml is valid"
+          echo "Public compatibility shims validated"
 
   security-scan:
     name: Security Scan
@@ -82,12 +68,12 @@ jobs:
       contents: read
       security-events: write
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           persist-credentials: false
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # 0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
         continue-on-error: ${{ vars.ENFORCE_TRIVY_SCAN != 'true' }}
         with:
           scan-type: 'fs'
@@ -97,38 +83,32 @@ jobs:
 
       - name: Upload Trivy results to GitHub Security
         if: ${{ hashFiles('trivy-results.sarif') != '' }}
-        uses: github/codeql-action/upload-sarif@5595ccaf912efad79be6eef63a5619ff05969be3 # v4.37.6
+        uses: github/codeql-action/upload-sarif@5595ccaf912efad79be6eef63a5619ff05969be3
         with:
           sarif_file: 'trivy-results.sarif'
 
-  docker-desktop-pro-readiness:
-    name: Verify Docker Desktop Pro Readiness
+  public-boundary:
+    name: Verify non-commanding public boundary
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           persist-credentials: false
 
-      - name: Check configuration files
+      - name: Confirm public artifact policy is present
         run: |
-          echo "Verifying deployment readiness..."
-          test -f docker-compose-mcp.yml || exit 1
-          test -f .env.mcp.template || exit 1
-          test -f prometheus.yml || exit 1
-          test -f scripts/deploy_mcp_full.sh || exit 1
-          test -x scripts/deploy_mcp_full.sh || exit 1
-          echo "All configuration files present and valid"
+          test -f policy/public_proof_phi_boundary.yaml
+          test -f policy/public_artifact_manifest.yaml
+          grep -Fq 'target_state: artifact_only' policy/public_artifact_manifest.yaml
+          grep -Fq 'deployment_orchestration_allowed: false' policy/public_artifact_manifest.yaml
+          echo "Public artifact boundary contract present"
 
-      - name: Generate deployment report
+      - name: Reject deployment-readiness assertions
         run: |
-          echo "## Deployment Readiness Report" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Configuration Files" >> $GITHUB_STEP_SUMMARY
-          ls -lh docker-compose-mcp.yml .env.mcp.template prometheus.yml >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Automation Scripts" >> $GITHUB_STEP_SUMMARY
-          ls -lh scripts/*.sh >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Ready for Docker Desktop Pro deployment" >> $GITHUB_STEP_SUMMARY
+          if grep -R -n -E 'Ready for Docker Desktop Pro deployment|PHI \+ MCP CI/CD Pipeline' .github/workflows --exclude='public-proof-phi-boundary.yml' --exclude='ci.yml'; then
+            echo 'Legacy deployment-readiness assertion remains in public CI.' >&2
+            exit 1
+          fi
+          echo "Public CI is verification-only"
