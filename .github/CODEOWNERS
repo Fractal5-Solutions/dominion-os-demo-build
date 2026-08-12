@@ -1,10 +1,14 @@
 * @Fractal5-X
 
-# Public Phi/Dominion proof-lane boundary changes require security and maintainer review.
-policy/**                                      @Fractal5-Solutions/secops @Fractal5-Solutions/maintainers
-scripts/**                                     @Fractal5-Solutions/secops @Fractal5-Solutions/maintainers
-*.sh                                           @Fractal5-Solutions/secops @Fractal5-Solutions/maintainers
-*.py                                           @Fractal5-Solutions/secops @Fractal5-Solutions/maintainers
-*.yml                                          @Fractal5-Solutions/secops @Fractal5-Solutions/maintainers
-*.yaml                                         @Fractal5-Solutions/secops @Fractal5-Solutions/maintainers
-.github/workflows/public-proof-phi-boundary.yml @Fractal5-Solutions/secops @Fractal5-Solutions/maintainers
+# Public Phi/Dominion proof-lane boundary ownership.
+# The previously referenced secops/maintainers team slugs were verified absent
+# through the GitHub API on 2026-08-12. Keep source ownership bound to the
+# current valid repository principal until an authorized admin deliberately
+# establishes an independent review principal/team and enforces it by ruleset.
+policy/**                                      @Fractal5-X
+scripts/**                                     @Fractal5-X
+*.sh                                           @Fractal5-X
+*.py                                           @Fractal5-X
+*.yml                                          @Fractal5-X
+*.yaml                                         @Fractal5-X
+.github/workflows/public-proof-phi-boundary.yml @Fractal5-X
