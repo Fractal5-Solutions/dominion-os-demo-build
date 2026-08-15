@@ -91,6 +91,7 @@ jobs:
           set -euo pipefail
           if [ "${AUTH_OUTCOME}" = "success" ]; then
             echo "GCloud WIF authentication probe succeeded. No deployment or cloud mutation was attempted."
-          else
-            echo "GCloud WIF authentication probe failed. See the auth action log and receipt; deployment remains withheld."
+            exit 0
           fi
+          echo "GCloud WIF authentication probe failed. See the auth action log and receipt; deployment remains withheld."
+          exit 1
