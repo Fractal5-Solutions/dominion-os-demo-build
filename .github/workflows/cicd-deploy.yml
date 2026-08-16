@@ -20,13 +20,14 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # Project and identity resource names are identifiers, not credentials.
-      # Deployment remains withheld until an operator restores the Google trust
-      # root and explicitly enables this repository through variables.
+      # The canonical WIF provider and service-account identity are already
+      # source-controlled by the receipt-only authentication probe. Deployment
+      # remains explicitly withheld until an operator enables the repository.
       DEPLOY_ENABLED: ${{ vars.ENABLE_OIDC_DEPLOY || 'false' }}
       GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID || 'f5-prod-command-core' }}
       GCP_PROJECT_NUMBER: ${{ vars.GCP_PROJECT_NUMBER || '732190342674' }}
-      WIF_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER || secrets.GCP_WORKLOAD_IDENTITY_PROVIDER || secrets.GCP_WIF_PROVIDER || '' }}
-      WIF_SERVICE_ACCOUNT: ${{ vars.GCP_SERVICE_ACCOUNT_EMAIL || secrets.GCP_SERVICE_ACCOUNT_EMAIL || secrets.GCP_WIF_SA_EMAIL || '' }}
+      WIF_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER || secrets.GCP_WORKLOAD_IDENTITY_PROVIDER || secrets.GCP_WIF_PROVIDER || 'projects/732190342674/locations/global/workloadIdentityPools/fractal5-github-pool/providers/github-provider' }}
+      WIF_SERVICE_ACCOUNT: ${{ vars.GCP_SERVICE_ACCOUNT_EMAIL || secrets.GCP_SERVICE_ACCOUNT_EMAIL || secrets.GCP_WIF_SA_EMAIL || 'dominion-demo-oidc-sa@f5-prod-command-core.iam.gserviceaccount.com' }}
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
