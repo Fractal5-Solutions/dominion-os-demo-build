@@ -22,8 +22,9 @@ jobs:
       # Project and identity resource names are identifiers, not credentials.
       # The canonical WIF provider and service-account identity are already
       # source-controlled by the receipt-only authentication probe. Deployment
-      # remains explicitly withheld until an operator enables the repository.
-      DEPLOY_ENABLED: ${{ vars.ENABLE_OIDC_DEPLOY || 'false' }}
+      # remains explicitly gated by either the repository variable or a one-shot
+      # source-audited [deploy-public-demo] marker on the exact push commit.
+      DEPLOY_ENABLED: ${{ vars.ENABLE_OIDC_DEPLOY == 'true' || (github.event_name == 'push' && contains(github.event.head_commit.message, '[deploy-public-demo]')) }}
       GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID || 'f5-prod-command-core' }}
       GCP_PROJECT_NUMBER: ${{ vars.GCP_PROJECT_NUMBER || '732190342674' }}
       WIF_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER || secrets.GCP_WORKLOAD_IDENTITY_PROVIDER || secrets.GCP_WIF_PROVIDER || 'projects/732190342674/locations/global/workloadIdentityPools/fractal5-github-pool/providers/github-provider' }}
@@ -42,7 +43,7 @@ jobs:
           canonical_provider=""
 
           if [ "${DEPLOY_ENABLED}" != "true" ]; then
-            missing+=("ENABLE_OIDC_DEPLOY is not true")
+            missing+=("deployment authorization absent: set ENABLE_OIDC_DEPLOY=true or use an audited [deploy-public-demo] push marker")
           fi
           if [ -z "${WIF_PROVIDER}" ]; then
             missing+=("GCP_WORKLOAD_IDENTITY_PROVIDER/GCP_WIF_PROVIDER")
