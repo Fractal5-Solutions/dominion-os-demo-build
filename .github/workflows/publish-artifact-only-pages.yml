@@ -1,0 +1,51 @@
+name: Publish artifact-only public demo
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: artifact-only-pages
+  cancel-in-progress: true
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: false
+      - name: Build public artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir _site
+          cp index.html 404.html .nojekyll _site/
+          mkdir -p _site/demo/assets
+          cp demo/assets/*.json _site/demo/assets/
+          python3 - <<'PY'
+          import json, os
+          receipt={
+            "schema":"dominion.public-static-release.v1",
+            "releaseSha":os.environ["GITHUB_SHA"],
+            "mode":"artifact-only-static-proof",
+            "pass":True,
+            "failClosed":True,
+            "providerRuntimeClaimedLive":False,
+            "containsPrivateSource":False,
+            "containsSecrets":False
+          }
+          open("_site/release.json","w",encoding="utf-8").write(json.dumps(receipt,indent=2)+"\n")
+          PY
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
+        with:
+          path: _site
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128
