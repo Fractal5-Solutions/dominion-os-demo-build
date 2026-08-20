@@ -6,7 +6,7 @@ It is **not** the Dominion OS source repository, an operator console, a deployme
 
 ## Public artifact contract
 
-Current `main` is limited to public presentation and sanitized proof material:
+Current `main` is limited to eight approved public presentation and sanitized proof artifacts:
 
 - `index.html` — static public demonstration
 - `404.html` — fail-closed route handling
@@ -15,6 +15,9 @@ Current `main` is limited to public presentation and sanitized proof material:
 - `SECURITY.md` — disclosure and repository-safety policy
 - `demo/assets/cloud-deployment-manifest.json` — sanitized deployment-readiness contract
 - `demo/assets/multicloud-runtime-manifest.json` — sanitized provider-runtime claim state
+- `squarespace/demo-1-final.html` — canonical fail-closed Squarespace `/demo-1` presentation artifact
+
+No other implementation/runtime/configuration/automation artifact is approved for the current public tree.
 
 Private source, credentials, signing material, customer data, payment data, private APIs, operational keys, internal automation, infrastructure definitions, production controls, and private service authority do not belong in this repository.
 
@@ -28,6 +31,7 @@ The current static proof surface may remain available even when no optional publ
 
 - Public proof: https://fractal5-solutions.github.io/dominion-os-demo-build/
 - Dominion OS™: https://www.fractal5solutions.com/dominion-os
+- Fractal5 demo bridge: https://www.fractal5solutions.com/demo-1
 - Deployment contact: https://www.fractal5solutions.com/#contact
 
 Security concerns should be reported privately as described in `SECURITY.md`.
