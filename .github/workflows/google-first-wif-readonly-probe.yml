@@ -1,0 +1,101 @@
+name: Google First WIF Read-Only Probe
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/google-first-wif-readonly-probe.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: google-first-wif-readonly-probe
+  cancel-in-progress: true
+
+env:
+  GCP_PROJECT_ID: f5-prod-command-core
+  GCP_PROJECT_NUMBER: '732190342674'
+  WIF_PROVIDER: projects/732190342674/locations/global/workloadIdentityPools/fractal5-github-pool/providers/github-provider
+  WIF_SERVICE_ACCOUNT: dominion-demo-oidc-sa@f5-prod-command-core.iam.gserviceaccount.com
+
+jobs:
+  probe:
+    name: Canonical keyless auth and read-only identity proof
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911
+        with:
+          egress-policy: audit
+
+      - name: Checkout exact protected source
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+
+      - name: Authenticate with canonical Workload Identity Federation
+        id: auth
+        uses: google-github-actions/auth@b7593ed2efd1c1617e1b0254da33b86225adb2a5
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.WIF_SERVICE_ACCOUNT }}
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@26f734c2779b00b7dda794207734c511110a4368
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
+
+      - name: Prove active keyless identity without provider mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          active="$(gcloud auth list --filter=status:ACTIVE --format='value(account)' | head -n 1)"
+          if [[ "$active" != "$WIF_SERVICE_ACCOUNT" ]]; then
+            echo "unexpected active account: $active" >&2
+            exit 1
+          fi
+          printf 'WIF_AUTH_PASS\n'
+          printf 'source_head=%s\n' "$GITHUB_SHA"
+          printf 'project_id=%s\n' "$GCP_PROJECT_ID"
+          printf 'project_number=%s\n' "$GCP_PROJECT_NUMBER"
+          printf 'service_account=%s\n' "$WIF_SERVICE_ACCOUNT"
+          printf 'provider_mutation=false\n'
+          printf 'iam_mutation=false\n'
+          printf 'deployment=false\n'
+
+      - name: Optional read-only project and Cloud Run visibility probe
+        id: provider_read
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -u
+          project_number="$(gcloud projects describe "$GCP_PROJECT_ID" --format='value(projectNumber)' 2>/dev/null)"
+          if [[ "$project_number" != "$GCP_PROJECT_NUMBER" ]]; then
+            echo "project metadata not readable or number mismatch" >&2
+            exit 2
+          fi
+          gcloud run services list --project "$GCP_PROJECT_ID" --region us-central1 --format='value(metadata.name)' >/tmp/cloud-run-services.txt 2>/tmp/cloud-run-services.err || exit 3
+          echo "project_read=true"
+          echo "cloud_run_read=true"
+
+      - name: Emit sanitized probe summary
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat >> "$GITHUB_STEP_SUMMARY" <<EOF
+          ## Google-first WIF read-only probe
+          - source head: \`$GITHUB_SHA\`
+          - repository: \`$GITHUB_REPOSITORY\`
+          - canonical project: \`$GCP_PROJECT_ID / $GCP_PROJECT_NUMBER\`
+          - canonical service account: \`$WIF_SERVICE_ACCOUNT\`
+          - auth step: \`${{ steps.auth.outcome }}\`
+          - provider read step: \`${{ steps.provider_read.outcome }}\`
+          - provider/IAM mutation: **false**
+          - deployment: **false**
+          EOF
