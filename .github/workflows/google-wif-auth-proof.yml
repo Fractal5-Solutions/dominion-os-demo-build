@@ -1,0 +1,211 @@
+name: Google WIF Auth Proof
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  id-token: write
+  contents: read
+  issues: write
+
+concurrency:
+  group: google-wif-auth-proof-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+env:
+  PROJECT_ID: f5-prod-command-core
+  EXPECTED_PROJECT_NUMBER: '732190342674'
+  WIF_PROVIDER: projects/732190342674/locations/global/workloadIdentityPools/fractal5-github-pool/providers/github-provider
+  WIF_SERVICE_ACCOUNT: dominion-demo-oidc-sa@f5-prod-command-core.iam.gserviceaccount.com
+
+jobs:
+  prove:
+    name: Prove canonical keyless Google identity
+    if: >-
+      github.event.issue.number == 233 &&
+      github.event.action == 'created' &&
+      github.event.comment.user.login == 'Fractal5-X' &&
+      contains(github.event.comment.body, 'PHI_GOOGLE_WIF_PROBE')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      source_head: ${{ steps.admit.outputs.source_head }}
+      receipt_path: ${{ steps.receipt.outputs.receipt_path }}
+      pass: ${{ steps.receipt.outputs.pass }}
+    steps:
+      - name: Admit connector-authenticated exact-main command
+        id: admit
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, re, urllib.request
+
+          event = json.load(open(os.environ['GITHUB_EVENT_PATH'], encoding='utf-8'))
+          comment = event.get('comment') or {}
+          app = comment.get('performed_via_github_app') or {}
+          if app.get('slug') != 'chatgpt-codex-connector':
+              raise SystemExit('request not authenticated by approved connector')
+
+          body = str(comment.get('body') or '')
+          if not re.search(r'(?m)^PHI_GOOGLE_WIF_PROBE\s*$', body):
+              raise SystemExit('probe marker missing')
+          match = re.search(r'(?m)^source_head:\s*([0-9a-f]{40})\s*$', body)
+          if not match:
+              raise SystemExit('source_head missing or invalid')
+          requested = match.group(1).lower()
+
+          captured = os.environ['GITHUB_SHA'].lower()
+          if requested != captured:
+              raise SystemExit('request not bound to event main head')
+
+          req = urllib.request.Request(
+              f"https://api.github.com/repos/{os.environ['GITHUB_REPOSITORY']}/git/ref/heads/main",
+              headers={
+                  'Authorization': f"Bearer {os.environ['GH_TOKEN']}",
+                  'Accept': 'application/vnd.github+json',
+                  'X-GitHub-Api-Version': '2022-11-28',
+              },
+          )
+          with urllib.request.urlopen(req, timeout=20) as response:
+              live = json.load(response)['object']['sha'].lower()
+          if requested != live:
+              raise SystemExit('request no longer bound to live protected main head')
+
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as out:
+              out.write(f'source_head={requested}\n')
+          PY
+
+      - name: Exchange GitHub OIDC for Google credentials
+        id: auth
+        continue-on-error: true
+        uses: google-github-actions/auth@b7593ed2efd1c1617e1b0254da33b86225adb2a5
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.WIF_SERVICE_ACCOUNT }}
+          create_credentials_file: true
+          export_environment_variables: true
+
+      - name: Set up Google Cloud CLI
+        id: setup
+        if: steps.auth.outcome == 'success'
+        continue-on-error: true
+        uses: google-github-actions/setup-gcloud@26f734c2779b00b7dda794207734c511110a4368
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Verify exact Google project identity
+        id: project
+        if: steps.auth.outcome == 'success' && steps.setup.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          actual="$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)')"
+          test "$actual" = "$EXPECTED_PROJECT_NUMBER"
+
+      - name: Create run-bound sanitized receipt
+        id: receipt
+        if: always()
+        shell: bash
+        env:
+          AUTH_OUTCOME: ${{ steps.auth.outcome }}
+          SETUP_OUTCOME: ${{ steps.setup.outcome }}
+          PROJECT_OUTCOME: ${{ steps.project.outcome }}
+          SOURCE_HEAD: ${{ steps.admit.outputs.source_head }}
+        run: |
+          set -euo pipefail
+          receipt="$RUNNER_TEMP/google-wif-auth-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT.json"
+          python - "$receipt" <<'PY'
+          import json, os, pathlib, sys
+
+          auth = os.environ.get('AUTH_OUTCOME', 'skipped')
+          setup = os.environ.get('SETUP_OUTCOME', 'skipped')
+          project = os.environ.get('PROJECT_OUTCOME', 'skipped')
+          passed = auth == setup == project == 'success'
+          if passed:
+              state = 'AUTHENTICATED'
+              failure = None
+          elif auth != 'success':
+              state = 'AUTH_FAILED'
+              failure = 'GOOGLE_OIDC_WIF_EXCHANGE_FAILED'
+          elif setup != 'success':
+              state = 'SETUP_FAILED'
+              failure = 'GCLOUD_SETUP_FAILED'
+          else:
+              state = 'PROJECT_IDENTITY_FAILED'
+              failure = 'GOOGLE_PROJECT_IDENTITY_MISMATCH_OR_UNREADABLE'
+
+          receipt = {
+              'schema': 'dominion.google-wif-auth-proof.v1',
+              'repository': os.environ['GITHUB_REPOSITORY'],
+              'sourceHead': os.environ.get('SOURCE_HEAD') or os.environ['GITHUB_SHA'],
+              'runId': os.environ['GITHUB_RUN_ID'],
+              'runAttempt': os.environ['GITHUB_RUN_ATTEMPT'],
+              'projectId': os.environ['PROJECT_ID'],
+              'expectedProjectNumber': os.environ['EXPECTED_PROJECT_NUMBER'],
+              'providerResource': os.environ['WIF_PROVIDER'],
+              'serviceAccount': os.environ['WIF_SERVICE_ACCOUNT'],
+              'authOutcome': auth,
+              'setupOutcome': setup,
+              'projectIdentityOutcome': project,
+              'state': state,
+              'pass': passed,
+              'failureClass': failure,
+              'cloudMutationAttempted': False,
+              'iamMutationAttempted': False,
+              'deploymentAttempted': False,
+              'credentialValueIncluded': False,
+          }
+          pathlib.Path(sys.argv[1]).write_text(json.dumps(receipt, indent=2) + '\n', encoding='utf-8')
+          PY
+          pass_value="$(python -c 'import json,sys; print(str(json.load(open(sys.argv[1]))["pass"]).lower())' "$receipt")"
+          echo "receipt_path=$receipt" >> "$GITHUB_OUTPUT"
+          echo "pass=$pass_value" >> "$GITHUB_OUTPUT"
+
+      - name: Preserve proof artifact
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: google-wif-auth-proof-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ steps.receipt.outputs.receipt_path }}
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Post sanitized proof result
+        if: always() && steps.receipt.outputs.receipt_path != ''
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RECEIPT_PATH: ${{ steps.receipt.outputs.receipt_path }}
+        run: |
+          set -euo pipefail
+          python - <<'PY' > "$RUNNER_TEMP/comment.md"
+          import json, os
+          r = json.load(open(os.environ['RECEIPT_PATH'], encoding='utf-8'))
+          print('## Google-first canonical keyless WIF proof')
+          print(f"- repository identity: `{r['repository']}`")
+          print(f"- exact main head: `{r['sourceHead']}`")
+          print(f"- run/attempt: `{r['runId']}` / `{r['runAttempt']}`")
+          print(f"- state: **{r['state']}**")
+          print(f"- pass: **{str(r['pass']).lower()}**")
+          print(f"- project identity: `{r['projectId']}` / `{r['expectedProjectNumber']}`")
+          print(f"- failure class: `{r['failureClass'] or ''}`")
+          print('- mutation: `cloud=false, iam=false, deployment=false`')
+          print('')
+          print('This receipt proves only the bounded keyless identity exchange and exact project identity. It does not certify Cloud Run runtime health or authorize a Google-live public claim.')
+          PY
+          gh issue comment 233 --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/comment.md"
+
+      - name: Require proof PASS
+        if: always()
+        shell: bash
+        env:
+          RECEIPT_PATH: ${{ steps.receipt.outputs.receipt_path }}
+        run: |
+          set -euo pipefail
+          test -n "$RECEIPT_PATH"
+          python -c 'import json,sys; raise SystemExit(0 if json.load(open(sys.argv[1]))["pass"] else 1)' "$RECEIPT_PATH"
