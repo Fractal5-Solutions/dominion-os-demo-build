@@ -3,5 +3,39 @@
   "product": "Dominion OS",
   "productVersion": "1.0",
   "updatedAt": "2026-08-30T05:19:00-07:00",
-  "entries": []
+  "entries": [
+    {
+      "public": true,
+      "name": "Dominion OS 1.0 Enterprise Demo — Windows x64",
+      "domain": "Business + Politics",
+      "distribution": "Downloadable GUI",
+      "state": "Controlled Access Candidate",
+      "version": "1.0.0",
+      "build": "adfe181459acb2d72137370eb0ec8f524c6da0ff",
+      "deploymentTarget": "Windows x64",
+      "requirements": "Self-contained Windows x64 package; synthetic-only enterprise demo; no separate .NET Desktop Runtime prerequisite",
+      "checksum": "sha256:e0b3316e981a1365a912f0c6070055dfafb01388db58529c17af56d6d38f92e6",
+      "description": "Enterprise-acceptance-tested, distribution-hardened Dominion OS 1.0 demonstration covering Business Suite and Politics & Civic synthetic scenarios. CI and distribution-readiness are green on the exact build. Real AT2 first-install/visible-GUI acceptance and broad Authenticode-signed enterprise distribution remain separately unproven.",
+      "action": {
+        "label": "Request Demo Access",
+        "url": "https://www.fractal5solutions.com/#contact"
+      }
+    },
+    {
+      "public": true,
+      "name": "Dominion OS 1.0 — Google Cloud Deployment Family",
+      "domain": "Core",
+      "distribution": "Cloud Deployment",
+      "state": "Deployment-Ready Source / Runtime Uncertified",
+      "version": "1.0",
+      "build": "04479abc129ffdd26500c1747d32ee948c7aacd7",
+      "deploymentTarget": "Google Cloud",
+      "requirements": "Client-controlled Google Cloud environment; provider identity, IAM, runtime, cost, security and release evidence scoped per deployment",
+      "description": "Google Cloud source and deployment path with fail-closed public claims. Source/deployment readiness does not certify a currently live public provider runtime.",
+      "action": {
+        "label": "Plan Google Cloud Pilot",
+        "url": "https://www.fractal5solutions.com/#contact"
+      }
+    }
+  ]
 }
