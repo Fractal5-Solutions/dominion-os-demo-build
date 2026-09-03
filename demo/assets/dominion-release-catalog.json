@@ -2,7 +2,7 @@
   "schema": "dominion.public-release-catalog.v1",
   "product": "Dominion OS",
   "productVersion": "1.0",
-  "updatedAt": "2026-08-30T05:19:00-07:00",
+  "updatedAt": "2026-09-03T04:03:15-07:00",
   "entries": [
     {
       "public": true,
@@ -15,7 +15,7 @@
       "deploymentTarget": "Windows x64",
       "requirements": "Self-contained Windows x64 package; synthetic-only enterprise demo; no separate .NET Desktop Runtime prerequisite",
       "checksum": "sha256:e0b3316e981a1365a912f0c6070055dfafb01388db58529c17af56d6d38f92e6",
-      "description": "Enterprise-acceptance-tested, distribution-hardened Dominion OS 1.0 demonstration covering Business Suite and Politics & Civic synthetic scenarios. CI and distribution-readiness are green on the exact build. Real AT2 first-install/visible-GUI acceptance and broad Authenticode-signed enterprise distribution remain separately unproven.",
+      "description": "Enterprise-acceptance-tested, distribution-hardened Dominion OS 1.0 demonstration covering Business Suite and Politics & Civic synthetic scenarios. CI and distribution-readiness are green on the exact build. Real AT2 first-install/visible-GUI lifecycle acceptance is proven for this exact build by immutable machine run 33361368179. Broad Authenticode-signed enterprise distribution remains separately unproven.",
       "action": {
         "label": "Request Demo Access",
         "url": "https://www.fractal5solutions.com/#contact"
