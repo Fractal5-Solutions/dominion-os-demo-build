@@ -1,0 +1,27 @@
+{
+  "name": "dominion-os-demo-build",
+  "version": "1.0.0",
+  "description": "Public-facing demo service repository for Dominion OS.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Fractal5-Solutions/dominion-os-demo-build.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Fractal5-Solutions/dominion-os-demo-build/issues"
+  },
+  "homepage": "https://github.com/Fractal5-Solutions/dominion-os-demo-build#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.60.0"
+  }
+}
