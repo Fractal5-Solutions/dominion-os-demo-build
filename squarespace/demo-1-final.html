@@ -343,6 +343,7 @@
   const $=id=>document.getElementById(id);
 
   function openPhi(){
+    if(window.__F5&&typeof window.__F5.openAskPhi==="function"){window.__F5.openAskPhi();return;}
     const roots=[document.getElementById("f5ap"),document.getElementById("f5-ask-phi-launcher")].filter(Boolean);
     for(const root of roots){
       const target=(root.matches&&root.matches("button,a,[role='button']"))?root:root.querySelector("button,a,[role='button']");
