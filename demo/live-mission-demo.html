@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dominion OS 1.0 Live Mission Demo</title>
+<style>
+:root{--bg:#f7f6f2;--paper:#fff;--ink:#121417;--muted:#6d6a64;--line:#ddd8cf;--nav:#0d1624;--gold:#9a7b4f;--green:#286b4b;--amber:#9a621d;--red:#983b3b;--violet:#6752a5}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:var(--nav);color:#fff;padding:22px 34px;display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid var(--gold)}
+.brand{font-weight:850;letter-spacing:.09em}.badge{font-size:11px;border:1px solid #566276;border-radius:999px;padding:7px 11px}
+.wrap{max-width:1440px;margin:auto;padding:24px}.notice{background:#fff8ec;border:1px solid #ead6ad;border-left:5px solid var(--gold);padding:13px 16px;border-radius:10px;margin-bottom:16px;font-size:13px}
+.tabs{display:flex;gap:8px;margin-bottom:16px}.tab{border:1px solid var(--line);background:#fff;padding:10px 14px;border-radius:9px;font-weight:750;cursor:pointer}.tab.active{background:var(--nav);color:#fff}
+.layout{display:grid;grid-template-columns:260px 1fr 320px;gap:14px}.panel{background:var(--paper);border:1px solid var(--line);border-radius:13px;padding:17px;box-shadow:0 8px 24px rgba(20,20,20,.04)}
+.kicker{font-size:10px;font-weight:850;letter-spacing:.12em;color:var(--gold);text-transform:uppercase}.mission h1{font-size:25px;margin:6px 0 10px}.small{font-size:12px;line-height:1.5;color:var(--muted)}
+.navstep{padding:10px 11px;border-radius:9px;margin-top:7px;font-size:12px;font-weight:750;border:1px solid transparent}.navstep.active{background:#f1ede5;border-color:#d9cfbd}.navstep.done{color:var(--green)}
+.status{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.pill{font-size:10px;font-weight:800;padding:5px 8px;border-radius:999px;background:#f0f1f3}.pill.green{color:var(--green)}.pill.amber{color:var(--amber)}.pill.red{color:var(--red)}.pill.violet{color:var(--violet)}
+.stage{display:none}.stage.active{display:block}.stage h2{font-size:22px;margin:5px 0 13px}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.card{border:1px solid var(--line);border-radius:11px;padding:14px;min-height:115px}.card h3{font-size:14px;margin:4px 0 7px}.state{font-size:10px;font-weight:850;letter-spacing:.06em}.confirmed{color:var(--green)}.supported{color:#496a86}.assumption{color:var(--violet)}.conflicted{color:var(--red)}.unknown{color:var(--amber)}
+table{width:100%;border-collapse:collapse}th,td{padding:10px 11px;border-bottom:1px solid var(--line);font-size:12px;text-align:left}th{color:var(--muted);font-weight:700}
+.callout{border-left:4px solid var(--red);background:#fff5f5;padding:14px;border-radius:9px;margin:11px 0}.authority{border:1px solid #d8c4a1;background:#fffaf0;padding:16px;border-radius:11px}.receipt{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#111827;color:#e5e7eb;border-radius:11px;padding:15px;font-size:12px;line-height:1.55;white-space:pre-wrap}
+button.action{border:0;background:var(--nav);color:#fff;border-radius:9px;padding:10px 14px;font-weight:800;cursor:pointer;margin-right:7px;margin-top:10px}.action.secondary{background:#fff;color:var(--ink);border:1px solid var(--line)}.action.approve{background:var(--green)}
+.right .metric{font-size:28px;font-weight:850;margin:5px 0}.log{margin-top:8px;border-top:1px solid var(--line);padding-top:8px}.log div{font-size:11px;color:var(--muted);margin:6px 0}.log b{color:var(--ink)}
+.hidden{display:none}@media(max-width:1000px){.layout{grid-template-columns:1fr}.cards{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><div class="brand">DOMINION OS™ 1.0 · LIVE MISSION DEMO</div><div class="badge">SYNTHETIC DATA · FILMING BUILD</div></header>
+<div class="wrap">
+<div class="notice"><strong>Demonstration boundary.</strong> Synthetic scenarios only. No customer data, confidential party data, voter targeting, production mutation, or unsupported runtime claim. Connector actions remain visibly marked synthetic unless a separately verified live connector is used.</div>
+<div class="tabs"><button class="tab active" data-mode="business">Business</button><button class="tab" data-mode="politics">Politics</button></div>
+<div class="layout">
+<aside class="panel">
+<div class="kicker">Operating Loop</div>
+<div id="steps"></div>
+</aside>
+<main class="panel mission">
+<div id="mission"></div>
+</main>
+<aside class="panel right">
+<div class="kicker">Mission State</div><div class="metric" id="state">READY</div><div class="small" id="stateNote">Awaiting mission start.</div>
+<div class="status"><span class="pill green">HUMAN-GOVERNED</span><span class="pill violet">SYNTHETIC</span><span class="pill amber">EVIDENCE-BOUND</span></div>
+<div class="log" id="log"><div><b>System</b> Demo workspace loaded.</div></div>
+</aside>
+</div></div>
+<script>
+const flows={
+business:{
+title:"Northstar Systems · British Columbia Market Entry",
+prompt:"Assess whether Northstar Systems should enter the British Columbia market during FY2027. Reconcile financial assumptions, customer evidence, operating capacity, competitive position and regulatory constraints. Identify material contradictions and missing evidence. Do not authorize spending, external commitments or implementation without CEO approval.",
+stages:[
+["Mission",()=>`<div class="kicker">Mission</div><h1>Northstar Systems · BC Market Entry</h1><p class="small">${flows.business.prompt}</p><div class="cards"><div class="card"><div class="state confirmed">OBJECTIVE</div><h3>Decide whether and how to enter BC</h3><p class="small">FY2027 entry decision.</p></div><div class="card"><div class="state supported">AUTHORITY</div><h3>CEO</h3><p class="small">External commitments and spend above $100K require approval.</p></div><div class="card"><div class="state assumption">DEADLINE</div><h3>October 15, 2026</h3><p class="small">Decision gate for FY2027 planning.</p></div></div><button class="action" onclick="next()">Build situation</button>`],
+["Situation",()=>`<div class="kicker">Situation</div><h2>One operating picture</h2><table><tr><th>Source</th><th>Finding</th><th>Provenance</th></tr><tr><td>FY2027 Strategy</td><td>BC named as candidate expansion market</td><td>Internal · current</td></tr><tr><td>CRM</td><td>27 qualified BC opportunities</td><td>Internal · current</td></tr><tr><td>Finance model</td><td>Revenue ramp assumes 6 months</td><td>Internal · current</td></tr><tr><td>Operations plan</td><td>Capacity plan assumes 12 months</td><td>Internal · current</td></tr><tr><td>Regulatory memo</td><td>Legacy cost estimate predates current synthetic assumptions</td><td>Internal · stale</td></tr></table><button class="action" onclick="next()">Analyze intelligence</button>`],
+["Intelligence",()=>`<div class="kicker">Intelligence</div><h2>Truth states remain separate</h2><div class="cards"><div class="card"><div class="state confirmed">CONFIRMED</div><h3>Demand signal exists</h3><p class="small">Current CRM contains qualified opportunities.</p></div><div class="card"><div class="state supported">SUPPORTED</div><h3>BC is commercially plausible</h3><p class="small">Multiple synthetic sources support market attractiveness.</p></div><div class="card"><div class="state assumption">ASSUMPTION</div><h3>6-month sales ramp</h3><p class="small">Material to forecast and not reconciled.</p></div><div class="card"><div class="state conflicted">CONFLICTED</div><h3>6 vs 12 months</h3><p class="small">Finance and Operations cannot both be right.</p></div><div class="card"><div class="state unknown">UNKNOWN</div><h3>Final partner economics</h3><p class="small">Evidence not yet available.</p></div></div><div class="callout"><strong>Material contradiction detected.</strong><br>Revenue forecast assumes a 6-month ramp while the operating plan assumes 12 months. Decision sensitivity: HIGH.</div><button class="action" onclick="next()">Compare options</button>`],
+["Options",()=>`<div class="kicker">Options</div><h2>Decision surface</h2><table><tr><th>Path</th><th>Exposure</th><th>Dependency</th><th>Reversibility</th></tr><tr><td><b>Direct Entry</b></td><td>Highest</td><td>Internal build-out</td><td>Lower</td></tr><tr><td><b>Channel Partnership</b></td><td>Moderate</td><td>Partner economics</td><td>Moderate</td></tr><tr><td><b>Controlled Pilot</b></td><td>Limited</td><td>Customer validation</td><td>High</td></tr></table><p class="small">Dominion presents viable courses of action and dependencies. It does not silently exercise executive authority.</p><button class="action" onclick="next()">Request action</button>`],
+["Decision",()=>`<div class="kicker">Decision</div><h2>Authority is explicit</h2><div class="authority"><div class="state conflicted">APPROVAL REQUIRED</div><h3>Initiate BC Controlled Pilot</h3><p class="small">Consequential external commitments are blocked until CEO approval is recorded.</p><button class="action approve" onclick="approve()">Authorize Controlled Pilot</button><button class="action secondary" onclick="reject()">Hold decision</button></div>`],
+["Action",()=>`<div class="kicker">Action</div><h2>Approved work becomes coordinated execution</h2><div class="cards"><div class="card"><div class="state confirmed">CREATED</div><h3>BC Market Pilot</h3><p class="small">Synthetic workstream created in the filming demo.</p></div><div class="card"><div class="state confirmed">ASSIGNED</div><h3>Finance validation</h3><p class="small">Owner and decision gate attached.</p></div><div class="card"><div class="state supported">CONNECTOR</div><h3>External action boundary</h3><p class="small">Synthetic in this build. Replace with a separately verified MCP/connector action for final live capture.</p></div></div><button class="action" onclick="next()">Open evidence receipt</button>`],
+["Evidence",()=>`<div class="kicker">Evidence</div><h2>Decision receipt</h2><div class="receipt">MISSION: BC Market Entry
+EVIDENCE: 5 synthetic sources
+MATERIAL CONFLICTS: 3
+OPEN UNCERTAINTIES: 2
+OPTIONS: Direct Entry | Channel Partnership | Controlled Pilot
+AUTHORITY: CEO
+DECISION: Controlled Pilot Authorized
+ACTIONS: Workstream + finance validation + review gate
+EXTERNAL CONNECTOR: NOT CLAIMED LIVE IN THIS BUILD
+RESULTING STATE: EXECUTION ACTIVE
+RECEIPT: DEMO-BUS-001</div><button class="action secondary" onclick="resetFlow()">Reset mission</button>`]
+]},
+politics:{
+title:"Legislative Session Readiness · Infrastructure Procurement",
+prompt:"Prepare the organization for the upcoming legislative sitting following the government's new infrastructure procurement announcement. Establish what materially changed using authoritative evidence. Identify conflicts, unresolved questions, affected policy files, responsible teams and stakeholder implications. Do not infer or select a political position. Coordinate only work explicitly authorized by leadership.",
+stages:[
+["Mission",()=>`<div class="kicker">Mission</div><h1>Legislative Session Readiness</h1><p class="small">${flows.politics.prompt}</p><div class="cards"><div class="card"><div class="state confirmed">TIME HORIZON</div><h3>48 hours</h3><p class="small">Prepare before the sitting.</p></div><div class="card"><div class="state supported">AUTHORITY</div><h3>Leadership</h3><p class="small">Political judgment remains human.</p></div><div class="card"><div class="state assumption">EVIDENCE STANDARD</div><h3>Authoritative first</h3><p class="small">Disputed claims remain marked.</p></div></div><button class="action" onclick="next()">Build situation</button>`],
+["Situation",()=>`<div class="kicker">Situation</div><h2>What materially changed?</h2><table><tr><th>Source</th><th>Finding</th><th>State</th></tr><tr><td>Government announcement</td><td>Accelerated implementation this fiscal year</td><td>NEW</td></tr><tr><td>Fiscal plan</td><td>Substantive funding begins next fiscal year</td><td>CONFLICT</td></tr><tr><td>Bill text</td><td>Underlying authority unchanged</td><td>UNCHANGED</td></tr><tr><td>Stakeholder submission</td><td>Consultation status unclear</td><td>UNRESOLVED</td></tr></table><button class="action" onclick="next()">Analyze intelligence</button>`],
+["Intelligence",()=>`<div class="kicker">Intelligence</div><h2>Facts, interpretation and uncertainty remain separate</h2><div class="cards"><div class="card"><div class="state confirmed">NEW</div><h3>Timeline accelerated</h3><p class="small">Announcement is clear.</p></div><div class="card"><div class="state conflicted">CONFLICTED</div><h3>Timing vs funding</h3><p class="small">Published fiscal evidence does not cleanly align.</p></div><div class="card"><div class="state unknown">UNRESOLVED</div><h3>Appropriation authority</h3><p class="small">Further analysis required.</p></div></div><div class="callout"><strong>Source conflict — review required.</strong><br>Implementation timing and fiscal funding evidence do not cleanly align. Dominion does not infer motive or political position.</div><button class="action" onclick="next()">Prepare options</button>`],
+["Options",()=>`<div class="kicker">Options</div><h2>Legitimate operational options</h2><table><tr><th>Option</th><th>Purpose</th><th>Dependency</th></tr><tr><td>Expedited fiscal analysis</td><td>Resolve timing/funding conflict</td><td>Current fiscal evidence</td></tr><tr><td>Stakeholder consultation</td><td>Clarify implementation effects</td><td>Named stakeholder set</td></tr><tr><td>Legislative briefing</td><td>Prepare leadership</td><td>Verified issue summary</td></tr><tr><td>Hold pending evidence</td><td>Avoid premature position</td><td>Further authoritative sources</td></tr></table><button class="action" onclick="next()">Request leadership action</button>`],
+["Decision",()=>`<div class="kicker">Decision</div><h2>Leadership authority</h2><div class="authority"><div class="state conflicted">LEADERSHIP APPROVAL REQUIRED</div><h3>Authorize fiscal analysis + stakeholder review + legislative briefing</h3><p class="small">Dominion structures the work. Leadership decides whether it proceeds.</p><button class="action approve" onclick="approve()">Authorize work</button><button class="action secondary" onclick="reject()">Hold</button></div>`],
+["Action",()=>`<div class="kicker">Action</div><h2>Authorized workstreams</h2><div class="cards"><div class="card"><div class="state confirmed">ASSIGNED</div><h3>Fiscal analysis</h3><p class="small">Question set and owner attached.</p></div><div class="card"><div class="state confirmed">ASSIGNED</div><h3>Stakeholder review</h3><p class="small">Consultation task prepared.</p></div><div class="card"><div class="state supported">CONNECTOR</div><h3>External action boundary</h3><p class="small">Synthetic in this build. Final film should substitute a separately verified live connector action.</p></div></div><button class="action" onclick="next()">Open evidence receipt</button>`],
+["Evidence",()=>`<div class="kicker">Evidence</div><h2>Decision receipt</h2><div class="receipt">MISSION: Legislative Session Readiness
+AUTHORITATIVE SOURCES: 4 synthetic sources
+MATERIAL CHANGES: 2
+SOURCE CONFLICTS: 1
+OPEN QUESTIONS: 2
+POLITICAL POSITION: NOT SELECTED BY SYSTEM
+AUTHORITY: Leadership
+AUTHORIZED WORKSTREAMS: 3
+EXTERNAL CONNECTOR: NOT CLAIMED LIVE IN THIS BUILD
+RESULTING STATE: PREPARATION ACTIVE
+RECEIPT: DEMO-POL-001</div><button class="action secondary" onclick="resetFlow()">Reset mission</button>`]
+]}}
+let mode="business",idx=0,approved=false;
+function render(){
+ const f=flows[mode]; document.getElementById("mission").innerHTML=f.stages[idx][1]();
+ document.getElementById("steps").innerHTML=f.stages.map((s,i)=>`<div class="navstep ${i===idx?'active':''} ${i<idx?'done':''}">${String(i+1).padStart(2,'0')} · ${s[0]}</div>`).join("");
+ const states=["MISSION","SITUATION","INTELLIGENCE","OPTIONS","DECISION","EXECUTION","EVIDENCE"];
+ document.getElementById("state").textContent=states[idx];
+ document.getElementById("stateNote").textContent=idx===4&&!approved?"Consequential action is blocked pending human authority.":idx===6?"Mission evidence is reconstructable.":"Synthetic filming workflow in progress.";
+}
+function addLog(text){document.getElementById("log").innerHTML+=`<div><b>${new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</b> ${text}</div>`}
+function next(){idx=Math.min(idx+1,flows[mode].stages.length-1);addLog("Advanced to "+flows[mode].stages[idx][0]+".");render()}
+function approve(){approved=true;addLog(mode==="business"?"CEO approval recorded.":"Leadership approval recorded.");idx=5;render()}
+function reject(){approved=false;addLog("Decision held. No consequential action executed.");}
+function resetFlow(){idx=0;approved=false;document.getElementById("log").innerHTML="<div><b>System</b> Demo workspace reset.</div>";render()}
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");mode=b.dataset.mode;resetFlow()});
+
+const params=new URLSearchParams(window.location.search);
+const requestedMode=(params.get("mode")||"business").toLowerCase();
+if(requestedMode==="politics"){
+  mode="politics";
+  document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x.dataset.mode==="politics"));
+}
+const autoplay=params.get("autoplay")==="1";
+let autoplayTimer=null;
+function startAutoplay(){
+  if(!autoplay) return;
+  if(autoplayTimer) clearInterval(autoplayTimer);
+  autoplayTimer=setInterval(()=>{
+    if(idx===4 && !approved){ approve(); return; }
+    if(idx>=flows[mode].stages.length-1){ clearInterval(autoplayTimer); autoplayTimer=null; return; }
+    next();
+  },6500);
+}
+document.addEventListener("keydown",e=>{
+  if(e.key==="ArrowRight" || e.key===" "){ e.preventDefault(); if(idx===4&&!approved) approve(); else next(); }
+  if(e.key==="ArrowLeft"){ e.preventDefault(); idx=Math.max(0,idx-1); render(); }
+  if(e.key.toLowerCase()==="r"){ e.preventDefault(); resetFlow(); startAutoplay(); }
+  if(e.key.toLowerCase()==="b"){ e.preventDefault(); mode="business"; document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x.dataset.mode==="business")); resetFlow(); startAutoplay(); }
+  if(e.key.toLowerCase()==="p"){ e.preventDefault(); mode="politics"; document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x.dataset.mode==="politics")); resetFlow(); startAutoplay(); }
+});
+render();
+startAutoplay();
+</script>
+</body></html>
