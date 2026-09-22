@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "generated_for": "Dominion OS 1.0 live mission films",
   "source_desktop_main": "cc27b83de06de4c906b67a070e23f3cedbb2c3c6",
   "source_desktop_ci_run_id": 35723649564,
@@ -22,7 +22,9 @@
       "captions_sha256": "daf67473c09b37cd8f4fc80325e519f56538ad22376b62d73c3f5325f971ffba",
       "mp4_url": null,
       "poster_url": null,
-      "captions_url": null
+      "captions_url": null,
+      "interactive_state": "available",
+      "interactive_url": "https://fractal5-solutions.github.io/dominion-os-demo-build/demo/live-mission-demo.html?mode=business"
     },
     {
       "id": "politics",
@@ -39,7 +41,17 @@
       "captions_sha256": "daf67473c09b37cd8f4fc80325e519f56538ad22376b62d73c3f5325f971ffba",
       "mp4_url": null,
       "poster_url": null,
-      "captions_url": null
+      "captions_url": null,
+      "interactive_state": "available",
+      "interactive_url": "https://fractal5-solutions.github.io/dominion-os-demo-build/demo/live-mission-demo.html?mode=politics"
     }
-  ]
+  ],
+  "interactive_public_demo": {
+    "state": "available",
+    "source_desktop_main": "cc27b83de06de4c906b67a070e23f3cedbb2c3c6",
+    "url": "https://fractal5-solutions.github.io/dominion-os-demo-build/demo/live-mission-demo.html",
+    "data_class": "synthetic",
+    "external_connector_claim": "not_live",
+    "authority_boundary": "explicit"
+  }
 }
