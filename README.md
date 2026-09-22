@@ -37,3 +37,10 @@ The current static proof surface may remain available even when no optional publ
 - Deployment contact: https://www.fractal5solutions.com/#contact
 
 Security concerns should be reported privately as described in `SECURITY.md`.
+
+
+## Publication contract
+
+GitHub Pages is published from protected `main` by `.github/workflows/publish-artifact-only-pages.yml`. The workflow copies only the approved public artifacts into the Pages bundle and validates the synthetic-data, authority, and connector-claim boundaries before deployment.
+
+The canonical Squarespace page remains `squarespace/demo-1-final.html`; the principal pastes that finished artifact into Squarespace. Squarespace is not the source repository and is not mutated by this workflow.
