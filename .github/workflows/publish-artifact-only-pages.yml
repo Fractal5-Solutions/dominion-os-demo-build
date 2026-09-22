@@ -1,0 +1,96 @@
+name: Publish artifact-only public demo
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: artifact-only-pages
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: false
+
+      - name: Validate public proof contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f index.html
+          test -f 404.html
+          test -f .nojekyll
+          test -f README.md
+          test -f SECURITY.md
+          test -f demo/live-mission-demo.html
+          test -f demo/assets/live-mission-video-manifest.json
+
+          grep -Fq 'SYNTHETIC DATA · FILMING BUILD' demo/live-mission-demo.html
+          grep -Fq 'EXTERNAL CONNECTOR: NOT CLAIMED LIVE IN THIS BUILD' demo/live-mission-demo.html
+          grep -Fq 'Dominion does not infer motive or political position' demo/live-mission-demo.html
+          grep -Fq '"interactive_public_demo"' demo/assets/live-mission-video-manifest.json
+
+          python3 - <<'PY'
+          import json
+          p="demo/assets/live-mission-video-manifest.json"
+          data=json.load(open(p,encoding="utf-8"))
+          public=data.get("interactive_public_demo",{})
+          assert public.get("state")=="available", public
+          assert public.get("data_class")=="synthetic", public
+          assert public.get("external_connector_claim")=="not_live", public
+          for video in data.get("videos",[]):
+              assert video.get("interactive_state")=="available", video
+              assert video.get("mp4_url") is None, video
+          print("public proof contract: PASS")
+          PY
+
+      - name: Build approved public artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf _site
+          mkdir -p _site/demo/assets
+
+          cp index.html 404.html .nojekyll README.md SECURITY.md _site/
+          cp demo/live-mission-demo.html _site/demo/
+          cp demo/assets/*.json _site/demo/assets/
+
+          python3 - <<'PY'
+          import json, os
+          receipt={
+            "schema":"dominion.public-static-release.v2",
+            "releaseSha":os.environ["GITHUB_SHA"],
+            "mode":"artifact-only-static-proof",
+            "pass":True,
+            "failClosed":True,
+            "interactiveMissionDemoPublished":True,
+            "interactiveMissionDemoDataClass":"synthetic",
+            "externalConnectorClaimedLive":False,
+            "providerRuntimeClaimedLive":False,
+            "containsPrivateSource":False,
+            "containsSecrets":False
+          }
+          open("_site/release.json","w",encoding="utf-8").write(json.dumps(receipt,indent=2)+"\n")
+          PY
+
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d
+
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
+        with:
+          path: _site
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128
