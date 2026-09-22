@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "generated_for": "Dominion OS 1.0 live mission films",
+  "claim_rule": "A video may be marked available only after recording, privacy, claim, encoding, and clean-browser playback QA pass.",
+  "videos": [
+    {
+      "id": "business",
+      "title": "Executive Decision to Execution",
+      "mission": "Enter a new regional market",
+      "state": "pending",
+      "expected_basename": "dominion-os-business-1080p.mp4",
+      "mp4_url": null,
+      "poster_url": null,
+      "captions_url": null
+    },
+    {
+      "id": "politics",
+      "title": "Intelligence to Institutional Readiness",
+      "mission": "Prepare for a legislative session",
+      "state": "pending",
+      "expected_basename": "dominion-os-politics-1080p.mp4",
+      "mp4_url": null,
+      "poster_url": null,
+      "captions_url": null
+    }
+  ]
+}
