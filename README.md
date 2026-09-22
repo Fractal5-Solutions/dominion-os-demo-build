@@ -6,7 +6,7 @@ It is **not** the Dominion OS source repository, an operator console, a deployme
 
 ## Public artifact contract
 
-This filming branch extends the approved public presentation and sanitized proof surface with one fail-closed video-state manifest:
+The approved public presentation and sanitized proof surface includes:
 
 - `index.html` — static public demonstration
 - `404.html` — fail-closed route handling
@@ -15,7 +15,8 @@ This filming branch extends the approved public presentation and sanitized proof
 - `SECURITY.md` — disclosure and repository-safety policy
 - `demo/assets/cloud-deployment-manifest.json` — sanitized deployment-readiness contract
 - `demo/assets/multicloud-runtime-manifest.json` — sanitized provider-runtime claim state
-- `demo/assets/live-mission-video-manifest.json` — fail-closed Business/Politics video publication state; pending entries must not render as playable media
+- `demo/live-mission-demo.html` — sanitized interactive Business/Politics mission surface using synthetic data and explicit authority/evidence boundaries
+- `demo/assets/live-mission-video-manifest.json` — receipt-bound Business/Politics media state; rendered MP4 masters remain distinct from the public interactive demo
 - `squarespace/demo-1-final.html` — canonical fail-closed Squarespace `/demo-1` presentation artifact
 
 No other implementation/runtime/configuration/automation artifact is approved for the current public tree.
