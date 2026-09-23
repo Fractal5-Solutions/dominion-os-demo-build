@@ -2,23 +2,31 @@
   "schema": "dominion.public-release-catalog.v1",
   "product": "Dominion OS",
   "productVersion": "1.0",
-  "updatedAt": "2026-09-21T10:38:45-07:00",
+  "updatedAt": "2026-09-23T05:58:00-07:00",
   "entries": [
     {
       "public": true,
       "name": "Dominion OS 1.0 Enterprise Demo — Windows x64",
       "domain": "Business + Politics",
-      "distribution": "Downloadable GUI",
+      "distribution": "Controlled GUI Package",
       "state": "Controlled Access Candidate",
       "version": "1.0.0",
-      "build": "adfe181459acb2d72137370eb0ec8f524c6da0ff",
+      "build": "cc27b83de06de4c906b67a070e23f3cedbb2c3c6",
       "deploymentTarget": "Windows x64",
-      "requirements": "Self-contained Windows x64 package; synthetic-only enterprise demo; no separate .NET Desktop Runtime prerequisite",
-      "checksum": "sha256:e0b3316e981a1365a912f0c6070055dfafb01388db58529c17af56d6d38f92e6",
-      "description": "Enterprise-acceptance-tested, distribution-hardened Dominion OS 1.0 demonstration covering Business Suite and Politics & Civic synthetic scenarios. CI and distribution-readiness are green on the exact build. Real AT2 first-install/visible-GUI lifecycle acceptance is proven for this exact build by immutable machine run 33361368179. Broad Authenticode-signed enterprise distribution remains separately unproven.",
+      "requirements": "Self-contained Windows x64 package; synthetic-only Business and Politics mission packs; no separate .NET Desktop Runtime prerequisite",
+      "checksum": "sha256:68cd2c09666a4a223c1b1ab2867fe9888277317895f462463792277b09fc4c20",
+      "description": "Current exact protected Dominion OS 1.0 Windows candidate covering the Business and Politics synthetic mission packs. CI artifact build 35723649564 and exact-artifact AT2 lifecycle acceptance 35723900879 are passing. The candidate remains controlled access until a separately certified public distribution package and public download location are promoted.",
       "action": {
         "label": "Request Demo Access",
         "url": "https://www.fractal5solutions.com/#contact"
+      },
+      "proof": {
+        "sourceSha": "cc27b83de06de4c906b67a070e23f3cedbb2c3c6",
+        "ciRunId": 35723649564,
+        "artifactId": 10691984606,
+        "artifactDigest": "sha256:68cd2c09666a4a223c1b1ab2867fe9888277317895f462463792277b09fc4c20",
+        "at2AcceptanceRunId": 35723900879,
+        "publicDownloadCertified": false
       }
     },
     {
