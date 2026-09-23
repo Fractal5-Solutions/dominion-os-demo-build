@@ -19,7 +19,7 @@ The approved public presentation and sanitized proof surface includes:
 - `demo/assets/live-mission-video-manifest.json` — receipt-bound Business/Politics media state; rendered MP4 masters remain distinct from the public interactive demo
 - `squarespace/demo-1-final.html` — canonical fail-closed Squarespace `/demo-1` presentation artifact
 
-No other implementation/runtime/configuration/automation artifact is approved for the current public tree.
+No implementation/runtime/configuration/provider-authentication artifact is approved for the current public tree. The only public automation retained is the minimal static Pages publisher for the approved artifact bundle.
 
 Private source, credentials, signing material, customer data, payment data, private APIs, operational keys, internal automation, infrastructure definitions, production controls, and private service authority do not belong in this repository.
 
@@ -41,6 +41,6 @@ Security concerns should be reported privately as described in `SECURITY.md`.
 
 ## Publication contract
 
-GitHub Pages is published from protected `main` by `.github/workflows/publish-artifact-only-pages.yml`. The workflow copies only the approved public artifacts into the Pages bundle and validates the synthetic-data, authority, and connector-claim boundaries before deployment.
+GitHub Pages is published from protected `main` by the minimal `.github/workflows/publish-artifact-only-pages.yml` workflow. It copies only the approved public artifacts into the Pages bundle and validates the synthetic-data, authority, and connector-claim boundaries before deployment. Provider authentication, IAM repair, cloud deployment, and private runtime workflows are deliberately excluded from this public repository.
 
 The canonical Squarespace page remains `squarespace/demo-1-final.html`; the principal pastes that finished artifact into Squarespace. Squarespace is not the source repository and is not mutated by this workflow.
