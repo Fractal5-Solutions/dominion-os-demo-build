@@ -1,0 +1,51 @@
+{
+  "schema": "f5.dominion.demo.download-package.v4",
+  "generatedAt": "2026-09-25T20:22:00Z",
+  "title": "Dominion OS 1.0 for Business — Windows Downloadable Experience",
+  "publicBridge": "https://www.fractal5solutions.com/demo-1",
+  "experienceContract": "demo/assets/customer-owned-experience-contract.json",
+  "windowsExperience": {
+    "product": "Dominion OS 1.0 for Business",
+    "platform": "Windows x64",
+    "missionPack": "Business",
+    "experienceParity": "same-product-runtime",
+    "sourceSha": "b8d6b512412f4da19b12ca640e81ed01db8b6990",
+    "packageSha256": "581f0948fdfeec3f2a68e5bf63fa9a0cc7e07f9206810183388b7d49d31f8f50",
+    "executableSha256": "0af1f9533cbaff994624b550645afacf8476650b846b194774fa984888735a51",
+    "lifecycleAcceptance": "PASS",
+    "defenderScan": "PASS",
+    "authenticode": "NOT_SIGNED",
+    "publicDownloadCertified": false,
+    "distributionState": "publisher-signing-required"
+  },
+  "politicsExperience": {
+    "publicContentAllowed": true,
+    "publicDemoAllowed": true,
+    "downloadable": false,
+    "distributionState": "withheld-by-product-policy",
+    "releaseGate": "separate explicit certification and principal approval required"
+  },
+  "googleCloudExperience": {
+    "missionPack": "Business",
+    "estate": "customer-owned Google Cloud",
+    "deploymentModel": "customer credentials + customer project + customer-controlled runtime",
+    "publicRuntimeCertified": false,
+    "deploymentReady": true
+  },
+  "platformRoadmap": {
+    "current": "Windows x64 Business",
+    "next": "macOS Business",
+    "nextState": "planned-later"
+  },
+  "claimControl": {
+    "binaryDownloadEnabled": false,
+    "businessDownloadAllowedWhenCertified": true,
+    "politicsDownloadAllowed": false,
+    "sourceCodeDistributed": false,
+    "fractal5SecretsDistributed": false,
+    "customerCredentialsEmbedded": false,
+    "reverseEngineeringClaim": "resistant-not-impossible",
+    "blocker": "verified Authenticode publisher identity is not yet provisioned"
+  },
+  "notes": "The exact Business Windows candidate is built, provenance-bound, lifecycle-tested and Defender-clean. Public binary distribution remains disabled until verified publisher signing completes the exact-artifact release gate. Politics remains public-demonstration-only. macOS follows Windows later as a separate platform release."
+}
