@@ -16,11 +16,19 @@ concurrency:
 
 jobs:
   publish:
+    if: github.repository == 'Fractal5-Solutions/dominion-os-demo-build'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Assert canonical public-demo authority
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "Fractal5-Solutions/dominion-os-demo-build"
+          echo "canonical public-demo repository: PASS"
+
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           persist-credentials: false
