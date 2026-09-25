@@ -2,7 +2,7 @@
   "schema": "dominion.public-release-catalog.v1",
   "product": "Dominion OS",
   "productVersion": "1.0",
-  "updatedAt": "2026-09-25T13:22:00-07:00",
+  "updatedAt": "2026-09-25T13:56:00-07:00",
   "entries": [
     {
       "public": true,
@@ -11,19 +11,19 @@
       "distribution": "Controlled GUI Package",
       "state": "Business Candidate · Publisher Signing Pending",
       "version": "1.0.0",
-      "build": "b8d6b512412f4da19b12ca640e81ed01db8b6990",
+      "build": "90de700bb9c44ab62212731dbaa13c0bea3b3ffd",
       "deploymentTarget": "Windows x64",
       "requirements": "Self-contained Windows x64 Business package; no separate .NET Desktop Runtime prerequisite; Politics is excluded from the downloadable artifact",
-      "checksum": "sha256:581f0948fdfeec3f2a68e5bf63fa9a0cc7e07f9206810183388b7d49d31f8f50",
+      "checksum": "sha256:ccbe636f6017bd3f5d2ae95fce261d1cb4cee2e963d255328886d6abce20aeeb",
       "description": "Exact Business-only Windows candidate. Source is committed and provenance-bound; package integrity, tamper rejection, install, first launch, integrity verification, Windows registration, deterministic shutdown, uninstall, Microsoft Defender, SBOM, provenance, security notice and privacy notice have passed. Public distribution remains withheld until verified Authenticode publisher signing is provisioned and completed.",
       "action": {
         "label": "Request Controlled Business Candidate",
         "url": "https://www.fractal5solutions.com/#contact"
       },
       "proof": {
-        "sourceSha": "b8d6b512412f4da19b12ca640e81ed01db8b6990",
-        "packageSha256": "581f0948fdfeec3f2a68e5bf63fa9a0cc7e07f9206810183388b7d49d31f8f50",
-        "executableSha256": "0af1f9533cbaff994624b550645afacf8476650b846b194774fa984888735a51",
+        "sourceSha": "90de700bb9c44ab62212731dbaa13c0bea3b3ffd",
+        "packageSha256": "ccbe636f6017bd3f5d2ae95fce261d1cb4cee2e963d255328886d6abce20aeeb",
+        "executableSha256": "d8b2f974dda56bd48fb9790f1ac8966fba4e72f2a643dc6c75d7b44406143de3",
         "missionPack": "Business",
         "politicsIncluded": false,
         "selfContained": true,

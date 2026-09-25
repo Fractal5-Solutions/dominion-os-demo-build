@@ -44,9 +44,9 @@ def test_release_catalog_binds_exact_business_candidate():
     assert len(windows) == 1
     win = windows[0]
     assert win["domain"] == "Business"
-    assert win["build"] == "b8d6b512412f4da19b12ca640e81ed01db8b6990"
-    assert win["checksum"] == "sha256:581f0948fdfeec3f2a68e5bf63fa9a0cc7e07f9206810183388b7d49d31f8f50"
-    assert win["proof"]["executableSha256"] == "0af1f9533cbaff994624b550645afacf8476650b846b194774fa984888735a51"
+    assert win["build"] == "90de700bb9c44ab62212731dbaa13c0bea3b3ffd"
+    assert win["checksum"] == "sha256:ccbe636f6017bd3f5d2ae95fce261d1cb4cee2e963d255328886d6abce20aeeb"
+    assert win["proof"]["executableSha256"] == "d8b2f974dda56bd48fb9790f1ac8966fba4e72f2a643dc6c75d7b44406143de3"
     assert win["proof"]["politicsIncluded"] is False
     assert win["proof"]["lifecycleAcceptance"] == "PASS"
     assert win["proof"]["defenderScan"] == "PASS"
