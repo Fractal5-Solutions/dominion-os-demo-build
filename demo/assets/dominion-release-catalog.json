@@ -2,47 +2,77 @@
   "schema": "dominion.public-release-catalog.v1",
   "product": "Dominion OS",
   "productVersion": "1.0",
-  "updatedAt": "2026-09-23T05:58:00-07:00",
+  "updatedAt": "2026-09-25T13:22:00-07:00",
   "entries": [
     {
       "public": true,
-      "name": "Dominion OS 1.0 Enterprise Demo — Windows x64",
-      "domain": "Business + Politics",
+      "name": "Dominion OS 1.0 for Business — Windows x64",
+      "domain": "Business",
       "distribution": "Controlled GUI Package",
-      "state": "Controlled Access Candidate",
+      "state": "Business Candidate · Publisher Signing Pending",
       "version": "1.0.0",
-      "build": "cc27b83de06de4c906b67a070e23f3cedbb2c3c6",
+      "build": "b8d6b512412f4da19b12ca640e81ed01db8b6990",
       "deploymentTarget": "Windows x64",
-      "requirements": "Self-contained Windows x64 package; synthetic-only Business and Politics mission packs; no separate .NET Desktop Runtime prerequisite",
-      "checksum": "sha256:68cd2c09666a4a223c1b1ab2867fe9888277317895f462463792277b09fc4c20",
-      "description": "Current exact protected Dominion OS 1.0 Windows candidate covering the Business and Politics synthetic mission packs. CI artifact build 35723649564 and exact-artifact AT2 lifecycle acceptance 35723900879 are passing. The candidate remains controlled access until a separately certified public distribution package and public download location are promoted.",
+      "requirements": "Self-contained Windows x64 Business package; no separate .NET Desktop Runtime prerequisite; Politics is excluded from the downloadable artifact",
+      "checksum": "sha256:581f0948fdfeec3f2a68e5bf63fa9a0cc7e07f9206810183388b7d49d31f8f50",
+      "description": "Exact Business-only Windows candidate. Source is committed and provenance-bound; package integrity, tamper rejection, install, first launch, integrity verification, Windows registration, deterministic shutdown, uninstall, Microsoft Defender, SBOM, provenance, security notice and privacy notice have passed. Public distribution remains withheld until verified Authenticode publisher signing is provisioned and completed.",
       "action": {
-        "label": "Request Demo Access",
+        "label": "Request Controlled Business Candidate",
         "url": "https://www.fractal5solutions.com/#contact"
       },
       "proof": {
-        "sourceSha": "cc27b83de06de4c906b67a070e23f3cedbb2c3c6",
-        "ciRunId": 35723649564,
-        "artifactId": 10691984606,
-        "artifactDigest": "sha256:68cd2c09666a4a223c1b1ab2867fe9888277317895f462463792277b09fc4c20",
-        "at2AcceptanceRunId": 35723900879,
+        "sourceSha": "b8d6b512412f4da19b12ca640e81ed01db8b6990",
+        "packageSha256": "581f0948fdfeec3f2a68e5bf63fa9a0cc7e07f9206810183388b7d49d31f8f50",
+        "executableSha256": "0af1f9533cbaff994624b550645afacf8476650b846b194774fa984888735a51",
+        "missionPack": "Business",
+        "politicsIncluded": false,
+        "selfContained": true,
+        "debugSymbolsShipped": false,
+        "lifecycleAcceptance": "PASS",
+        "defenderScan": "PASS",
+        "trustEvidence": "PASS",
+        "authenticode": "NOT_SIGNED",
         "publicDownloadCertified": false
       }
     },
     {
       "public": true,
-      "name": "Dominion OS 1.0 — Google Cloud Deployment Family",
-      "domain": "Core",
-      "distribution": "Cloud Deployment",
-      "state": "Deployment-Ready Source / Runtime Uncertified",
+      "name": "Dominion OS 1.0 for Politics — Public Demonstration",
+      "domain": "Politics",
+      "distribution": "Public Demonstration Only",
+      "state": "Demonstrated · Download Withheld",
       "version": "1.0",
-      "build": "04479abc129ffdd26500c1747d32ee948c7aacd7",
+      "deploymentTarget": "Public proof surface",
+      "requirements": "Synthetic public demonstration only; no downloadable Politics artifact is authorized",
+      "description": "Politics remains part of the Dominion product story, mission architecture and public-safe demonstrations. It is deliberately excluded from downloadable distribution until it receives separate certification and principal approval.",
+      "action": {
+        "label": "Open Politics Demo",
+        "url": "https://fractal5-solutions.github.io/dominion-os-demo-build/demo/live-mission-demo.html?mode=politics"
+      },
+      "proof": {
+        "publicDemonstrationAllowed": true,
+        "downloadAllowed": false,
+        "publicDownloadCertified": false
+      }
+    },
+    {
+      "public": true,
+      "name": "Dominion OS 1.0 for Business — Google Cloud Deployment Family",
+      "domain": "Business",
+      "distribution": "Cloud Deployment",
+      "state": "Deployment-Ready Source · Runtime Uncertified",
+      "version": "1.0",
       "deploymentTarget": "Google Cloud",
-      "requirements": "Client-controlled Google Cloud environment; provider identity, IAM, runtime, cost, security and release evidence scoped per deployment",
-      "description": "Google Cloud source and deployment path with fail-closed public claims. Source/deployment readiness does not certify a currently live public provider runtime.",
+      "requirements": "Customer-controlled Google Cloud project, identity, IAM, runtime, containers, storage, connectors, cost, security and release evidence scoped per deployment",
+      "description": "Google Cloud is the first cloud deployment path for the Business experience. Deployment readiness does not certify a currently live public provider runtime.",
       "action": {
         "label": "Plan Google Cloud Pilot",
         "url": "https://www.fractal5solutions.com/#contact"
+      },
+      "proof": {
+        "deploymentReady": true,
+        "customerOwnedEstate": true,
+        "publicRuntimeCertified": false
       }
     }
   ]

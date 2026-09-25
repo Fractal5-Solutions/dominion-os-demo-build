@@ -1,0 +1,48 @@
+{
+  "schema": "f5.dominion.customer-owned-experience.v1",
+  "product": "Dominion OS 1.0 + SaaS Suite",
+  "experienceParity": "same-product-runtime",
+  "distributionModel": "hardened-executable-and-runtime-artifacts",
+  "missionPackPolicy": {
+    "downloadableNow": ["Business"],
+    "publiclyDemonstratedButNotDownloadable": ["Politics"],
+    "politicsReleaseGate": "separate explicit certification and principal approval required"
+  },
+  "platformPolicy": {
+    "currentMission": "Windows x64 Business downloadable experience",
+    "nextMission": "macOS Business downloadable experience",
+    "nextMissionState": "later",
+    "crossPlatformRule": "each platform receives its own build, signing, security, lifecycle and distribution certification"
+  },
+  "customerEstate": {
+    "windows": "customer-controlled Windows x64 device",
+    "googleCloud": "customer-controlled Google Cloud project",
+    "containers": "customer-controlled runtime infrastructure",
+    "drives": "customer-authorized storage only",
+    "connectors": "customer-authorized connectors only"
+  },
+  "neverDistributed": [
+    "source repositories",
+    "git history",
+    "build pipelines",
+    "debug symbols",
+    "Fractal5 credentials",
+    "API keys",
+    "service-account secrets",
+    "signing material",
+    "operator configuration",
+    "internal documentation",
+    "Fractal5 production data"
+  ],
+  "secretPolicy": "runtime-injected-from-customer-secret-store",
+  "artifactPolicy": {
+    "signed": true,
+    "digestBound": true,
+    "minimumRuntime": true,
+    "developmentToolingExcluded": true,
+    "sourceTreesExcluded": true
+  },
+  "reverseEngineeringClaim": "resistant-not-impossible",
+  "publicClaim": "Full Dominion OS Business product experience in the customer's estate without distributing Fractal5 source code, secrets, credentials, or proprietary operational infrastructure. Politics may be demonstrated publicly but is not included in downloadable distribution.",
+  "releaseGate": "exact-artifact security verification and verified publisher signing required before public download"
+}
