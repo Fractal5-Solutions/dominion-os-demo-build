@@ -1,0 +1,83 @@
+{
+  "schema": "fractal5.dominion.saas-catalog.v1",
+  "product_family": "Dominion OS + Fractal5 SaaS Suite",
+  "catalogue_state": "stable",
+  "availability_rule": "Catalogue presence and Configure state do not independently prove general availability, paid API access, marketplace listing, production certification, or universal runtime.",
+  "commerce_rule": "Exact availability, runtime, licensing, integration, identity, data, support, and deployment state are confirmed per governed engagement.",
+  "public_sources": [
+    "https://www.fractal5solutions.com/dominion-os",
+    "https://www.fractal5solutions.com/store-preview"
+  ],
+  "modules": [
+    {
+      "name": "GrantConnect",
+      "store_state": "Configure",
+      "description": "Grant discovery, eligibility, preparation workflows, funding intelligence, proposal support, and opportunity tracking."
+    },
+    {
+      "name": "TeamConnect",
+      "store_state": "Configure",
+      "description": "Coordinate roles, work routing, operating views, internal collaboration, team telemetry, and shared execution."
+    },
+    {
+      "name": "PolicyConnect",
+      "store_state": "Configure",
+      "description": "Organize policy change, compliance monitoring, legislative signals, regulatory context, risk identification, and policy-impact workflows."
+    },
+    {
+      "name": "ChannelConnect",
+      "store_state": "Configure",
+      "description": "Bring email, social, web, messaging, outreach, and communications workflows into a coordinated operating surface."
+    },
+    {
+      "name": "Cloud Engine",
+      "store_state": "Configure",
+      "description": "Structure deployment posture, infrastructure planning, health, environments, release pathways, rollback planning, and cloud operations."
+    },
+    {
+      "name": "Vault Systems",
+      "store_state": "Configure",
+      "description": "Organize structured intelligence, source records, review materials, compliance archives, evidence trails, and controlled information environments."
+    },
+    {
+      "name": "Command Core",
+      "store_state": "Configure",
+      "description": "Bring mission logic, operating state, workflows, telemetry, human roles, and governed execution into a central command environment."
+    },
+    {
+      "name": "Advocate Engine",
+      "store_state": "Configure",
+      "description": "Structure stakeholder maps, relationship workflows, engagement planning, issue intelligence, and public-affairs operating views."
+    },
+    {
+      "name": "Install Grid",
+      "store_state": "Configure",
+      "description": "Create structured installation, access, onboarding, deployment, and implementation-entry pathways."
+    },
+    {
+      "name": "OpsSignal",
+      "store_state": "Configure",
+      "description": "Bring system state, integrity signals, operating metrics, alerts, and mission telemetry into decision-ready views."
+    },
+    {
+      "name": "EcoStack",
+      "store_state": "Configure",
+      "description": "Add environmental, sustainability, infrastructure, natural-resource, climate, and ESG-oriented information layers where appropriate."
+    },
+    {
+      "name": "StoryThread",
+      "store_state": "Configure",
+      "description": "Structure messages, stories, content systems, media workflows, narrative development, and multi-channel communications."
+    },
+    {
+      "name": "DataHarbor",
+      "store_state": "Configure",
+      "description": "Create controlled data collections, catalogues, repositories, warehouses, and source-aware information environments."
+    }
+  ],
+  "module_count": 13,
+  "runtime_certification": "engagement-specific",
+  "independent_ga_claim": false,
+  "universal_api_claim": false,
+  "marketplace_listing_claim": false
+}

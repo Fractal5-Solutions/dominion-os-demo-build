@@ -46,6 +46,7 @@ jobs:
           test -f release/business-windows-1.0.html
           test -f demo/assets/live-mission-video-manifest.json
           test -f demo/assets/dominion-business-1.0-release-gate.json
+          test -f demo/assets/dominion-saas-catalog.json
           test -f demo/media/dominion-os-business-1080p.mp4
           test -f demo/media/dominion-os-business-poster.jpg
           test -f demo/media/dominion-os-business.vtt
@@ -111,6 +112,7 @@ jobs:
             "missionFilmsIncluded":True,
             "missionFilmDataClass":"synthetic",
             "businessReleaseGate":"demo/assets/dominion-business-1.0-release-gate.json",
+            "saasCatalogue":"demo/assets/dominion-saas-catalog.json",
             "politicsDownloadIncluded":False,
             "externalConnectorClaimedLive":False,
             "providerRuntimeClaimedLive":False,

@@ -7,6 +7,7 @@ MEDIA = ROOT / "demo" / "media"
 MANIFEST = ROOT / "demo" / "assets" / "live-mission-video-manifest.json"
 PACKAGE = ROOT / "demo" / "assets" / "demo-download-package.json"
 GATE = ROOT / "demo" / "assets" / "dominion-business-1.0-release-gate.json"
+SAAS = ROOT / "demo" / "assets" / "dominion-saas-catalog.json"
 
 
 def sha256(path: Path) -> str:
@@ -83,3 +84,21 @@ def test_business_release_gate_is_fail_closed():
     assert gate["pending_gates"]["public_binary_download"] == "DISABLED_FAIL_CLOSED"
     assert gate["separate_non_release_claims"]["politics_download"] == "WITHHELD_BY_PRODUCT_POLICY"
     assert "No unsigned public binary." in gate["prohibitions"]
+
+
+def test_saas_catalogue_is_stable_without_overclaiming_runtime():
+    catalog = load_json(SAAS)
+    expected = {
+        "GrantConnect", "TeamConnect", "PolicyConnect", "ChannelConnect",
+        "Cloud Engine", "Vault Systems", "Command Core", "Advocate Engine",
+        "Install Grid", "OpsSignal", "EcoStack", "StoryThread", "DataHarbor",
+    }
+    names = {module["name"] for module in catalog["modules"]}
+    assert catalog["catalogue_state"] == "stable"
+    assert catalog["module_count"] == 13
+    assert names == expected
+    assert all(module["store_state"] == "Configure" for module in catalog["modules"])
+    assert catalog["runtime_certification"] == "engagement-specific"
+    assert catalog["independent_ga_claim"] is False
+    assert catalog["universal_api_claim"] is False
+    assert catalog["marketplace_listing_claim"] is False
