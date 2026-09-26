@@ -102,3 +102,14 @@ def test_saas_catalogue_is_stable_without_overclaiming_runtime():
     assert catalog["independent_ga_claim"] is False
     assert catalog["universal_api_claim"] is False
     assert catalog["marketplace_listing_claim"] is False
+
+
+def test_squarespace_v17_handoff_is_immutable_and_fail_closed():
+    immutable = ROOT / "squarespace" / "demo-1-v1.7-business-media.html"
+    moving = ROOT / "squarespace" / "demo-1-final.html"
+    handoff = load_json(ROOT / "squarespace" / "demo-1-v1.7-handoff.json")
+    assert immutable.read_bytes() == moving.read_bytes()
+    assert sha256(immutable) == "0a49a40b849543c883ebc8bf65368e923796e58e0e7977d24d83fa6b64d53cec"
+    assert handoff["sha256"] == sha256(immutable)
+    assert handoff["principal_deployment_state"] == "PENDING_MANUAL_GATE"
+    assert handoff["automatic_deployment_authorized"] is False

@@ -1,0 +1,19 @@
+{
+  "schema": "dominion.squarespace.demo1.handoff.v1",
+  "page": "/demo-1",
+  "build": "demo-1-v1.7-20260926-business-media",
+  "immutable_artifact": "squarespace/demo-1-v1.7-business-media.html",
+  "sha256": "0a49a40b849543c883ebc8bf65368e923796e58e0e7977d24d83fa6b64d53cec",
+  "prepared_from_public_proof_commit": "5e0062afaf3fbaffea8b127fd3c5bd5d485d1c4d",
+  "principal_deployment_state": "PENDING_MANUAL_GATE",
+  "required_action": "Replace the /demo-1 Squarespace code surface with the exact immutable artifact and publish.",
+  "post_publish_checks": [
+    "page build marker equals demo-1-v1.7-20260926-business-media",
+    "Business film loads and plays",
+    "Politics film loads and plays as demonstration only",
+    "Business public download remains disabled until signed release certification",
+    "Politics downloadable artifact remains unavailable",
+    "release registry and cryptographic release record links resolve"
+  ],
+  "automatic_deployment_authorized": false
+}
