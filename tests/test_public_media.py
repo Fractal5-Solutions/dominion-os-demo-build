@@ -77,6 +77,8 @@ def test_business_release_gate_is_fail_closed():
     assert gate["candidate"]["source_sha"] == "90de700bb9c44ab62212731dbaa13c0bea3b3ffd"
     assert gate["candidate"]["politics_included"] is False
     assert gate["earned_gates"]["microsoft_defender"] == "PASS"
+    assert gate["earned_gates"]["business_film_pages_deployment"] == "PASS"
+    assert gate["earned_gates"]["business_film_clean_browser_playback"] == "PASS"
     assert gate["pending_gates"]["authenticode"] == "PENDING"
     assert gate["pending_gates"]["public_binary_download"] == "DISABLED_FAIL_CLOSED"
     assert gate["separate_non_release_claims"]["politics_download"] == "WITHHELD_BY_PRODUCT_POLICY"

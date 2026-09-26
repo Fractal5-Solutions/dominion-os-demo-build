@@ -20,15 +20,15 @@
     "sbom_and_provenance": "PASS",
     "security_notice": "PASS",
     "privacy_notice": "PASS",
-    "business_only_distribution_boundary": "PASS"
+    "business_only_distribution_boundary": "PASS",
+    "business_film_pages_deployment": "PASS",
+    "business_film_clean_browser_playback": "PASS"
   },
   "pending_gates": {
     "verified_publisher_identity": "BLOCKED_EXTERNAL_IDENTITY_NOT_PROVISIONED",
     "authenticode": "PENDING",
     "signed_exact_artifact_revalidation": "PENDING",
     "public_binary_download": "DISABLED_FAIL_CLOSED",
-    "business_film_pages_deployment": "PUBLISHING",
-    "business_film_clean_browser_playback": "PENDING",
     "squarespace_demo_1_principal_deployment": "PENDING_MANUAL_GATE"
   },
   "separate_non_release_claims": {
@@ -56,5 +56,12 @@
     "No self-signed substitute.",
     "No downloadable Politics artifact.",
     "No production SaaS or live provider-runtime claim without separate evidence."
-  ]
+  ],
+  "media_evidence": {
+    "pages_commit": "1bc7bf5794d33b53896b9d9acafbc773dd209e39",
+    "pages_workflow_run_id": 36265135542,
+    "public_hash_verification": "PASS",
+    "chromium_playback_qa": "PASS",
+    "verified_on": "2026-09-26"
+  }
 }

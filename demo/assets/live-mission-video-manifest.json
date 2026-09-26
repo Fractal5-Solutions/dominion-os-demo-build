@@ -21,7 +21,7 @@
       "id": "business",
       "title": "Executive Decision to Execution",
       "mission": "Enter a new regional market",
-      "state": "publishing",
+      "state": "available",
       "basename": "dominion-os-business-1080p.mp4",
       "duration_seconds": 50.0,
       "size_bytes": 137958,
@@ -42,7 +42,7 @@
       "id": "politics",
       "title": "Intelligence to Institutional Readiness",
       "mission": "Prepare for a legislative session",
-      "state": "publishing",
+      "state": "available",
       "basename": "dominion-os-politics-1080p.mp4",
       "duration_seconds": 50.0,
       "size_bytes": 143860,
@@ -69,9 +69,14 @@
     "source_html_sha256": "5789702b1fabcb20b48bcdf81bef7e32ff723f9b135199ad82588d5edbda831d"
   },
   "publication": {
-    "state": "publishing",
+    "state": "available",
     "media_root": "demo/media",
     "pages_base": "https://fractal5-solutions.github.io/dominion-os-demo-build/demo/media/",
-    "clean_browser_playback_qa": false
+    "clean_browser_playback_qa": true,
+    "pages_commit": "1bc7bf5794d33b53896b9d9acafbc773dd209e39",
+    "pages_workflow_run_id": 36265135542,
+    "public_hash_verification": "PASS",
+    "chromium_playback_qa": "PASS",
+    "verified_on": "2026-09-26"
   }
 }
