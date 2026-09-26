@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dominion OS 1.0 for Business — Windows Release Record</title>
+<style>
+:root{color-scheme:light;--ink:#171717;--muted:#6b6b67;--line:#ddd8ce;--paper:#f7f5ef;--gold:#9b7a34}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.6 system-ui,-apple-system,Segoe UI,sans-serif}
+main{width:min(980px,calc(100% - 32px));margin:0 auto;padding:64px 0 96px}
+.kicker{font-size:11px;font-weight:800;letter-spacing:.14em;color:var(--gold)}
+h1{font-size:clamp(34px,6vw,66px);line-height:1.02;margin:12px 0 18px}h2{margin-top:42px}
+.lead{font-size:19px;max-width:780px}.state{display:inline-block;border:1px solid var(--gold);padding:7px 10px;font-weight:800;letter-spacing:.08em}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:20px}
+.card{background:#fff;border:1px solid var(--line);padding:18px}.card small,.card strong,.card code{display:block}
+.card small{font-size:10px;color:var(--muted);letter-spacing:.08em}.card strong{margin-top:4px}
+code{font:12px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}
+.rule{border-left:3px solid var(--gold);padding:12px 16px;background:#fff}
+a{color:inherit}@media(max-width:680px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body><main>
+<div class="kicker">DOMINION OS™ 1.0 · PUBLIC RELEASE RECORD</div>
+<h1>Business · Windows x64</h1>
+<p><span class="state">CANDIDATE</span></p>
+<p class="lead">Candidate A is the exact Business-only Windows artifact that has passed the internal lifecycle, integrity, Microsoft Defender, SBOM and provenance gates. Public binary distribution remains disabled until verified publisher signing succeeds for the final artifact.</p>
+<h2>Immutable candidate identity</h2>
+<div class="grid">
+<div class="card"><small>SOURCE SHA</small><code>90de700bb9c44ab62212731dbaa13c0bea3b3ffd</code></div>
+<div class="card"><small>PACKAGE SHA-256</small><code>ccbe636f6017bd3f5d2ae95fce261d1cb4cee2e963d255328886d6abce20aeeb</code></div>
+<div class="card"><small>EXECUTABLE SHA-256</small><code>d8b2f974dda56bd48fb9790f1ac8966fba4e72f2a643dc6c75d7b44406143de3</code></div>
+<div class="card"><small>PLATFORM</small><strong>Windows x64 · self-contained</strong></div>
+<div class="card"><small>MISSION PACK</small><strong>Business only</strong></div>
+<div class="card"><small>POLITICS INCLUDED</small><strong>No</strong></div>
+</div>
+
+<h2>Earned evidence</h2>
+<div class="grid">
+<div class="card"><small>LIFECYCLE ACCEPTANCE</small><strong>PASS</strong></div>
+<div class="card"><small>MICROSOFT DEFENDER</small><strong>PASS</strong></div>
+<div class="card"><small>TAMPER / INTEGRITY</small><strong>PASS</strong></div>
+<div class="card"><small>SBOM + PROVENANCE</small><strong>PASS</strong></div>
+<div class="card"><small>AUTHENTICODE</small><strong>NOT SIGNED</strong></div>
+<div class="card"><small>PUBLIC DOWNLOAD CERTIFIED</small><strong>No</strong></div>
+</div>
+
+<h2>Promotion rule</h2>
+<p class="rule"><strong>CANDIDATE → RELEASED</strong> only after verified Fractal5 publisher signing, exact-artifact revalidation, Microsoft Defender PASS, final package hashing, public manifest promotion, and clean external download/install verification. No unsigned substitute is authorized.</p>
+<h2>Distribution boundary</h2>
+<p>Politics remains visible through public synthetic demonstrations and supporting media, but no downloadable Politics artifact is authorized in this release line. Google Cloud is a customer-owned deployment path; deployment readiness is not a claim that Fractal5 currently operates a certified public provider runtime.</p>
+
+<h2>Machine-readable evidence</h2>
+<ul>
+<li><a href="../demo/assets/dominion-business-1.0-release-gate.json">Business release gate receipt</a></li>
+<li><a href="../demo/assets/demo-download-package.json">Download package contract</a></li>
+<li><a href="../demo/assets/dominion-release-catalog.json">Public release catalogue</a></li>
+<li><a href="../demo/assets/live-mission-video-manifest.json">Mission film manifest</a></li>
+<li><a href="../demo/assets/customer-owned-experience-contract.json">Customer-owned experience contract</a></li>
+</ul>
+
+<p><a href="../">← Dominion OS public proof</a></p>
+</main></body></html>

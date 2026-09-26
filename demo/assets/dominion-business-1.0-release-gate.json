@@ -1,0 +1,60 @@
+{
+  "schema": "dominion.business.release-gate.v1",
+  "product": "Dominion OS",
+  "version": "1.0.0",
+  "domain": "Business",
+  "platform": "Windows x64",
+  "release_state": "CANDIDATE",
+  "candidate": {
+    "source_sha": "90de700bb9c44ab62212731dbaa13c0bea3b3ffd",
+    "package_sha256": "ccbe636f6017bd3f5d2ae95fce261d1cb4cee2e963d255328886d6abce20aeeb",
+    "executable_sha256": "d8b2f974dda56bd48fb9790f1ac8966fba4e72f2a643dc6c75d7b44406143de3",
+    "mission_pack": "Business",
+    "politics_included": false,
+    "self_contained": true
+  },
+  "earned_gates": {
+    "lifecycle_acceptance": "PASS",
+    "integrity_and_tamper": "PASS",
+    "microsoft_defender": "PASS",
+    "sbom_and_provenance": "PASS",
+    "security_notice": "PASS",
+    "privacy_notice": "PASS",
+    "business_only_distribution_boundary": "PASS"
+  },
+  "pending_gates": {
+    "verified_publisher_identity": "BLOCKED_EXTERNAL_IDENTITY_NOT_PROVISIONED",
+    "authenticode": "PENDING",
+    "signed_exact_artifact_revalidation": "PENDING",
+    "public_binary_download": "DISABLED_FAIL_CLOSED",
+    "business_film_pages_deployment": "PUBLISHING",
+    "business_film_clean_browser_playback": "PENDING",
+    "squarespace_demo_1_principal_deployment": "PENDING_MANUAL_GATE"
+  },
+  "separate_non_release_claims": {
+    "politics_download": "WITHHELD_BY_PRODUCT_POLICY",
+    "politics_public_demo": "ALLOWED_SYNTHETIC_ONLY",
+    "google_cloud_business_deployment": "DEPLOYMENT_READY_CUSTOMER_OWNED",
+    "google_cloud_public_runtime": "UNCERTIFIED",
+    "canonical_phi_hostname": "BLOCKED_EXTERNAL_DNS_AUTHORITY"
+  },
+  "promotion_rule": {
+    "from": "CANDIDATE",
+    "to": "RELEASED",
+    "requires": [
+      "verified Fractal5 publisher signing",
+      "revalidation of the exact signed artifact",
+      "Microsoft Defender PASS on the final package",
+      "final hashes and provenance",
+      "public download manifest promotion",
+      "clean external download/install verification",
+      "principal deployment of the final Squarespace gateway"
+    ]
+  },
+  "prohibitions": [
+    "No unsigned public binary.",
+    "No self-signed substitute.",
+    "No downloadable Politics artifact.",
+    "No production SaaS or live provider-runtime claim without separate evidence."
+  ]
+}

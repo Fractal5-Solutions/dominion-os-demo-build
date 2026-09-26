@@ -43,7 +43,15 @@ jobs:
           test -f README.md
           test -f SECURITY.md
           test -f demo/live-mission-demo.html
+          test -f release/business-windows-1.0.html
           test -f demo/assets/live-mission-video-manifest.json
+          test -f demo/assets/dominion-business-1.0-release-gate.json
+          test -f demo/media/dominion-os-business-1080p.mp4
+          test -f demo/media/dominion-os-business-poster.jpg
+          test -f demo/media/dominion-os-business.vtt
+          test -f demo/media/dominion-os-politics-1080p.mp4
+          test -f demo/media/dominion-os-politics-poster.jpg
+          test -f demo/media/dominion-os-politics.vtt
 
           grep -Fq 'SYNTHETIC DATA · FILMING BUILD' demo/live-mission-demo.html
           grep -Fq 'EXTERNAL CONNECTOR: NOT CLAIMED LIVE IN THIS BUILD' demo/live-mission-demo.html
@@ -58,9 +66,22 @@ jobs:
           assert public.get("state")=="available", public
           assert public.get("data_class")=="synthetic", public
           assert public.get("external_connector_claim")=="not_live", public
+          import hashlib, pathlib
+          media=pathlib.Path("demo/media")
           for video in data.get("videos",[]):
               assert video.get("interactive_state")=="available", video
-              assert video.get("mp4_url") is None, video
+              assert video.get("state") in {"publishing","available"}, video
+              for basename_key,hash_key,url_key in [
+                  ("basename","sha256","mp4_url"),
+                  ("poster_basename","poster_sha256","poster_url"),
+                  ("captions_basename","captions_sha256","captions_url"),
+              ]:
+                  name=video[basename_key]
+                  p=media/name
+                  assert p.is_file(), p
+                  digest=hashlib.sha256(p.read_bytes()).hexdigest()
+                  assert digest==video[hash_key], (p,digest,video[hash_key])
+                  assert str(video[url_key]).startswith("https://fractal5-solutions.github.io/dominion-os-demo-build/demo/media/"), video
           print("public proof contract: PASS")
           PY
 
@@ -69,11 +90,13 @@ jobs:
         run: |
           set -euo pipefail
           rm -rf _site
-          mkdir -p _site/demo/assets
+          mkdir -p _site/demo/assets _site/demo/media _site/release
 
           cp index.html 404.html .nojekyll README.md SECURITY.md _site/
           cp demo/live-mission-demo.html _site/demo/
           cp demo/assets/*.json _site/demo/assets/
+          cp demo/media/* _site/demo/media/
+          cp release/*.html _site/release/
 
           python3 - <<'PY'
           import json, os
@@ -85,6 +108,10 @@ jobs:
             "failClosed":True,
             "interactiveMissionDemoPublished":True,
             "interactiveMissionDemoDataClass":"synthetic",
+            "missionFilmsIncluded":True,
+            "missionFilmDataClass":"synthetic",
+            "businessReleaseGate":"demo/assets/dominion-business-1.0-release-gate.json",
+            "politicsDownloadIncluded":False,
             "externalConnectorClaimedLive":False,
             "providerRuntimeClaimedLive":False,
             "containsPrivateSource":False,

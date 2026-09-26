@@ -1,57 +1,77 @@
 {
-  "schema_version": 3,
-  "generated_for": "Dominion OS 1.0 live mission films",
-  "source_desktop_main": "cc27b83de06de4c906b67a070e23f3cedbb2c3c6",
-  "source_desktop_ci_run_id": 35723649564,
-  "source_desktop_artifact_id": 10691984606,
-  "source_desktop_at2_acceptance_run_id": 35723900879,
-  "claim_rule": "A video may be marked available only after recording, privacy, claim, encoding, hosting, and clean-browser playback QA pass.",
+  "schema_version": 4,
+  "generated_for": "Dominion OS 1.0 public-safe mission films",
+  "claim_rule": "A film is public only after durable local rendering, checksum binding, repository publication, GitHub Pages deployment, and clean-browser playback QA pass.",
+  "sources": {
+    "business_windows_candidate": {
+      "repository": "Fractal5-Solutions/dominion-os-1.0-desktop-pc",
+      "source_sha": "90de700bb9c44ab62212731dbaa13c0bea3b3ffd",
+      "package_sha256": "ccbe636f6017bd3f5d2ae95fce261d1cb4cee2e963d255328886d6abce20aeeb",
+      "executable_sha256": "d8b2f974dda56bd48fb9790f1ac8966fba4e72f2a643dc6c75d7b44406143de3"
+    },
+    "public_demo": {
+      "repository": "Fractal5-Solutions/dominion-os-demo-build",
+      "source_commit_before_media_publication": "faf24682408964916563aeca06db16df3df2e894",
+      "html_path": "demo/live-mission-demo.html",
+      "html_sha256": "5789702b1fabcb20b48bcdf81bef7e32ff723f9b135199ad82588d5edbda831d"
+    }
+  },
   "videos": [
     {
       "id": "business",
       "title": "Executive Decision to Execution",
       "mission": "Enter a new regional market",
-      "state": "rendered_pending_hosting",
+      "state": "publishing",
       "basename": "dominion-os-business-1080p.mp4",
-      "duration_seconds": 33,
-      "size_bytes": 1213714,
-      "sha256": "b1c27cca0105fa99bc967de2f714fd22db33b6210c739e4b799aba9664dc4e0f",
+      "duration_seconds": 50.0,
+      "size_bytes": 137958,
+      "sha256": "33fecad17a8a69f0ce4ed74b82b477ddbfbab22f105a3c5511045645ce4db0ff",
       "poster_basename": "dominion-os-business-poster.jpg",
-      "poster_sha256": "bbe93a1271fc3554e80191c0fc0864cb3453ac150a29748c37782c2c37b058e4",
+      "poster_sha256": "af33ce6adfa2f0689a9979928e27b9aa9de09c2505acccc8c0303d67a308d79d",
       "captions_basename": "dominion-os-business.vtt",
-      "captions_sha256": "daf67473c09b37cd8f4fc80325e519f56538ad22376b62d73c3f5325f971ffba",
-      "mp4_url": null,
-      "poster_url": null,
-      "captions_url": null,
+      "captions_sha256": "8a00c9159ffe49efb60752c89ce50eb8b07e744de18547afbaf65117edbdb270",
+      "mp4_url": "https://fractal5-solutions.github.io/dominion-os-demo-build/demo/media/dominion-os-business-1080p.mp4",
+      "poster_url": "https://fractal5-solutions.github.io/dominion-os-demo-build/demo/media/dominion-os-business-poster.jpg",
+      "captions_url": "https://fractal5-solutions.github.io/dominion-os-demo-build/demo/media/dominion-os-business.vtt",
       "interactive_state": "available",
-      "interactive_url": "https://fractal5-solutions.github.io/dominion-os-demo-build/demo/live-mission-demo.html?mode=business"
+      "interactive_url": "https://fractal5-solutions.github.io/dominion-os-demo-build/demo/live-mission-demo.html?mode=business",
+      "source_authority": "Windows Business Candidate A 90de700bb9c44ab62212731dbaa13c0bea3b3ffd",
+      "distribution_boundary": "Business film; does not certify unsigned Windows public download."
     },
     {
       "id": "politics",
       "title": "Intelligence to Institutional Readiness",
       "mission": "Prepare for a legislative session",
-      "state": "rendered_pending_hosting",
+      "state": "publishing",
       "basename": "dominion-os-politics-1080p.mp4",
-      "duration_seconds": 33.233333,
-      "size_bytes": 1032017,
-      "sha256": "c0a47ce54f13d26d3d09fec438cac457479eb03361090cef59b33388555b933e",
+      "duration_seconds": 50.0,
+      "size_bytes": 143860,
+      "sha256": "f74892b799735d8749df089bb08ef102456c0649a8e850a50ff1a682c515984a",
       "poster_basename": "dominion-os-politics-poster.jpg",
-      "poster_sha256": "c3112d0a8081baf7561d48e023795b06606c3604cd991b72a2fe83135126b6ef",
+      "poster_sha256": "d86a3cfc248bb2657e9a4922ce4919254f186150958161a30143d2864fec310e",
       "captions_basename": "dominion-os-politics.vtt",
-      "captions_sha256": "daf67473c09b37cd8f4fc80325e519f56538ad22376b62d73c3f5325f971ffba",
-      "mp4_url": null,
-      "poster_url": null,
-      "captions_url": null,
+      "captions_sha256": "68ad3783f23f2bdcc647c40d16c2ad557ce0a8908a820efc40cfe05d92e62d16",
+      "mp4_url": "https://fractal5-solutions.github.io/dominion-os-demo-build/demo/media/dominion-os-politics-1080p.mp4",
+      "poster_url": "https://fractal5-solutions.github.io/dominion-os-demo-build/demo/media/dominion-os-politics-poster.jpg",
+      "captions_url": "https://fractal5-solutions.github.io/dominion-os-demo-build/demo/media/dominion-os-politics.vtt",
       "interactive_state": "available",
-      "interactive_url": "https://fractal5-solutions.github.io/dominion-os-demo-build/demo/live-mission-demo.html?mode=politics"
+      "interactive_url": "https://fractal5-solutions.github.io/dominion-os-demo-build/demo/live-mission-demo.html?mode=politics",
+      "source_authority": "Public synthetic demonstration only",
+      "distribution_boundary": "Politics film and interactive demo only; no downloadable Politics artifact authorized."
     }
   ],
   "interactive_public_demo": {
     "state": "available",
-    "source_desktop_main": "cc27b83de06de4c906b67a070e23f3cedbb2c3c6",
     "url": "https://fractal5-solutions.github.io/dominion-os-demo-build/demo/live-mission-demo.html",
     "data_class": "synthetic",
     "external_connector_claim": "not_live",
-    "authority_boundary": "explicit"
+    "authority_boundary": "explicit",
+    "source_html_sha256": "5789702b1fabcb20b48bcdf81bef7e32ff723f9b135199ad82588d5edbda831d"
+  },
+  "publication": {
+    "state": "publishing",
+    "media_root": "demo/media",
+    "pages_base": "https://fractal5-solutions.github.io/dominion-os-demo-build/demo/media/",
+    "clean_browser_playback_qa": false
   }
 }

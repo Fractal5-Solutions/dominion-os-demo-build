@@ -14,7 +14,7 @@ def load_json(path):
 
 def test_v16_is_windows_business_first_and_preserves_public_politics():
     text = PAGE.read_text(encoding="utf-8")
-    assert 'data-page-build="demo-1-v1.6-20260925-windows-first"' in text
+    assert 'data-page-build="demo-1-v1.7-20260926-business-media"' in text
     assert "Operate the mission." in text
     assert 'id="d1-download"' in text
     assert "Dominion OS 1.0 for Business. Windows first." in text
@@ -22,6 +22,9 @@ def test_v16_is_windows_business_first_and_preserves_public_politics():
     assert "DOMINION OS FOR POLITICS" not in text
     assert "Download Dominion OS 1.0 for Business" in text
     assert "mode=politics" in text
+    assert "dominion-os-business-1080p.mp4" in text
+    assert "dominion-os-politics-1080p.mp4" in text
+    assert "no downloadable Politics artifact is authorized" in text
 
 
 def test_download_gate_is_fail_closed_and_business_only():
