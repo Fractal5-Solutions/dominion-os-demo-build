@@ -97,7 +97,20 @@ def test_saas_catalogue_is_stable_without_overclaiming_runtime():
     assert catalog["catalogue_state"] == "stable"
     assert catalog["module_count"] == 13
     assert names == expected
-    assert all(module["store_state"] == "Configure" for module in catalog["modules"])
+    by_name = {module["name"]: module for module in catalog["modules"]}
+    coming_soon = {"EcoStack", "Install Grid", "DataHarbor"}
+    for name, module in by_name.items():
+        if name in coming_soon:
+            assert module["store_state"] == "Coming Soon"
+            assert module["sellable"] is False
+        else:
+            assert module["store_state"] == "Configure"
+    assert by_name["Cloud Engine"]["sku"] == "APP-CLOUD-ENGINE-W2"
+    assert by_name["OpsSignal"]["sku"] == "APP-OPSSIGNAL-W2"
+    assert by_name["Advocate Engine"]["sku"] == "APP-ADVOCATE-ENG-W2"
+    assert by_name["EcoStack"]["sku"] == "APP-ECOSTACK"
+    assert by_name["Install Grid"]["sku"] == "APP-INSTALL-GRID"
+    assert by_name["DataHarbor"]["sku"] == "APP-DATAHARBOR"
     assert catalog["runtime_certification"] == "engagement-specific"
     assert catalog["independent_ga_claim"] is False
     assert catalog["universal_api_claim"] is False
@@ -110,16 +123,42 @@ def test_saas_catalogue_is_stable_without_overclaiming_runtime():
         source = governed[module["name"]]
         assert module["id"] == source["id"]
         assert module["sku"] == source["sku"]
+        assert module["store_state"] == source["store_state"]
         assert module["implementation_state"] == source["implementation_state"]
         assert module["standalone_ga"] is False
+        if "sellable" in source:
+            assert module["sellable"] == source["sellable"]
+        else:
+            assert "sellable" not in module
 
 
-def test_squarespace_v17_handoff_is_immutable_and_fail_closed():
+def test_squarespace_v17_handoff_remains_immutable_while_final_can_advance():
     immutable = ROOT / "squarespace" / "demo-1-v1.7-business-media.html"
     moving = ROOT / "squarespace" / "demo-1-final.html"
     handoff = load_json(ROOT / "squarespace" / "demo-1-v1.7-handoff.json")
-    assert immutable.read_bytes() == moving.read_bytes()
     assert sha256(immutable) == "0a49a40b849543c883ebc8bf65368e923796e58e0e7977d24d83fa6b64d53cec"
     assert handoff["sha256"] == sha256(immutable)
+    assert moving.read_bytes() != immutable.read_bytes()
+    assert 'data-page-build="demo-1-v1.8-20260927-four-provider-windows"' in moving.read_text(encoding="utf-8")
     assert handoff["principal_deployment_state"] == "PENDING_MANUAL_GATE"
     assert handoff["automatic_deployment_authorized"] is False
+
+def test_current_release_gate_records_four_provider_fanout_and_dns_ready():
+    gate = load_json(GATE)
+    assert gate["separate_non_release_claims"]["canonical_phi_hostname"] == "READY"
+    fanout = gate["provider_fanout_evidence"]
+    assert fanout["windows_main_sha"] == "f0d6c04473175afbeeab7e835fbd4fc3a1e3ea54"
+    assert fanout["packaging_mechanics"] == "PASS"
+    assert set(fanout["providers"]) == {"gcp", "aws", "azure", "oci"}
+    assert all(value == "PASS" for value in fanout["providers"].values())
+    assert fanout["public_download_certification"] == "WITHHELD_PENDING_AUTHENTICODE"
+
+def test_current_squarespace_fallback_is_truthful_without_javascript():
+    page = (ROOT / "squarespace" / "demo-1-final.html").read_text(encoding="utf-8")
+    assert "Business Candidate · Publisher Signing Pending" in page
+    assert "Demonstrated · Download Withheld" in page
+    assert "Google Cloud" in page
+    assert "Amazon Web Services" in page
+    assert "Microsoft Azure" in page
+    assert "Oracle Cloud Infrastructure" in page
+    assert "No public Dominion OS 1.0 release entries are currently registered." not in page
