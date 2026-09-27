@@ -13,8 +13,12 @@ by_name = {m["name"]: m for m in manifest["modules"]}
 
 for module in catalog["modules"]:
     source = by_name[module["name"]]
-    for key in ("id", "sku", "implementation_state", "standalone_ga"):
+    for key in ("id", "sku", "store_state", "implementation_state", "standalone_ga"):
         module[key] = source[key]
+    if "sellable" in source:
+        module["sellable"] = source["sellable"]
+    else:
+        module.pop("sellable", None)
 
 catalog["canonical_manifest"] = {
     "authority": "dominion-os-core/config/dominion-product-manifest.v1.json",

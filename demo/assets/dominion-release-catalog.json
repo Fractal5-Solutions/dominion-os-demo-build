@@ -2,7 +2,7 @@
   "schema": "dominion.public-release-catalog.v1",
   "product": "Dominion OS",
   "productVersion": "1.0",
-  "updatedAt": "2026-09-27T06:19:00-07:00",
+  "updatedAt": "2026-09-27T12:30:00-07:00",
   "entries": [
     {
       "public": true,
@@ -15,7 +15,7 @@
       "deploymentTarget": "Windows x64",
       "requirements": "Self-contained Windows x64 Business package; no separate .NET Desktop Runtime prerequisite; Politics is excluded from the downloadable artifact",
       "checksum": "sha256:ccbe636f6017bd3f5d2ae95fce261d1cb4cee2e963d255328886d6abce20aeeb",
-      "description": "Exact Business-only Windows candidate. Source is committed and provenance-bound; package integrity, tamper rejection, install, first launch, integrity verification, Windows registration, deterministic shutdown, uninstall, Microsoft Defender, SBOM, provenance, security notice and privacy notice have passed. Public distribution remains withheld until verified Authenticode publisher signing is provisioned and completed.",
+      "description": "Exact Business-only Windows candidate with lifecycle, integrity, Microsoft Defender, SBOM/provenance, security and privacy evidence. Four-provider Windows packaging mechanics for Google Cloud, AWS, Azure, and OCI are also proven on protected Windows main. Public binary distribution remains withheld until verified Authenticode publisher signing and exact signed-artifact revalidation complete.",
       "action": {
         "label": "Request Controlled Business Candidate",
         "url": "https://www.fractal5solutions.com/#contact"
@@ -32,7 +32,10 @@
         "defenderScan": "PASS",
         "trustEvidence": "PASS",
         "authenticode": "NOT_SIGNED",
-        "publicDownloadCertified": false
+        "publicDownloadCertified": false,
+        "providerFanoutWindowsMainSha": "f0d6c04473175afbeeab7e835fbd4fc3a1e3ea54",
+        "providerPackagingMechanics": "PASS",
+        "providerCount": 4
       }
     },
     {
@@ -96,7 +99,10 @@
         "providerEvidenceState": "DEPLOYMENT_READY_SOURCE / RUNTIME_UNCERTIFIED",
         "commonWindowsPayloadRequired": true,
         "politicsIncluded": false,
-        "publicDownloadCertified": false
+        "publicDownloadCertified": false,
+        "providerFanoutWindowsMainSha": "f0d6c04473175afbeeab7e835fbd4fc3a1e3ea54",
+        "providerPackagingMechanics": "PASS",
+        "providerManifestSchema": "PASS"
       }
     },
     {
@@ -120,7 +126,10 @@
         "providerEvidenceState": "DEPLOYMENT_BLUEPRINT_READY / PROVIDER_RUNTIME_UNCERTIFIED",
         "commonWindowsPayloadRequired": true,
         "politicsIncluded": false,
-        "publicDownloadCertified": false
+        "publicDownloadCertified": false,
+        "providerFanoutWindowsMainSha": "f0d6c04473175afbeeab7e835fbd4fc3a1e3ea54",
+        "providerPackagingMechanics": "PASS",
+        "providerManifestSchema": "PASS"
       }
     },
     {
@@ -144,7 +153,10 @@
         "providerEvidenceState": "DEPLOYMENT_BLUEPRINT_READY / PROVIDER_RUNTIME_UNCERTIFIED",
         "commonWindowsPayloadRequired": true,
         "politicsIncluded": false,
-        "publicDownloadCertified": false
+        "publicDownloadCertified": false,
+        "providerFanoutWindowsMainSha": "f0d6c04473175afbeeab7e835fbd4fc3a1e3ea54",
+        "providerPackagingMechanics": "PASS",
+        "providerManifestSchema": "PASS"
       }
     },
     {
@@ -168,7 +180,10 @@
         "providerEvidenceState": "STAGED_PROVIDER_SOURCE_CONTRACT / RUNTIME_UNCERTIFIED",
         "commonWindowsPayloadRequired": true,
         "politicsIncluded": false,
-        "publicDownloadCertified": false
+        "publicDownloadCertified": false,
+        "providerFanoutWindowsMainSha": "f0d6c04473175afbeeab7e835fbd4fc3a1e3ea54",
+        "providerPackagingMechanics": "PASS",
+        "providerManifestSchema": "PASS"
       }
     }
   ]

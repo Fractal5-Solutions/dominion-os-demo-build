@@ -50,7 +50,7 @@
       "store_state": "Configure",
       "description": "Structure deployment posture, infrastructure planning, health, environments, release pathways, rollback planning, and cloud operations.",
       "id": "cloud-engine",
-      "sku": "IC-CLOUD-ENGINE-IC",
+      "sku": "APP-CLOUD-ENGINE-W2",
       "implementation_state": "capability_family_present",
       "standalone_ga": false
     },
@@ -77,36 +77,38 @@
       "store_state": "Configure",
       "description": "Structure stakeholder maps, relationship workflows, engagement planning, issue intelligence, and public-affairs operating views.",
       "id": "advocate-engine",
-      "sku": "IC-ADV-ENGINE-IC",
+      "sku": "APP-ADVOCATE-ENG-W2",
       "implementation_state": "catalogued_evidence_required",
       "standalone_ga": false
     },
     {
       "name": "Install Grid",
-      "store_state": "Configure",
+      "store_state": "Coming Soon",
       "description": "Create structured installation, access, onboarding, deployment, and implementation-entry pathways.",
       "id": "install-grid",
-      "sku": "APP-INSTALLGRID-W2",
-      "implementation_state": "capability_family_present",
-      "standalone_ga": false
+      "sku": "APP-INSTALL-GRID",
+      "implementation_state": "documented_development",
+      "standalone_ga": false,
+      "sellable": false
     },
     {
       "name": "OpsSignal",
       "store_state": "Configure",
       "description": "Bring system state, integrity signals, operating metrics, alerts, and mission telemetry into decision-ready views.",
       "id": "opssignal",
-      "sku": "IC-OPS-SIGNAL-IC",
+      "sku": "APP-OPSSIGNAL-W2",
       "implementation_state": "capability_family_present",
       "standalone_ga": false
     },
     {
       "name": "EcoStack",
-      "store_state": "Configure",
+      "store_state": "Coming Soon",
       "description": "Add environmental, sustainability, infrastructure, natural-resource, climate, and ESG-oriented information layers where appropriate.",
       "id": "ecostack",
-      "sku": "APP-ECOSTACK-W2",
-      "implementation_state": "capability_family_present",
-      "standalone_ga": false
+      "sku": "APP-ECOSTACK",
+      "implementation_state": "documented_development",
+      "standalone_ga": false,
+      "sellable": false
     },
     {
       "name": "StoryThread",
@@ -119,12 +121,13 @@
     },
     {
       "name": "DataHarbor",
-      "store_state": "Configure",
+      "store_state": "Coming Soon",
       "description": "Create controlled data collections, catalogues, repositories, warehouses, and source-aware information environments.",
       "id": "dataharbor",
-      "sku": "APP-DATAHARBOR-W2",
-      "implementation_state": "capability_family_present",
-      "standalone_ga": false
+      "sku": "APP-DATAHARBOR",
+      "implementation_state": "documented_development",
+      "standalone_ga": false,
+      "sellable": false
     }
   ],
   "module_count": 13,
@@ -135,6 +138,6 @@
   "canonical_manifest": {
     "authority": "dominion-os-core/config/dominion-product-manifest.v1.json",
     "snapshot_path": "demo/assets/dominion-product-manifest.v1.json",
-    "snapshot_sha256": "920e8c2974b63728bc65f0f25231f3ed969ac3bb11967b471de43332efaca517"
+    "snapshot_sha256": "5c76249cc4eab2cc1b0ad4de60b1dd7698b181e12b3d3ab4cfbdeb766ccc254b"
   }
 }
