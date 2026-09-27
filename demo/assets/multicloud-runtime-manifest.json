@@ -2,11 +2,59 @@
   "schema": "dominion.public-runtime-claims.v1",
   "publicSurface": "static-proof",
   "providers": [
-    {"id":"gcp","name":"Google Cloud","deploymentState":"deployment-ready","publicRuntimeState":"uncertified","publicClaimAllowed":false},
-    {"id":"azure","name":"Microsoft Azure","deploymentState":"architecture-ready","publicRuntimeState":"not-published","publicClaimAllowed":false},
-    {"id":"aws","name":"Amazon Web Services","deploymentState":"architecture-ready","publicRuntimeState":"not-published","publicClaimAllowed":false},
-    {"id":"oci","name":"Oracle Cloud Infrastructure","deploymentState":"portable-path-ready","publicRuntimeState":"not-published","publicClaimAllowed":false}
+    {
+      "id": "gcp",
+      "name": "Google Cloud",
+      "deploymentState": "deployment-ready",
+      "publicRuntimeState": "uncertified",
+      "publicClaimAllowed": false,
+      "windowsBusinessPackageTarget": true,
+      "publicDownloadCertified": false
+    },
+    {
+      "id": "azure",
+      "name": "Microsoft Azure",
+      "deploymentState": "architecture-ready",
+      "publicRuntimeState": "not-published",
+      "publicClaimAllowed": false,
+      "windowsBusinessPackageTarget": true,
+      "publicDownloadCertified": false
+    },
+    {
+      "id": "aws",
+      "name": "Amazon Web Services",
+      "deploymentState": "architecture-ready",
+      "publicRuntimeState": "not-published",
+      "publicClaimAllowed": false,
+      "windowsBusinessPackageTarget": true,
+      "publicDownloadCertified": false
+    },
+    {
+      "id": "oci",
+      "name": "Oracle Cloud Infrastructure",
+      "deploymentState": "portable-path-ready",
+      "publicRuntimeState": "not-published",
+      "publicClaimAllowed": false,
+      "windowsBusinessPackageTarget": true,
+      "publicDownloadCertified": false
+    }
   ],
-  "claimControl":{"failClosed":true,"continuousPublicRuntimeClaimAllowed":false,"staticPublicDemoClaimAllowed":true},
-  "safety":{"containsSecrets":false,"containsCustomerData":false,"containsPaymentData":false,"containsPrivateEndpoints":false}
+  "claimControl": {
+    "failClosed": true,
+    "continuousPublicRuntimeClaimAllowed": false,
+    "staticPublicDemoClaimAllowed": true,
+    "providerWindowsDownloadsRequired": [
+      "gcp",
+      "aws",
+      "azure",
+      "oci"
+    ],
+    "providerDownloadPromotionRule": "independent exact-artifact certification required; runtime readiness does not imply download readiness"
+  },
+  "safety": {
+    "containsSecrets": false,
+    "containsCustomerData": false,
+    "containsPaymentData": false,
+    "containsPrivateEndpoints": false
+  }
 }
