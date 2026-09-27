@@ -1,11 +1,11 @@
 {
-  "schema": "f5.dominion.demo.download-package.v4",
-  "generatedAt": "2026-09-25T20:56:00Z",
-  "title": "Dominion OS 1.0 for Business — Windows Downloadable Experience",
+  "schema": "f5.dominion.demo.download-package.v5",
+  "generatedAt": "2026-09-27T13:19:00Z",
+  "title": "Dominion OS 1.0 + SaaS Suite — Windows Provider Distribution Matrix",
   "publicBridge": "https://www.fractal5solutions.com/demo-1",
   "experienceContract": "demo/assets/customer-owned-experience-contract.json",
   "windowsExperience": {
-    "product": "Dominion OS 1.0 for Business",
+    "product": "Dominion OS 1.0 + SaaS Suite for Business",
     "platform": "Windows x64",
     "missionPack": "Business",
     "experienceParity": "same-product-runtime",
@@ -45,7 +45,65 @@
     "fractal5SecretsDistributed": false,
     "customerCredentialsEmbedded": false,
     "reverseEngineeringClaim": "resistant-not-impossible",
-    "blocker": "verified Authenticode publisher identity is not yet provisioned"
+    "blocker": "verified Authenticode publisher identity is not yet provisioned",
+    "providerDownloadsRequired": [
+      "gcp",
+      "aws",
+      "azure",
+      "oci"
+    ],
+    "providerDownloadsRequireIndependentCertification": true,
+    "providerDownloadPromotionRule": "download button may activate only when the exact provider package is signed, checksum-bound, lifecycle-tested, security-scanned, registered, and publicDownloadCertified=true"
   },
-  "notes": "The exact Business Windows candidate is built, provenance-bound, lifecycle-tested and Defender-clean. Public binary distribution remains disabled until verified publisher signing completes the exact-artifact release gate. Politics remains public-demonstration-only. macOS follows Windows later as a separate platform release."
+  "notes": "The common Windows Business payload has lifecycle, integrity, Defender, SBOM and provenance evidence but remains unsigned for broad public distribution. Four provider-specific Windows Business packages are required: Google Cloud, AWS, Microsoft Azure and Oracle Cloud Infrastructure. Each provider package remains fail-closed until exact-artifact certification is complete. Politics remains public-demonstration-only.",
+  "providerDownloads": [
+    {
+      "id": "gcp",
+      "provider": "Google Cloud",
+      "platform": "Windows x64",
+      "missionPack": "Business",
+      "packageModel": "common-certified-windows-payload-plus-provider-profile",
+      "providerSource": "Fractal5-Solutions/dominion-os-1.0-gcloud",
+      "providerEvidenceState": "DEPLOYMENT_READY_SOURCE / RUNTIME_UNCERTIFIED",
+      "publicDownloadCertified": false,
+      "publicDownloadUrl": null,
+      "releaseState": "provider-package-certification-pending"
+    },
+    {
+      "id": "aws",
+      "provider": "Amazon Web Services",
+      "platform": "Windows x64",
+      "missionPack": "Business",
+      "packageModel": "common-certified-windows-payload-plus-provider-profile",
+      "providerSource": "Fractal5-Solutions/dominion-os-1.0-aws",
+      "providerEvidenceState": "DEPLOYMENT_BLUEPRINT_READY / PROVIDER_RUNTIME_UNCERTIFIED",
+      "publicDownloadCertified": false,
+      "publicDownloadUrl": null,
+      "releaseState": "provider-package-certification-pending"
+    },
+    {
+      "id": "azure",
+      "provider": "Microsoft Azure",
+      "platform": "Windows x64",
+      "missionPack": "Business",
+      "packageModel": "common-certified-windows-payload-plus-provider-profile",
+      "providerSource": "Fractal5-Solutions/dominion-os-1.0-azure",
+      "providerEvidenceState": "DEPLOYMENT_BLUEPRINT_READY / PROVIDER_RUNTIME_UNCERTIFIED",
+      "publicDownloadCertified": false,
+      "publicDownloadUrl": null,
+      "releaseState": "provider-package-certification-pending"
+    },
+    {
+      "id": "oci",
+      "provider": "Oracle Cloud Infrastructure",
+      "platform": "Windows x64",
+      "missionPack": "Business",
+      "packageModel": "common-certified-windows-payload-plus-provider-profile",
+      "providerSource": "Fractal5-Solutions/dominion-command-center/staging/providers/oci",
+      "providerEvidenceState": "STAGED_PROVIDER_SOURCE_CONTRACT / RUNTIME_UNCERTIFIED",
+      "publicDownloadCertified": false,
+      "publicDownloadUrl": null,
+      "releaseState": "canonical-provider-repository-and-package-certification-pending"
+    }
+  ]
 }
