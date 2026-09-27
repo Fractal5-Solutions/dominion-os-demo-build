@@ -26,5 +26,19 @@
     "catalog Business mission and Politics excluded",
     "catalog URL exactly matches provider manifest URL",
     "catalog checksum exactly matches provider package SHA-256"
+  ],
+  "canonicalSource": "squarespace/demo-1-v1.9-ecosystem-truth.html",
+  "movingAlias": "squarespace/demo-1-final.html",
+  "gitBlobSha": "031d69009d424b91c73ccd868d35d6cd3491f303",
+  "sourceMergeSha": "92b33fd6cf17c81a587bf648baa804c6db1ef626",
+  "publicationRule": "Replace the entire existing Squarespace code block with the complete canonical source. Do not micro-edit.",
+  "requiredLiveChecks": [
+    "build marker demo-1-v1.9-20260927-hardened-four-provider-gates",
+    "four Windows Business provider paths visible: GCP, AWS, Azure, OCI",
+    "Windows candidate remains publisher-signing pending",
+    "no public binary before exact signed-artifact certification",
+    "Politics remains demonstration-only and not downloadable",
+    "SaaS catalogue matches canonical Configure versus Coming Soon states",
+    "static fallback remains truthful when JavaScript evidence fetches fail"
   ]
 }
