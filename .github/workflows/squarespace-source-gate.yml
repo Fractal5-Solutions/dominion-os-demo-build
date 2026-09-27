@@ -1,0 +1,71 @@
+name: Squarespace Source Gate
+
+on:
+  pull_request:
+    paths:
+      - "squarespace/demo-1-final.html"
+      - "squarespace/demo-1-v1.9-hardened-four-provider-gates.html"
+      - "demo/assets/demo-download-package.json"
+      - "demo/assets/dominion-release-catalog.json"
+      - ".github/workflows/squarespace-source-gate.yml"
+  push:
+    branches: [main]
+    paths:
+      - "squarespace/demo-1-final.html"
+      - "demo/assets/demo-download-package.json"
+      - "demo/assets/dominion-release-catalog.json"
+      - ".github/workflows/squarespace-source-gate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: false
+
+      - name: Validate embedded JavaScript and fail-closed release state
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, pathlib, re, subprocess, tempfile
+
+          html = pathlib.Path("squarespace/demo-1-final.html").read_text(encoding="utf-8")
+          assert 'data-page-build="demo-1-v1.9-20260927-hardened-four-provider-gates"' in html
+          assert 'if(state==="ready")else' not in html
+          assert 'commonCertified&&packageCertified&&catalogCertified&&hrefMatches&&checksumMatches' in html
+
+          scripts = re.findall(r"<script(?:\s[^>]*)?>(.*?)</script>", html, flags=re.I|re.S)
+          js_blocks = [s for s in scripts if '"@context"' not in s]
+          assert js_blocks, "no executable script blocks found"
+          for index, script in enumerate(js_blocks):
+              with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False, encoding="utf-8") as tmp:
+                  tmp.write(script)
+                  path = tmp.name
+              result = subprocess.run(["node","--check",path], text=True, capture_output=True)
+              if result.returncode:
+                  raise SystemExit(f"script {index} syntax failure:\n{result.stderr}")
+
+          package = json.loads(pathlib.Path("demo/assets/demo-download-package.json").read_text(encoding="utf-8"))
+          catalog = json.loads(pathlib.Path("demo/assets/dominion-release-catalog.json").read_text(encoding="utf-8"))
+
+          assert package["claimControl"]["binaryDownloadEnabled"] is False
+          assert package["windowsExperience"]["publicDownloadCertified"] is False
+          assert package["politicsExperience"]["downloadable"] is False
+
+          providers = package["providerDownloads"]
+          assert {p["id"] for p in providers} == {"gcp","aws","azure","oci"}
+          assert all(p["publicDownloadCertified"] is False for p in providers)
+          assert all(p.get("publicDownloadUrl") is None for p in providers)
+
+          catalog_providers = [e for e in catalog["entries"] if e.get("providerDownloadFamily") is True]
+          assert {e["providerId"] for e in catalog_providers} == {"gcp","aws","azure","oci"}
+          assert all(e["proof"]["publicDownloadCertified"] is False for e in catalog_providers)
+          assert all(e["proof"].get("politicsIncluded") is False for e in catalog_providers)
+
+          print("SQUARESPACE_SOURCE_GATE_PASS")
+          PY
