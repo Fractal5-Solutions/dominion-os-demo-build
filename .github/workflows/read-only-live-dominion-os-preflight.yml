@@ -27,13 +27,16 @@ jobs:
           url = 'https://www.fractal5solutions.com/dominion-os'
           out = pathlib.Path('live-preflight').resolve()
           out.mkdir()
+          # Squarespace's public response exceeded the former 2 MB capture limit.
+          # Retain a finite cap; this is a read-only public-page capture, not a release gate.
+          max_bytes = 8_000_000
           request = urllib.request.Request(url, headers={'User-Agent':'Fractal5-ReadOnly-Website-Preflight/1.0','Cache-Control':'no-cache','Pragma':'no-cache','Accept-Encoding':'identity'})
           with urllib.request.urlopen(request, timeout=30) as response:
               if response.geturl().split('?',1)[0] != url:
                   raise RuntimeError('Unexpected public URL redirect')
-              data = response.read(2_000_001)
-              if len(data) > 2_000_000:
-                  raise RuntimeError('Public response exceeded bounded size')
+              data = response.read(max_bytes + 1)
+              if len(data) > max_bytes:
+                  raise RuntimeError('Public response exceeded bounded 8 MB capture size')
               status = response.status
               headers = {key:response.headers.get(key) for key in ['Date','ETag','Last-Modified','Age','Cache-Control']}
           source = data.decode('utf-8')
@@ -46,7 +49,7 @@ jobs:
                   if 'sqs-block-code' in attrs.get('class','').split(): self.blocks.append(attrs.get('id'))
                   if attrs.get('data-page-build'): self.builds.append(attrs['data-page-build'])
           scan=Scan(); scan.feed(source)
-          receipt={'schema':'fractal5.public-page-preflight.v1','url':url,'capturedAt':datetime.datetime.now(datetime.timezone.utc).isoformat(),'httpStatus':status,'responseSha256':hashlib.sha256(data).hexdigest(),'bytes':len(data),'headers':headers,'codeBlockIds':scan.blocks,'buildMarkers':scan.builds,'sourceHead':os.environ.get('GITHUB_SHA'),'siteMutation':False,'secretsUsed':False,'browser':{}}
+          receipt={'schema':'fractal5.public-page-preflight.v1','url':url,'capturedAt':datetime.datetime.now(datetime.timezone.utc).isoformat(),'httpStatus':status,'responseSha256':hashlib.sha256(data).hexdigest(),'bytes':len(data),'maxBytes':max_bytes,'headers':headers,'codeBlockIds':scan.blocks,'buildMarkers':scan.builds,'sourceHead':os.environ.get('GITHUB_SHA'),'runId':os.environ.get('GITHUB_RUN_ID'),'runAttempt':os.environ.get('GITHUB_RUN_ATTEMPT'),'siteMutation':False,'secretsUsed':False,'browser':{}}
           chrome=shutil.which('google-chrome') or shutil.which('google-chrome-stable') or shutil.which('chromium')
           if chrome:
               for label,width,height in [('desktop',1440,1100),('mobile',390,844)]:
