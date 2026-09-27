@@ -1,6 +1,6 @@
 {
   "schema": "f5.dominion.demo.download-package.v5",
-  "generatedAt": "2026-09-27T13:19:00Z",
+  "generatedAt": "2026-09-27T19:30:00Z",
   "title": "Dominion OS 1.0 + SaaS Suite — Windows Provider Distribution Matrix",
   "publicBridge": "https://www.fractal5solutions.com/demo-1",
   "experienceContract": "demo/assets/customer-owned-experience-contract.json",
@@ -35,7 +35,8 @@
   "platformRoadmap": {
     "current": "Windows x64 Business",
     "next": "macOS Business",
-    "nextState": "planned-later"
+    "nextState": "not-currently-implemented",
+    "linuxState": "not-currently-implemented"
   },
   "claimControl": {
     "binaryDownloadEnabled": false,
@@ -105,5 +106,19 @@
       "publicDownloadUrl": null,
       "releaseState": "canonical-provider-repository-and-package-certification-pending"
     }
-  ]
+  ],
+  "providerFanout": {
+    "windowsMainSha": "f0d6c04473175afbeeab7e835fbd4fc3a1e3ea54",
+    "providers": [
+      "gcp",
+      "aws",
+      "azure",
+      "oci"
+    ],
+    "packagingMechanics": "PASS",
+    "lifecycleAcceptance": "PASS",
+    "politicsIncluded": false,
+    "publicDownloadCertified": false,
+    "blocker": "verified Authenticode publisher identity is not yet provisioned"
+  }
 }
