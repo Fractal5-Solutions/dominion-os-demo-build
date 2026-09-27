@@ -1,0 +1,20 @@
+{
+  "schema": "f5.squarespace.handoff.v1",
+  "page": "/demo-1",
+  "build": "demo-1-v1.8-20260927-four-provider-windows",
+  "source": "squarespace/demo-1-final.html",
+  "deploymentUnit": "single Squarespace code block",
+  "publicationAuthority": "Principal manual Squarespace publish",
+  "releaseTruth": {
+    "publicDownloadsAvailableNow": false,
+    "providerFamilies": [
+      "gcp",
+      "aws",
+      "azure",
+      "oci"
+    ],
+    "businessOnly": true,
+    "politicsDownloadable": false,
+    "promotionRule": "each provider action activates only when package manifest and public release catalog independently certify the exact provider artifact and a safe registry URL exists"
+  }
+}
