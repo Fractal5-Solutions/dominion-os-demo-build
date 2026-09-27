@@ -1,5 +1,5 @@
 <!-- Dominion OS 1.0 public product gateway — canonical Squarespace artifact -->
-<section id="dominion-demo-v1" data-page-build="demo-1-v1.8-20260927-four-provider-windows">
+<section id="dominion-demo-v1" data-page-build="demo-1-v1.9-20260927-hardened-four-provider-gates">
   <header class="d1-hero">
     <div class="d1-shell d1-hero-grid">
       <div>
@@ -490,10 +490,50 @@
     REQUIRED_PROVIDER_IDS.forEach(providerId=>{
       const packageEntry=providerPackageEntry(providerId);
       const catalogEntry=providerCatalogEntry(providerId);
-      const packageCertified=!!(packageEntry&&packageEntry.publicDownloadCertified===true);
-      const catalogCertified=!!(catalogEntry&&catalogEntry.proof&&catalogEntry.proof.publicDownloadCertified===true);
-      const href=catalogEntry&&catalogEntry.action?safeHref(catalogEntry.action.url):null;
-      const downloadable=packageCertified&&catalogCertified&&href;
+      const common=downloadPackage&&downloadPackage.windowsExperience;
+      const claimControl=downloadPackage&&downloadPackage.claimControl;
+      const packageCertified=!!(
+        packageEntry &&
+        packageEntry.publicDownloadCertified===true &&
+        String(packageEntry.missionPack||"").toLowerCase()==="business" &&
+        packageEntry.politicsIncluded!==true &&
+        typeof packageEntry.sha256==="string" &&
+        /^[a-f0-9]{64}$/i.test(packageEntry.sha256) &&
+        safeHref(packageEntry.publicDownloadUrl)
+      );
+      const catalogCertified=!!(
+        catalogEntry &&
+        catalogEntry.proof &&
+        catalogEntry.proof.publicDownloadCertified===true &&
+        catalogEntry.proof.politicsIncluded===false &&
+        String(catalogEntry.proof.missionPack||"Business").toLowerCase()==="business" &&
+        typeof catalogEntry.checksum==="string" &&
+        /^sha256:[a-f0-9]{64}$/i.test(catalogEntry.checksum) &&
+        catalogEntry.action &&
+        safeHref(catalogEntry.action.url)
+      );
+      const commonCertified=!!(
+        common &&
+        common.publicDownloadCertified===true &&
+        /^verified$/i.test(String(common.authenticode||"")) &&
+        common.lifecycleAcceptance==="PASS" &&
+        common.defenderScan==="PASS" &&
+        claimControl &&
+        claimControl.binaryDownloadEnabled===true &&
+        claimControl.politicsDownloadAllowed===false
+      );
+      const packageHref=packageEntry?safeHref(packageEntry.publicDownloadUrl):null;
+      const catalogHref=catalogEntry&&catalogEntry.action?safeHref(catalogEntry.action.url):null;
+      const hrefMatches=!!(packageHref&&catalogHref&&packageHref===catalogHref);
+      const checksumMatches=!!(
+        packageEntry &&
+        catalogEntry &&
+        typeof packageEntry.sha256==="string" &&
+        typeof catalogEntry.checksum==="string" &&
+        ("sha256:"+packageEntry.sha256.toLowerCase())===catalogEntry.checksum.toLowerCase()
+      );
+      const downloadable=!!(commonCertified&&packageCertified&&catalogCertified&&hrefMatches&&checksumMatches);
+      const href=downloadable?packageHref:null;
       if(downloadable)certifiedCount++;
 
       const card=document.createElement("article");card.className="d1-provider-download-card";
@@ -512,7 +552,7 @@
         action.href=href;action.textContent="Download for "+(PROVIDER_LABELS[providerId]||providerId)+" →";
         if(new URL(href).origin!==window.location.origin){action.target="_blank";action.rel="noopener noreferrer";}
       }else{
-        action.href="/#contact";action.textContent="Public Download Pending";action.setAttribute("aria-disabled","true");
+        action.href="/#contact";action.textContent="Public Download Pending";action.setAttribute("aria-disabled","true");action.setAttribute("data-download-certified","false");
       }
       card.append(action);
       grid.append(card);
@@ -555,10 +595,8 @@
   }
 
   const deploymentPromise=fetchJson(URLS.deployment).then(data=>{
-    const state=data&&data.deploymentReadiness&&data.deploymentReadiness.state;
-    if(state==="ready")else 
     return data;
-  }).catch(()=>{return null;});
+  }).catch(()=>null);
 
   const runtimePromise=fetchJson(URLS.runtime).then(data=>{
     renderProviders(data);
