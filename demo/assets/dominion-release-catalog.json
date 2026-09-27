@@ -2,7 +2,7 @@
   "schema": "dominion.public-release-catalog.v1",
   "product": "Dominion OS",
   "productVersion": "1.0",
-  "updatedAt": "2026-09-25T13:56:00-07:00",
+  "updatedAt": "2026-09-27T06:19:00-07:00",
   "entries": [
     {
       "public": true,
@@ -73,6 +73,102 @@
         "deploymentReady": true,
         "customerOwnedEstate": true,
         "publicRuntimeCertified": false
+      }
+    },
+    {
+      "public": true,
+      "providerDownloadFamily": true,
+      "providerId": "gcp",
+      "name": "Dominion OS 1.0 + SaaS Suite for Business — Google Cloud for Windows",
+      "domain": "Business",
+      "distribution": "Provider-Specific Windows Package Target",
+      "state": "Certification Pending · Not Downloadable",
+      "version": "1.0",
+      "deploymentTarget": "Windows x64 + Google Cloud",
+      "requirements": "Common certified Windows Business payload plus provider-specific profile; exact signed package, checksum, SBOM/provenance, lifecycle acceptance, security scan, release-registry promotion and publicDownloadCertified=true required before public download",
+      "description": "Required Google Cloud Windows Business distribution family. Provider source exists at Fractal5-Solutions/dominion-os-1.0-gcloud. Current provider evidence: DEPLOYMENT_READY_SOURCE / RUNTIME_UNCERTIFIED. This entry is a release target, not a downloadable artifact.",
+      "action": {
+        "label": "Public Download Not Yet Certified",
+        "url": "https://www.fractal5solutions.com/#contact"
+      },
+      "proof": {
+        "providerSource": "Fractal5-Solutions/dominion-os-1.0-gcloud",
+        "providerEvidenceState": "DEPLOYMENT_READY_SOURCE / RUNTIME_UNCERTIFIED",
+        "commonWindowsPayloadRequired": true,
+        "politicsIncluded": false,
+        "publicDownloadCertified": false
+      }
+    },
+    {
+      "public": true,
+      "providerDownloadFamily": true,
+      "providerId": "aws",
+      "name": "Dominion OS 1.0 + SaaS Suite for Business — Amazon Web Services for Windows",
+      "domain": "Business",
+      "distribution": "Provider-Specific Windows Package Target",
+      "state": "Certification Pending · Not Downloadable",
+      "version": "1.0",
+      "deploymentTarget": "Windows x64 + Amazon Web Services",
+      "requirements": "Common certified Windows Business payload plus provider-specific profile; exact signed package, checksum, SBOM/provenance, lifecycle acceptance, security scan, release-registry promotion and publicDownloadCertified=true required before public download",
+      "description": "Required Amazon Web Services Windows Business distribution family. Provider source exists at Fractal5-Solutions/dominion-os-1.0-aws. Current provider evidence: DEPLOYMENT_BLUEPRINT_READY / PROVIDER_RUNTIME_UNCERTIFIED. This entry is a release target, not a downloadable artifact.",
+      "action": {
+        "label": "Public Download Not Yet Certified",
+        "url": "https://www.fractal5solutions.com/#contact"
+      },
+      "proof": {
+        "providerSource": "Fractal5-Solutions/dominion-os-1.0-aws",
+        "providerEvidenceState": "DEPLOYMENT_BLUEPRINT_READY / PROVIDER_RUNTIME_UNCERTIFIED",
+        "commonWindowsPayloadRequired": true,
+        "politicsIncluded": false,
+        "publicDownloadCertified": false
+      }
+    },
+    {
+      "public": true,
+      "providerDownloadFamily": true,
+      "providerId": "azure",
+      "name": "Dominion OS 1.0 + SaaS Suite for Business — Microsoft Azure for Windows",
+      "domain": "Business",
+      "distribution": "Provider-Specific Windows Package Target",
+      "state": "Certification Pending · Not Downloadable",
+      "version": "1.0",
+      "deploymentTarget": "Windows x64 + Microsoft Azure",
+      "requirements": "Common certified Windows Business payload plus provider-specific profile; exact signed package, checksum, SBOM/provenance, lifecycle acceptance, security scan, release-registry promotion and publicDownloadCertified=true required before public download",
+      "description": "Required Microsoft Azure Windows Business distribution family. Provider source exists at Fractal5-Solutions/dominion-os-1.0-azure. Current provider evidence: DEPLOYMENT_BLUEPRINT_READY / PROVIDER_RUNTIME_UNCERTIFIED. This entry is a release target, not a downloadable artifact.",
+      "action": {
+        "label": "Public Download Not Yet Certified",
+        "url": "https://www.fractal5solutions.com/#contact"
+      },
+      "proof": {
+        "providerSource": "Fractal5-Solutions/dominion-os-1.0-azure",
+        "providerEvidenceState": "DEPLOYMENT_BLUEPRINT_READY / PROVIDER_RUNTIME_UNCERTIFIED",
+        "commonWindowsPayloadRequired": true,
+        "politicsIncluded": false,
+        "publicDownloadCertified": false
+      }
+    },
+    {
+      "public": true,
+      "providerDownloadFamily": true,
+      "providerId": "oci",
+      "name": "Dominion OS 1.0 + SaaS Suite for Business — Oracle Cloud Infrastructure for Windows",
+      "domain": "Business",
+      "distribution": "Provider-Specific Windows Package Target",
+      "state": "Certification Pending · Not Downloadable",
+      "version": "1.0",
+      "deploymentTarget": "Windows x64 + Oracle Cloud Infrastructure",
+      "requirements": "Common certified Windows Business payload plus provider-specific profile; exact signed package, checksum, SBOM/provenance, lifecycle acceptance, security scan, release-registry promotion and publicDownloadCertified=true required before public download",
+      "description": "Required Oracle Cloud Infrastructure Windows Business distribution family. Provider source exists at Fractal5-Solutions/dominion-command-center/staging/providers/oci. Current provider evidence: STAGED_PROVIDER_SOURCE_CONTRACT / RUNTIME_UNCERTIFIED. This entry is a release target, not a downloadable artifact.",
+      "action": {
+        "label": "Public Download Not Yet Certified",
+        "url": "https://www.fractal5solutions.com/#contact"
+      },
+      "proof": {
+        "providerSource": "Fractal5-Solutions/dominion-command-center/staging/providers/oci",
+        "providerEvidenceState": "STAGED_PROVIDER_SOURCE_CONTRACT / RUNTIME_UNCERTIFIED",
+        "commonWindowsPayloadRequired": true,
+        "politicsIncluded": false,
+        "publicDownloadCertified": false
       }
     }
   ]
