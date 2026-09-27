@@ -36,7 +36,7 @@
     "politics_public_demo": "ALLOWED_SYNTHETIC_ONLY",
     "google_cloud_business_deployment": "DEPLOYMENT_READY_CUSTOMER_OWNED",
     "google_cloud_public_runtime": "UNCERTIFIED",
-    "canonical_phi_hostname": "BLOCKED_EXTERNAL_DNS_AUTHORITY"
+    "canonical_phi_hostname": "READY"
   },
   "promotion_rule": {
     "from": "CANDIDATE",
@@ -63,5 +63,21 @@
     "public_hash_verification": "PASS",
     "chromium_playback_qa": "PASS",
     "verified_on": "2026-09-26"
+  },
+  "provider_fanout_evidence": {
+    "windows_main_sha": "f0d6c04473175afbeeab7e835fbd4fc3a1e3ea54",
+    "evidence_date": "2026-09-27",
+    "packaging_mechanics": "PASS",
+    "providers": {
+      "gcp": "PASS",
+      "aws": "PASS",
+      "azure": "PASS",
+      "oci": "PASS"
+    },
+    "provider_manifest_schema": "PASS",
+    "business_only_policy": "PASS",
+    "politics_exclusion": "PASS",
+    "per_zip_sha256_binding": "PASS",
+    "public_download_certification": "WITHHELD_PENDING_AUTHENTICODE"
   }
 }
