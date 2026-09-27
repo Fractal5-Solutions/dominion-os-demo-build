@@ -14,7 +14,7 @@ def load_json(path):
 
 def test_v16_is_windows_business_first_and_preserves_public_politics():
     text = PAGE.read_text(encoding="utf-8")
-    assert 'data-page-build="demo-1-v1.7-20260926-business-media"' in text
+    assert 'data-page-build="demo-1-v1.8-20260927-four-provider-windows"' in text
     assert "Operate the mission." in text
     assert 'id="d1-download"' in text
     assert "Dominion OS 1.0 for Business. Windows first." in text
@@ -39,6 +39,11 @@ def test_download_gate_is_fail_closed_and_business_only():
     assert package["politicsExperience"]["downloadable"] is False
     assert package["platformRoadmap"]["current"] == "Windows x64 Business"
     assert package["platformRoadmap"]["next"] == "macOS Business"
+    assert package["platformRoadmap"]["nextState"] == "not-currently-implemented"
+    assert package["platformRoadmap"]["linuxState"] == "not-currently-implemented"
+    assert package["providerFanout"]["windowsMainSha"] == "f0d6c04473175afbeeab7e835fbd4fc3a1e3ea54"
+    assert package["providerFanout"]["packagingMechanics"] == "PASS"
+    assert package["providerFanout"]["publicDownloadCertified"] is False
 
 
 def test_release_catalog_binds_exact_business_candidate():
@@ -78,3 +83,12 @@ def test_page_only_enables_download_when_all_independent_gates_agree():
     assert "win.proof.publicDownloadCertified===true" in text
     assert "Public Download Certification Pending" in text
     assert "customer-owned-experience-contract.json" in text
+
+def test_four_provider_release_targets_stay_fail_closed():
+    catalog = load_json(CATALOG)
+    entries = [e for e in catalog["entries"] if e.get("providerDownloadFamily") is True]
+    assert {e["providerId"] for e in entries} == {"gcp", "aws", "azure", "oci"}
+    for entry in entries:
+        assert entry["proof"]["providerFanoutWindowsMainSha"] == "f0d6c04473175afbeeab7e835fbd4fc3a1e3ea54"
+        assert entry["proof"]["providerPackagingMechanics"] == "PASS"
+        assert entry["proof"]["publicDownloadCertified"] is False
