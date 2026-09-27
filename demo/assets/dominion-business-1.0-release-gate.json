@@ -6,12 +6,13 @@
   "platform": "Windows x64",
   "release_state": "CANDIDATE",
   "candidate": {
-    "source_sha": "90de700bb9c44ab62212731dbaa13c0bea3b3ffd",
-    "package_sha256": "ccbe636f6017bd3f5d2ae95fce261d1cb4cee2e963d255328886d6abce20aeeb",
-    "executable_sha256": "d8b2f974dda56bd48fb9790f1ac8966fba4e72f2a643dc6c75d7b44406143de3",
+    "source_sha": "a3d51eb4876b801c726d3b776ddb6f8e265c4001",
+    "package_sha256": "70311d6dfea3800fbe31be9b69e587757c0b83e40d8eace50e2c55f70b887ff6",
+    "executable_sha256": "ac3e59c76bd0819fe5e42be79bfab0ade3fd5f0137982685d0ecda4f35839d23",
     "mission_pack": "Business",
     "politics_included": false,
-    "self_contained": true
+    "self_contained": true,
+    "merged_main_sha": "a177ea79c2a09f24dc29da075fd2b71bd1b259b2"
   },
   "earned_gates": {
     "lifecycle_acceptance": "PASS",
@@ -36,7 +37,7 @@
     "politics_public_demo": "ALLOWED_SYNTHETIC_ONLY",
     "google_cloud_business_deployment": "DEPLOYMENT_READY_CUSTOMER_OWNED",
     "google_cloud_public_runtime": "UNCERTIFIED",
-    "canonical_phi_hostname": "BLOCKED_EXTERNAL_DNS_AUTHORITY"
+    "canonical_phi_hostname": "READY"
   },
   "promotion_rule": {
     "from": "CANDIDATE",

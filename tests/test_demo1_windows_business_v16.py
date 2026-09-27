@@ -39,6 +39,7 @@ def test_download_gate_is_fail_closed_and_business_only():
     assert package["politicsExperience"]["downloadable"] is False
     assert package["platformRoadmap"]["current"] == "Windows x64 Business"
     assert package["platformRoadmap"]["next"] == "macOS Business"
+    assert package["platformRoadmap"]["nextState"] == "not-currently-implemented"
 
 
 def test_release_catalog_binds_exact_business_candidate():
@@ -47,9 +48,10 @@ def test_release_catalog_binds_exact_business_candidate():
     assert len(windows) == 1
     win = windows[0]
     assert win["domain"] == "Business"
-    assert win["build"] == "90de700bb9c44ab62212731dbaa13c0bea3b3ffd"
-    assert win["checksum"] == "sha256:ccbe636f6017bd3f5d2ae95fce261d1cb4cee2e963d255328886d6abce20aeeb"
-    assert win["proof"]["executableSha256"] == "d8b2f974dda56bd48fb9790f1ac8966fba4e72f2a643dc6c75d7b44406143de3"
+    assert win["build"] == "a3d51eb4876b801c726d3b776ddb6f8e265c4001"
+    assert win["checksum"] == "sha256:70311d6dfea3800fbe31be9b69e587757c0b83e40d8eace50e2c55f70b887ff6"
+    assert win["proof"]["mergedMainSha"] == "a177ea79c2a09f24dc29da075fd2b71bd1b259b2"
+    assert win["proof"]["executableSha256"] == "ac3e59c76bd0819fe5e42be79bfab0ade3fd5f0137982685d0ecda4f35839d23"
     assert win["proof"]["politicsIncluded"] is False
     assert win["proof"]["lifecycleAcceptance"] == "PASS"
     assert win["proof"]["defenderScan"] == "PASS"

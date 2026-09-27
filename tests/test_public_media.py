@@ -64,9 +64,10 @@ def test_business_and_politics_release_authority_remain_separate():
 def test_human_readable_release_record_is_fail_closed():
     release = (ROOT / "release" / "business-windows-1.0.html").read_text(encoding="utf-8")
     assert "CANDIDATE" in release
-    assert "90de700bb9c44ab62212731dbaa13c0bea3b3ffd" in release
-    assert "ccbe636f6017bd3f5d2ae95fce261d1cb4cee2e963d255328886d6abce20aeeb" in release
-    assert "d8b2f974dda56bd48fb9790f1ac8966fba4e72f2a643dc6c75d7b44406143de3" in release
+    assert "a3d51eb4876b801c726d3b776ddb6f8e265c4001" in release
+    assert "a177ea79c2a09f24dc29da075fd2b71bd1b259b2" in release
+    assert "70311d6dfea3800fbe31be9b69e587757c0b83e40d8eace50e2c55f70b887ff6" in release
+    assert "ac3e59c76bd0819fe5e42be79bfab0ade3fd5f0137982685d0ecda4f35839d23" in release
     assert "AUTHENTICODE" in release and "NOT SIGNED" in release
     assert "PUBLIC DOWNLOAD CERTIFIED" in release
     assert "No unsigned substitute is authorized" in release
@@ -75,7 +76,10 @@ def test_human_readable_release_record_is_fail_closed():
 def test_business_release_gate_is_fail_closed():
     gate = load_json(GATE)
     assert gate["release_state"] == "CANDIDATE"
-    assert gate["candidate"]["source_sha"] == "90de700bb9c44ab62212731dbaa13c0bea3b3ffd"
+    assert gate["candidate"]["source_sha"] == "a3d51eb4876b801c726d3b776ddb6f8e265c4001"
+    assert gate["candidate"]["merged_main_sha"] == "a177ea79c2a09f24dc29da075fd2b71bd1b259b2"
+    assert gate["candidate"]["package_sha256"] == "70311d6dfea3800fbe31be9b69e587757c0b83e40d8eace50e2c55f70b887ff6"
+    assert gate["candidate"]["executable_sha256"] == "ac3e59c76bd0819fe5e42be79bfab0ade3fd5f0137982685d0ecda4f35839d23"
     assert gate["candidate"]["politics_included"] is False
     assert gate["earned_gates"]["microsoft_defender"] == "PASS"
     assert gate["earned_gates"]["business_film_pages_deployment"] == "PASS"
@@ -97,7 +101,20 @@ def test_saas_catalogue_is_stable_without_overclaiming_runtime():
     assert catalog["catalogue_state"] == "stable"
     assert catalog["module_count"] == 13
     assert names == expected
-    assert all(module["store_state"] == "Configure" for module in catalog["modules"])
+    by_name = {module["name"]: module for module in catalog["modules"]}
+    coming_soon = {"EcoStack", "Install Grid", "DataHarbor"}
+    for name, module in by_name.items():
+        if name in coming_soon:
+            assert module["store_state"] == "Coming Soon"
+            assert module["sellable"] is False
+        else:
+            assert module["store_state"] == "Configure"
+    assert by_name["Cloud Engine"]["sku"] == "APP-CLOUD-ENGINE-W2"
+    assert by_name["OpsSignal"]["sku"] == "APP-OPSSIGNAL-W2"
+    assert by_name["Advocate Engine"]["sku"] == "APP-ADVOCATE-ENG-W2"
+    assert by_name["EcoStack"]["sku"] == "APP-ECOSTACK"
+    assert by_name["Install Grid"]["sku"] == "APP-INSTALL-GRID"
+    assert by_name["DataHarbor"]["sku"] == "APP-DATAHARBOR"
     assert catalog["runtime_certification"] == "engagement-specific"
     assert catalog["independent_ga_claim"] is False
     assert catalog["universal_api_claim"] is False
@@ -110,8 +127,13 @@ def test_saas_catalogue_is_stable_without_overclaiming_runtime():
         source = governed[module["name"]]
         assert module["id"] == source["id"]
         assert module["sku"] == source["sku"]
+        assert module["store_state"] == source["store_state"]
         assert module["implementation_state"] == source["implementation_state"]
         assert module["standalone_ga"] is False
+        if "sellable" in source:
+            assert module["sellable"] == source["sellable"]
+        else:
+            assert "sellable" not in module
 
 
 def test_squarespace_v17_handoff_is_immutable_and_fail_closed():
