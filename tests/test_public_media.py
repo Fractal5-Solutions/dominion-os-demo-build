@@ -102,6 +102,16 @@ def test_saas_catalogue_is_stable_without_overclaiming_runtime():
     assert catalog["independent_ga_claim"] is False
     assert catalog["universal_api_claim"] is False
     assert catalog["marketplace_listing_claim"] is False
+    snapshot_path = ROOT / "demo" / "assets" / "dominion-product-manifest.v1.json"
+    snapshot = load_json(snapshot_path)
+    assert catalog["canonical_manifest"]["snapshot_sha256"] == sha256(snapshot_path)
+    governed = {module["name"]: module for module in snapshot["modules"]}
+    for module in catalog["modules"]:
+        source = governed[module["name"]]
+        assert module["id"] == source["id"]
+        assert module["sku"] == source["sku"]
+        assert module["implementation_state"] == source["implementation_state"]
+        assert module["standalone_ga"] is False
 
 
 def test_squarespace_v17_handoff_is_immutable_and_fail_closed():

@@ -1,0 +1,73 @@
+{
+  "schema": "fractal5.dominion.product-manifest.v1",
+  "product": {"name":"Dominion OS","version":"1.0","family":"Dominion OS + Fractal5 SaaS Suite"},
+  "authority": {
+    "effective_date": "2026-09-27",
+    "canonical_client_docs": "docs/client/README.md",
+    "rule": "current receipts outrank historical prose",
+    "public_claim_policy": "fail_closed"
+  },
+  "profiles": {
+    "system": {"enabled":true,"public_release":"governed"},
+    "business": {"enabled":true,"politics_included":false,"public_release":"exact-artifact-certified-only"},
+    "politics_civic": {"enabled":true,"public_download":false,"release":"withheld-by-product-policy"}
+  },
+  "capabilities": [
+    {"id":"reasoning","contract":"http-json","binding":"governed provider/runtime adapters"},
+    {"id":"speech","contract":"http-json","binding":"external phi-ops speech service","certification":"separate"},
+    {"id":"animation","contract":"http-json","binding":"external phi-ops animation/renderer","certification":"separate"},
+    {"id":"governed-tools","contract":"mcp","binding":"runtime-broker and governed connectors"},
+    {"id":"web","contract":"http","binding":"Next.js/API surfaces"},
+    {"id":"identity","contract":"oidc-oauth2","binding":"auth/"},
+    {"id":"storage","contract":"provider-adapter","binding":"core connectors and governed data surfaces"},
+    {"id":"infrastructure","contract":"terraform-oci","binding":"deploy/gcp and immutable container promotion"}
+  ],
+  "desktop_surfaces": ["Command Center","Runtime","Companies","Workspaces","Software","Files","Operations","Evidence"],
+  "modules": [
+    {"id":"grantconnect","name":"GrantConnect","sku":"APP-GRANTCONNECT-W1","store_state":"Configure","implementation_state":"catalogued_evidence_required","standalone_ga":false},
+    {"id":"teamconnect","name":"TeamConnect","sku":"APP-TEAMCONNECT-W1","store_state":"Configure","implementation_state":"capability_family_present","bindings":["collab","governance","core command routing"],"standalone_ga":false},
+    {"id":"policyconnect","name":"PolicyConnect","sku":"APP-POLICYCONNEC-W1","store_state":"Configure","implementation_state":"capability_family_present","bindings":["policy-suite","regulatory_watchdog_v61.js","compliance-guard"],"standalone_ga":false},
+    {"id":"channelconnect","name":"ChannelConnect","sku":"APP-CHANNELCONNE-W1","store_state":"Configure","implementation_state":"implementation_evidenced_external","bindings":["phi-ops/services/channel-connect"],"standalone_ga":false},
+    {"id":"cloud-engine","name":"Cloud Engine","sku":"IC-CLOUD-ENGINE-IC","store_state":"Configure","implementation_state":"capability_family_present","bindings":["deploy/gcp","cloud","infrastructure"],"standalone_ga":false},
+    {"id":"vault-systems","name":"Vault Systems","sku":"APP-VAULT-SYSTEM-W1","store_state":"Configure","implementation_state":"known_family_reconciliation_required","bindings":["vault-metadata.json","storage capability"],"standalone_ga":false},
+    {"id":"command-core","name":"Command Core","sku":"DOM-FS-COMMAND-CORE","store_state":"Configure","implementation_state":"capability_family_present","bindings":["core","ops","governance","runtime-broker"],"standalone_ga":false},
+    {"id":"advocate-engine","name":"Advocate Engine","sku":"IC-ADV-ENGINE-IC","store_state":"Configure","implementation_state":"catalogued_evidence_required","standalone_ga":false},
+    {"id":"install-grid","name":"Install Grid","sku":"APP-INSTALLGRID-W2","store_state":"Configure","implementation_state":"capability_family_present","bindings":["install","docs/client/INSTALLATION.md"],"standalone_ga":false},
+    {"id":"opssignal","name":"OpsSignal","sku":"IC-OPS-SIGNAL-IC","store_state":"Configure","implementation_state":"capability_family_present","bindings":["telemetry","monitoring","ops"],"standalone_ga":false},
+    {"id":"ecostack","name":"EcoStack","sku":"APP-ECOSTACK-W2","store_state":"Configure","implementation_state":"capability_family_present","bindings":["sustainability_engine.py","green_policy_framework.md"],"standalone_ga":false},
+    {"id":"storythread","name":"StoryThread","sku":"APP-STORYTHREAD-W1","store_state":"Configure","implementation_state":"catalogued_evidence_required","standalone_ga":false},
+    {"id":"dataharbor","name":"DataHarbor","sku":"APP-DATAHARBOR-W2","store_state":"Configure","implementation_state":"capability_family_present","bindings":["storage capability","data provenance and audit surfaces"],"standalone_ga":false}
+  ],
+  "commercial_policy": {
+    "catalogue_presence_proves_ga": false,
+    "configure_state_proves_runtime": false,
+    "marketplace_listing_claim": false,
+    "independent_module_ga_default": false,
+    "entitlement_model": "profile-and-engagement-governed"
+  },
+  "deployment_targets": {
+    "windows_business": {"source_repo":"dominion-os-1.0-desktop-pc","state":"candidate","required_gates":["exact-head-ci","business-only-content","authenticode","lifecycle","defender"]},
+    "macos_business": {"state":"package_candidate","required_gates":["developer-id","notarization","real-device-lifecycle"]},
+    "linux_business": {"state":"package_candidate","required_gates":["artifact-signing","repository-signing","target-distro-lifecycle"]},
+    "gcp_saas": {"source_repo":"dominion-os-core","state":"deployment-ready-source","required_gates":["provider-auth","immutable-digest","live-runtime-certification"]},
+    "aws": {"state":"not-currently-certified"},
+    "azure": {"state":"not-currently-certified"},
+    "private_edge": {"state":"engagement-specific"}
+  },
+  "release_requirements": [
+    "source_sha",
+    "profile",
+    "feature_manifest_sha256",
+    "artifact_hash_or_image_digest",
+    "signature_or_provider_identity",
+    "health_readiness",
+    "integration_tests",
+    "rollback_procedure",
+    "current_release_receipt"
+  ],
+  "historical_authority": {
+    "DOMINION_OS_1.0_COMPLETION_CERTIFICATE.md": "historical-only",
+    "MARKETPLACE_SUBMISSION_PACKAGE.md": "historical-only",
+    "config/marketplace-catalog.json": "historical-only-unless-regenerated-from-this-manifest"
+  }
+}

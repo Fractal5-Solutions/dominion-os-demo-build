@@ -12,72 +12,129 @@
     {
       "name": "GrantConnect",
       "store_state": "Configure",
-      "description": "Grant discovery, eligibility, preparation workflows, funding intelligence, proposal support, and opportunity tracking."
+      "description": "Grant discovery, eligibility, preparation workflows, funding intelligence, proposal support, and opportunity tracking.",
+      "id": "grantconnect",
+      "sku": "APP-GRANTCONNECT-W1",
+      "implementation_state": "catalogued_evidence_required",
+      "standalone_ga": false
     },
     {
       "name": "TeamConnect",
       "store_state": "Configure",
-      "description": "Coordinate roles, work routing, operating views, internal collaboration, team telemetry, and shared execution."
+      "description": "Coordinate roles, work routing, operating views, internal collaboration, team telemetry, and shared execution.",
+      "id": "teamconnect",
+      "sku": "APP-TEAMCONNECT-W1",
+      "implementation_state": "capability_family_present",
+      "standalone_ga": false
     },
     {
       "name": "PolicyConnect",
       "store_state": "Configure",
-      "description": "Organize policy change, compliance monitoring, legislative signals, regulatory context, risk identification, and policy-impact workflows."
+      "description": "Organize policy change, compliance monitoring, legislative signals, regulatory context, risk identification, and policy-impact workflows.",
+      "id": "policyconnect",
+      "sku": "APP-POLICYCONNEC-W1",
+      "implementation_state": "capability_family_present",
+      "standalone_ga": false
     },
     {
       "name": "ChannelConnect",
       "store_state": "Configure",
-      "description": "Bring email, social, web, messaging, outreach, and communications workflows into a coordinated operating surface."
+      "description": "Bring email, social, web, messaging, outreach, and communications workflows into a coordinated operating surface.",
+      "id": "channelconnect",
+      "sku": "APP-CHANNELCONNE-W1",
+      "implementation_state": "implementation_evidenced_external",
+      "standalone_ga": false
     },
     {
       "name": "Cloud Engine",
       "store_state": "Configure",
-      "description": "Structure deployment posture, infrastructure planning, health, environments, release pathways, rollback planning, and cloud operations."
+      "description": "Structure deployment posture, infrastructure planning, health, environments, release pathways, rollback planning, and cloud operations.",
+      "id": "cloud-engine",
+      "sku": "IC-CLOUD-ENGINE-IC",
+      "implementation_state": "capability_family_present",
+      "standalone_ga": false
     },
     {
       "name": "Vault Systems",
       "store_state": "Configure",
-      "description": "Organize structured intelligence, source records, review materials, compliance archives, evidence trails, and controlled information environments."
+      "description": "Organize structured intelligence, source records, review materials, compliance archives, evidence trails, and controlled information environments.",
+      "id": "vault-systems",
+      "sku": "APP-VAULT-SYSTEM-W1",
+      "implementation_state": "known_family_reconciliation_required",
+      "standalone_ga": false
     },
     {
       "name": "Command Core",
       "store_state": "Configure",
-      "description": "Bring mission logic, operating state, workflows, telemetry, human roles, and governed execution into a central command environment."
+      "description": "Bring mission logic, operating state, workflows, telemetry, human roles, and governed execution into a central command environment.",
+      "id": "command-core",
+      "sku": "DOM-FS-COMMAND-CORE",
+      "implementation_state": "capability_family_present",
+      "standalone_ga": false
     },
     {
       "name": "Advocate Engine",
       "store_state": "Configure",
-      "description": "Structure stakeholder maps, relationship workflows, engagement planning, issue intelligence, and public-affairs operating views."
+      "description": "Structure stakeholder maps, relationship workflows, engagement planning, issue intelligence, and public-affairs operating views.",
+      "id": "advocate-engine",
+      "sku": "IC-ADV-ENGINE-IC",
+      "implementation_state": "catalogued_evidence_required",
+      "standalone_ga": false
     },
     {
       "name": "Install Grid",
       "store_state": "Configure",
-      "description": "Create structured installation, access, onboarding, deployment, and implementation-entry pathways."
+      "description": "Create structured installation, access, onboarding, deployment, and implementation-entry pathways.",
+      "id": "install-grid",
+      "sku": "APP-INSTALLGRID-W2",
+      "implementation_state": "capability_family_present",
+      "standalone_ga": false
     },
     {
       "name": "OpsSignal",
       "store_state": "Configure",
-      "description": "Bring system state, integrity signals, operating metrics, alerts, and mission telemetry into decision-ready views."
+      "description": "Bring system state, integrity signals, operating metrics, alerts, and mission telemetry into decision-ready views.",
+      "id": "opssignal",
+      "sku": "IC-OPS-SIGNAL-IC",
+      "implementation_state": "capability_family_present",
+      "standalone_ga": false
     },
     {
       "name": "EcoStack",
       "store_state": "Configure",
-      "description": "Add environmental, sustainability, infrastructure, natural-resource, climate, and ESG-oriented information layers where appropriate."
+      "description": "Add environmental, sustainability, infrastructure, natural-resource, climate, and ESG-oriented information layers where appropriate.",
+      "id": "ecostack",
+      "sku": "APP-ECOSTACK-W2",
+      "implementation_state": "capability_family_present",
+      "standalone_ga": false
     },
     {
       "name": "StoryThread",
       "store_state": "Configure",
-      "description": "Structure messages, stories, content systems, media workflows, narrative development, and multi-channel communications."
+      "description": "Structure messages, stories, content systems, media workflows, narrative development, and multi-channel communications.",
+      "id": "storythread",
+      "sku": "APP-STORYTHREAD-W1",
+      "implementation_state": "catalogued_evidence_required",
+      "standalone_ga": false
     },
     {
       "name": "DataHarbor",
       "store_state": "Configure",
-      "description": "Create controlled data collections, catalogues, repositories, warehouses, and source-aware information environments."
+      "description": "Create controlled data collections, catalogues, repositories, warehouses, and source-aware information environments.",
+      "id": "dataharbor",
+      "sku": "APP-DATAHARBOR-W2",
+      "implementation_state": "capability_family_present",
+      "standalone_ga": false
     }
   ],
   "module_count": 13,
   "runtime_certification": "engagement-specific",
   "independent_ga_claim": false,
   "universal_api_claim": false,
-  "marketplace_listing_claim": false
+  "marketplace_listing_claim": false,
+  "canonical_manifest": {
+    "authority": "dominion-os-core/config/dominion-product-manifest.v1.json",
+    "snapshot_path": "demo/assets/dominion-product-manifest.v1.json",
+    "snapshot_sha256": "920e8c2974b63728bc65f0f25231f3ed969ac3bb11967b471de43332efaca517"
+  }
 }
