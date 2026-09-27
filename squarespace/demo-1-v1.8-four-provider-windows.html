@@ -562,10 +562,12 @@
 
   const runtimePromise=fetchJson(URLS.runtime).then(data=>{
     renderProviders(data);
-    const providers=Array.isArray(data.providers)?data.providers:[];const gcp=providers.find(p=>p.id==="gcp");
-    if(gcp&&gcp.publicClaimAllowed===true&&String(gcp.publicRuntimeState||"").toLowerCase()==="live")badge("d1-runtime-state","Live Certified","positive");
-    else if(gcp)badge("d1-runtime-state",pretty(gcp.publicRuntimeState||"Not Certified"),"neutral");
-    else badge("d1-runtime-state","Not Certified","neutral");
+    const providers=Array.isArray(data.providers)?data.providers:[];
+    const required=REQUIRED_PROVIDER_IDS.map(id=>providers.find(p=>p&&String(p.id||"").toLowerCase()===id)).filter(Boolean);
+    const liveCertified=required.filter(p=>p.publicClaimAllowed===true&&String(p.publicRuntimeState||"").toLowerCase()==="live").length;
+    if(liveCertified===4)badge("d1-runtime-state","4 / 4 Live Certified","positive");
+    else if(liveCertified>0)badge("d1-runtime-state",liveCertified+" / 4 Live Certified","ready");
+    else badge("d1-runtime-state","0 / 4 Live Certified","neutral");
     return data;
   }).catch(()=>{badge("d1-runtime-state","Evidence Unavailable","neutral");renderProviders(null);return null;});
 
