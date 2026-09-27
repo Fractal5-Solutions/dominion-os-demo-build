@@ -12,19 +12,22 @@ def load_json(path):
     return json.loads(path.read_text(encoding="utf-8-sig"))
 
 
-def test_v16_is_windows_business_first_and_preserves_public_politics():
+def test_v19_is_four_provider_windows_business_and_preserves_public_politics():
     text = PAGE.read_text(encoding="utf-8")
-    assert 'data-page-build="demo-1-v1.8-20260927-four-provider-windows"' in text
+    assert 'data-page-build="demo-1-v1.9-20260927-hardened-four-provider-gates"' in text
     assert "Operate the mission." in text
     assert 'id="d1-download"' in text
-    assert "Dominion OS 1.0 for Business. Windows first." in text
-    assert "Politics remains fully demonstrable here" in text
-    assert "DOMINION OS FOR POLITICS" not in text
-    assert "Download Dominion OS 1.0 for Business" in text
+    assert "WINDOWS BUSINESS · FOUR-PROVIDER RELEASE TARGET" in text
+    assert "One Dominion payload. Four governed provider packages." in text
+    assert "Windows Release Paths" in text
+    assert "GCP · AWS · Azure · OCI" in text
+    assert "Politics remains public-demonstration-only" in text
     assert "mode=politics" in text
     assert "dominion-os-business-1080p.mp4" in text
     assert "dominion-os-politics-1080p.mp4" in text
     assert "no downloadable Politics artifact is authorized" in text
+    assert "MISSION 01 · DOWNLOADABLE EXPERIENCE" not in text
+    assert "Dominion OS 1.0 for Business. Windows first." not in text
 
 
 def test_download_gate_is_fail_closed_and_business_only():
@@ -38,27 +41,39 @@ def test_download_gate_is_fail_closed_and_business_only():
     assert package["politicsExperience"]["publicDemoAllowed"] is True
     assert package["politicsExperience"]["downloadable"] is False
     assert package["platformRoadmap"]["current"] == "Windows x64 Business"
-    assert package["platformRoadmap"]["next"] == "macOS Business"
-    assert package["platformRoadmap"]["nextState"] == "not-currently-implemented"
-    assert package["platformRoadmap"]["linuxState"] == "not-currently-implemented"
-    assert package["providerFanout"]["windowsMainSha"] == "f0d6c04473175afbeeab7e835fbd4fc3a1e3ea54"
     assert package["providerFanout"]["packagingMechanics"] == "PASS"
     assert package["providerFanout"]["publicDownloadCertified"] is False
 
 
-def test_release_catalog_binds_exact_business_candidate():
+def test_four_provider_release_targets_stay_fail_closed():
+    package = load_json(PACKAGE)
+    providers = package["providerDownloads"]
+    assert {p["id"] for p in providers} == {"gcp", "aws", "azure", "oci"}
+    for provider in providers:
+        assert provider["missionPack"] == "Business"
+        assert provider["politicsIncluded"] is False
+        assert provider["publicDownloadCertified"] is False
+        assert provider["publicDownloadUrl"] is None
+
     catalog = load_json(CATALOG)
-    windows = [e for e in catalog["entries"] if e.get("deploymentTarget") == "Windows x64"]
-    assert len(windows) == 1
-    win = windows[0]
-    assert win["domain"] == "Business"
-    assert win["build"] == "90de700bb9c44ab62212731dbaa13c0bea3b3ffd"
-    assert win["checksum"] == "sha256:ccbe636f6017bd3f5d2ae95fce261d1cb4cee2e963d255328886d6abce20aeeb"
-    assert win["proof"]["executableSha256"] == "d8b2f974dda56bd48fb9790f1ac8966fba4e72f2a643dc6c75d7b44406143de3"
-    assert win["proof"]["politicsIncluded"] is False
-    assert win["proof"]["lifecycleAcceptance"] == "PASS"
-    assert win["proof"]["defenderScan"] == "PASS"
-    assert win["proof"]["publicDownloadCertified"] is False
+    entries = [e for e in catalog["entries"] if e.get("providerDownloadFamily") is True]
+    assert {e["providerId"] for e in entries} == {"gcp", "aws", "azure", "oci"}
+    for entry in entries:
+        assert entry["proof"]["providerPackagingMechanics"] == "PASS"
+        assert entry["proof"]["publicDownloadCertified"] is False
+        assert entry["proof"]["politicsIncluded"] is False
+
+
+def test_page_download_activation_requires_exact_dual_evidence():
+    text = PAGE.read_text(encoding="utf-8")
+    assert "commonCertified&&packageCertified&&catalogCertified&&hrefMatches&&checksumMatches" in text
+    assert "claimControl.binaryDownloadEnabled===true" in text
+    assert "claimControl.politicsDownloadAllowed===false" in text
+    assert "packageEntry.publicDownloadCertified===true" in text
+    assert "catalogEntry.proof.publicDownloadCertified===true" in text
+    assert "common.lifecycleAcceptance===\"PASS\"" in text
+    assert "common.defenderScan===\"PASS\"" in text
+    assert "data-download-certified" in text
 
 
 def test_politics_is_demo_only_and_macos_is_later():
@@ -67,28 +82,10 @@ def test_politics_is_demo_only_and_macos_is_later():
     assert len(politics) == 1
     assert politics[0]["proof"]["publicDemonstrationAllowed"] is True
     assert politics[0]["proof"]["downloadAllowed"] is False
+
     contract = load_json(CONTRACT)
     assert contract["missionPackPolicy"]["downloadableNow"] == ["Business"]
     assert contract["missionPackPolicy"]["publiclyDemonstratedButNotDownloadable"] == ["Politics"]
     assert contract["platformPolicy"]["currentMission"].startswith("Windows x64 Business")
     assert contract["platformPolicy"]["nextMission"].startswith("macOS Business")
     assert contract["platformPolicy"]["nextMissionState"] == "later"
-
-
-def test_page_only_enables_download_when_all_independent_gates_agree():
-    text = PAGE.read_text(encoding="utf-8")
-    assert "controls.binaryDownloadEnabled===true" in text
-    assert "controls.businessDownloadAllowedWhenCertified===true" in text
-    assert "controls.politicsDownloadAllowed===false" in text
-    assert "win.proof.publicDownloadCertified===true" in text
-    assert "Public Download Certification Pending" in text
-    assert "customer-owned-experience-contract.json" in text
-
-def test_four_provider_release_targets_stay_fail_closed():
-    catalog = load_json(CATALOG)
-    entries = [e for e in catalog["entries"] if e.get("providerDownloadFamily") is True]
-    assert {e["providerId"] for e in entries} == {"gcp", "aws", "azure", "oci"}
-    for entry in entries:
-        assert entry["proof"]["providerFanoutWindowsMainSha"] == "f0d6c04473175afbeeab7e835fbd4fc3a1e3ea54"
-        assert entry["proof"]["providerPackagingMechanics"] == "PASS"
-        assert entry["proof"]["publicDownloadCertified"] is False
