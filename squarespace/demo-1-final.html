@@ -22,8 +22,8 @@
         <div class="d1-state-row"><div><strong>Ask Phi</strong><small>Bounded public assistant</small></div><span class="d1-badge positive">Live</span></div>
         <div class="d1-state-row"><div><strong>Public Proof</strong><small>Sanitized public surface</small></div><span class="d1-badge positive">Available</span></div>
         <div class="d1-state-row"><div><strong>Windows GUI</strong><small>Dominion OS 1.0 · Business</small></div><span id="d1-windows-state" class="d1-badge ready">Registered Candidate</span></div>
-        <div class="d1-state-row"><div><strong>Google Cloud</strong><small>Customer-owned deployment path</small></div><span id="d1-gcp-state" class="d1-badge ready">Deployment Ready</span></div>
-        <div class="d1-state-row"><div><strong>Public Download</strong><small>Exact Business binary distribution gate</small></div><span id="d1-download-state" class="d1-badge neutral">Certification Pending</span></div>
+        <div class="d1-state-row"><div><strong>Provider Packages</strong><small>GCP · AWS · Azure · OCI</small></div><span id="d1-provider-package-state" class="d1-badge neutral">0 / 4 Certified</span></div>
+        <div class="d1-state-row"><div><strong>Public Downloads</strong><small>Exact provider artifacts only</small></div><span id="d1-download-state" class="d1-badge neutral">Certification Pending</span></div>
         <div class="d1-state-row"><div><strong>Public Runtime</strong><small>Fresh provider certification</small></div><span id="d1-runtime-state" class="d1-badge neutral">Not Certified</span></div>
         <div class="d1-state-row"><div><strong>Release Registry</strong><small>Public distribution truth</small></div><span id="d1-catalog-state" class="d1-badge ready">Published</span></div>
       </aside>
@@ -556,9 +556,9 @@
 
   const deploymentPromise=fetchJson(URLS.deployment).then(data=>{
     const state=data&&data.deploymentReadiness&&data.deploymentReadiness.state;
-    if(state==="ready")badge("d1-gcp-state","Deployment Ready","ready");else badge("d1-gcp-state","Not Verified","neutral");
+    if(state==="ready")else 
     return data;
-  }).catch(()=>{badge("d1-gcp-state","Evidence Unavailable","neutral");return null;});
+  }).catch(()=>{return null;});
 
   const runtimePromise=fetchJson(URLS.runtime).then(data=>{
     renderProviders(data);
