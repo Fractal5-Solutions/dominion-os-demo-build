@@ -15,7 +15,7 @@ The approved public presentation and sanitized proof surface includes:
 - `SECURITY.md` — disclosure and repository-safety policy
 - `demo/assets/cloud-deployment-manifest.json` — sanitized deployment-readiness contract
 - `demo/assets/multicloud-runtime-manifest.json` — sanitized provider-runtime claim state
-- `demo/live-mission-demo.html` — sanitized interactive Business/Politics mission surface using synthetic data and explicit authority/evidence boundaries
+- `demo/live-mission-demo.html` — sanitized interactive Business/Politics mission surface using synthetic data and explicit authority/evidence boundaries\n- `demo/dominion-command-preview.html` — static Dominion Command for Politics cockpit preview using synthetic data, no connectors, and zero command authority
 - `demo/assets/live-mission-video-manifest.json` — receipt-bound Business/Politics media state; rendered MP4 masters remain distinct from the public interactive demo
 - `squarespace/demo-1-final.html` — canonical fail-closed Squarespace `/demo-1` presentation artifact
 
@@ -31,7 +31,7 @@ The current static proof surface may remain available even when no optional publ
 
 ## Public routes
 
-- Public proof: https://fractal5-solutions.github.io/dominion-os-demo-build/
+- Public proof: https://fractal5-solutions.github.io/dominion-os-demo-build/\n- Dominion Command public-safe preview: https://fractal5-solutions.github.io/dominion-os-demo-build/demo/dominion-command-preview.html
 - Dominion OS™: https://www.fractal5solutions.com/dominion-os
 - Fractal5 demo bridge: https://www.fractal5solutions.com/demo-1
 - Deployment contact: https://www.fractal5solutions.com/#contact
@@ -43,4 +43,4 @@ Security concerns should be reported privately as described in `SECURITY.md`.
 
 GitHub Pages is published from protected `main` by the minimal `.github/workflows/publish-artifact-only-pages.yml` workflow. It copies only the approved public artifacts into the Pages bundle and validates the synthetic-data, authority, and connector-claim boundaries before deployment. Provider authentication, IAM repair, cloud deployment, and private runtime workflows are deliberately excluded from this public repository.
 
-The canonical Squarespace page remains `squarespace/demo-1-final.html`; the principal pastes that finished artifact into Squarespace. Squarespace is not the source repository and is not mutated by this workflow.
+The command preview is explicitly non-authoritative: it contains synthetic data only, performs no external browser networking, and has no private runtime or campaign connection.\n\nThe canonical Squarespace page remains `squarespace/demo-1-final.html`; the principal pastes that finished artifact into Squarespace. Squarespace is not the source repository and is not mutated by this workflow.
