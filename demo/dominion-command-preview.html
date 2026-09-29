@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; form-action 'none'; frame-ancestors 'none'; base-uri 'none'; object-src 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>Dominion Command for Politics - Public-Safe Preview</title>
+  <style>
+    :root{--bg:#f3f3ef;--paper:#fff;--ink:#111;--muted:#66665f;--line:#deded7;--soft:#f1f1ec;--ok:#2e6543;--warn:#7b5b20;--radius:20px}
+    *{box-sizing:border-box}html{background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    body{margin:0;min-height:100vh;background:linear-gradient(180deg,#fff 0,#f7f7f3 40%,#ededE7 100%)}
+    button,input{font:inherit}.shell{max-width:1460px;margin:0 auto;padding:22px}
+    .top{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:17px 19px;background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:24px;box-shadow:0 16px 50px rgba(0,0,0,.05);position:sticky;top:12px;z-index:10;backdrop-filter:blur(16px)}
+    .brand{display:flex;align-items:center;gap:14px}.mark{width:39px;height:39px;border:2px solid var(--ink);border-radius:50%;display:grid;place-items:center;font-weight:800;letter-spacing:-.08em}
+    .eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted)}h1{font-size:18px;margin:2px 0 0;letter-spacing:-.025em}
+    .status{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}.dot{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+    .rolebar{display:flex;gap:8px;flex-wrap:wrap}.role{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 12px;cursor:pointer}.role.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+    .notice{margin:16px 0;padding:12px 15px;border:1px solid #d8d4c8;border-radius:14px;background:#fffdf6;color:#5b4b24;font-size:12px;display:flex;justify-content:space-between;gap:12px;align-items:center}.notice strong{color:#332b18}
+    .pill{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;padding:5px 8px;font-size:10px;color:var(--muted);background:#fafaf7}.pill.synthetic{border-style:dashed}
+    .layout{display:grid;grid-template-columns:240px 1fr;gap:18px}.side,.main{background:rgba(255,255,255,.82);border:1px solid var(--line);border-radius:var(--radius)}
+    .side{padding:16px;align-self:start;position:sticky;top:112px}.nav{display:grid;gap:5px}.nav button{border:0;background:transparent;text-align:left;padding:10px 11px;border-radius:11px;color:var(--muted);cursor:pointer}.nav button:hover,.nav button.active{background:var(--soft);color:var(--ink);font-weight:650}
+    .guard{margin-top:18px;padding-top:16px;border-top:1px solid var(--line);font-size:11px;line-height:1.55;color:var(--muted)}
+    .main{padding:24px;min-height:760px}.hero{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:24px}.hero h2{font-size:36px;letter-spacing:-.045em;margin:0}.hero p{margin:8px 0 0;color:var(--muted);max-width:720px;line-height:1.5}.datebox{text-align:right;color:var(--muted);font-size:12px}.datebox strong{display:block;color:var(--ink);font-size:15px;margin-bottom:4px}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;min-height:120px}.span3{grid-column:span 3}.span4{grid-column:span 4}.span5{grid-column:span 5}.span6{grid-column:span 6}.span7{grid-column:span 7}.span8{grid-column:span 8}.span12{grid-column:span 12}
+    .label{font-size:11px;text-transform:uppercase;letter-spacing:.13em;color:var(--muted)}.metric{font-size:32px;font-weight:760;letter-spacing:-.04em;margin:12px 0 2px}.sub{font-size:12px;color:var(--muted)}
+    .rows{margin-top:12px}.row{display:flex;justify-content:space-between;gap:18px;padding:12px 0;border-top:1px solid #ecece7;align-items:center}.row:first-child{border-top:0}.row b{font-size:13px}.row span{font-size:12px;color:var(--muted)}
+    .action{border:1px solid var(--ink);background:var(--ink);color:#fff;padding:9px 11px;border-radius:10px;cursor:pointer;font-size:12px}.action.ghost{background:#fff;color:var(--ink);border-color:var(--line)}
+    .ask{display:flex;gap:8px;margin-top:14px}.ask input{flex:1;border:1px solid var(--line);border-radius:12px;padding:12px 13px;background:#fbfbf8}.ask button{border:0;border-radius:12px;background:var(--ink);color:#fff;padding:0 16px;cursor:pointer}
+    .view{display:none}.view.active{display:block}.section-title{display:flex;justify-content:space-between;align-items:center;margin:0 0 14px}.section-title h3{margin:0;font-size:20px;letter-spacing:-.03em}
+    .toast{position:fixed;right:24px;bottom:24px;background:#151515;color:#fff;padding:13px 15px;border-radius:12px;font-size:12px;opacity:0;transform:translateY(8px);pointer-events:none;transition:.18s}.toast.show{opacity:1;transform:none}
+    @media(max-width:900px){.layout{grid-template-columns:1fr}.side{position:static}.nav{grid-template-columns:repeat(3,1fr)}.hero{align-items:start;flex-direction:column}.datebox{text-align:left}.span3,.span4,.span5,.span6,.span7,.span8{grid-column:span 12}.top{position:static}.shell{padding:10px}.main{padding:17px}.hero h2{font-size:30px}}
+  </style>
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <div class="brand"><div class="mark">D</div><div><div class="eyebrow">Dominion Command for Politics</div><h1>Secure Command Preview</h1></div></div>
+    <div class="rolebar"><button class="role active" data-role="manager">Campaign Manager</button><button class="role" data-role="candidate">Candidate</button></div>
+    <div class="status"><span class="dot"></span><span>Public-safe preview</span></div>
+  </header>
+  <div class="notice"><span><strong>Experience only.</strong> Synthetic content. This page has no campaign database, voter/donor information, credentials, private APIs, command bridge, or write authority.</span><span class="pill synthetic">ZERO AUTHORITY</span></div>
+  <div class="layout">
+    <aside class="side">
+      <div class="eyebrow" style="margin:4px 8px 10px">Command</div>
+      <nav class="nav">
+        <button class="active" data-view="today">Today</button>
+        <button data-view="decisions">Decisions</button>
+        <button data-view="calendar">Calendar</button>
+        <button data-view="field">Field</button>
+        <button data-view="fundraising">Fundraising</button>
+        <button data-view="comms">Communications</button>
+        <button data-view="compliance">Compliance</button>
+        <button data-view="research">Research</button>
+        <button data-view="documents">Documents</button>
+        <button data-view="evidence">Evidence</button>
+      </nav>
+      <div class="guard"><b>Public boundary</b><br>Static interface only.<br>No outbound browser networking.<br>No persistent campaign state.<br>No arbitrary execution.<br><br>The real tenant belongs behind authenticated zero-trust access.</div>
+    </aside>
+    <main class="main">
+      <section id="today" class="view active">
+        <div class="hero"><div><div class="eyebrow">Situation</div><h2 id="hello">Campaign Manager cockpit</h2><p id="lede">One surface for the day: decisions, candidate schedule, calls, field operations, compliance, communications and evidence.</p></div><div class="datebox"><strong>Preview environment</strong><span>Not production campaign data</span></div></div>
+        <div class="grid">
+          <article class="card span3"><div class="label">Decisions</div><div class="metric">3</div><div class="sub">Synthetic pending items</div></article>
+          <article class="card span3"><div class="label">Candidate calls</div><div class="metric">12</div><div class="sub">Synthetic call queue</div></article>
+          <article class="card span3"><div class="label">Today</div><div class="metric">4</div><div class="sub">Synthetic scheduled blocks</div></article>
+          <article class="card span3"><div class="label">System posture</div><div class="metric" style="font-size:22px">Isolated</div><div class="sub">No command authority</div></article>
+          <article class="card span7"><div class="section-title"><h3>Needs attention</h3><span class="pill synthetic">SYNTHETIC</span></div><div class="rows">
+            <div class="row"><div><b>Candidate schedule review</b><br><span>Demo decision item</span></div><button class="action">Open</button></div>
+            <div class="row"><div><b>Call queue</b><br><span>Demo operating task</span></div><button class="action ghost">Review</button></div>
+            <div class="row"><div><b>Compliance checkpoint</b><br><span>Demo evidence item</span></div><button class="action ghost">Inspect</button></div>
+          </div></article>
+          <article class="card span5"><div class="section-title"><h3>Command brief</h3><span class="pill">READ ONLY</span></div><p style="font-size:14px;line-height:1.55;color:var(--muted)">This is where situation, changes, unresolved dependencies and approved next actions converge. In the authenticated tenant, consequential actions can be policy-checked and receipt-bearing.</p><button class="action" style="margin-top:6px">Generate preview brief</button></article>
+          <article class="card span12"><div class="section-title"><h3>Ask Dominion</h3><span class="pill">NO BACKEND CONNECTED</span></div><div class="ask"><input id="ask" aria-label="Ask Dominion preview" placeholder="Ask about this synthetic preview..."><button id="askbtn">Ask</button></div><p id="answer" class="sub" style="margin:10px 2px 0">Preview responses stay in this browser and issue no command.</p></article>
+        </div>
+      </section>
+      <section id="decisions" class="view"><div class="section-title"><h3>Decisions</h3><span class="pill synthetic">SYNTHETIC</span></div><div class="card"><div class="rows"><div class="row"><div><b>Example approval</b><br><span>Awaiting candidate decision</span></div><button class="action">Review</button></div><div class="row"><div><b>Example operational choice</b><br><span>Prepared by campaign manager</span></div><button class="action ghost">Open evidence</button></div></div></div></section>
+      <section id="calendar" class="view"><div class="section-title"><h3>Calendar</h3><span class="pill synthetic">SYNTHETIC</span></div><div class="grid"><div class="card span4"><div class="label">Morning</div><div class="metric">08:30</div><div class="sub">Demo campaign office block</div></div><div class="card span4"><div class="label">Midday</div><div class="metric">12:00</div><div class="sub">Demo stakeholder block</div></div><div class="card span4"><div class="label">Afternoon</div><div class="metric">15:00</div><div class="sub">Demo calls block</div></div></div></section>
+      <section id="field" class="view"><div class="section-title"><h3>Field</h3><span class="pill synthetic">SYNTHETIC</span></div><div class="grid"><div class="card span4"><div class="label">Teams</div><div class="metric">5</div><div class="sub">Demo only</div></div><div class="card span4"><div class="label">Routes</div><div class="metric">8</div><div class="sub">Demo only</div></div><div class="card span4"><div class="label">Check-ins</div><div class="metric">17</div><div class="sub">Demo only</div></div></div></section>
+      <section id="fundraising" class="view"><div class="section-title"><h3>Fundraising</h3><span class="pill synthetic">SYNTHETIC</span></div><div class="card"><p class="sub">The secure tenant can present call workflow and aggregate status while restricting donor identity and financial detail to authorized roles. This preview contains no donor information.</p></div></section>
+      <section id="comms" class="view"><div class="section-title"><h3>Communications</h3><span class="pill synthetic">SYNTHETIC</span></div><div class="card"><div class="rows"><div class="row"><div><b>Draft queue</b><br><span>Example content awaiting review</span></div><button class="action ghost">Open</button></div><div class="row"><div><b>Approval queue</b><br><span>Example candidate approval state</span></div><button class="action">Review</button></div></div></div></section>
+      <section id="compliance" class="view"><div class="section-title"><h3>Compliance</h3><span class="pill synthetic">SYNTHETIC</span></div><div class="card"><p class="sub">Compliance items can become explicit tasks with evidence, owners, due dates and receipts. No election filing or legal data is connected here.</p></div></section>
+      <section id="research" class="view"><div class="section-title"><h3>Research</h3><span class="pill synthetic">SYNTHETIC</span></div><div class="card"><p class="sub">Research can be organized with source provenance and role-based access. This public preview contains no opponent, voter, polling or targeting data.</p></div></section>
+      <section id="documents" class="view"><div class="section-title"><h3>Documents</h3><span class="pill synthetic">SYNTHETIC</span></div><div class="card"><div class="rows"><div class="row"><div><b>Candidate brief - example</b><br><span>Read-only preview object</span></div><button class="action ghost">Open</button></div><div class="row"><div><b>Operations brief - example</b><br><span>Read-only preview object</span></div><button class="action ghost">Open</button></div></div></div></section>
+      <section id="evidence" class="view"><div class="section-title"><h3>Evidence</h3><span class="pill">PREVIEW</span></div><div class="card"><div class="label">Example receipt</div><div class="rows"><div class="row"><b>Request</b><span>CMD-DEMO-0001</span></div><div class="row"><b>Tenant</b><span>public-preview</span></div><div class="row"><b>Action</b><span>OPEN_PREVIEW</span></div><div class="row"><b>Authority</b><span>NONE</span></div><div class="row"><b>Result</b><span>DISPLAY ONLY</span></div></div></div></section>
+    </main>
+  </div>
+</div>
+<div class="toast" id="toast">Preview only - no command was issued.</div>
+<script>
+(function(){
+  var nav=[].slice.call(document.querySelectorAll(".nav button"));
+  var views=[].slice.call(document.querySelectorAll(".view"));
+  var roles=[].slice.call(document.querySelectorAll(".role"));
+  function toast(msg){var t=document.getElementById("toast");t.textContent=msg||"Preview only - no command was issued.";t.classList.add("show");setTimeout(function(){t.classList.remove("show")},1800)}
+  nav.forEach(function(b){b.addEventListener("click",function(){nav.forEach(function(x){x.classList.remove("active")});views.forEach(function(x){x.classList.remove("active")});b.classList.add("active");document.getElementById(b.getAttribute("data-view")).classList.add("active")})});
+  roles.forEach(function(b){b.addEventListener("click",function(){roles.forEach(function(x){x.classList.remove("active")});b.classList.add("active");var candidate=b.getAttribute("data-role")==="candidate";document.getElementById("hello").textContent=candidate?"Candidate cockpit":"Campaign Manager cockpit";document.getElementById("lede").textContent=candidate?"A concise surface for today, decisions, calls, schedule, approvals and the command brief.":"One surface for the day: decisions, candidate schedule, calls, field operations, compliance, communications and evidence.";toast(candidate?"Candidate view selected":"Campaign Manager view selected")})});
+  [].slice.call(document.querySelectorAll(".action")).forEach(function(b){b.addEventListener("click",function(){toast()})});
+  document.getElementById("askbtn").addEventListener("click",function(){var q=document.getElementById("ask").value.trim();document.getElementById("answer").textContent=q?"Preview answer: the authenticated version would reason only over data authorized to the tenant and role. No request left this browser.":"Type a question to experience the interaction shell.";toast("Local preview response only")});
+})();
+</script>
+</body>
+</html>
