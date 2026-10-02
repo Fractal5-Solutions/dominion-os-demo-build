@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify the public /demo-1 Squarespace surface against the canonical v1.9 contract."""
+"""Verify the public /demo-1 Squarespace surface against the canonical v2.4 contract."""
 
 from __future__ import annotations
 
@@ -11,30 +11,32 @@ import urllib.error
 import urllib.request
 
 DEFAULT_URL = "https://www.fractal5solutions.com/demo-1"
-EXPECTED_BUILD = "demo-1-v1.9-20260927-hardened-four-provider-gates"
+EXPECTED_BUILD = "demo-1-v2.4-20261002-canon-light-evidence-disciplined"
 
 REQUIRED_TEXT = (
     EXPECTED_BUILD,
-    "Windows Release Paths",
-    "WINDOWS BUSINESS · FOUR-PROVIDER RELEASE TARGET",
-    "One Dominion payload. Four governed provider packages.",
-    "GCP · AWS · Azure · OCI",
-    "0 / 4 Certified",
-    "No public downloadable package is available",
-    "Google Cloud",
-    "Amazon Web Services",
-    "Microsoft Azure",
-    "Oracle Cloud Infrastructure",
-    "Politics remains public-demonstration-only",
+    'data-claim-mode="evidence-disciplined"',
+    'data-public-runtime-claim="none"',
+    "Operate the mission.",
+    "Public Proof Surface",
+    "Demo here. Production in the Store.",
+    "The film is synthetic. Deployment evidence is documented separately.",
+    "Public deployment evidence is separated from the synthetic",
+    "Presentation is not authority.",
+    "Different claims require different evidence.",
+    "Production is its own claim.",
+    "governed commercial access and deployment paths through the",
+    "provider-runtime certification dashboard",
+    "Public-safe demonstration",
 )
 
 FORBIDDEN_TEXT = (
-    "MISSION 01 · DOWNLOADABLE EXPERIENCE",
-    "Dominion OS 1.0 for Business. Windows first.",
-    ">Windows Experience<",
-    "Google Cloud</strong><small>Customer-owned deployment path",
+    "The film is synthetic. The deployment record is real.",
+    "controlled live campaign deployments at Canadian federal",
+    "2 Publicly documented campaign deployment contexts",
+    "remain commercial Store products.",
+    "Dominion OS™ 1.0 and the Fractal5 SaaS Suite are",
 )
-
 
 def fetch(url: str, timeout: int) -> str:
     separator = "&" if "?" in url else "?"
@@ -58,22 +60,12 @@ def verify(html: str) -> dict:
     required = {text: (text in html) for text in REQUIRED_TEXT}
     forbidden = {text: (text in html) for text in FORBIDDEN_TEXT}
 
-    provider_cards = {
-        "gcp": "GOOGLE CLOUD" in html,
-        "aws": "AMAZON WEB SERVICES" in html,
-        "azure": "MICROSOFT AZURE" in html,
-        "oci": "ORACLE CLOUD INFRASTRUCTURE" in html,
-    }
-
     result = {
-        "schema": "dominion.demo1.live-verification.v1",
+        "schema": "dominion.demo1.live-verification.v2",
         "expectedBuild": EXPECTED_BUILD,
         "required": required,
         "forbiddenPresent": forbidden,
-        "providerCards": provider_cards,
-        "pass": all(required.values())
-        and all(provider_cards.values())
-        and not any(forbidden.values()),
+        "pass": all(required.values()) and not any(forbidden.values()),
     }
     return result
 
