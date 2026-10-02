@@ -35,9 +35,10 @@ jobs:
           import json, pathlib, re, subprocess, tempfile
 
           html = pathlib.Path("squarespace/demo-1-final.html").read_text(encoding="utf-8")
-          assert 'data-page-build="demo-1-v1.9-20260927-hardened-four-provider-gates"' in html
-          assert 'if(state==="ready")else' not in html
-          assert 'commonCertified&&packageCertified&&catalogCertified&&hrefMatches&&checksumMatches' in html
+          assert 'data-page-build="demo-1-v2.3-20261002-evidence-disciplined-deployment-copy"' in html
+          assert 'Dominion OS™ 1.0 and the Fractal5 SaaS Suite follow governed commercial production and deployment paths through the Fractal5 Store.' in html
+          assert 'The public demo does not act as a release registry, deployment-status dashboard, or software distribution channel.' in html
+          assert 'Dominion OS 1.0 and the SaaS Suite are commercial production software.' not in html
 
           scripts = re.findall(r"<script(?:\s[^>]*)?>(.*?)</script>", html, flags=re.I|re.S)
           js_blocks = [s for s in scripts if '"@context"' not in s]
