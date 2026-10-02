@@ -35,9 +35,9 @@ jobs:
           import json, pathlib, re, subprocess, tempfile
 
           html = pathlib.Path("squarespace/demo-1-final.html").read_text(encoding="utf-8")
-          assert 'data-page-build="demo-1-v2.3-20261002-evidence-disciplined-deployment-copy"' in html
-          assert 'Dominion OS™ 1.0 and the Fractal5 SaaS Suite follow governed commercial production and deployment paths through the Fractal5 Store.' in html
-          assert 'The public demo does not act as a release registry, deployment-status dashboard, or software distribution channel.' in html
+          assert 'data-build="demo-1-v2.4-20261002-canon-light-evidence-disciplined"' in html
+          assert 'Dominion OS™ 1.0 and the Fractal5 SaaS Suite follow' in html
+          assert 'This public demonstration is not a release' in html
           assert 'Dominion OS 1.0 and the SaaS Suite are commercial production software.' not in html
 
           scripts = re.findall(r"<script(?:\s[^>]*)?>(.*?)</script>", html, flags=re.I|re.S)
