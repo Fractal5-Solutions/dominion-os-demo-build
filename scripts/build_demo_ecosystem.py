@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CANON = ROOT / "squarespace/demo-1-v1.9-ecosystem-truth.html"
 EXT = ROOT / "squarespace/demo-ecosystem-extension-20261021.review.html"
 CANON_BLOB = "031d69009d424b91c73ccd868d35d6cd3491f303"
-EXT_BLOB = "205f7993195f4b0859a6f2b3e399a1de6306f3f7"
+EXT_BLOB = "7cf4c04b6f133b0c2f8008bf16a67516fc1984ff"
 OLD_BUILD = "demo-1-v1.9-20260927-hardened-four-provider-gates"
 NEW_BUILD = "demo-1-v2.0-20261021-ecosystem-evidence-candidate"
 
