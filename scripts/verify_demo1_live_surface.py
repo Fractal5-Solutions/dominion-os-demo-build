@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify the public /demo-1 Squarespace surface against the canonical v2.4 contract."""
+"""Verify /demo-1 against the pending Google-first v2.5 preview contract."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ import urllib.error
 import urllib.request
 
 DEFAULT_URL = "https://www.fractal5solutions.com/demo-1"
-EXPECTED_BUILD = "demo-1-v2.4-20261002-canon-light-evidence-disciplined"
+EXPECTED_BUILD = "demo-1-v2.5-20261024-google-first-preview-pending"
 
 REQUIRED_TEXT = (
     EXPECTED_BUILD,
@@ -19,18 +19,25 @@ REQUIRED_TEXT = (
     'data-public-runtime-claim="none"',
     "Operate the mission.",
     "Public Proof Surface",
-    "Demo here. Production in the Store.",
+    "Synthetic preview here. Production certification is separate.",
     "The film is synthetic. Deployment evidence is documented separately.",
     "Public deployment evidence is separated from the synthetic",
     "Presentation is not authority.",
     "Different claims require different evidence.",
     "Production is its own claim.",
-    "governed commercial access and deployment paths through the",
     "provider-runtime certification dashboard",
     "Public-safe demonstration",
+    'data-google-certification="pending"',
+    'data-preview-download="pending"',
+    "Google first: deployment certification pending.",
+    "Offline Preview — Pending",
+    "No download URL is active.",
 )
 
 FORBIDDEN_TEXT = (
+    "Commercial Runtime Verified",
+    "Governed release complete",
+    "Dominion OS 1.0 has completed the governed release path",
     "The film is synthetic. The deployment record is real.",
     "controlled live campaign deployments at Canadian federal",
     "2 Publicly documented campaign deployment contexts",

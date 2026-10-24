@@ -1,0 +1,26 @@
+{
+  "schema": "dominion.offline-preview.release.v1",
+  "artifactClass": "synthetic-static-web-preview",
+  "title": "Dominion OS Business + Politics Offline Preview",
+  "packageName": "Dominion-OS-Business-Politics-Offline-Preview.zip",
+  "sourceCommit": "c2e066cfc1c95cba129bbadcd864833a05e86d99",
+  "inputRawHtmlSha256": "6e8ca733f3dbd3798064b47309c1cfd56b29957c5f27d39593d9d1a9295eedb2",
+  "generatedOfflineHtmlSha256": null,
+  "packageSha256": null,
+  "packageBytes": null,
+  "publicUrl": null,
+  "artifactAcceptance": "PENDING_EXACT_ARTIFACT_REVIEW",
+  "publicationState": "PENDING_GOOGLE_CERTIFICATION",
+  "googleDeployment": {
+    "certification": "PENDING",
+    "acceptedCertificateUrl": null,
+    "acceptedCertificateSha256": null
+  },
+  "missions": ["Business", "Politics"],
+  "syntheticOnly": true,
+  "nativeProductIncluded": false,
+  "saasIncluded": false,
+  "realAuthority": false,
+  "nativeDistributionPolicyChanged": false,
+  "note": "Local preview validation does not certify Google, SaaS, or the native product. Public download activation follows accepted Google deployment evidence and separate exact preview-artifact acceptance."
+}
