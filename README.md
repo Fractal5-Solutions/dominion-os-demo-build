@@ -19,6 +19,8 @@ The approved public presentation and sanitized proof surface includes:
 - `demo/assets/live-mission-video-manifest.json` — receipt-bound Business/Politics media state; rendered MP4 masters remain distinct from the public interactive demo
 - `squarespace/demo-1-final.html` — canonical fail-closed Squarespace `/demo-1` presentation artifact
 - `demo/assets/offline-preview-download.json` - pending release record for the separate free synthetic Business/Politics offline preview; no public download URL is configured
+- `demo/saas-suite-offline-preview.html` - self-contained synthetic examples for all 13 catalogue modules in Business and neutral civic administration modes; no actual SaaS implementation or general-availability claim
+- `demo/assets/saas-offline-preview-download.json` - pending release record for the separate free SaaS catalogue preview; no public download URL is configured
 
 No implementation/runtime/configuration/provider-authentication artifact is approved for the current public tree. The only public automation retained is the minimal static Pages publisher for the approved artifact bundle.
 
@@ -31,6 +33,8 @@ Deployment readiness and public-runtime availability are separate claims. The pu
 The current static proof surface may remain available even when no optional public provider runtime is certified live.
 
 The offline preview candidate contains only public presentation files and synthetic data. It does not include or certify the native Dominion product, core runtime, SaaS, connectors, or Google deployment. Its packaging contract is in `docs/OFFLINE_PREVIEW_RELEASE.md`. Google certification comes first; exact preview-artifact acceptance and approved public activation follow. Historical native Windows signing and release gates are separate.
+
+The separate SaaS Suite preview covers all 13 catalogue entries with fixed, interactive examples. It preserves each module's catalogue state, including Coming Soon, and does not distribute or certify the actual modules. Its four-file archive, source binding, approval/Hold behavior, and pending release gates are described in `docs/SAAS_OFFLINE_PREVIEW_RELEASE.md`. This candidate adds no Pages publisher route and leaves the pending Squarespace source and download activation unchanged.
 
 ## Public routes
 
