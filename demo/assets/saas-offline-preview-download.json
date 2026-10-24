@@ -1,0 +1,18 @@
+{
+  "schema": "dominion.synthetic-saas-preview.release-candidate.v1",
+  "title": "Fractal5 SaaS Suite Business + Politics Offline Preview",
+  "artifactClass": "synthetic-static-saas-catalogue-preview",
+  "moduleCount": 13,
+  "missions": ["Business", "Politics"],
+  "status": "PENDING_GOOGLE_CERTIFICATION",
+  "publicUrl": null,
+  "packageSha256": null,
+  "packageBytes": null,
+  "googleDeployment": {"provider": "Google Cloud", "certification": "PENDING", "certificateUrl": null, "certificateSha256": null},
+  "exactArtifactAcceptance": "PENDING",
+  "nativeDistributionPolicyChanged": false,
+  "actualSaasImplementationIncluded": false,
+  "generalAvailabilityClaim": false,
+  "externalAuthority": false,
+  "publicationOrder": ["Google deployment certification", "Exact preview-artifact acceptance", "Approved public activation"]
+}
