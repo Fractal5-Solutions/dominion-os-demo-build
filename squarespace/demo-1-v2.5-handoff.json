@@ -1,0 +1,28 @@
+{
+  "schema": "f5.squarespace.handoff.v2",
+  "page": "/demo-1",
+  "build": "demo-1-v2.5-20261024-google-first-preview-pending",
+  "canonicalSource": "squarespace/demo-1-v2.5-google-first-preview-pending.html",
+  "movingAlias": "squarespace/demo-1-final.html",
+  "sha256": "b1ebe36ec51a53b7c977862ebfdc53dbc4261afb25380a862befff092dd361b6",
+  "deploymentUnit": "complete single Squarespace code block",
+  "publicationState": "PENDING_PRINCIPAL_REVIEW_NOT_PUBLISHED",
+  "automaticDeploymentAuthorized": false,
+  "googleCertification": "PENDING",
+  "previewDownloadState": "PENDING_GOOGLE_CERTIFICATION",
+  "previewReleaseRecord": "demo/assets/offline-preview-download.json",
+  "publicDownloadUrl": null,
+  "acceptedGoogleCertificateUrl": null,
+  "acceptedGoogleCertificateSha256": null,
+  "activationRule": "No activation adapter exists in this candidate. A reviewed source change after genuine Google certification and exact preview-artifact acceptance must introduce the canonical accepted-record adapter; a JSON green boolean alone is not trust.",
+  "nativeProductOrSaasCertificationClaimed": false,
+  "requiredLiveChecks": [
+    "exact build marker and source hash",
+    "Google certification explicitly pending until earned",
+    "three offline preview buttons disabled",
+    "no mutable HTML download fallback",
+    "synthetic preview distinct from native product and SaaS",
+    "Business and Politics film playback",
+    "390px mobile layout and keyboard controls"
+  ]
+}
