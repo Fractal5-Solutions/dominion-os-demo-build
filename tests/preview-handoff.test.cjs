@@ -8,7 +8,7 @@ const { test } = require('node:test');
 const root = path.join(__dirname, '..');
 const html = fs.readFileSync(path.join(root, 'squarespace/demo-1-final.html'), 'utf8');
 const source = html.match(/<script>([\s\S]*?)<\/script>/)[1];
-const ids = ['f5-download-demo', 'f5-download-demo-2', 'f5-download-demo-3'];
+const ids = ['f5-download-demo', 'f5-download-demo-2', 'f5-download-demo-3', 'f5-download-saas-preview'];
 
 function setup(crypto = webcrypto) {
   let requests = 0;
@@ -63,7 +63,7 @@ test('integrity helper accepts only the exact expected ZIP bytes and size', asyn
 
 test('release record and handoff contain no invented Google acceptance or download URL', () => {
   const status = JSON.parse(fs.readFileSync(path.join(root, 'demo/assets/offline-preview-download.json')));
-  const handoff = JSON.parse(fs.readFileSync(path.join(root, 'squarespace/demo-1-v2.5-handoff.json')));
+  const handoff = JSON.parse(fs.readFileSync(path.join(root, 'squarespace/demo-1-v2.6-handoff.json')));
   assert.equal(status.publicationState, 'PENDING_GOOGLE_CERTIFICATION');
   assert.equal(status.publicUrl, null);
   assert.equal(status.googleDeployment.certification, 'PENDING');
@@ -76,7 +76,7 @@ test('release record and handoff contain no invented Google acceptance or downlo
 });
 
 test('immutable Squarespace source, moving alias, build marker, and handoff hash agree', () => {
-  const handoff = JSON.parse(fs.readFileSync(path.join(root, 'squarespace/demo-1-v2.5-handoff.json')));
+  const handoff = JSON.parse(fs.readFileSync(path.join(root, 'squarespace/demo-1-v2.6-handoff.json')));
   const moving = fs.readFileSync(path.join(root, handoff.movingAlias));
   const immutable = fs.readFileSync(path.join(root, handoff.canonicalSource));
   assert.deepEqual(moving, immutable);
@@ -85,4 +85,24 @@ test('immutable Squarespace source, moving alias, build marker, and handoff hash
   assert.match(html, /Google first: deployment certification pending/);
   assert.match(html, /Core and SaaS\s+completion are not certified/);
   assert.doesNotMatch(html, /Commercial Runtime Verified|Governed release complete|has completed the governed release path/);
+});
+
+test('suite preview is separate and cannot activate through either pending release record', () => {
+  const handoff = JSON.parse(fs.readFileSync(path.join(root, 'squarespace/demo-1-v2.6-handoff.json')));
+  const suite = JSON.parse(fs.readFileSync(path.join(root, 'demo/assets/saas-offline-preview-download.json')));
+  assert.equal(handoff.previewReleaseRecords.length, 2);
+  assert.deepEqual(handoff.previewReleaseRecords.map(record => record.kind), ['dominion-os', 'saas-suite']);
+  assert.ok(handoff.previewReleaseRecords.every(record => record.publicUrl === null));
+  assert.equal(suite.publicUrl, null);
+  assert.equal(suite.googleDeployment.certification, 'PENDING');
+  assert.equal(suite.exactArtifactAcceptance, 'PENDING');
+  assert.equal(suite.actualSaasImplementationIncluded, false);
+  assert.equal(suite.generalAvailabilityClaim, false);
+  assert.match(html, /13 SaaS module examples/);
+  assert.match(html, /neutral civic modes/);
+  const demo = setup();
+  demo.nodes.get('f5-download-saas-preview').listeners.click();
+  assert.equal(demo.nodes.get('f5-download-saas-preview').disabled, true);
+  assert.equal(demo.nodes.get('f5-download-saas-preview').textContent, 'SaaS Suite Preview - Pending');
+  assert.equal(demo.requests, 0);
 });
