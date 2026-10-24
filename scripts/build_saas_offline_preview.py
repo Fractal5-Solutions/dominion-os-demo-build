@@ -117,13 +117,16 @@ def build(repo_root: Path, output_dir: Path) -> dict:
     package = archive.make_zip(payloads)
     manifest = archive.validate_archive(package, payloads)
     packager_path = "scripts/build_saas_offline_preview.py"
-    packager_raw = (repo_root / packager_path).read_bytes()
     packager_head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repo_root, text=True).strip()
-    tracked = subprocess.run(["git", "cat-file", "blob", f"{packager_head}:{packager_path}"], cwd=repo_root, capture_output=True)
+    packager_files = {}
+    for path in (packager_path, "scripts/build_offline_preview.py"):
+        actual = (repo_root / path).read_bytes()
+        tracked = subprocess.run(["git", "cat-file", "blob", f"{packager_head}:{path}"], cwd=repo_root, capture_output=True)
+        packager_files[path] = {"sha256": archive.digest(actual), "headBlobMatches": tracked.returncode == 0 and tracked.stdout == actual}
     receipt = {
         "schema": "dominion.synthetic-saas-offline-preview.build-receipt.v1", "validation": "PASS",
         "source": manifest["source"], "generatedOfflineHtmlSha256": archive.digest(payloads["index.html"]),
-        "packager": {"head": packager_head, "path": packager_path, "sha256": archive.digest(packager_raw), "headBlobMatches": tracked.returncode == 0 and tracked.stdout == packager_raw},
+        "packager": {"head": packager_head, "files": packager_files, "headBlobMatches": all(record["headBlobMatches"] for record in packager_files.values())},
         "packageName": PACKAGE_NAME, "packageSha256": archive.digest(package), "packageBytes": len(package),
         "entries": {name: {"sha256": archive.digest(content), "bytes": len(content)} for name, content in sorted(payloads.items())},
         "publicUrl": None, "publicationState": "PENDING_GOOGLE_CERTIFICATION",
