@@ -1,0 +1,95 @@
+{
+  "schema": "fractal5.dominion.google-demo.acceptance.v1",
+  "created_at": "2026-10-24",
+  "status": "SOURCE_CONTRACT_ONLY_NOT_DEPLOYED",
+  "priority": "P0",
+  "mission_objective_id": "cmd-5815fbcb7e2a41c190b99bd2082d9d67",
+  "canonical_page": "https://www.fractal5solutions.com/demo-1",
+  "canonical_gcp_project": "f5-prod-command-core",
+  "provider_attestation": "BLOCKED_PHI_MCP_CAPABILITY_REQUIRED",
+  "provider_blocker": "gcloud-toolchain-unavailable-inside-phi-boundary",
+  "authority": {
+    "live_dominion_management": "PHI_MCP_ONLY",
+    "require_independent_source_review": true,
+    "require_exact_head_provenance": true,
+    "require_scoped_provider_mutation_authority": true,
+    "require_publication_approval": true,
+    "no_placeholder_live_urls": true
+  },
+  "candidate_services_historical_only": [
+    {
+      "project": "dominion-core-prod",
+      "name": "demo",
+      "last_observed": "2026-07-23",
+      "current_state": "UNVERIFIED"
+    },
+    {
+      "project": "dominion-core-prod",
+      "name": "dominion-demo-service",
+      "last_observed": "2026-07-23",
+      "current_state": "UNVERIFIED"
+    },
+    {
+      "project": "dominion-core-prod",
+      "name": "dominion-demo",
+      "last_observed": "2026-07-23",
+      "current_state": "UNVERIFIED"
+    },
+    {
+      "project": "dominion-core-prod",
+      "name": "dominion-os-demo",
+      "last_observed": "2026-07-23",
+      "current_state": "UNVERIFIED"
+    }
+  ],
+  "experience": [
+    {
+      "id": "business",
+      "requested_live_url": null,
+      "verified_live_url": null,
+      "public_demo_fallback": "https://fractal5-solutions.github.io/dominion-os-demo-build/demo/live-mission-demo.html?autoplay=1&mode=business",
+      "gates": [
+        "same-core-artifact-provenance",
+        "synthetic-business-tenant-isolation",
+        "organization-memory-intelligence-workflow-decision-receipt",
+        "no-real-customer-data",
+        "https-tls-valid",
+        "auth-and-reset-verified",
+        "current-revision-ready-and-serving",
+        "rollback-verified",
+        "observable-health-and-cost",
+        "external-clickthrough-pass"
+      ],
+      "certified": false
+    },
+    {
+      "id": "politics",
+      "requested_live_url": null,
+      "verified_live_url": null,
+      "public_demo_fallback": "https://fractal5-solutions.github.io/dominion-os-demo-build/demo/live-mission-demo.html?autoplay=1&mode=politics",
+      "gates": [
+        "same-core-artifact-provenance",
+        "synthetic-politics-tenant-isolation",
+        "factual-briefing-evidence-conflict-decision-support-receipt",
+        "no-voter-personal-data",
+        "no-campaign-transmissions",
+        "no-downloadable-politics-artifact",
+        "https-tls-valid",
+        "auth-and-reset-verified",
+        "current-revision-ready-and-serving",
+        "rollback-verified",
+        "observable-health-and-cost",
+        "external-clickthrough-pass"
+      ],
+      "certified": false
+    }
+  ],
+  "publication": {
+    "page_source": "squarespace/demo-1-final.html",
+    "replacement_rule": "full-block-verified-source-only",
+    "change_only_after_both_endpoints_certified": true,
+    "retain_current_fallbacks_until_complete": true,
+    "live_page_published": false
+  },
+  "completion_rule": "Both independently verified GCP HTTPS endpoints must run accepted Business and Politics workflows and be accessible via the published canonical demo page with current PHI-correlated deployment and external-clickthrough evidence. Source readiness, historical Cloud Run metadata and GitHub Pages synthetic links do not constitute GCP deployment."
+}
