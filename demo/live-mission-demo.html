@@ -25,7 +25,7 @@ button.action{border:0;background:var(--nav);color:#fff;border-radius:9px;paddin
 <body>
 <header><div class="brand">DOMINION OS™ 1.0 · LIVE MISSION DEMO</div><div class="badge">SYNTHETIC DATA · FILMING BUILD</div></header>
 <div class="wrap">
-<div class="notice"><strong>Demonstration boundary.</strong> Synthetic scenarios only. No customer data, confidential party data, voter targeting, production mutation, or unsupported runtime claim. Connector actions remain visibly marked synthetic unless a separately verified live connector is used.</div>
+<div class="notice"><strong>Demonstration boundary.</strong> Synthetic scenarios only. No customer data, confidential party data, voter targeting, production mutation, or unsupported runtime claim. Approvals and receipts are simulated and grant no real authority. This demo makes no external requests or changes. Connector actions remain visibly marked synthetic unless a separately verified live connector is used.</div>
 <div class="tabs"><button class="tab active" data-mode="business">Business</button><button class="tab" data-mode="politics">Politics</button></div>
 <div class="layout">
 <aside class="panel">
@@ -51,15 +51,16 @@ stages:[
 ["Situation",()=>`<div class="kicker">Situation</div><h2>One operating picture</h2><table><tr><th>Source</th><th>Finding</th><th>Provenance</th></tr><tr><td>FY2027 Strategy</td><td>BC named as candidate expansion market</td><td>Internal · current</td></tr><tr><td>CRM</td><td>27 qualified BC opportunities</td><td>Internal · current</td></tr><tr><td>Finance model</td><td>Revenue ramp assumes 6 months</td><td>Internal · current</td></tr><tr><td>Operations plan</td><td>Capacity plan assumes 12 months</td><td>Internal · current</td></tr><tr><td>Regulatory memo</td><td>Legacy cost estimate predates current synthetic assumptions</td><td>Internal · stale</td></tr></table><button class="action" onclick="next()">Analyze intelligence</button>`],
 ["Intelligence",()=>`<div class="kicker">Intelligence</div><h2>Truth states remain separate</h2><div class="cards"><div class="card"><div class="state confirmed">CONFIRMED</div><h3>Demand signal exists</h3><p class="small">Current CRM contains qualified opportunities.</p></div><div class="card"><div class="state supported">SUPPORTED</div><h3>BC is commercially plausible</h3><p class="small">Multiple synthetic sources support market attractiveness.</p></div><div class="card"><div class="state assumption">ASSUMPTION</div><h3>6-month sales ramp</h3><p class="small">Material to forecast and not reconciled.</p></div><div class="card"><div class="state conflicted">CONFLICTED</div><h3>6 vs 12 months</h3><p class="small">Finance and Operations cannot both be right.</p></div><div class="card"><div class="state unknown">UNKNOWN</div><h3>Final partner economics</h3><p class="small">Evidence not yet available.</p></div></div><div class="callout"><strong>Material contradiction detected.</strong><br>Revenue forecast assumes a 6-month ramp while the operating plan assumes 12 months. Decision sensitivity: HIGH.</div><button class="action" onclick="next()">Compare options</button>`],
 ["Options",()=>`<div class="kicker">Options</div><h2>Decision surface</h2><table><tr><th>Path</th><th>Exposure</th><th>Dependency</th><th>Reversibility</th></tr><tr><td><b>Direct Entry</b></td><td>Highest</td><td>Internal build-out</td><td>Lower</td></tr><tr><td><b>Channel Partnership</b></td><td>Moderate</td><td>Partner economics</td><td>Moderate</td></tr><tr><td><b>Controlled Pilot</b></td><td>Limited</td><td>Customer validation</td><td>High</td></tr></table><p class="small">Dominion presents viable courses of action and dependencies. It does not silently exercise executive authority.</p><button class="action" onclick="next()">Request action</button>`],
-["Decision",()=>`<div class="kicker">Decision</div><h2>Authority is explicit</h2><div class="authority"><div class="state conflicted">APPROVAL REQUIRED</div><h3>Initiate BC Controlled Pilot</h3><p class="small">Consequential external commitments are blocked until CEO approval is recorded.</p><button class="action approve" onclick="approve()">Authorize Controlled Pilot</button><button class="action secondary" onclick="reject()">Hold decision</button></div>`],
+["Decision",()=>`<div class="kicker">Decision</div><h2>Authority is explicit</h2><div class="authority"><div class="state conflicted">SIMULATED APPROVAL REQUIRED</div><h3>Initiate BC Controlled Pilot</h3><p class="small">Choose whether to simulate CEO approval. This grants no real authority and makes no external commitment.</p><button class="action approve" onclick="approve()">Simulate CEO approval</button><button class="action secondary" onclick="reject()">Hold decision</button></div>`],
 ["Action",()=>`<div class="kicker">Action</div><h2>Approved work becomes coordinated execution</h2><div class="cards"><div class="card"><div class="state confirmed">CREATED</div><h3>BC Market Pilot</h3><p class="small">Synthetic workstream created in the filming demo.</p></div><div class="card"><div class="state confirmed">ASSIGNED</div><h3>Finance validation</h3><p class="small">Owner and decision gate attached.</p></div><div class="card"><div class="state supported">CONNECTOR</div><h3>External action boundary</h3><p class="small">Synthetic in this build. Replace with a separately verified MCP/connector action for final live capture.</p></div></div><button class="action" onclick="next()">Open evidence receipt</button>`],
-["Evidence",()=>`<div class="kicker">Evidence</div><h2>Decision receipt</h2><div class="receipt">MISSION: BC Market Entry
+["Evidence",()=>`<div class="kicker">Evidence</div><h2>Simulated decision receipt</h2><div class="receipt">SIMULATED RECEIPT — NO REAL AUTHORITY OR EXTERNAL ACTION
+MISSION: BC Market Entry
 EVIDENCE: 5 synthetic sources
-MATERIAL CONFLICTS: 3
-OPEN UNCERTAINTIES: 2
+MATERIAL CONFLICTS: 1
+OPEN UNCERTAINTIES: 1
 OPTIONS: Direct Entry | Channel Partnership | Controlled Pilot
-AUTHORITY: CEO
-DECISION: Controlled Pilot Authorized
+SIMULATED ROLE: CEO
+SIMULATED DECISION: Controlled Pilot Authorized
 ACTIONS: Workstream + finance validation + review gate
 EXTERNAL CONNECTOR: NOT CLAIMED LIVE IN THIS BUILD
 RESULTING STATE: EXECUTION ACTIVE
@@ -73,33 +74,47 @@ stages:[
 ["Situation",()=>`<div class="kicker">Situation</div><h2>What materially changed?</h2><table><tr><th>Source</th><th>Finding</th><th>State</th></tr><tr><td>Government announcement</td><td>Accelerated implementation this fiscal year</td><td>NEW</td></tr><tr><td>Fiscal plan</td><td>Substantive funding begins next fiscal year</td><td>CONFLICT</td></tr><tr><td>Bill text</td><td>Underlying authority unchanged</td><td>UNCHANGED</td></tr><tr><td>Stakeholder submission</td><td>Consultation status unclear</td><td>UNRESOLVED</td></tr></table><button class="action" onclick="next()">Analyze intelligence</button>`],
 ["Intelligence",()=>`<div class="kicker">Intelligence</div><h2>Facts, interpretation and uncertainty remain separate</h2><div class="cards"><div class="card"><div class="state confirmed">NEW</div><h3>Timeline accelerated</h3><p class="small">Announcement is clear.</p></div><div class="card"><div class="state conflicted">CONFLICTED</div><h3>Timing vs funding</h3><p class="small">Published fiscal evidence does not cleanly align.</p></div><div class="card"><div class="state unknown">UNRESOLVED</div><h3>Appropriation authority</h3><p class="small">Further analysis required.</p></div></div><div class="callout"><strong>Source conflict — review required.</strong><br>Implementation timing and fiscal funding evidence do not cleanly align. Dominion does not infer motive or political position.</div><button class="action" onclick="next()">Prepare options</button>`],
 ["Options",()=>`<div class="kicker">Options</div><h2>Legitimate operational options</h2><table><tr><th>Option</th><th>Purpose</th><th>Dependency</th></tr><tr><td>Expedited fiscal analysis</td><td>Resolve timing/funding conflict</td><td>Current fiscal evidence</td></tr><tr><td>Stakeholder consultation</td><td>Clarify implementation effects</td><td>Named stakeholder set</td></tr><tr><td>Legislative briefing</td><td>Prepare leadership</td><td>Verified issue summary</td></tr><tr><td>Hold pending evidence</td><td>Avoid premature position</td><td>Further authoritative sources</td></tr></table><button class="action" onclick="next()">Request leadership action</button>`],
-["Decision",()=>`<div class="kicker">Decision</div><h2>Leadership authority</h2><div class="authority"><div class="state conflicted">LEADERSHIP APPROVAL REQUIRED</div><h3>Authorize fiscal analysis + stakeholder review + legislative briefing</h3><p class="small">Dominion structures the work. Leadership decides whether it proceeds.</p><button class="action approve" onclick="approve()">Authorize work</button><button class="action secondary" onclick="reject()">Hold</button></div>`],
-["Action",()=>`<div class="kicker">Action</div><h2>Authorized workstreams</h2><div class="cards"><div class="card"><div class="state confirmed">ASSIGNED</div><h3>Fiscal analysis</h3><p class="small">Question set and owner attached.</p></div><div class="card"><div class="state confirmed">ASSIGNED</div><h3>Stakeholder review</h3><p class="small">Consultation task prepared.</p></div><div class="card"><div class="state supported">CONNECTOR</div><h3>External action boundary</h3><p class="small">Synthetic in this build. Final film should substitute a separately verified live connector action.</p></div></div><button class="action" onclick="next()">Open evidence receipt</button>`],
-["Evidence",()=>`<div class="kicker">Evidence</div><h2>Decision receipt</h2><div class="receipt">MISSION: Legislative Session Readiness
+["Decision",()=>`<div class="kicker">Decision</div><h2>Leadership authority</h2><div class="authority"><div class="state conflicted">SIMULATED LEADERSHIP APPROVAL REQUIRED</div><h3>Authorize fiscal analysis + stakeholder review + legislative briefing</h3><p class="small">Choose whether to simulate leadership approval. This grants no real authority and performs no external work.</p><button class="action approve" onclick="approve()">Simulate leadership approval</button><button class="action secondary" onclick="reject()">Hold</button></div>`],
+["Action",()=>`<div class="kicker">Action</div><h2>Simulated authorized workstreams</h2><div class="cards"><div class="card"><div class="state confirmed">ASSIGNED</div><h3>Fiscal analysis</h3><p class="small">Synthetic question set and owner attached.</p></div><div class="card"><div class="state confirmed">ASSIGNED</div><h3>Stakeholder review</h3><p class="small">Synthetic consultation task prepared.</p></div><div class="card"><div class="state confirmed">ASSIGNED</div><h3>Legislative briefing</h3><p class="small">Synthetic issue summary and leadership review gate prepared.</p></div><div class="card"><div class="state supported">CONNECTOR</div><h3>External action boundary</h3><p class="small">Synthetic in this build. Final film should substitute a separately verified live connector action.</p></div></div><button class="action" onclick="next()">Open evidence receipt</button>`],
+["Evidence",()=>`<div class="kicker">Evidence</div><h2>Simulated decision receipt</h2><div class="receipt">SIMULATED RECEIPT — NO REAL AUTHORITY OR EXTERNAL ACTION
+MISSION: Legislative Session Readiness
 AUTHORITATIVE SOURCES: 4 synthetic sources
-MATERIAL CHANGES: 2
+MATERIAL CHANGES: 1
 SOURCE CONFLICTS: 1
 OPEN QUESTIONS: 2
 POLITICAL POSITION: NOT SELECTED BY SYSTEM
-AUTHORITY: Leadership
-AUTHORIZED WORKSTREAMS: 3
+SIMULATED ROLE: Leadership
+SIMULATED AUTHORIZED WORKSTREAMS: 3
 EXTERNAL CONNECTOR: NOT CLAIMED LIVE IN THIS BUILD
 RESULTING STATE: PREPARATION ACTIVE
 RECEIPT: DEMO-POL-001</div><button class="action secondary" onclick="resetFlow()">Reset mission</button>`]
 ]}}
-let mode="business",idx=0,approved=false;
+let mode="business",idx=0,approved=false,held=false;
 function render(){
  const f=flows[mode]; document.getElementById("mission").innerHTML=f.stages[idx][1]();
  document.getElementById("steps").innerHTML=f.stages.map((s,i)=>`<div class="navstep ${i===idx?'active':''} ${i<idx?'done':''}">${String(i+1).padStart(2,'0')} · ${s[0]}</div>`).join("");
  const states=["MISSION","SITUATION","INTELLIGENCE","OPTIONS","DECISION","EXECUTION","EVIDENCE"];
  document.getElementById("state").textContent=states[idx];
- document.getElementById("stateNote").textContent=idx===4&&!approved?"Consequential action is blocked pending human authority.":idx===6?"Mission evidence is reconstructable.":"Synthetic filming workflow in progress.";
+ document.getElementById("stateNote").textContent=idx===4&&held?"Simulated decision held. Explicit simulated approval is required to proceed.":idx===4&&!approved?"Paused for explicit simulated approval. No real authority is granted.":idx===6?"Simulated receipt only. No real authority or external action.":"Synthetic filming workflow in progress.";
 }
 function addLog(text){document.getElementById("log").innerHTML+=`<div><b>${new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</b> ${text}</div>`}
-function next(){idx=Math.min(idx+1,flows[mode].stages.length-1);addLog("Advanced to "+flows[mode].stages[idx][0]+".");render()}
-function approve(){approved=true;addLog(mode==="business"?"CEO approval recorded.":"Leadership approval recorded.");idx=5;render()}
-function reject(){approved=false;addLog("Decision held. No consequential action executed.");}
-function resetFlow(){idx=0;approved=false;document.getElementById("log").innerHTML="<div><b>System</b> Demo workspace reset.</div>";render()}
+function next(){
+ if(idx>=4&&!approved){stopAutoplay();render();return;}
+ idx=Math.min(idx+1,flows[mode].stages.length-1);
+ if(idx===4) stopAutoplay();
+ addLog("Advanced to "+flows[mode].stages[idx][0]+".");render();
+}
+function approve(){
+ if(idx!==4) return;
+ approved=true;held=false;
+ addLog(mode==="business"?"Simulated CEO approval recorded. No real authority or external action.":"Simulated leadership approval recorded. No real authority or external action.");
+ idx=5;render();startAutoplay();
+}
+function reject(){
+ if(idx!==4) return;
+ approved=false;held=true;stopAutoplay();addLog("Simulated decision held. No consequential action executed.");render();
+}
+function resetFlow(){stopAutoplay();idx=0;approved=false;held=false;document.getElementById("log").innerHTML="<div><b>System</b> Demo workspace reset.</div>";render();startAutoplay()}
 document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");mode=b.dataset.mode;resetFlow()});
 
 const params=new URLSearchParams(window.location.search);
@@ -110,21 +125,24 @@ if(requestedMode==="politics"){
 }
 const autoplay=params.get("autoplay")==="1";
 let autoplayTimer=null;
+function stopAutoplay(){
+ if(autoplayTimer!==null){clearInterval(autoplayTimer);autoplayTimer=null;}
+}
 function startAutoplay(){
-  if(!autoplay) return;
-  if(autoplayTimer) clearInterval(autoplayTimer);
+  if(!autoplay||held||idx===4||idx>=flows[mode].stages.length-1) return;
+  stopAutoplay();
   autoplayTimer=setInterval(()=>{
-    if(idx===4 && !approved){ approve(); return; }
-    if(idx>=flows[mode].stages.length-1){ clearInterval(autoplayTimer); autoplayTimer=null; return; }
+    if(held||idx===4||idx>=flows[mode].stages.length-1){stopAutoplay();return;}
     next();
   },6500);
 }
 document.addEventListener("keydown",e=>{
-  if(e.key==="ArrowRight" || e.key===" "){ e.preventDefault(); if(idx===4&&!approved) approve(); else next(); }
+  if(e.defaultPrevented||e.altKey||e.ctrlKey||e.metaKey||(e.target&&e.target.closest&&e.target.closest("button, input, select, textarea, a[href], [contenteditable], [role='button']"))) return;
+  if(e.key==="ArrowRight" || e.key===" "){ e.preventDefault(); next(); }
   if(e.key==="ArrowLeft"){ e.preventDefault(); idx=Math.max(0,idx-1); render(); }
-  if(e.key.toLowerCase()==="r"){ e.preventDefault(); resetFlow(); startAutoplay(); }
-  if(e.key.toLowerCase()==="b"){ e.preventDefault(); mode="business"; document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x.dataset.mode==="business")); resetFlow(); startAutoplay(); }
-  if(e.key.toLowerCase()==="p"){ e.preventDefault(); mode="politics"; document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x.dataset.mode==="politics")); resetFlow(); startAutoplay(); }
+  if(e.key.toLowerCase()==="r"){ e.preventDefault(); resetFlow(); }
+  if(e.key.toLowerCase()==="b"){ e.preventDefault(); mode="business"; document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x.dataset.mode==="business")); resetFlow(); }
+  if(e.key.toLowerCase()==="p"){ e.preventDefault(); mode="politics"; document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x.dataset.mode==="politics")); resetFlow(); }
 });
 render();
 startAutoplay();
