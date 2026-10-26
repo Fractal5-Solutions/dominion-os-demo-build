@@ -1,19 +1,45 @@
 name: Squarespace Source Gate
 
+# Cover every current handoff, release record, builder and regression input.
 on:
   pull_request:
     paths:
-      - "squarespace/demo-1-final.html"
-      - "squarespace/demo-1-v1.9-hardened-four-provider-gates.html"
+      - "squarespace/demo-1-*.html"
+      - "squarespace/demo-1-*-handoff.json"
+      - "demo/live-mission-demo.html"
+      - "demo/saas-suite-offline-preview.html"
       - "demo/assets/demo-download-package.json"
       - "demo/assets/dominion-release-catalog.json"
+      - "demo/assets/dominion-saas-catalog.json"
+      - "demo/assets/offline-preview-download.json"
+      - "demo/assets/saas-offline-preview-download.json"
+      - "scripts/build_offline_preview.py"
+      - "scripts/build_saas_offline_preview.py"
+      - "tests/live-mission-approval.test.cjs"
+      - "tests/preview-handoff.test.cjs"
+      - "tests/saas-offline-preview.test.cjs"
+      - "tests/test_offline_preview_package.py"
+      - "tests/test_saas_offline_preview.py"
       - ".github/workflows/squarespace-source-gate.yml"
   push:
     branches: [main]
     paths:
-      - "squarespace/demo-1-final.html"
+      - "squarespace/demo-1-*.html"
+      - "squarespace/demo-1-*-handoff.json"
+      - "demo/live-mission-demo.html"
+      - "demo/saas-suite-offline-preview.html"
       - "demo/assets/demo-download-package.json"
       - "demo/assets/dominion-release-catalog.json"
+      - "demo/assets/dominion-saas-catalog.json"
+      - "demo/assets/offline-preview-download.json"
+      - "demo/assets/saas-offline-preview-download.json"
+      - "scripts/build_offline_preview.py"
+      - "scripts/build_saas_offline_preview.py"
+      - "tests/live-mission-approval.test.cjs"
+      - "tests/preview-handoff.test.cjs"
+      - "tests/saas-offline-preview.test.cjs"
+      - "tests/test_offline_preview_package.py"
+      - "tests/test_saas_offline_preview.py"
       - ".github/workflows/squarespace-source-gate.yml"
 
 permissions:
@@ -22,10 +48,13 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           persist-credentials: false
+          # Packagers verify immutable Git blobs, not mutable working-tree inputs.
+          fetch-depth: 0
 
       - name: Validate embedded JavaScript and fail-closed release state
         shell: bash
@@ -99,3 +128,21 @@ jobs:
 
           print("SQUARESPACE_SOURCE_GATE_PASS")
           PY
+
+      - name: Test synthetic approval, hold and download behaviour
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test tests/live-mission-approval.test.cjs tests/preview-handoff.test.cjs tests/saas-offline-preview.test.cjs
+
+      - name: Test exact OS preview archive and tamper rejection
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B -m unittest discover -s tests -p test_offline_preview_package.py -v
+
+      - name: Test all 13 SaaS preview modules and reproducible packaging
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B -m unittest discover -s tests -p test_saas_offline_preview.py -v
