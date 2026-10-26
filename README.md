@@ -41,6 +41,15 @@ Security concerns should be reported privately as described in `SECURITY.md`.
 
 ## Publication contract
 
+The Business and Politics walkthroughs stop at the decision stage, including in
+autoplay. Select the scenario's authorization button explicitly to continue.
+Holding a decision, resetting, or changing contexts stops playback. Reset returns
+the selected scenario to its canonical mission with no retained approval.
+
+Validate the shipped interaction script with
+`node --test tests/live-mission-demo.test.cjs`. The Pages publisher runs the same
+acceptance check before packaging the public artifacts.
+
 GitHub Pages is published from protected `main` by the minimal `.github/workflows/publish-artifact-only-pages.yml` workflow. It copies only the approved public artifacts into the Pages bundle and validates the synthetic-data, authority, and connector-claim boundaries before deployment. Provider authentication, IAM repair, cloud deployment, and private runtime workflows are deliberately excluded from this public repository.
 
 The command preview is explicitly non-authoritative: it contains synthetic data only, performs no external browser networking, and has no private runtime or campaign connection.\n\nThe canonical Squarespace page remains `squarespace/demo-1-final.html`; the principal pastes that finished artifact into Squarespace. Squarespace is not the source repository and is not mutated by this workflow.

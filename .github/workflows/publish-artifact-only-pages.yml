@@ -33,6 +33,9 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Verify interactive mission acceptance before publication
+        run: node --test tests/live-mission-demo.test.cjs
+
       - name: Validate public proof contract
         shell: bash
         run: |
@@ -43,6 +46,7 @@ jobs:
           test -f README.md
           test -f SECURITY.md
           test -f demo/live-mission-demo.html
+          test -f demo/dominion-command-preview.html
           test -f release/business-windows-1.0.html
           test -f demo/assets/live-mission-video-manifest.json
           test -f demo/assets/dominion-business-1.0-release-gate.json
@@ -95,12 +99,14 @@ jobs:
 
           cp index.html 404.html .nojekyll README.md SECURITY.md _site/
           cp demo/live-mission-demo.html _site/demo/
+          cp demo/dominion-command-preview.html _site/demo/
           cp demo/assets/*.json _site/demo/assets/
           cp demo/media/* _site/demo/media/
           cp release/*.html _site/release/
 
           python3 - <<'PY'
           import json, os
+          assert os.path.isfile("_site/demo/dominion-command-preview.html"), "command preview missing from public bundle"
           receipt={
             "schema":"dominion.public-static-release.v2",
             "releaseSha":os.environ["GITHUB_SHA"],
