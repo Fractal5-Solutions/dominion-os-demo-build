@@ -32,13 +32,33 @@ jobs:
         run: |
           set -euo pipefail
           python3 - <<'PY'
-          import json, pathlib, re, subprocess, tempfile
+          import hashlib, json, pathlib, re, subprocess, tempfile
 
           html = pathlib.Path("squarespace/demo-1-final.html").read_text(encoding="utf-8")
-          assert 'data-build="demo-1-v2.4-20261002-canon-light-evidence-disciplined"' in html
+          assert 'data-build="demo-1-v2.6-20261024-google-first-suite-preview-pending"' in html
           assert 'Dominion OS™ 1.0 and the Fractal5 SaaS Suite follow' in html
           assert 'This public demonstration is not a release' in html
           assert 'Dominion OS 1.0 and the SaaS Suite are commercial production software.' not in html
+          assert 'data-google-certification="pending"' in html
+          assert 'data-preview-download="pending"' in html
+          assert 'id="f5-download-saas-preview"' in html
+          assert 'Google first: deployment certification pending.' in html
+          assert 'No download URL is active.' in html
+
+          handoff = json.loads(pathlib.Path("squarespace/demo-1-v2.6-handoff.json").read_text(encoding="utf-8"))
+          assert handoff["build"] == "demo-1-v2.6-20261024-google-first-suite-preview-pending"
+          assert handoff["canonicalSource"] == "squarespace/demo-1-v2.6-google-first-suite-preview-pending.html"
+          assert handoff["movingAlias"] == "squarespace/demo-1-final.html"
+          assert handoff["googleCertification"] == "PENDING"
+          assert handoff["publicationState"] == "PENDING_GOOGLE_AND_ARTIFACT_ACCEPTANCE_NOT_PUBLISHED"
+          assert handoff["automaticDeploymentAuthorized"] is False
+          assert handoff["nativeProductOrSaasCertificationClaimed"] is False
+          assert handoff["publicDownloadUrl"] is None
+          assert [item["kind"] for item in handoff["previewReleaseRecords"]] == ["dominion-os", "saas-suite"]
+          assert all(item["publicUrl"] is None for item in handoff["previewReleaseRecords"])
+          immutable = pathlib.Path(handoff["canonicalSource"]).read_bytes()
+          assert pathlib.Path(handoff["movingAlias"]).read_bytes() == immutable
+          assert hashlib.sha256(immutable).hexdigest() == handoff["sha256"]
 
           scripts = re.findall(r"<script(?:\s[^>]*)?>(.*?)</script>", html, flags=re.I|re.S)
           js_blocks = [s for s in scripts if '"@context"' not in s]
@@ -57,6 +77,15 @@ jobs:
           assert package["claimControl"]["binaryDownloadEnabled"] is False
           assert package["windowsExperience"]["publicDownloadCertified"] is False
           assert package["politicsExperience"]["downloadable"] is False
+
+          suite = json.loads(pathlib.Path("demo/assets/saas-offline-preview-download.json").read_text(encoding="utf-8"))
+          assert suite["moduleCount"] == 13
+          assert suite["status"] == "PENDING_GOOGLE_CERTIFICATION"
+          assert suite["googleDeployment"]["certification"] == "PENDING"
+          assert suite["exactArtifactAcceptance"] == "PENDING"
+          assert suite["publicUrl"] is None
+          assert suite["actualSaasImplementationIncluded"] is False
+          assert suite["generalAvailabilityClaim"] is False
 
           providers = package["providerDownloads"]
           assert {p["id"] for p in providers} == {"gcp","aws","azure","oci"}
