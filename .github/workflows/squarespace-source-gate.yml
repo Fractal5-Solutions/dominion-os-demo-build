@@ -1,19 +1,45 @@
 name: Squarespace Source Gate
 
+# Cover every current handoff, release record, builder and regression input.
 on:
   pull_request:
     paths:
-      - "squarespace/demo-1-final.html"
-      - "squarespace/demo-1-v1.9-hardened-four-provider-gates.html"
+      - "squarespace/demo-1-*.html"
+      - "squarespace/demo-1-*-handoff.json"
+      - "demo/live-mission-demo.html"
+      - "demo/saas-suite-offline-preview.html"
       - "demo/assets/demo-download-package.json"
       - "demo/assets/dominion-release-catalog.json"
+      - "demo/assets/dominion-saas-catalog.json"
+      - "demo/assets/offline-preview-download.json"
+      - "demo/assets/saas-offline-preview-download.json"
+      - "scripts/build_offline_preview.py"
+      - "scripts/build_saas_offline_preview.py"
+      - "tests/live-mission-approval.test.cjs"
+      - "tests/preview-handoff.test.cjs"
+      - "tests/saas-offline-preview.test.cjs"
+      - "tests/test_offline_preview_package.py"
+      - "tests/test_saas_offline_preview.py"
       - ".github/workflows/squarespace-source-gate.yml"
   push:
     branches: [main]
     paths:
-      - "squarespace/demo-1-final.html"
+      - "squarespace/demo-1-*.html"
+      - "squarespace/demo-1-*-handoff.json"
+      - "demo/live-mission-demo.html"
+      - "demo/saas-suite-offline-preview.html"
       - "demo/assets/demo-download-package.json"
       - "demo/assets/dominion-release-catalog.json"
+      - "demo/assets/dominion-saas-catalog.json"
+      - "demo/assets/offline-preview-download.json"
+      - "demo/assets/saas-offline-preview-download.json"
+      - "scripts/build_offline_preview.py"
+      - "scripts/build_saas_offline_preview.py"
+      - "tests/live-mission-approval.test.cjs"
+      - "tests/preview-handoff.test.cjs"
+      - "tests/saas-offline-preview.test.cjs"
+      - "tests/test_offline_preview_package.py"
+      - "tests/test_saas_offline_preview.py"
       - ".github/workflows/squarespace-source-gate.yml"
 
 permissions:
@@ -22,23 +48,46 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           persist-credentials: false
+          # Packagers verify immutable Git blobs, not mutable working-tree inputs.
+          fetch-depth: 0
 
       - name: Validate embedded JavaScript and fail-closed release state
         shell: bash
         run: |
           set -euo pipefail
           python3 - <<'PY'
-          import json, pathlib, re, subprocess, tempfile
+          import hashlib, json, pathlib, re, subprocess, tempfile
 
           html = pathlib.Path("squarespace/demo-1-final.html").read_text(encoding="utf-8")
-          assert 'data-build="demo-1-v2.4-20261002-canon-light-evidence-disciplined"' in html
+          assert 'data-build="demo-1-v2.6-20261024-google-first-suite-preview-pending"' in html
           assert 'Dominion OS™ 1.0 and the Fractal5 SaaS Suite follow' in html
           assert 'This public demonstration is not a release' in html
           assert 'Dominion OS 1.0 and the SaaS Suite are commercial production software.' not in html
+          assert 'data-google-certification="pending"' in html
+          assert 'data-preview-download="pending"' in html
+          assert 'id="f5-download-saas-preview"' in html
+          assert 'Google first: deployment certification pending.' in html
+          assert 'No download URL is active.' in html
+
+          handoff = json.loads(pathlib.Path("squarespace/demo-1-v2.6-handoff.json").read_text(encoding="utf-8"))
+          assert handoff["build"] == "demo-1-v2.6-20261024-google-first-suite-preview-pending"
+          assert handoff["canonicalSource"] == "squarespace/demo-1-v2.6-google-first-suite-preview-pending.html"
+          assert handoff["movingAlias"] == "squarespace/demo-1-final.html"
+          assert handoff["googleCertification"] == "PENDING"
+          assert handoff["publicationState"] == "PENDING_GOOGLE_AND_ARTIFACT_ACCEPTANCE_NOT_PUBLISHED"
+          assert handoff["automaticDeploymentAuthorized"] is False
+          assert handoff["nativeProductOrSaasCertificationClaimed"] is False
+          assert handoff["publicDownloadUrl"] is None
+          assert [item["kind"] for item in handoff["previewReleaseRecords"]] == ["dominion-os", "saas-suite"]
+          assert all(item["publicUrl"] is None for item in handoff["previewReleaseRecords"])
+          immutable = pathlib.Path(handoff["canonicalSource"]).read_bytes()
+          assert pathlib.Path(handoff["movingAlias"]).read_bytes() == immutable
+          assert hashlib.sha256(immutable).hexdigest() == handoff["sha256"]
 
           scripts = re.findall(r"<script(?:\s[^>]*)?>(.*?)</script>", html, flags=re.I|re.S)
           js_blocks = [s for s in scripts if '"@context"' not in s]
@@ -58,6 +107,15 @@ jobs:
           assert package["windowsExperience"]["publicDownloadCertified"] is False
           assert package["politicsExperience"]["downloadable"] is False
 
+          suite = json.loads(pathlib.Path("demo/assets/saas-offline-preview-download.json").read_text(encoding="utf-8"))
+          assert suite["moduleCount"] == 13
+          assert suite["status"] == "PENDING_GOOGLE_CERTIFICATION"
+          assert suite["googleDeployment"]["certification"] == "PENDING"
+          assert suite["exactArtifactAcceptance"] == "PENDING"
+          assert suite["publicUrl"] is None
+          assert suite["actualSaasImplementationIncluded"] is False
+          assert suite["generalAvailabilityClaim"] is False
+
           providers = package["providerDownloads"]
           assert {p["id"] for p in providers} == {"gcp","aws","azure","oci"}
           assert all(p["publicDownloadCertified"] is False for p in providers)
@@ -70,3 +128,21 @@ jobs:
 
           print("SQUARESPACE_SOURCE_GATE_PASS")
           PY
+
+      - name: Test synthetic approval, hold and download behaviour
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test tests/live-mission-approval.test.cjs tests/preview-handoff.test.cjs tests/saas-offline-preview.test.cjs
+
+      - name: Test exact OS preview archive and tamper rejection
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B -m unittest discover -s tests -p test_offline_preview_package.py -v
+
+      - name: Test all 13 SaaS preview modules and reproducible packaging
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B -m unittest discover -s tests -p test_saas_offline_preview.py -v

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify /demo-1 against the pending Google-first v2.5 preview contract."""
+"""Verify /demo-1 against the pending Google-first v2.6 preview contract."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ import urllib.error
 import urllib.request
 
 DEFAULT_URL = "https://www.fractal5solutions.com/demo-1"
-EXPECTED_BUILD = "demo-1-v2.5-20261024-google-first-preview-pending"
+EXPECTED_BUILD = "demo-1-v2.6-20261024-google-first-suite-preview-pending"
 
 REQUIRED_TEXT = (
     EXPECTED_BUILD,
@@ -31,6 +31,9 @@ REQUIRED_TEXT = (
     'data-preview-download="pending"',
     "Google first: deployment certification pending.",
     "Offline Preview — Pending",
+    "SaaS Suite Preview - Pending",
+    'id="f5-download-saas-preview"',
+    "13 SaaS module examples",
     "No download URL is active.",
 )
 

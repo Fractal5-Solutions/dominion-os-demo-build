@@ -1,0 +1,41 @@
+{
+  "schema": "f5.squarespace.handoff.v2",
+  "page": "/demo-1",
+  "build": "demo-1-v2.6-20261024-google-first-suite-preview-pending",
+  "canonicalSource": "squarespace/demo-1-v2.6-google-first-suite-preview-pending.html",
+  "movingAlias": "squarespace/demo-1-final.html",
+  "sha256": "38bed129d9541f1add14c4cd2802944f880a1cc6cfbd99e740e2f2fb83c48086",
+  "deploymentUnit": "complete single Squarespace code block",
+  "publicationState": "PENDING_GOOGLE_AND_ARTIFACT_ACCEPTANCE_NOT_PUBLISHED",
+  "automaticDeploymentAuthorized": false,
+  "googleCertification": "PENDING",
+  "previewDownloadState": "PENDING_GOOGLE_CERTIFICATION",
+  "previewReleaseRecord": "demo/assets/offline-preview-download.json",
+  "publicDownloadUrl": null,
+  "acceptedGoogleCertificateUrl": null,
+  "acceptedGoogleCertificateSha256": null,
+  "activationRule": "No activation adapter exists in this candidate. A reviewed source change after genuine Google certification and exact preview-artifact acceptance must introduce the canonical accepted-record adapter; a JSON green boolean alone is not trust.",
+  "nativeProductOrSaasCertificationClaimed": false,
+  "requiredLiveChecks": [
+    "exact build marker and source hash",
+    "Google certification explicitly pending until earned",
+    "all four OS and SaaS preview buttons disabled before release",
+    "separate OS mission and all 13 catalogue module preview scope",
+    "no mutable HTML download fallback",
+    "synthetic previews distinct from production Core, native product and SaaS",
+    "Business and Politics film playback",
+    "390px mobile layout and keyboard controls"
+  ],
+  "previewReleaseRecords": [
+    {
+      "kind": "dominion-os",
+      "record": "demo/assets/offline-preview-download.json",
+      "publicUrl": null
+    },
+    {
+      "kind": "saas-suite",
+      "record": "demo/assets/saas-offline-preview-download.json",
+      "publicUrl": null
+    }
+  ]
+}
