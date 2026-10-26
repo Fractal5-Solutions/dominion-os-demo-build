@@ -31,6 +31,8 @@
     .view{display:none}.view.active{display:block}.section-title{display:flex;justify-content:space-between;align-items:center;margin:0 0 14px}.section-title h3{margin:0;font-size:20px;letter-spacing:-.03em}
     .toast{position:fixed;right:24px;bottom:24px;background:#151515;color:#fff;padding:13px 15px;border-radius:12px;font-size:12px;opacity:0;transform:translateY(8px);pointer-events:none;transition:.18s}.toast.show{opacity:1;transform:none}
     @media(max-width:900px){.layout{grid-template-columns:1fr}.side{position:static}.nav{grid-template-columns:repeat(3,1fr)}.hero{align-items:start;flex-direction:column}.datebox{text-align:left}.span3,.span4,.span5,.span6,.span7,.span8{grid-column:span 12}.top{position:static}.shell{padding:10px}.main{padding:17px}.hero h2{font-size:30px}}
+    .main,.side{min-width:0}.ask input{min-width:0}
+    @media(max-width:600px){.layout{grid-template-columns:minmax(0,1fr)}.nav{grid-template-columns:repeat(2,minmax(0,1fr))}.top,.notice{flex-wrap:wrap}.grid{grid-template-columns:repeat(12,minmax(0,1fr))}}
   </style>
 </head>
 <body>
