@@ -36,6 +36,17 @@ jobs:
       - name: Verify interactive mission acceptance before publication
         run: node --test tests/live-mission-demo.test.cjs
 
+      - name: Validate fail-closed public demo gates before publication
+        run: python3 scripts/verify_public_demo_gates.py
+
+      - name: Install pinned browser testing runtime
+        run: |
+          python3 -m pip install playwright==1.55.0
+          python3 -m playwright install --with-deps chromium
+
+      - name: Verify interactive synthetic demo in Chromium before publication
+        run: python3 scripts/test_demo_browser.py
+
       - name: Validate public proof contract
         shell: bash
         run: |
