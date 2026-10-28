@@ -8,6 +8,7 @@ on:
       - 'demo/portable-public-mission-v4.3.html'
       - 'scripts/test_demo_page_production.py'
       - 'scripts/test_demo_windows_offline.py'
+      - '.gitattributes'
       - '.github/workflows/ci-demo-page-prepublication.yml'
   workflow_dispatch:
 
