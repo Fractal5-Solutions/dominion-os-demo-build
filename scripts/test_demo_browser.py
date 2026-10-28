@@ -21,19 +21,20 @@ with sync_playwright() as pw:
         assert page.locator(".tab.active").get_attribute("data-mode") == mode
         assert page.locator("#state").inner_text() == "MISSION"
         for expected in ("SITUATION", "INTELLIGENCE", "OPTIONS", "DECISION"):
-            page.evaluate("next()")
+            page.locator("#mission button.action").first.click()
             assert page.locator("#state").inner_text() == expected, (mode, expected)
-        page.evaluate("next()")
+        page.keyboard.press("ArrowRight")
         assert page.locator("#state").inner_text() == "DECISION", "Approval bypassed"
-        page.evaluate("reject()")
+        page.locator("#mission button.action.secondary").click()
         assert page.locator("#state").inner_text() == "DECISION"
-        page.evaluate("approve()")
+        page.locator("#mission button.action.approve").click()
         assert page.locator("#state").inner_text() == "EXECUTION"
-        page.evaluate("next()")
+        page.locator("#mission button.action").first.click()
         assert page.locator("#state").inner_text() == "EVIDENCE"
-        page.evaluate("resetFlow()")
+        page.get_by_role("button", name="Reset mission").click()
         assert page.locator("#state").inner_text() == "MISSION"
         print("PASS: browser journey and human authority boundary:", mode)
+    page.wait_for_timeout(1500)
     assert not external_requests, "Offline synthetic mission made external requests: " + str(external_requests)
     print("PASS: local HTML mission operates without HTTP(S) requests")
     browser.close()
