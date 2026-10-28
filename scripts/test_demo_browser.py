@@ -8,6 +8,14 @@ URL = (Path(__file__).resolve().parents[1] / "demo" / "live-mission-demo.html").
 with sync_playwright() as pw:
     browser = pw.chromium.launch(headless=True)
     page = browser.new_page()
+    external_requests = []
+    def guard_request(route):
+        if route.request.url.startswith(("http://", "https://")):
+            external_requests.append(route.request.url)
+            route.abort()
+        else:
+            route.continue_()
+    page.route("**/*", guard_request)
     for mode in ("business", "politics"):
         page.goto(URL + "?mode=" + mode)
         assert page.locator(".tab.active").get_attribute("data-mode") == mode
@@ -26,4 +34,6 @@ with sync_playwright() as pw:
         page.evaluate("resetFlow()")
         assert page.locator("#state").inner_text() == "MISSION"
         print("PASS: browser journey and human authority boundary:", mode)
+    assert not external_requests, "Offline synthetic mission made external requests: " + str(external_requests)
+    print("PASS: local HTML mission operates without HTTP(S) requests")
     browser.close()
