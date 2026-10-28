@@ -1,0 +1,48 @@
+name: Canon Demo Page Prepublication
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'squarespace/demo-1-v4-4-production-preflight.html'
+      - 'demo/portable-public-mission-v4.3.html'
+      - 'scripts/test_demo_page_production.py'
+      - '.github/workflows/ci-demo-page-prepublication.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  canon-demo-prepublication:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout proposed review revision
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: false
+      - name: Install pinned browser test dependencies
+        run: |
+          python3 -m pip install --disable-pip-version-check beautifulsoup4==4.14.3 playwright==1.55.0
+          python3 -m playwright install --with-deps chromium
+      - name: Verify Canon page, browser interactions, and byte-exact offline download
+        env:
+          F5_DEMO_QA_REPORT: prepublication-v44-results.json
+        run: python3 scripts/test_demo_page_production.py
+      - name: Print evidence summary
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json,pathlib
+          p=pathlib.Path('prepublication-v44-results.json')
+          if not p.exists():
+              print('No test report was produced: fail closed')
+              raise SystemExit(1)
+          r=json.loads(p.read_text(encoding='utf-8'))
+          print('Canon prepublication check count:',r['passed'],'/',r['total'])
+          print('Review artifact SHA-256:',r['source_sha256'])
+          print('Portable demo SHA-256:',r['portable_sha256'])
+          if r['passed'] != r['total']:
+              raise SystemExit(1)
+          PY
