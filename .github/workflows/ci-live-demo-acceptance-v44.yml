@@ -1,0 +1,61 @@
+name: Live Squarespace Demo v4.4 Acceptance (Read Only)
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/ci-live-demo-acceptance-v44.yml'
+      - 'scripts/accept_demo_page_live_v44.py'
+      - 'squarespace/demo-1-v4-4-production-preflight.html'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-squarespace-acceptance:
+    name: Real public /demo-1 browser and hosted asset acceptance
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact review source
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: false
+      - name: Install pinned Chromium testing runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check playwright==1.55.0
+          python3 -m playwright install --with-deps chromium
+      - name: Check actual Squarespace v4.4, mobile layout, mission links, download and hosted assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/accept_demo_page_live_v44.py --url https://www.fractal5solutions.com/demo-1 --report live-acceptance-v44.json
+      - name: Print saved acceptance receipt
+        if: always()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json, pathlib
+          file=pathlib.Path('live-acceptance-v44.json')
+          if not file.exists():
+              print('NOT CERTIFIED: live acceptance report missing')
+              raise SystemExit(1)
+          r=json.loads(file.read_text(encoding='utf-8'))
+          print('LIVE SQUARESPACE ACCEPTANCE:',r['passed'],'/',r['total'])
+          for row in r['checks']:
+              if not row['pass']:
+                  print('FAILED:',row['name'],row.get('detail','')[:240])
+          if r['passed']!=r['total']:
+              raise SystemExit(1)
+          PY
+      - name: Save receipt for independent review
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: squarespace-v44-acceptance-receipt
+          path: live-acceptance-v44.json
+          if-no-files-found: warn
+          retention-days: 14
