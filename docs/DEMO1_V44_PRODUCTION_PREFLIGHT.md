@@ -16,7 +16,7 @@ Source authority: APPROVED Fractal5 Website Canon v2 at DCC docs/canon/FRACTAL5_
 - Local Chrome/Chromium production preflight: 125/125 checks PASS across 1440, 1200, 1024, 768, 430, 390 and 360px.
 - Business and Politics preview modes, human-approval simulation, reset, keyboard Enter, primary CTA, video error/recovery fallback, download, and exact portable data equality verified.
 - No network dependency for primary embedded Mission Console or portable HTML generation.
-- Automated non-deploying PR-only GitHub workflow created. Initial CI #40771402113 succeeded: 104/104 browser/source checks. A newer exact-artifact run is required for the newline-aligned source.
+- Automated non-deploying PR-only GitHub workflow passed on exact newline-aligned source: [run #40771604229](https://github.com/Fractal5-Solutions/dominion-os-demo-build/actions/runs/40771604229), 104/104 browser/source checks PASS, reported SHA-256 98e05dd1e8b6cfd0f46d4f5a9e600f5819c38ff2baa3f66ca28a16c110513dda and portable hash c69dae845977ac1b91752967e2a0b72dcb520c520de9d380ea8ae24a8d155813. Earlier run #40771402113 also succeeded on prior text-equivalent source.
 - Website links to hosted Business/Politics missions followed via live Squarespace page. Browser fetching of binary MP4 assets and true Windows file:// opening remain separate acceptance checks.
 
 ## V4.4 production changes
