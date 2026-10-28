@@ -1,0 +1,55 @@
+name: Live Demo Chrome Video and Visual Acceptance (Read Only)
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/ci-live-demo-chrome-visual-v44.yml'
+      - 'scripts/check_demo_live_visual_video_v44.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-visual-media:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact QA source
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: false
+      - name: Install pinned Playwright and Google Chrome
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check playwright==1.55.0
+          python3 -m playwright install --with-deps chrome
+      - name: Verify actual live Chrome media playback and responsive visuals
+        shell: bash
+        run: python3 scripts/check_demo_live_visual_video_v44.py
+      - name: Print verification result
+        if: always()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,pathlib
+          p=pathlib.Path('live-v44-visual-proof/report.json')
+          if not p.is_file():
+              print("Live visual/media report missing")
+              raise SystemExit(1)
+          r=json.loads(p.read_text(encoding='utf-8'))
+          print("LIVE VISUAL AND REAL VIDEO ACCEPTANCE:",r["passed"],"/",r["total"])
+          for c in r["checks"]:
+              if not c["pass"]: print("FAIL:",c["check"],c.get("detail",""))
+          if r["passed"]!=r["total"]:raise SystemExit(1)
+          PY
+      - name: Save read-only visual screenshots and receipt
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: dominion-v44-live-visual-and-video-proof
+          path: live-v44-visual-proof/
+          if-no-files-found: warn
+          retention-days: 14
