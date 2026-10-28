@@ -27,8 +27,7 @@ verify(data["politicsExperience"]["downloadable"] is False, "Politics binary dow
 verify(data["windowsExperience"]["publicDownloadCertified"] is False or data["windowsExperience"]["authenticode"] == "VERIFIED", "Common Windows signing gate")
 for provider in data.get("providerDownloads", []):
     if provider.get("publicDownloadCertified"):
-        verify(bool(provider.get("publicDownloadUrl")), provider["id"] + " certified URL exists")
-        verify(data["windowsExperience"]["authenticode"] == "VERIFIED", provider["id"] + " publisher signing")
+        verify(False, provider["id"] + " must use independently verified exact-artifact release attestation (not implemented in this gate)")
     else:
         verify(not provider.get("publicDownloadUrl"), provider["id"] + " uncertified URL withheld")
 
@@ -38,7 +37,8 @@ if "--network" in sys.argv:
             req = urllib.request.Request(url, headers={"User-Agent":"Fractal5DemoAcceptance/1.0"})
             with urllib.request.urlopen(req, timeout=15) as resp:
                 body = resp.read(500000).decode("utf-8", "replace")
-                verify(resp.status == 200 and len(body) > 1000, "Public HTTP page: " + url)
+                marker_ok = ("SYNTHETIC DATA" in body and "DOMINION OS" in body) if url.startswith(MISSION) else ("dominion" in body.lower() and "demo" in body.lower())
+                verify(resp.status == 200 and len(body) > 1000 and marker_ok, "Public content and HTTP page: " + url)
         except Exception as ex:
             verify(False, "Public HTTP page: " + url + " (" + type(ex).__name__ + ")")
 else:
