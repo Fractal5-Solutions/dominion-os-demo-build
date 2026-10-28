@@ -1,0 +1,4 @@
+# Preserve byte-for-byte SHA-256 integrity across Linux and Windows checkouts.
+# Both artifacts have independently certified UTF-8 LF bytes; do not transform them.
+squarespace/demo-1-v4.4-production-preflight.html -text
+demo/portable-public-mission-v4.3.html -text
