@@ -42,7 +42,7 @@ check("standalone CSP denies connections", b"connect-src 'none'" in portable)
 check("portable has no external URLs", b"https://" not in portable and b"http://" not in portable)
 check("portable modes", all(("data-mode=\""+m+"\"").encode() in portable for m in ("business","politics")))
 check("reliable current access destination", bool(root.find("a",href="https://www.fractal5solutions.com/launch")))
-check("no unsafe signup/login", not any(t in a.get("href","").lower() for a in root.find_all("a") for t in ("/signup","/account","/store\"","/login")))
+check("no unsafe signup/login", not any(re.sub(r"^https?://[^/]+", "", a.get("href","")).split("?")[0] in ("/signup","/account","/store","/login") for a in root.find_all("a")))
 
 with sync_playwright() as pw:
     kwargs={"executable_path":"/usr/bin/chromium"} if Path("/usr/bin/chromium").is_file() else {}
