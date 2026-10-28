@@ -6,6 +6,7 @@ on:
       - 'demo/assets/demo-download-package.json'
       - 'scripts/verify_public_demo_gates.py'
       - '.github/workflows/demo-acceptance.yml'
+      - 'scripts/test_demo_browser.py'
   workflow_dispatch:
 permissions:
   contents: read
@@ -19,3 +20,9 @@ jobs:
         run: python3 scripts/verify_public_demo_gates.py
       - name: Check public demo endpoints
         run: python3 scripts/verify_public_demo_gates.py --network
+      - name: Install pinned browser testing runtime
+        run: |
+          python3 -m pip install playwright==1.55.0
+          python3 -m playwright install --with-deps chromium
+      - name: Exercise Business and Politics browser journeys
+        run: python3 scripts/test_demo_browser.py
