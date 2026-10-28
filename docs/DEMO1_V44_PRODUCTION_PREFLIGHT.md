@@ -38,3 +38,10 @@ Source authority: APPROVED Fractal5 Website Canon v2 at DCC docs/canon/FRACTAL5_
 - Google Cloud own-data Data Lab: authenticated provider, isolated tenant and data processing, privacy and consent, quotas and signed licence, data deletion, authorized funding, real E2E. GCloud PR #19; Command Center issue #1933.
 
 **The previously live phrase 'Commercial Runtime Verified' is not itself proof of the customer's installable Windows or own-data cloud service.**
+
+## Windows-native portable-file acceptance (2026-10-28)
+
+- [PR CI #40772996976](https://github.com/Fractal5-Solutions/dominion-os-demo-build/actions/runs/40772996976), Windows latest GitHub runner, Playwright Chromium, actual `file://` URI, browser network disabled: **25/25 checks PASS**.
+- Actual portable artifact SHA-256 on the Windows checkout: `c69dae845977ac1b91752967e2a0b72dcb520c520de9d380ea8ae24a8d155813`, matching the embedded-download source.
+- A first test run reported 24/25 because Windows text checkout altered line endings; dedicated `.gitattributes` path rules (`-text`) corrected exact-byte checkout. The succeeding test is the authoritative result.
+- This is Windows offline **HTML in a browser**, not a native signed installer or a paid/full software runtime. User double-click on a personal PC is not independently observed, but native Windows `file://` behavior was tested on CI.
