@@ -6,6 +6,7 @@ on:
       - 'demo/assets/demo-download-package.json'
       - 'scripts/verify_public_demo_gates.py'
       - '.github/workflows/demo-acceptance.yml'
+      - '.github/workflows/publish-artifact-only-pages.yml'
       - 'scripts/test_demo_browser.py'
   workflow_dispatch:
 permissions:
