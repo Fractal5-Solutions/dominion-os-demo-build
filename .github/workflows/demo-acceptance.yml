@@ -8,6 +8,7 @@ on:
       - '.github/workflows/demo-acceptance.yml'
       - '.github/workflows/publish-artifact-only-pages.yml'
       - 'scripts/test_demo_browser.py'
+      - 'scripts/test_published_demo_browser.py'
   workflow_dispatch:
 permissions:
   contents: read
@@ -27,3 +28,5 @@ jobs:
           python3 -m playwright install --with-deps chromium
       - name: Exercise Business and Politics browser journeys
         run: python3 scripts/test_demo_browser.py
+      - name: Exercise currently published synthetic mission in Chromium (read only)
+        run: python3 scripts/test_published_demo_browser.py
