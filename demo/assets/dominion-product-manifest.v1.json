@@ -29,13 +29,13 @@
     {"id":"policyconnect","name":"PolicyConnect","sku":"APP-POLICYCONNEC-W1","store_state":"Configure","implementation_state":"capability_family_present","bindings":["policy-suite","regulatory_watchdog_v61.js","compliance-guard"],"standalone_ga":false},
     {"id":"channelconnect","name":"ChannelConnect","sku":"APP-CHANNELCONNE-W1","store_state":"Configure","implementation_state":"implementation_evidenced_external","bindings":["phi-ops/services/channel-connect"],"standalone_ga":false},
     {"id":"cloud-engine","name":"Cloud Engine","sku":"APP-CLOUD-ENGINE-W2","store_state":"Configure","implementation_state":"capability_family_present","bindings":["deploy/gcp","cloud","infrastructure"],"standalone_ga":false},
-    {"id":"vault-systems","name":"Vault Systems","sku":"APP-VAULT-SYSTEM-W1","store_state":"Configure","implementation_state":"known_family_reconciliation_required","bindings":["vault-metadata.json","storage capability"],"standalone_ga":false},
+    {"id":"vault-systems","name":"Vault Systems","sku":"APP-VAULT-SYSTEM-W2","store_state":"Configure","implementation_state":"known_family_reconciliation_required","bindings":["vault-metadata.json","storage capability"],"standalone_ga":false},
     {"id":"command-core","name":"Command Core","sku":"DOM-FS-COMMAND-CORE","store_state":"Configure","implementation_state":"capability_family_present","bindings":["core","ops","governance","runtime-broker"],"standalone_ga":false},
     {"id":"advocate-engine","name":"Advocate Engine","sku":"APP-ADVOCATE-ENG-W2","store_state":"Configure","implementation_state":"catalogued_evidence_required","standalone_ga":false},
     {"id":"install-grid","name":"Install Grid","sku":"APP-INSTALL-GRID","store_state":"Coming Soon","sellable":false,"implementation_state":"documented_development","bindings":["install","docs/client/INSTALLATION.md"],"standalone_ga":false},
     {"id":"opssignal","name":"OpsSignal","sku":"APP-OPSSIGNAL-W2","store_state":"Configure","implementation_state":"capability_family_present","bindings":["telemetry","monitoring","ops"],"standalone_ga":false},
     {"id":"ecostack","name":"EcoStack","sku":"APP-ECOSTACK","store_state":"Coming Soon","sellable":false,"implementation_state":"documented_development","bindings":["sustainability_engine.py","green_policy_framework.md"],"standalone_ga":false},
-    {"id":"storythread","name":"StoryThread","sku":"APP-STORYTHREAD-W1","store_state":"Configure","implementation_state":"catalogued_evidence_required","standalone_ga":false},
+    {"id":"storythread","name":"StoryThread","sku":"APP-STORYTHREAD-W2","store_state":"Configure","implementation_state":"catalogued_evidence_required","standalone_ga":false},
     {"id":"dataharbor","name":"DataHarbor","sku":"APP-DATAHARBOR","store_state":"Coming Soon","sellable":false,"implementation_state":"documented_development","bindings":["storage capability","data provenance and audit surfaces"],"standalone_ga":false}
   ],
   "commercial_policy": {
