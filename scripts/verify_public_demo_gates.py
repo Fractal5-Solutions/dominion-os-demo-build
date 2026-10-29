@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Fail-closed public demo gate check. Standard library; no credentials or mutations."""
 import json
+import hashlib
 import pathlib
 import sys
 import urllib.request
@@ -30,6 +31,39 @@ for provider in data.get("providerDownloads", []):
         verify(False, provider["id"] + " must use independently verified exact-artifact release attestation (not implemented in this gate)")
     else:
         verify(not provider.get("publicDownloadUrl"), provider["id"] + " uncertified URL withheld")
+
+# Public catalogue may not silently regress to historical SKUs or claim 13 live modules.
+PRODUCT_SNAPSHOT = ROOT / "demo/assets/dominion-product-manifest.v1.json"
+SAAS_CATALOG = ROOT / "demo/assets/dominion-saas-catalog.json"
+EXPECTED_SAAS = {
+    "GrantConnect": "APP-GRANTCONNECT-W1",
+    "TeamConnect": "APP-TEAMCONNECT-W1",
+    "PolicyConnect": "APP-POLICYCONNEC-W1",
+    "ChannelConnect": "APP-CHANNELCONNE-W1",
+    "Cloud Engine": "APP-CLOUD-ENGINE-W2",
+    "Vault Systems": "APP-VAULT-SYSTEM-W2",
+    "Command Core": "DOM-FS-COMMAND-CORE",
+    "Advocate Engine": "APP-ADVOCATE-ENG-W2",
+    "Install Grid": "APP-INSTALL-GRID",
+    "OpsSignal": "APP-OPSSIGNAL-W2",
+    "EcoStack": "APP-ECOSTACK",
+    "StoryThread": "APP-STORYTHREAD-W2",
+    "DataHarbor": "APP-DATAHARBOR",
+}
+product_bytes = PRODUCT_SNAPSHOT.read_bytes()
+product = json.loads(product_bytes.decode("utf-8-sig"))
+saas = json.loads(SAAS_CATALOG.read_text(encoding="utf-8-sig"))
+for item_name, module_rows in (("public product snapshot", product["modules"]), ("public SaaS catalogue", saas["modules"])):
+    pairs = [(m["name"], m["sku"]) for m in module_rows]
+    verify(len(pairs) == 13 and len({name for name, _ in pairs}) == 13 and
+           dict(pairs) == EXPECTED_SAAS, item_name + " exact 13 canonical module SKUs")
+    verify(all(m.get("standalone_ga") is False for m in module_rows),
+           item_name + " does not assert universal standalone GA")
+verify(saas.get("module_count") == 13, "SaaS catalogue count is exactly 13")
+verify(saas.get("canonical_manifest", {}).get("snapshot_sha256") == hashlib.sha256(product_bytes).hexdigest(),
+       "Public catalogue is bound to exact product snapshot bytes")
+verify(saas.get("independent_ga_claim") is False and saas.get("marketplace_listing_claim") is False,
+       "Public catalogue retains fail-closed commercial claim boundary")
 
 if "--network" in sys.argv:
     for url in [LIVE, MISSION + "?mode=business", MISSION + "?mode=politics"]:
