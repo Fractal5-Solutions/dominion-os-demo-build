@@ -1,0 +1,20 @@
+name: Demo Browser QA Policy
+on:
+  pull_request:
+    paths:
+      - 'tests/browser_qa/**'
+      - '.github/workflows/demo-browser-qa-policy.yml'
+permissions:
+  contents: read
+jobs:
+  bounded-qa-policy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Compile QA scripts
+        run: python3 -m py_compile tests/browser_qa/fractal5_live_demo_qa.py tests/browser_qa/test_fractal5_live_demo_qa.py
+      - name: Run isolated URL policy regressions
+        run: python3 -m unittest discover -s tests/browser_qa -p 'test_fractal5_live_demo_qa.py' -v
