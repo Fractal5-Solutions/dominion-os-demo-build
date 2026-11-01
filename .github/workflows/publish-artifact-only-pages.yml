@@ -151,3 +151,8 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128
+
+      # This is a post-publication verification, not a prepublication gate.
+      # A failure flags the deployed artifact for review; it does not roll back Pages.
+      - name: Verify deployed Pages browser journey, exact bytes and release SHA
+        run: python3 scripts/test_published_demo_browser.py --expected-commit "$GITHUB_SHA"
