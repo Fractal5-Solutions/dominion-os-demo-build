@@ -105,6 +105,8 @@ def test_saas_catalogue_is_stable_without_overclaiming_runtime():
             assert module["sellable"] is False
         else:
             assert module["store_state"] == "Configure"
+    assert by_name["Vault Systems"]["sku"] == "APP-VAULT-SYSTEM-W2"
+    assert by_name["StoryThread"]["sku"] == "APP-STORYTHREAD-W2"
     assert by_name["Cloud Engine"]["sku"] == "APP-CLOUD-ENGINE-W2"
     assert by_name["OpsSignal"]["sku"] == "APP-OPSSIGNAL-W2"
     assert by_name["Advocate Engine"]["sku"] == "APP-ADVOCATE-ENG-W2"

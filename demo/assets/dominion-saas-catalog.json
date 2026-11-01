@@ -59,7 +59,7 @@
       "store_state": "Configure",
       "description": "Organize structured intelligence, source records, review materials, compliance archives, evidence trails, and controlled information environments.",
       "id": "vault-systems",
-      "sku": "APP-VAULT-SYSTEM-W1",
+      "sku": "APP-VAULT-SYSTEM-W2",
       "implementation_state": "known_family_reconciliation_required",
       "standalone_ga": false
     },
@@ -115,7 +115,7 @@
       "store_state": "Configure",
       "description": "Structure messages, stories, content systems, media workflows, narrative development, and multi-channel communications.",
       "id": "storythread",
-      "sku": "APP-STORYTHREAD-W1",
+      "sku": "APP-STORYTHREAD-W2",
       "implementation_state": "catalogued_evidence_required",
       "standalone_ga": false
     },
@@ -138,6 +138,6 @@
   "canonical_manifest": {
     "authority": "dominion-os-core/config/dominion-product-manifest.v1.json",
     "snapshot_path": "demo/assets/dominion-product-manifest.v1.json",
-    "snapshot_sha256": "5c76249cc4eab2cc1b0ad4de60b1dd7698b181e12b3d3ab4cfbdeb766ccc254b"
+    "snapshot_sha256": "716c1ae7dc11c31e684dc469d6148cc7d0c594c6fa2ab81af6c98f8d1ed0569e"
   }
 }
