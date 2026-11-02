@@ -46,7 +46,7 @@ jobs:
           print('Squarespace source SHA-256:',r['source_sha256'])
           print('Recovered November 1 live baseline SHA-256:',r['baseline_sha256'])
           for c in r['checks']:
-              if not c['pass']: print('FAILED:',c['check'])
+              if not c['passed']: print('FAILED:',c['name'])
           if r['passed']!=r['total']: raise SystemExit(1)
           PY
       - name: Save read-only acceptance receipt
