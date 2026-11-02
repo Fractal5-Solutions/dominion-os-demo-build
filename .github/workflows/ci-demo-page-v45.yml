@@ -44,7 +44,7 @@ jobs:
           r=json.loads(p.read_text(encoding='utf-8'))
           print('v4.5 Canon/Chromium:',r['passed'],'/',r['total'])
           print('Squarespace source SHA-256:',r['source_sha256'])
-          print('Unchanged portable offline artifact SHA-256:',r['portable_sha256'])
+          print('Recovered November 1 live baseline SHA-256:',r['baseline_sha256'])
           for c in r['checks']:
               if not c['pass']: print('FAILED:',c['check'])
           if r['passed']!=r['total']: raise SystemExit(1)
