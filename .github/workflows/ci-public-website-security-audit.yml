@@ -1,0 +1,31 @@
+name: Fractal5 public website secret-exposure audit
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_public_website_secrets.py'
+      - '.github/workflows/ci-public-website-security-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  public_html:
+    name: Read-only public site and demo exposure audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: false
+      - name: Scan published HTML and inline source without fetching private files
+        run: python3 scripts/audit_public_website_secrets.py
+      - name: Save redacted evidence without secret values
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: public-website-security-audit
+          path: security-audit-receipts/public-security-scan.json
+          if-no-files-found: warn
+          retention-days: 14
