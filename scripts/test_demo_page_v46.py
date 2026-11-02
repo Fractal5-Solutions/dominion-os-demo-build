@@ -18,7 +18,7 @@ def check(name,good):
     if not good:print("FAIL",name)
 
 check("one scoped Canon root",len(soup.select("section#fractal5-demo-v46"))==1)
-check("live-baseline v4.6 identity",bool(root and root.get("data-build")=="demo-1-v4.6-20261102-live-parity"))
+check("live-baseline v4.6 identity",bool(root and root.get("data-build")=="demo-1-v4.6-20261102-canon-v2"))
 check("synthetic-only claim",root.get("data-claim")=="synthetic-public-proof")
 for key in ("data-windows-installer-certified","data-cloud-trial-certified","data-cloud-deployment-certified","data-licence-issuance-enabled"):
     check(key+" fail-closed",root.get(key)=="false")
