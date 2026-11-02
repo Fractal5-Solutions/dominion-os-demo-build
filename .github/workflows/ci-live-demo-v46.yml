@@ -1,0 +1,36 @@
+name: Live Squarespace demo v4.6 verification
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/verify_demo1_live_v46.py'
+      - '.github/workflows/ci-live-demo-v46.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live_public_acceptance:
+    name: Public read-only canonical/cache/Chromium acceptance
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: false
+      - name: Pinned Chromium test dependency
+        run: |
+          python3 -m pip install --disable-pip-version-check playwright==1.55.0
+          python3 -m playwright install --with-deps chromium
+      - name: Verify live public Squarespace without CMS access
+        run: python3 scripts/verify_demo1_live_v46.py
+      - name: Preserve live public acceptance or mismatch receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: demo-v46-live-readonly-acceptance
+          path: live-v46-receipts/
+          if-no-files-found: warn
+          retention-days: 14

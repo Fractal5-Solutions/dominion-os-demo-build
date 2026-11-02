@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "contract": "fractal5.dominion.evaluation-expiry-commercial-v1",
+  "status": "DESIGN_ONLY_NO_LIVE_ACTIVATION",
+  "as_of": "2026-11-02",
+  "authority": "Fractal5 Solutions Inc.; protected commercial release requires independent evidence and principal authorization",
+  "publicDemo": {
+    "medium": "Static synthetic browser demo plus standalone self-contained offline HTML",
+    "freeForever": true,
+    "runtimeEntitlements": false,
+    "protectedBackendConnectivity": false,
+    "canRemotelyExpireDownloadedHtml": false,
+    "codeVisibility": "Any shipped HTML CSS JS is freely inspectable; never embed protected models, internal source, service secrets or proprietary backend logic",
+    "upgradePromotion": "Non-blocking links to separately verified commercial qualification pages only; no deceptive automatic subscription checkout"
+  },
+  "windowsEvaluation": {
+    "distributionEnabled": false,
+    "signedInstallerVerified": false,
+    "protectedRuntime": false,
+    "maxTrialDays": 7,
+    "grantCondition": "Separate counsel-reviewed evaluation agreement, signed exact artifact and scoped user/device/edition/module entitlement",
+    "runtimeCheck": "Verify signed licence, expiry, nonce and device binding on protected functions; online-only protected functions use short renewable server lease",
+    "expiry": "Protected use denied after expiry unless a newly signed paid subscription entitlement is verified",
+    "offlineRevocationLimit": "No claim of instantaneous remote revocation while isolated offline. Only bounded expiry with trusted time/anti-rollback design; enforce network-required functions server side.",
+    "noProductionConnectors": true,
+    "noProtectedSourceOrSecrets": true,
+    "paidConversion": "Request governed licence and paid edition; automatic reactivation forbidden without server/provider verified paid entitlement and scope"
+  },
+  "googleCloudPilot": {
+    "publicRuntimeEnabled": false,
+    "publicUploadEnabled": false,
+    "selfServiceCheckoutEnabled": false,
+    "invitationOnly": true,
+    "maxTrialDays": 7,
+    "maxRuns": 50,
+    "maxFileBytes": 10485760,
+    "maxTenantBytes": 52428800,
+    "maxActiveSessions": 1,
+    "storageTtlHours": 24,
+    "signedUploadMaxSeconds": 300,
+    "identity": "Verified named invitee, MFA and service-enforced per-tenant identity. Never trust role or tenant from browser",
+    "serverEnforcement": "Deny expired, revoked, missing, exhausted, unpaid and counterfeit evaluation claims on every protected operation. Verify server persisted subscription status, scope, usage and budget atomically.",
+    "resourceQuotas": "Atomic per-tenant run counters, storage and cost limits, with circuit breaker and no billable processing after expiry/limit.",
+    "offboard": "Invalidate refresh/session tokens, revoke signed URL issuance, stop queue scheduling, terminate workers where feasible, purge temporary data at policy deadline and issue receipts.",
+    "paidConversion": "Show read-only end-of-trial state and verified governed-commercial links; no automatic charge, no grandfathered free execution, no reactivation without signed paid entitlement.",
+    "customerData": "Only allowed after separate runtime, privacy, IAM and data lifecycle certification; forbidden today"
+  },
+  "commercialLinks": {
+    "licensing": "https://www.fractal5solutions.com/license",
+    "productPlanning": "https://www.fractal5solutions.com/store-preview",
+    "qualifiedContact": "https://www.fractal5solutions.com/launch",
+    "checkoutVerified": false,
+    "language": "After a genuine trial ends, protected features stop. Request a paid licence or governed deployment. Plans and fees require approved written terms.",
+    "doNotClaim": "Payment or subscriptions are automatic, prices final, or production runtime immediately available."
+  },
+  "entitlementStateMachine": {
+    "states": [
+      "NOT_ISSUED",
+      "FREE_EVALUATION_ACTIVE",
+      "EVALUATION_EXPIRED",
+      "REVOKED",
+      "PAID_PENDING_VERIFICATION",
+      "PAID_ACTIVE",
+      "PAID_SUSPENDED"
+    ],
+    "onMissingProof": "DENY_PROTECTED_OPERATIONS",
+    "transitionGuards": {
+      "NOT_ISSUED->FREE_EVALUATION_ACTIVE": "trial service certified + identity MFA + signed terms + signed bounded entitlement + owner cost approved",
+      "FREE_EVALUATION_ACTIVE->EVALUATION_EXPIRED": "time or usage or cost exhausted, atomically recorded and protected access denied",
+      "FREE_EVALUATION_ACTIVE->REVOKED": "signed revocation receipt or admin action, protected access denied",
+      "EVALUATION_EXPIRED->PAID_PENDING_VERIFICATION": "customer requests commercial terms, no entitlement",
+      "PAID_PENDING_VERIFICATION->PAID_ACTIVE": "paid contract + payment/approved billing evidence + signed paid entitlement + scope verified",
+      "PAID_ACTIVE->PAID_SUSPENDED": "payment or term suspension from authoritative billing/license service, protected access denied"
+    },
+    "clientFlagsAuthorize": false,
+    "staticSiteCannotActivate": true
+  },
+  "requiredTests": {
+    "expiredTokenDenied": false,
+    "clockRollbackDenied": false,
+    "revokedEntitlementDenied": false,
+    "overQuotaDenied": false,
+    "crossTenantDenied": false,
+    "unpaidReactivationDenied": false,
+    "paymentWebHookSignatureVerified": false,
+    "billingReplayDenied": false,
+    "paidScopeServerConfirmed": false,
+    "dataExpiryDeletionReceipts": false,
+    "budgetsAndCircuitBreakerTested": false,
+    "cleanMachineSignedInstallerAccepted": false
+  },
+  "releaseCertification": {
+    "windows": "HELD",
+    "cloud": "HELD",
+    "paidAutomaticActivation": "HELD",
+    "reason": "Design-only contract is not functioning backend, Stripe/processor integration or signed installer; no customer runtime can be promoted by this JSON."
+  }
+}

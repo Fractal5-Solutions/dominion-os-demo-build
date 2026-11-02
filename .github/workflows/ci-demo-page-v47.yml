@@ -1,0 +1,62 @@
+name: Canon Demo Page v4.7 Prepublication
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'squarespace/demo-1-v4-7-commercial-handoff-candidate.html'
+      - 'scripts/test_demo_page_v47.py'
+      - '.github/workflows/ci-demo-page-v47.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prepublication:
+    name: v4.7 local Chromium / Canon / trial fail-closed
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout review SHA
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: false
+      - name: Install pinned dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check beautifulsoup4==4.14.3 playwright==1.55.0
+          python3 -m playwright install --with-deps chromium
+      - name: Verify seven responsive widths, Business and Politics controls, exact offline bytes and no public trial activation
+        env:
+          F5_DEMO_QA_REPORT: prepublication-v47-results.json
+        run: python3 scripts/test_demo_page_v47.py
+      - name: Emit acceptance receipt
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json,pathlib
+          p=pathlib.Path('prepublication-v47-results.json')
+          if not p.is_file():
+              print('FAIL CLOSED: Missing v4.7 QA receipt')
+              raise SystemExit(1)
+          r=json.loads(p.read_text(encoding='utf-8'))
+          print('v4.7 Canon/Chromium:',r['passed'],'/',r['total'])
+          print('Squarespace source SHA-256:',r['source_sha256'])
+          print('Canon profile:',r['canon'])
+          for c in r['checks']:
+              if not c['passed']: print('FAILED:',c['name'])
+          if r['passed']!=r['total']: raise SystemExit(1)
+          PY
+      - name: Save read-only acceptance receipt
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: demo-v47-prepublication-receipt
+          path: |
+            prepublication-v47-results.json
+            v47-canon-screenshots/1440px.png
+            v47-canon-screenshots/390px.png
+          if-no-files-found: warn
+          retention-days: 14
