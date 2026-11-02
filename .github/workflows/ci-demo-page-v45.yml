@@ -54,6 +54,9 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: demo-v45-prepublication-receipt
-          path: prepublication-v45-results.json
+          path: |
+            prepublication-v45-results.json
+            v45-canon-screenshots/1440px.png
+            v45-canon-screenshots/390px.png
           if-no-files-found: warn
           retention-days: 14
