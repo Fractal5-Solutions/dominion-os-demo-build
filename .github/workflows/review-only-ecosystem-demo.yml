@@ -1,0 +1,58 @@
+name: Review-only ecosystem demo build
+
+on:
+  pull_request:
+    paths:
+      - "squarespace/demo-1-v1.9-ecosystem-truth.html"
+      - "squarespace/demo-ecosystem-extension-20261021.review.html"
+      - "demo/assets/dominion-ecosystem-public-snapshot.2026-10-21.json"
+      - "scripts/build_demo_ecosystem.py"
+      - ".github/workflows/review-only-ecosystem-demo.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  review-static-candidate:
+    if: github.repository == 'Fractal5-Solutions/dominion-os-demo-build'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact PR source without stored credentials
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: false
+      - name: Build offline and reject unsupported release claims
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/build_demo_ecosystem.py --output "$RUNNER_TEMP/demo-1-v2.0-ecosystem-truth.review.html"
+          test -s "$RUNNER_TEMP/demo-1-v2.0-ecosystem-truth.review.html"
+          python3 -m py_compile scripts/build_demo_ecosystem.py
+          node - <<'JS' "$RUNNER_TEMP/demo-1-v2.0-ecosystem-truth.review.html"
+          const fs = require('node:fs');
+          const { execFileSync } = require('node:child_process');
+          const file = process.argv[2];
+          const src = fs.readFileSync(file,'utf8');
+          const js = [...src.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)]
+            .filter(m => !m[0].includes('application/ld+json')).map(m => m[1]);
+          if (!js.length) throw Error('No executable source script found');
+          for (let i=0;i<js.length;i++) {
+            const tmp = require('node:os').tmpdir() + '/f5-demo-'+process.pid+'-'+i+'.js';
+            try { fs.writeFileSync(tmp,js[i]); execFileSync(process.execPath,['--check',tmp],{stdio:'pipe'}); }
+            finally { try { fs.unlinkSync(tmp); } catch {} }
+          }
+          if (!src.includes('data-page-build="demo-1-v2.0-20261021-ecosystem-evidence-candidate"')) throw Error('Missing exact v2 marker');
+          if (/Commercial Runtime Verified|Governed release complete|has completed its governed release path/i.test(src)) throw Error('Unsupported public claim');
+          if (/https?:\/\/[^"']*\/download[^"']*\.exe/i.test(src)) throw Error('Unexpected public installer URL');
+          console.log('inline JS: syntax valid', js.length, 'script(s)');
+          console.log('publication: WITHHELD; source-only artifact');
+          JS
+      - name: Preserve only review candidate (no publication)
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: dominion-ecosystem-squarespace-review-only
+          path: ${{ runner.temp }}/demo-1-v2.0-ecosystem-truth.review.html
+          retention-days: 14
+          if-no-files-found: error

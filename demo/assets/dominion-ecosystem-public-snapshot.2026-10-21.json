@@ -1,0 +1,117 @@
+{
+  "schema": "fractal5.demo.ecosystem-public-snapshot.v1",
+  "asOf": "2026-10-21",
+  "publicationState": "CANDIDATE_NOT_PUBLISHED",
+  "policy": {
+    "sourcePresenceDoesNotCertifyLiveRuntime": true,
+    "catalogPresenceDoesNotMeanStandaloneGA": true,
+    "commercialPaymentsOrEntitlementsAuthorized": false,
+    "productionRuntimeCertified": false,
+    "publicDownloadCertified": false,
+    "professionalEquivalence": false,
+    "politicsPublicDownload": false
+  },
+  "history": {
+    "catalogRecords": 65,
+    "snapshot": "2026-02-03",
+    "families": 9
+  },
+  "saas": {
+    "count": 13,
+    "configure": [
+      "GrantConnect",
+      "TeamConnect",
+      "PolicyConnect",
+      "ChannelConnect",
+      "Cloud Engine",
+      "Vault Systems",
+      "Command Core",
+      "Advocate Engine",
+      "OpsSignal",
+      "StoryThread"
+    ],
+    "comingSoon": [
+      "Install Grid",
+      "EcoStack",
+      "DataHarbor"
+    ],
+    "standaloneGA": [],
+    "publicStoreGap": [
+      "Command Core"
+    ],
+    "skuReview": [
+      "Vault Systems",
+      "StoryThread"
+    ]
+  },
+  "agentic": {
+    "status": "PLANNED_NO_PAID_API_RECEIPT",
+    "products": [
+      [
+        "AG-01",
+        "Legal Research & Issue Analysis"
+      ],
+      [
+        "AG-02",
+        "Financial Analysis & Bookkeeping Support"
+      ],
+      [
+        "AG-03",
+        "Policy Research & Analysis"
+      ],
+      [
+        "AG-04",
+        "Economic Analysis & Scenario Models"
+      ],
+      [
+        "AG-05",
+        "Health Information & Navigation Support"
+      ],
+      [
+        "AG-06",
+        "IT & AI Security Analysis"
+      ]
+    ]
+  },
+  "cubes": {
+    "status": "PLANNED_NO_PAID_API_RECEIPT",
+    "ids": [
+      "IC-01-AEROSPACE",
+      "IC-02-ENERGY",
+      "IC-03-PUBLIC",
+      "IC-04-AGRICULTURE",
+      "IC-05-HEALTH",
+      "IC-06-SMART",
+      "IC-07-ECONOMIC",
+      "IC-08-REGULATORY",
+      "IC-09-EDUCATION",
+      "IC-10-DEMOCRACY",
+      "IC-11-ENVIRONMENTA",
+      "IC-12-TECHNOLOGY",
+      "IC-13-MACRO"
+    ]
+  },
+  "deployments": {
+    "windowsBusiness": "CONTROLLED_GUI_CANDIDATE_SIGNING_PENDING",
+    "macOSBusiness": "PRIVATE_NATIVE_PACKAGE_CANDIDATE_UNSIGNED_UNNOTARIZED",
+    "linuxBusiness": "PRIVATE_NATIVE_DEB_PACKAGE_CANDIDATE_UNSIGNED",
+    "gcp": "DEPLOYMENT_READY_SOURCE_RUNTIME_UNCERTIFIED",
+    "aws": "DEPLOYMENT_BLUEPRINT_READY_RUNTIME_UNCERTIFIED",
+    "azure": "DEPLOYMENT_BLUEPRINT_READY_RUNTIME_UNCERTIFIED",
+    "oci": "STAGED_PROVIDER_SOURCE_RUNTIME_UNCERTIFIED",
+    "privateCustomer": "ENGAGEMENT_SPECIFIC",
+    "politicsCanada": "BOUNDED_IMPLEMENTATION_RUNTIME_UNCERTIFIED",
+    "politicsUSA": "OPTIONAL_SOURCE_OVERLAY_RUNTIME_UNCERTIFIED",
+    "dominionOS2": "RESEARCH_OR_UNVERIFIED",
+    "dominion3": "RESEARCH_OR_UNVERIFIED"
+  },
+  "demo": {
+    "existingLiveClaims": "CONTRADICT_CURRENT_CERTIFICATE",
+    "immutableV19": "squarespace/demo-1-v1.9-ecosystem-truth.html",
+    "immutableV19Blob": "031d69009d424b91c73ccd868d35d6cd3491f303",
+    "movingAlias": "squarespace/demo-1-final.html",
+    "movingAliasBlob": "06c2edaab36c73d9de3bddaf9951239c8502c05f",
+    "aliasMatchesImmutable": false,
+    "publicationRequires": "reviewed full-code-block replacement and independent live verification"
+  }
+}
