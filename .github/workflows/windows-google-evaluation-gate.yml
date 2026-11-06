@@ -1,0 +1,19 @@
+name: Windows Google evaluation public claims gate
+on:
+  pull_request:
+    paths:
+      - 'demo/assets/windows-google-evaluation-readiness.v1.json'
+      - 'scripts/verify_windows_google_evaluation_gates.py'
+      - '.github/workflows/windows-google-evaluation-gate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/verify_windows_google_evaluation_gates.py
