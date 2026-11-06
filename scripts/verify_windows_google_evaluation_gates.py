@@ -24,6 +24,13 @@ def validate(data):
         item = data[platform]
         active = item[certified] is True
         if active:
+            # A public source registry cannot independently attest a private signed
+            # Windows package or an authenticated GCP tenant. Never let changing
+            # self-asserted booleans mint a distribution certificate.
+            raise AssertionError(
+                f"{platform}: public activation requires independent immutable "
+                "release-certificate verification outside this source-only gate"
+            )
             assert all(shared.values()), f"{platform}: missing universal release gate"
             assert all(item[k] is True for k in local_gates), f"{platform}: missing platform gate"
             assert isinstance(item[url], str) and item[url].startswith("https://"), f"{platform}: missing secure URL"
