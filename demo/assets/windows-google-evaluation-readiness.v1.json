@@ -1,0 +1,66 @@
+{
+  "schema": "f5.dominion.windows-google-evaluation-readiness.v1",
+  "asOf": "2026-11-06",
+  "releasePolicy": "FAIL_CLOSED",
+  "publicPage": "https://www.fractal5solutions.com/demo-1",
+  "scope": {
+    "platforms": [
+      "windows-x64",
+      "google-cloud-workspace"
+    ],
+    "domains": [
+      "business",
+      "politics-neutral"
+    ],
+    "outOfScope": [
+      "aws",
+      "azure-runtime",
+      "oci",
+      "macos",
+      "linux-native"
+    ],
+    "commercialParity": "Product UI and governance loop required; synthetic functionality must be labelled; never claim a feature is connected unless exact runtime receipt proves it."
+  },
+  "sharedGates": {
+    "sourceReleaseBound": false,
+    "reviewedRights": false,
+    "entitlementSevenDayTested": false,
+    "revocationTested": false,
+    "businessMissionApproved": false,
+    "politicsMissionApproved": false,
+    "suiteCatalogueClaimsReviewed": false,
+    "securityReviewApproved": false,
+    "principalPublicDistributionApproval": false
+  },
+  "windows": {
+    "status": "BLOCKED",
+    "publicDownloadCertified": false,
+    "downloadUrl": null,
+    "exactInstallerSha256": null,
+    "authenticodeVerified": false,
+    "installerCleanMachineTested": false,
+    "defenderAndSbomPassed": false,
+    "uninstallAndRecoveryPassed": false,
+    "portableSyntheticHtmlIsNotInstaller": true,
+    "reference": "https://github.com/Fractal5-Solutions/dominion-os-1.0-desktop-pc/pull/82"
+  },
+  "google": {
+    "status": "BLOCKED",
+    "publicLoginCertified": false,
+    "loginUrl": null,
+    "gcpProviderIdentityVerified": false,
+    "workspaceOAuthScopesVerified": false,
+    "mfaAndIsolationTested": false,
+    "perTenantQuotaAndBudgetTested": false,
+    "consentScanningAndDeletionTested": false,
+    "authenticatedE2ECertified": false,
+    "customerDataUploadsEnabled": false,
+    "reference": "https://github.com/Fractal5-Solutions/dominion-os-1.0-gcloud/pull/19"
+  },
+  "publicClaims": {
+    "htmlSyntheticBusinessPoliticsAvailable": true,
+    "windowsCommercialEvaluationAvailable": false,
+    "googleCommercialEvaluationAvailable": false,
+    "allThirteenSaaSModulesProductionCertified": false
+  }
+}

@@ -1,0 +1,25 @@
+name: Windows Google evaluation public claims gate
+on:
+  pull_request:
+    paths:
+      - 'demo/assets/windows-google-evaluation-readiness.v1.json'
+      - 'scripts/verify_windows_google_evaluation_gates.py'
+      - 'tests/test_windows_google_evaluation_gates.py'
+      - 'tests/test_demo_v45_windows_google.py'
+      - 'scripts/test_demo_v45_browser.py'
+      - 'squarespace/demo-1-v4-5-windows-google-release-candidate.html'
+      - '.github/workflows/windows-google-evaluation-gate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - run: python3 scripts/verify_windows_google_evaluation_gates.py
+      - run: python3 -m unittest discover -s tests -p 'test_windows_google_evaluation_gates.py' -v
+      - run: python3 -m unittest discover -s tests -p 'test_demo_v45_windows_google.py' -v
+      - run: python3 -m pip install playwright==1.55.0
+      - run: python3 -m playwright install --with-deps chromium
+      - run: python3 scripts/test_demo_v45_browser.py
