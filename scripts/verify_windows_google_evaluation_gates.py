@@ -11,7 +11,7 @@ def validate(data):
     assert data["releasePolicy"] == "FAIL_CLOSED"
     assert data["scope"]["platforms"] == ["windows-x64", "google-cloud-workspace"]
     assert data["scope"]["domains"] == ["business", "politics-neutral"]
-    shared = data["sharedGates"]
+    assert isinstance(data["sharedGates"], dict)
     for platform, certified, url, local_gates in [
         ("windows", "publicDownloadCertified", "downloadUrl", [
             "authenticodeVerified", "installerCleanMachineTested",
@@ -31,12 +31,6 @@ def validate(data):
                 f"{platform}: public activation requires independent immutable "
                 "release-certificate verification outside this source-only gate"
             )
-            assert all(shared.values()), f"{platform}: missing universal release gate"
-            assert all(item[k] is True for k in local_gates), f"{platform}: missing platform gate"
-            assert isinstance(item[url], str) and item[url].startswith("https://"), f"{platform}: missing secure URL"
-            assert data["publicClaims"][("windowsCommercialEvaluationAvailable" if platform == "windows" else "googleCommercialEvaluationAvailable")] is True
-            if platform == "windows":
-                assert isinstance(item["exactInstallerSha256"], str) and len(item["exactInstallerSha256"]) == 64
         else:
             assert item[url] is None, f"{platform}: URL must remain absent while blocked"
             assert item["status"] == "BLOCKED"
