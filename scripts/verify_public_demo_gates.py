@@ -25,7 +25,15 @@ verify('data-mode="business"' in html and 'data-mode="politics"' in html, "Both 
 verify("function approve()" in html and "function reject()" in html, "Approval and rejection controls present")
 verify("idx===4&&!approved" in html, "Decision boundary blocks unapproved advancement")
 verify(data["politicsExperience"]["downloadable"] is False, "Politics binary download disabled")
-verify(data["windowsExperience"]["publicDownloadCertified"] is False or data["windowsExperience"]["authenticode"] == "VERIFIED", "Common Windows signing gate")
+# This limited static checker cannot validate the publisher signature, its trust chain,
+# or the exact distributed binary. A manifest string is never that evidence.
+# Refuse promotion here even if the manifest self-reports "VERIFIED".
+verify(data["windowsExperience"].get("publicDownloadCertified") is False,
+       "Common Windows public download withheld until independent exact-artifact certification")
+verify(data.get("claimControl", {}).get("binaryDownloadEnabled") is False,
+       "Common Windows public binary-download control remains disabled")
+verify(data.get("politicsExperience", {}).get("downloadable") is False,
+       "Politics binary download remains withheld by product policy")
 for provider in data.get("providerDownloads", []):
     if provider.get("publicDownloadCertified"):
         verify(False, provider["id"] + " must use independently verified exact-artifact release attestation (not implemented in this gate)")
