@@ -48,7 +48,7 @@ business:{
 title:"Northstar Systems · British Columbia Market Entry",
 prompt:"Assess whether Northstar Systems should enter the British Columbia market during FY2027. Reconcile financial assumptions, customer evidence, operating capacity, competitive position and regulatory constraints. Identify material contradictions and missing evidence. Do not authorize spending, external commitments or implementation without CEO approval.",
 stages:[
-["Mission",()=>`<div class="kicker">Mission</div><h1>Northstar Systems · BC Market Entry</h1><p class="small">${flows.business.prompt}</p><div class="cards"><div class="card"><div class="state confirmed">OBJECTIVE</div><h3>Decide whether and how to enter BC</h3><p class="small">FY2027 entry decision.</p></div><div class="card"><div class="state supported">AUTHORITY</div><h3>CEO</h3><p class="small">External commitments and spend above $100K require approval.</p></div><div class="card"><div class="state assumption">DEADLINE</div><h3>October 15, 2026</h3><p class="small">Decision gate for FY2027 planning.</p></div></div><button class="action" onclick="next()">Build situation</button>`],
+["Mission",()=>`<div class="kicker">Mission</div><h1>Northstar Systems · BC Market Entry</h1><p class="small">${flows.business.prompt}</p><div class="cards"><div class="card"><div class="state confirmed">OBJECTIVE</div><h3>Decide whether and how to enter BC</h3><p class="small">FY2027 entry decision.</p></div><div class="card"><div class="state supported">AUTHORITY</div><h3>CEO</h3><p class="small">External commitments and spend above $100K require approval.</p></div><div class="card"><div class="state assumption">DEADLINE</div><h3>FY2027 planning gate</h3><p class="small">Synthetic scenario; no actual deadline asserted.</p></div></div><button class="action" onclick="next()">Build situation</button>`],
 ["Situation",()=>`<div class="kicker">Situation</div><h2>One operating picture</h2><div class="table-wrap"><table><tr><th>Source</th><th>Finding</th><th>Provenance</th></tr><tr><td>FY2027 Strategy</td><td>BC named as candidate expansion market</td><td>Internal · current</td></tr><tr><td>CRM</td><td>27 qualified BC opportunities</td><td>Internal · current</td></tr><tr><td>Finance model</td><td>Revenue ramp assumes 6 months</td><td>Internal · current</td></tr><tr><td>Operations plan</td><td>Capacity plan assumes 12 months</td><td>Internal · current</td></tr><tr><td>Regulatory memo</td><td>Legacy cost estimate predates current synthetic assumptions</td><td>Internal · stale</td></tr></table></div><button class="action" onclick="next()">Analyze intelligence</button>`],
 ["Intelligence",()=>`<div class="kicker">Intelligence</div><h2>Truth states remain separate</h2><div class="cards"><div class="card"><div class="state confirmed">CONFIRMED</div><h3>Demand signal exists</h3><p class="small">Current CRM contains qualified opportunities.</p></div><div class="card"><div class="state supported">SUPPORTED</div><h3>BC is commercially plausible</h3><p class="small">Multiple synthetic sources support market attractiveness.</p></div><div class="card"><div class="state assumption">ASSUMPTION</div><h3>6-month sales ramp</h3><p class="small">Material to forecast and not reconciled.</p></div><div class="card"><div class="state conflicted">CONFLICTED</div><h3>6 vs 12 months</h3><p class="small">Finance and Operations cannot both be right.</p></div><div class="card"><div class="state unknown">UNKNOWN</div><h3>Final partner economics</h3><p class="small">Evidence not yet available.</p></div></div><div class="callout"><strong>Material contradiction detected.</strong><br>Revenue forecast assumes a 6-month ramp while the operating plan assumes 12 months. Decision sensitivity: HIGH.</div><button class="action" onclick="next()">Compare options</button>`],
 ["Options",()=>`<div class="kicker">Options</div><h2>Decision surface</h2><div class="table-wrap"><table><tr><th>Path</th><th>Exposure</th><th>Dependency</th><th>Reversibility</th></tr><tr><td><b>Direct Entry</b></td><td>Highest</td><td>Internal build-out</td><td>Lower</td></tr><tr><td><b>Channel Partnership</b></td><td>Moderate</td><td>Partner economics</td><td>Moderate</td></tr><tr><td><b>Controlled Pilot</b></td><td>Limited</td><td>Customer validation</td><td>High</td></tr></table></div><p class="small">Dominion presents viable courses of action and dependencies. It does not silently exercise executive authority.</p><button class="action" onclick="next()">Request action</button>`],
@@ -64,7 +64,8 @@ DECISION: Controlled Pilot Authorized
 ACTIONS: Workstream + finance validation + review gate
 EXTERNAL CONNECTOR: NOT CLAIMED LIVE IN THIS BUILD
 RESULTING STATE: EXECUTION ACTIVE
-RECEIPT: DEMO-BUS-001</div><button class="action secondary" onclick="resetFlow()">Reset mission</button>`]
+RECEIPT: DEMO-BUS-001
+CLASSIFICATION: SIMULATED RECEIPT - NOT PRODUCTION EVIDENCE</div><button class="action secondary" onclick="resetFlow()">Reset mission</button>`]
 ]},
 politics:{
 title:"Legislative Session Readiness · Infrastructure Procurement",
@@ -86,7 +87,8 @@ AUTHORITY: Leadership
 AUTHORIZED WORKSTREAMS: 3
 EXTERNAL CONNECTOR: NOT CLAIMED LIVE IN THIS BUILD
 RESULTING STATE: PREPARATION ACTIVE
-RECEIPT: DEMO-POL-001</div><button class="action secondary" onclick="resetFlow()">Reset mission</button>`]
+RECEIPT: DEMO-POL-001
+CLASSIFICATION: SIMULATED RECEIPT - NOT PRODUCTION EVIDENCE</div><button class="action secondary" onclick="resetFlow()">Reset mission</button>`]
 ]}}
 let mode="business",idx=0,approved=false;
 function render(){
