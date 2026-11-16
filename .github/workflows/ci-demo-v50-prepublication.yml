@@ -1,0 +1,24 @@
+name: Demo v5 Experience Centre prepublication QA
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'squarespace/demo-1-v5.0-experience-centre-candidate.html'
+      - 'scripts/test_demo_page_v50.py'
+      - '.github/workflows/ci-demo-v50-prepublication.yml'
+permissions:
+  contents: read
+jobs:
+  browser-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: false
+      - name: Install pinned public browser QA dependencies
+        run: |
+          python3 -m pip install --disable-pip-version-check beautifulsoup4==4.14.3 playwright==1.55.0
+          python3 -m playwright install --with-deps chromium
+      - name: Verify v5 responsive synthetic mission controls and exact offline artifact
+        run: python3 scripts/test_demo_page_v50.py
