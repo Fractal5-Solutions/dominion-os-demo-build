@@ -6,6 +6,7 @@ on:
       - 'squarespace/demo-1-v5.0-experience-centre-candidate.html'
       - 'scripts/test_demo_page_v50.py'
       - 'scripts/test_demo_page_v51.py'
+      - 'scripts/test_demo_v51_live_content_parity.py'
       - 'squarespace/demo-1-v5.1-live-parity-candidate.html'
       - 'scripts/test_demo_v50_hosted_public.py'
       - '.github/workflows/ci-demo-v50-prepublication.yml'
@@ -27,3 +28,5 @@ jobs:
         run: python3 scripts/test_demo_page_v50.py && python3 scripts/test_demo_page_v51.py
       - name: Verify public GitHub Pages Business and Politics media
         run: python3 scripts/test_demo_v50_hosted_public.py
+      - name: Verify live Squarespace visible-content parity without editing site
+        run: python3 scripts/test_demo_v51_live_content_parity.py
