@@ -7,6 +7,7 @@ on:
       - 'scripts/test_demo_page_v50.py'
       - 'scripts/test_demo_page_v51.py'
       - 'scripts/test_demo_v51_live_content_parity.py'
+      - 'scripts/test_demo_v51_visual_chrome.py'
       - 'squarespace/demo-1-v5.1-live-parity-candidate.html'
       - 'scripts/test_demo_v50_hosted_public.py'
       - '.github/workflows/ci-demo-v50-prepublication.yml'
@@ -30,3 +31,15 @@ jobs:
         run: python3 scripts/test_demo_v50_hosted_public.py
       - name: Verify live Squarespace visible-content parity without editing site
         run: python3 scripts/test_demo_v51_live_content_parity.py
+      - name: Install real Google Chrome for visual and media QA
+        run: python3 -m playwright install --with-deps chrome
+      - name: Review v5.1 candidate in Chrome and capture visual proofs
+        run: python3 scripts/test_demo_v51_visual_chrome.py
+      - name: Retain candidate-versus-live screenshots
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: dominion-demo-v51-chrome-proof
+          path: v51-visual-proof/
+          if-no-files-found: warn
+          retention-days: 14
