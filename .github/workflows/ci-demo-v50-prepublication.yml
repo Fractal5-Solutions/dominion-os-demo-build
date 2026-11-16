@@ -5,6 +5,7 @@ on:
     paths:
       - 'squarespace/demo-1-v5.0-experience-centre-candidate.html'
       - 'scripts/test_demo_page_v50.py'
+      - 'scripts/test_demo_v50_hosted_public.py'
       - '.github/workflows/ci-demo-v50-prepublication.yml'
 permissions:
   contents: read
@@ -22,3 +23,5 @@ jobs:
           python3 -m playwright install --with-deps chromium
       - name: Verify v5 responsive synthetic mission controls and exact offline artifact
         run: python3 scripts/test_demo_page_v50.py
+      - name: Verify public GitHub Pages Business and Politics media
+        run: python3 scripts/test_demo_v50_hosted_public.py
