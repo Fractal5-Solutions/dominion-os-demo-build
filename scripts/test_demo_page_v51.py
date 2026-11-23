@@ -20,9 +20,12 @@ def check(name, condition):
 
 check("one scoped root", len(soup.select("section#fractal5-demo-v44")) == 1)
 check("Canon Light metadata", bool(root and root.get("data-canon")=="fractal5-light"))
-check("canonical build", "demo-1-v5.1.2-20261119-windows-google-proof-sigil" in raw)
+check("canonical build", "demo-1-v5.1.3-20261123-vision-convergence" in raw)
 check("one H1", len(root.find_all("h1")) == 1)
 check("live SaaS catalogue preserved", len(root.select(".v5-module-grid [role=listitem]")) == 13)
+check("full suite visible before offline download", bool(root.select_one("section#fractal5-demo-v44-suite .v5-module-grid")) and raw.index('id="fractal5-demo-v44-suite"') < raw.index('id="fractal5-demo-v44-offline"'))
+check("one authoritative module listing", len(root.select(".v5-module-grid")) == 1)
+check("operational existence and release gates stated", "already operating inside Fractal5" in raw and "independently release-gated" in raw)
 check("proposed pilot terms preserved", "50 read-only runs" in raw and "seven-day" in raw and "not presently active" in raw)
 check("planned Windows and Cloud status preserved", "publisher authenticode" in raw.lower() and "public login, uploads" in raw.lower())
 check("v5 hero entry cards",len(root.select("header.v5-hero .v5-choice")) == 2)
