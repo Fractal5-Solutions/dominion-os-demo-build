@@ -2,7 +2,8 @@
 """No-cost hosted Chromium acceptance for the PUBLIC synthetic mission page.
 
 Read-only. Opens only the canonical public GitHub Pages HTML, rejects every
-other browser network request, and never touches PHI/AT2 or customer data.
+other browser network request except the two exact public brand icon URLs, and
+never touches PHI/AT2 or customer data.
 A --expected-commit post-deployment run additionally checks exact HTML bytes
 and the static Pages release receipt. Passing does NOT certify product runtime.
 """
@@ -21,6 +22,17 @@ ROOT = Path(__file__).resolve().parents[1]
 PAGE_PATH = "/dominion-os-demo-build/demo/live-mission-demo.html"
 BASE = "https://fractal5-solutions.github.io" + PAGE_PATH
 RECEIPT = "https://fractal5-solutions.github.io/dominion-os-demo-build/release.json"
+ICON_ROOT = "/dominion-os-demo-build/demo/assets/brand/dominion/"
+ICON_PINS = {
+    ICON_ROOT + "favicon-light.ico": (
+        8775, "99be1e12806b56fd4dee0d58a2e8c103cebb5f603fc024e0a4032064040ff82e", None,
+    ),
+    ICON_ROOT + "favicon-dark.ico": (
+        12362, "bd3449346a96c703f174d4e15649475f8e835ddac7fa1741a0d1348164a56c76",
+        "(prefers-color-scheme: dark)",
+    ),
+}
+ICON_SIZES = "16x16 24x24 32x32 48x48 64x64"
 HEX40 = re.compile(r"^[0-9a-f]{40}$")
 LOCAL_SHA = hashlib.sha256(
     (ROOT / "demo" / "live-mission-demo.html").read_bytes()
@@ -75,8 +87,13 @@ def test_hosted(expected_commit):
                 allowed = (
                     url.scheme == "https"
                     and url.netloc == "fractal5-solutions.github.io"
-                    and url.path == PAGE_PATH
-                    and url.query in ("mode=business", "mode=politics")
+                    and (
+                        (url.path == PAGE_PATH and url.query in ("mode=business", "mode=politics"))
+                        or (
+                            url.path in ICON_PINS and not url.query
+                            and route.request.method == "GET"
+                        )
+                    )
                 )
                 if allowed:
                     route.continue_()
@@ -132,6 +149,23 @@ def test_hosted(expected_commit):
                     "published HTML differs from exact local release-source bytes"
                 )
                 print("PASS: published HTML SHA-256 equals exact release source", LOCAL_SHA)
+                links = page.locator('head link[rel="icon"]')
+                assert links.count() == len(ICON_PINS), "wrong favicon declaration count"
+                for index, (path, (size, pin, media)) in enumerate(ICON_PINS.items()):
+                    url = "https://fractal5-solutions.github.io" + path
+                    link = links.nth(index)
+                    assert link.evaluate("(element) => element.href") == url
+                    assert link.get_attribute("type") == "image/x-icon"
+                    assert link.get_attribute("sizes") == ICON_SIZES
+                    assert link.get_attribute("media") == media
+                    response = page.request.get(url, timeout=12000, max_redirects=0)
+                    assert response.status == 200 and response.url == url, path
+                    mime = response.headers.get("content-type", "").split(";")[0].strip().lower()
+                    assert mime in ("image/x-icon", "image/vnd.microsoft.icon", "image/ico"), mime
+                    raw = response.body()
+                    assert len(raw) == size and hashlib.sha256(raw).hexdigest() == pin, path
+                    print("PASS: exact published favicon bytes and MIME", path, pin)
+                print("INFO: browser chrome/tab icon choice and native Windows icon are separate gates")
             else:
                 print("INFO: hosted smoke only; no deploy-head parity claim")
         finally:
