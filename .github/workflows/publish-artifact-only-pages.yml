@@ -17,7 +17,7 @@ concurrency:
 jobs:
   publish:
     if: github.repository == 'Fractal5-Solutions/dominion-os-demo-build'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -112,6 +112,15 @@ jobs:
           cp demo/live-mission-demo.html _site/demo/
           cp demo/dominion-command-preview.html _site/demo/
           cp demo/assets/*.json _site/demo/assets/
+          mkdir -p _site/demo/assets/brand/dominion
+          cp demo/assets/brand/dominion/favicon-light.ico _site/demo/assets/brand/dominion/favicon-light.ico
+          cp demo/assets/brand/dominion/favicon-dark.ico _site/demo/assets/brand/dominion/favicon-dark.ico
+          (
+            cd _site
+            printf '%s  %s\n' \
+              '99be1e12806b56fd4dee0d58a2e8c103cebb5f603fc024e0a4032064040ff82e' 'demo/assets/brand/dominion/favicon-light.ico' \
+              'bd3449346a96c703f174d4e15649475f8e835ddac7fa1741a0d1348164a56c76' 'demo/assets/brand/dominion/favicon-dark.ico' | sha256sum --check --strict
+          )
           cp demo/media/* _site/demo/media/
           cp release/*.html _site/release/
 

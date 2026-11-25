@@ -66,7 +66,7 @@
     "data_class": "synthetic",
     "external_connector_claim": "not_live",
     "authority_boundary": "explicit",
-    "source_html_sha256": "339968ff6e801cd2205e0a50844028bef70abd3b8c29aa2166a177453a3cf39b"
+    "source_html_sha256": "ea6260818fb374aa9bff608f766ef26b3e9d0db82fa3a14a246bd5fe6aa387a8"
   },
   "publication": {
     "state": "available",
