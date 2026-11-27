@@ -1,0 +1,45 @@
+name: Demo v5 Experience Centre prepublication QA
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'squarespace/demo-1-v5.0-experience-centre-candidate.html'
+      - 'scripts/test_demo_page_v50.py'
+      - 'scripts/test_demo_page_v51.py'
+      - 'scripts/test_demo_v51_live_content_parity.py'
+      - 'scripts/test_demo_v51_visual_chrome.py'
+      - 'squarespace/demo-1-v5.1-live-parity-candidate.html'
+      - 'scripts/test_demo_v50_hosted_public.py'
+      - '.github/workflows/ci-demo-v50-prepublication.yml'
+permissions:
+  contents: read
+jobs:
+  browser-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: false
+      - name: Install pinned public browser QA dependencies
+        run: |
+          python3 -m pip install --disable-pip-version-check beautifulsoup4==4.14.3 playwright==1.55.0
+          python3 -m playwright install --with-deps chromium
+      - name: Verify v5 responsive synthetic mission controls and exact offline artifact
+        run: python3 scripts/test_demo_page_v50.py && python3 scripts/test_demo_page_v51.py
+      - name: Verify public GitHub Pages Business and Politics media
+        run: python3 scripts/test_demo_v50_hosted_public.py
+      - name: Verify live Squarespace visible-content parity without editing site
+        run: python3 scripts/test_demo_v51_live_content_parity.py
+      - name: Install real Google Chrome for visual and media QA
+        run: python3 -m playwright install --with-deps chrome
+      - name: Review v5.1 candidate in Chrome and capture visual proofs
+        run: python3 scripts/test_demo_v51_visual_chrome.py
+      - name: Retain candidate-versus-live screenshots
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: dominion-demo-v51-chrome-proof
+          path: v51-visual-proof/
+          if-no-files-found: warn
+          retention-days: 14

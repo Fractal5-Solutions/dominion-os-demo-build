@@ -1,0 +1,138 @@
+"""Canonical PR-only production prepublication checks; no provider/cloud writes."""
+from pathlib import Path
+import base64, hashlib, json, os, re, tempfile
+from bs4 import BeautifulSoup
+from playwright.sync_api import sync_playwright
+
+ROOT = Path(__file__).resolve().parents[1]
+HTML = ROOT / "squarespace/demo-1-v5.1-live-parity-candidate.html"
+PORTABLE = ROOT / "demo/portable-public-mission-v4.3.html"
+raw = HTML.read_text(encoding="utf-8")
+portable = PORTABLE.read_bytes()
+soup = BeautifulSoup(raw, "html.parser")
+root = soup.select_one("#fractal5-demo-v44")
+report = {"source_sha256": hashlib.sha256(HTML.read_bytes()).hexdigest(),
+          "portable_sha256": hashlib.sha256(portable).hexdigest(), "checks": []}
+
+def check(name, condition):
+    report["checks"].append({"check":name, "pass":bool(condition)})
+    if not condition: print("FAIL", name)
+
+check("one scoped root", len(soup.select("section#fractal5-demo-v44")) == 1)
+check("Canon Light metadata", bool(root and root.get("data-canon")=="fractal5-light"))
+check("canonical build", "demo-1-v5.1.3-20261123-vision-convergence" in raw)
+check("one H1", len(root.find_all("h1")) == 1)
+check("live SaaS catalogue preserved", len(root.select(".v5-module-grid [role=listitem]")) == 13)
+check("full suite visible before offline download", bool(root.select_one("section#fractal5-demo-v44-suite .v5-module-grid")) and raw.index('id="fractal5-demo-v44-suite"') < raw.index('id="fractal5-demo-v44-offline"'))
+check("one authoritative module listing", len(root.select(".v5-module-grid")) == 1)
+check("operational existence and release gates stated", "already operating inside Fractal5" in raw and "independently release-gated" in raw)
+check("proposed pilot terms preserved", "50 read-only runs" in raw and "seven-day" in raw and "not presently active" in raw)
+check("planned Windows and Cloud status preserved", "publisher authenticode" in raw.lower() and "public login, uploads" in raw.lower())
+check("v5 hero entry cards",len(root.select("header.v5-hero .v5-choice")) == 2)
+check("approved live Proof Sigil present",len(root.select("header .v5-proof-sigil svg.v5-proof-art")) == 1 and len(root.select("header .v5-proof-caption")) == 1)
+check("Proof Sigil is embedded, not a network image",not root.select("header .v5-proof-sigil img,header .v5-proof-sigil image"))
+check("free browser no account messaging preserved",len(root.select("header .v5-proof-badges span")) == 4 and "No account or payment required" in raw)
+check("Proof Sigil has reduced motion fallback","prefers-reduced-motion:reduce" in raw and ".proof-orbit" in raw)
+check("Windows and Google are both in the hero",len(root.select("header.v5-hero .v5-platform")) == 2 and all(root.select_one('header [data-platform="'+p+'"]') for p in ("windows","google")))
+check("both platform links target existing sections",all(root.select_one(a["href"]) for a in root.select("header .v5-platform")))
+check("native Windows and Google login fail closed",bool(root.select_one('[data-native-installer-certified="false"]')) and bool(root.select_one('[data-google-login-certified="false"]')))
+check("Workspace connectors explicitly planned not certified",bool(root.select_one('[data-workspace-oauth-certified="false"][data-live-google-connectors="disabled"]')) and all(x in raw for x in ("Gmail","Calendar","Drive","Docs","Sheets")))
+check("missions appear before console",raw.index('id="fractal5-demo-v44-business"') < raw.index('id="fractal5-demo-v44-stage-title"'))
+check("mobile hero cards stack", "@media(max-width:680px)" in raw)
+check("hero links are synthetic hosted missions", all(root.find("a",href=lambda x:x and "mode="+m in x) for m in ("business","politics")))
+check("unique IDs", len(root.find_all(id=True)) == len({e["id"] for e in root.find_all(id=True)}))
+check("no duplicate site footer", not root.select("footer, nav"))
+check("Dominion OS indivisible", "Dominion\u00a0OS" in raw and not bool(re.search(r"Dominion OS", soup.get_text())))
+check("canonical palette", all(k in raw for k in ["--ink:#101112","--gold:#c5a461","--bronze:#765f2b"]))
+check("no large dark panel", not root.select(".section.dark"))
+check("primary CTA self-contained", bool(root.select_one('a[href="#fractal5-demo-v44-command-title"]')))
+check("all anchor targets exist", all(root.select_one(a["href"]) for a in root.select('a[href^="#"]')))
+check("external tabs safe", all("noopener" in a.get("rel",[]) and "noreferrer" in a.get("rel",[]) for a in root.select("a[target=_blank]")))
+check("Business and Politics links", all(root.find("a",href=lambda x: x and "mode="+m in x) for m in ("business","politics")))
+check("two video fallbacks", len(root.select("[data-video-status]")) == 2)
+check("synthetic only", "data-claim=\"synthetic-public-proof\"" in raw)
+check("cloud fail closed", 'data-gcloud-runtime-certified="false"' in raw and 'data-customer-uploads="disabled"' in raw)
+check("no user file or cloud upload", not root.select("input[type=file], form"))
+check("no installer download URL", not any(re.search(r"\.(exe|msi|zip)(\?|$)",a.get("href",""),re.I) for a in root.find_all("a")))
+check("no external download fetch", "fetch(" not in raw)
+check("download data embedded exact", base64.b64encode(portable).decode("ascii") in raw)
+check("standalone CSP denies connections", b"connect-src 'none'" in portable)
+check("portable has no external URLs", b"https://" not in portable and b"http://" not in portable)
+check("portable modes", all(("data-mode=\""+m+"\"").encode() in portable for m in ("business","politics")))
+check("reliable current access destination", bool(root.find("a",href="https://www.fractal5solutions.com/launch")))
+check("no unsafe signup/login", not any(re.sub(r"^https?://[^/]+", "", a.get("href","")).split("?")[0] in ("/signup","/account","/store","/login") for a in root.find_all("a")))
+
+with sync_playwright() as pw:
+    kwargs={"executable_path":"/usr/bin/chromium"} if Path("/usr/bin/chromium").is_file() else {}
+    browser = pw.chromium.launch(headless=True, args=["--no-sandbox"], **kwargs)
+    for width in [1440,1200,1024,768,430,390,360]:
+        page=browser.new_page(viewport={"width":width,"height":900},accept_downloads=True)
+        errors=[]
+        page.on("pageerror",lambda e:errors.append(str(e)))
+        page.route("**/*",lambda route:route.abort())
+        page.set_content(raw,wait_until="domcontentloaded")
+        data=page.evaluate("""() => {
+          let r=document.querySelector('#fractal5-demo-v44'),
+          els=[...r.querySelectorAll('h1,h2,h3,button,a,.panel,.step')];
+          return {client:document.documentElement.clientWidth,
+          scroll:document.documentElement.scrollWidth,rc:r.clientWidth,rs:r.scrollWidth,
+          outside:els.some(el => {let x=el.getBoundingClientRect();
+            return x.width && (x.left < -2 || x.right > innerWidth + 2);})};
+        }""")
+        check(f"{width}px fits",data["scroll"]<=data["client"]+2 and data["rs"]<=data["rc"]+2)
+        check(f"{width}px controls visible",not data["outside"])
+        check(f"{width}px no script errors",not errors)
+        page.locator('[data-preview-mode="politics"]').click()
+        check(f"{width}px Politics controls", "POLICY" in page.locator("#fractal5-demo-v44-stage-title").inner_text().upper())
+        page.locator('[data-preview-mode="business"]').click()
+        for _ in range(4): page.locator("#fractal5-demo-v44-next").click()
+        check(f"{width}px approval gate blocks", page.locator("#fractal5-demo-v44-approve").is_visible() and not page.locator("#fractal5-demo-v44-next").is_visible())
+        page.locator("#fractal5-demo-v44-approve").click()
+        check(f"{width}px approval unlocks",page.locator("#fractal5-demo-v44-next").is_visible())
+        page.locator("#fractal5-demo-v44-reset").click()
+        check(f"{width}px reset",page.locator("#fractal5-demo-v44-stage-count").inner_text().startswith("01"))
+        with page.expect_download() as evt:page.locator("#fractal5-demo-v44-download").click()
+        dl=evt.value
+        check(f"{width}px download name",dl.suggested_filename=="Dominion-OS-1.0-Portable-Business-Politics-Demo.html")
+        with tempfile.TemporaryDirectory() as td:
+            saved=Path(td)/"offline.html"
+            dl.save_as(saved)
+            check(f"{width}px exact download",saved.read_bytes()==portable)
+        check(f"{width}px button restored",page.locator("#fractal5-demo-v44-download").is_enabled())
+        if width == 1440:
+            page.locator('a[href="#fractal5-demo-v44-command-title"]').click()
+            check("on-page primary CTA",page.evaluate("location.hash")=="#fractal5-demo-v44-command-title")
+            page.locator("#fractal5-demo-v44-reset").focus()
+            page.keyboard.press("Enter")
+            check("keyboard resets preview",page.locator("#fractal5-demo-v44-stage-count").inner_text().startswith("01"))
+            video=page.locator(".media-wrap video").first
+            fallback=page.locator('[data-video-status="business"]')
+            video.dispatch_event("error")
+            check("failed video keeps fallback", fallback.is_visible())
+            video.dispatch_event("loadedmetadata")
+            check("working video hides fallback",not fallback.is_visible())
+        page.close()
+    offline=browser.new_page()
+    network=[]
+    offline.on("request",lambda req:network.append(req.url))
+    offline.route("**/*",lambda route:route.abort())
+    offline.set_content(portable.decode("utf-8"),wait_until="domcontentloaded")
+    check("offline mission starts",offline.locator("#stage-name").inner_text()=="Mission")
+    offline.locator('[data-mode="politics"]').click()
+    check("offline Politics", "Legislative" in offline.locator("#mission-heading").inner_text())
+    for _ in range(4): offline.locator("#advance").click()
+    check("offline cannot bypass approval",offline.locator("#approve").is_visible() and offline.locator("#advance").is_hidden())
+    offline.locator("#approve").click()
+    offline.locator("#advance").click()
+    offline.locator("#advance").click()
+    check("offline decision evidence",offline.locator("#stage-name").inner_text()=="Evidence")
+    check("offline no outgoing network",not network)
+    offline.close()
+    browser.close()
+
+report["passed"]=sum(x["pass"] for x in report["checks"])
+report["total"]=len(report["checks"])
+target=Path(os.environ.get("F5_DEMO_QA_REPORT","prepublication-v51-results.json"))
+target.write_text(json.dumps(report,indent=2),encoding="utf-8")
+print("Canon production prepublication:",report["passed"],"/",report["total"])
+if report["passed"] != report["total"]:raise SystemExit(1)

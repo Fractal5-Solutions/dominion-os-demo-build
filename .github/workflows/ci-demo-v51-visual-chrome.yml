@@ -1,0 +1,32 @@
+name: Demo v5.1 Chrome Visual and Playback Review
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/test_demo_v51_visual_chrome.py'
+      - 'squarespace/demo-1-v5.1-live-parity-candidate.html'
+      - '.github/workflows/ci-demo-v51-visual-chrome.yml'
+permissions:
+  contents: read
+jobs:
+  candidate-chrome-visual:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: false
+      - name: Install pinned Playwright and real Google Chrome
+        run: |
+          python3 -m pip install --disable-pip-version-check playwright==1.55.0
+          python3 -m playwright install --with-deps chrome
+      - name: Capture read-only candidate and public visual evidence and test real media
+        run: python3 scripts/test_demo_v51_visual_chrome.py
+      - name: Upload visual and playback evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: demo-v51-candidate-vs-live-chrome-visual
+          path: v51-visual-proof/
+          retention-days: 14
+          if-no-files-found: warn
